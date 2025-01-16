@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123" # HTTP interface
+      - "9000:9000" # Native interface
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    environment:
+      - CLICKHOUSE_DB=analytics
+      - CLICKHOUSE_USER=admin
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=analytics_password
+
+  backend:
+    build:
+      context: ./server
+      # dockerfile: Dockerfile 
+      dockerfile: Dockerfile.dev 
+
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - CLICKHOUSE_HOST=http://clickhouse:8123
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_DB=analytics
+      - CLICKHOUSE_USER=admin
+      - CLICKHOUSE_PASSWORD=analytics_password
+    depends_on:
+      - clickhouse
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+volumes:
+  clickhouse-data:
