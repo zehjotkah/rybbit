@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frogstats Analytics Example</title>
+</head>
+<body>
+    <h1>Frogstats Analytics Example</h1>
+    
+    <button onclick="frogstats.trackEvent('button_click', { buttonId: 'test-button' })">
+        Track Button Click
+    </button>
+
+    <!-- Add the analytics script -->
+    <script src="/analytics.js"></script>
+
+    <!-- Example of tracking custom events -->
+    <script>
+        // Track a custom event
+        document.addEventListener('DOMContentLoaded', () => {
+            frogstats.trackEvent('page_ready', {
+                loadTime: performance.now()
+            });
+        });
+    </script>
+</body>
+</html> 

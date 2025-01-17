@@ -1,28 +1,14 @@
-FROM node:18-alpine
+# syntax=docker/dockerfile:1
 
-# Install pnpm
-RUN npm install -g pnpm
+FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY ["package.json", "package-lock.json*", "./"]
 
-# Install ALL dependencies (including dev) for building
-RUN pnpm install --frozen-lockfile
+RUN npm install
 
-# Copy source code and config files
 COPY . .
+RUN npm run build
 
-# Build the application
-RUN pnpm build
-
-# Clean up dev dependencies after build
-RUN pnpm prune --prod
-
-EXPOSE 3001
-
-# Use production environment
-ENV NODE_ENV=production
-
-CMD ["pnpm", "start"]
+CMD [ "npm", "start" ]

@@ -2,24 +2,28 @@ version: '3.8'
 
 services:
   clickhouse:
+    container_name: clickhouse
     image: clickhouse/clickhouse-server:latest
     ports:
-      - "8123:8123" # HTTP interface
-      - "9000:9000" # Native interface
+      - "8123:8123"
+      - "9000:9000"
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     environment:
       - CLICKHOUSE_DB=analytics
-      - CLICKHOUSE_USER=admin
-      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
-      - CLICKHOUSE_PASSWORD=analytics_password
+      - ALLOW_EMPTY_PASSWORD=yes
+    # healthcheck:
+    #   test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+    #   interval: 5s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 10s
 
   backend:
+    container_name: backend
     build:
       context: ./server
-      # dockerfile: Dockerfile 
-      dockerfile: Dockerfile.dev 
-
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     environment:
@@ -27,13 +31,11 @@ services:
       - CLICKHOUSE_HOST=http://clickhouse:8123
       - CLICKHOUSE_PORT=8123
       - CLICKHOUSE_DB=analytics
-      - CLICKHOUSE_USER=admin
-      - CLICKHOUSE_PASSWORD=analytics_password
     depends_on:
       - clickhouse
-    volumes:
-      - ./server:/app
-      - /app/node_modules
+    # volumes:
+      # - ./server:/app
+      # - /app/node_modules
 
 volumes:
   clickhouse-data:

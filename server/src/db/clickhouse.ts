@@ -1,11 +1,17 @@
 import { createClient } from "@clickhouse/client";
 
+console.info("Testing");
 const client = createClient({
-  host: process.env.CLICKHOUSE_HOST || "http://localhost:8123",
-  username: process.env.CLICKHOUSE_USER || "admin",
-  password: process.env.CLICKHOUSE_PASSWORD || "analytics_password",
-  database: process.env.CLICKHOUSE_DB || "analytics",
+  host: process.env.CLICKHOUSE_HOST,
+  database: process.env.CLICKHOUSE_DB,
 });
+// Add some debug logging
+// console.info("ClickHouse config:", {
+//   host: process.env.CLICKHOUSE_HOST,
+//   database: process.env.CLICKHOUSE_DB,
+//   username: process.env.CLICKHOUSE_USER,
+//   password: process.env.CLICKHOUSE_PASSWORD, // This will help verify what's being used
+// });
 
 export const initializeDatabase = async () => {
   // Create pageviews table
