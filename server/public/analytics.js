@@ -1,27 +1,45 @@
 // Frogstats Analytics Script
 (function () {
-  const ANALYTICS_URL = "http://localhost:3001"; // Replace with your actual analytics server URL
+  // Get the script tag that loaded this script
+  const scriptTag = document.currentScript;
+  const ANALYTICS_URL = scriptTag.getAttribute("src").split("/analytics.js")[0];
 
   // Generate a unique session ID
   const generateSessionId = () => {
     const existingId = localStorage.getItem("frogstats_session_id");
-    if (existingId) return existingId;
+    const lastActivity = localStorage.getItem("frogstats_last_activity");
+    const now = Date.now();
 
-    const newId =
-      Math.random().toString(36).substring(2) + Date.now().toString(36);
+    // Check if we have an existing session that's less than 30 minutes old
+    if (
+      existingId &&
+      lastActivity &&
+      now - parseInt(lastActivity) < 30 * 60 * 1000
+    ) {
+      localStorage.setItem("frogstats_last_activity", now.toString());
+      return existingId;
+    }
+
+    // Generate new session ID if none exists or if expired
+    const newId = Math.random().toString(36).substring(2) + now.toString(36);
     localStorage.setItem("frogstats_session_id", newId);
+    localStorage.setItem("frogstats_last_activity", now.toString());
     return newId;
   };
 
   // Track pageview
   const trackPageview = () => {
+    const url = new URL(window.location.href);
     const payload = {
-      url: window.location.href,
+      hostname: url.hostname,
+      pathname: url.pathname,
+      querystring: url.search,
       referrer: document.referrer,
       timestamp: new Date().toISOString(),
       sessionId: generateSessionId(),
       userAgent: navigator.userAgent,
-      screenSize: `${window.innerWidth}x${window.innerHeight}`,
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
       language: navigator.language,
     };
 
@@ -69,10 +87,10 @@
     };
 
     // Using sendBeacon for more reliable data sending on page unload
-    navigator.sendBeacon(
-      `${ANALYTICS_URL}/track/pageview`,
-      JSON.stringify(payload)
-    );
+    // navigator.sendBeacon(
+    //   `${ANALYTICS_URL}/track/pageview`,
+    //   JSON.stringify(payload)
+    // );
   });
 
   // Expose the tracking functions globally

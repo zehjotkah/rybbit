@@ -2,7 +2,11 @@ import Fastify, { FastifyRequest, FastifyReply } from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import path from "path";
-import { initializeDatabase } from "./db/clickhouse";
+import {
+  initializeDatabase,
+  insertPageview,
+  insertEvent,
+} from "./db/clickhouse";
 
 const server = Fastify({
   logger: {
@@ -27,15 +31,18 @@ server.register(fastifyStatic, {
 
 interface TrackingPayload {
   url: string;
+  pathname?: string;
+  querystring?: string;
   timestamp: string;
   sessionId: string;
   referrer?: string;
   userAgent?: string;
-  screenSize?: string;
+  screenWidth?: number;
+  screenHeight?: number;
   language?: string;
+  browser?: string;
   eventName?: string;
   eventData?: Record<string, unknown>;
-  duration?: number;
   [key: string]: unknown;
 }
 
@@ -69,14 +76,27 @@ server.post<{ Body: TrackingPayload }>(
     request: FastifyRequest<{ Body: TrackingPayload }>,
     reply: FastifyReply
   ) => {
-    const payload = {
-      ...request.body,
-      ip_address: getIpAddress(request),
-      timestamp: new Date().toISOString(),
-    };
-    console.info(payload);
-    // TODO: Implement pageview tracking logic
-    return { success: true };
+    try {
+      console.info(request.body);
+      const payload = {
+        ...request.body,
+        ip_address: getIpAddress(request),
+        timestamp: new Date().toISOString(),
+      };
+
+      const success = await insertPageview(payload);
+      if (!success) {
+        throw new Error("Failed to insert pageview");
+      }
+
+      return { success: true };
+    } catch (error) {
+      request.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: "Failed to track pageview",
+      });
+    }
   }
 );
 
@@ -87,13 +107,26 @@ server.post<{ Body: TrackingPayload }>(
     request: FastifyRequest<{ Body: TrackingPayload }>,
     reply: FastifyReply
   ) => {
-    const payload = {
-      ...request.body,
-      ip_address: getIpAddress(request),
-      timestamp: new Date().toISOString(),
-    };
-    // TODO: Implement event tracking logic
-    return { success: true };
+    try {
+      const payload = {
+        ...request.body,
+        ip_address: getIpAddress(request),
+        timestamp: new Date().toISOString(),
+      };
+
+      const success = await insertEvent(payload);
+      if (!success) {
+        throw new Error("Failed to insert event");
+      }
+
+      return { success: true };
+    } catch (error) {
+      request.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        error: "Failed to track event",
+      });
+    }
   }
 );
 
@@ -103,7 +136,7 @@ const start = async () => {
     await initializeDatabase();
 
     // Start the server
-    await server.listen({ port: 5000, host: "0.0.0.0" });
+    await server.listen({ port: 3001, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
