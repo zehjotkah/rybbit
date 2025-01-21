@@ -1,29 +1,29 @@
 import { createClient } from "@clickhouse/client";
-import { format } from "date-fns";
-import { getBrowserDetails } from "../utils";
 
-const client = createClient({
+export const clickhouse = createClient({
   host: process.env.CLICKHOUSE_HOST,
   database: process.env.CLICKHOUSE_DB,
 });
 
-export const initializeDatabase = async () => {
+export const initializeClickhouse = async () => {
   // Create pageviews table
-  await client.exec({
+  await clickhouse.exec({
     query: `
       CREATE TABLE IF NOT EXISTS pageviews (
         timestamp DateTime,
         session_id String,
+        user_id String,
         hostname String,
         pathname String,
         querystring String,
         referrer String,
         user_agent String,
-        ip_address String,
-        browser String,
-        language String,
+        browser LowCardinality(String),
+        operating_system LowCardinality(String),
+        language LowCardinality(String),
         screen_width UInt16,
         screen_height UInt16,
+        device_type LowCardinality(String)
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(timestamp)
@@ -32,7 +32,7 @@ export const initializeDatabase = async () => {
   });
 
   // Create events table
-  await client.exec({
+  await clickhouse.exec({
     query: `
       CREATE TABLE IF NOT EXISTS events (
         timestamp DateTime,
@@ -49,7 +49,7 @@ export const initializeDatabase = async () => {
   });
 
   // Create sessions table
-  await client.exec({
+  await clickhouse.exec({
     query: `
       CREATE TABLE IF NOT EXISTS sessions (
         hostname String,
@@ -75,43 +75,9 @@ export const initializeDatabase = async () => {
   });
 };
 
-export const insertPageview = async (pageview: Record<string, any>) => {
-  try {
-    const formattedTimestamp = format(
-      new Date(pageview.timestamp),
-      "yyyy-MM-dd HH:mm:ss"
-    );
-    await client.insert({
-      table: "pageviews",
-      values: [
-        {
-          timestamp: formattedTimestamp,
-          session_id: pageview.sessionId,
-          hostname: pageview.hostname || "",
-          pathname: pageview.pathname || "",
-          querystring: pageview.querystring || "",
-          referrer: pageview.referrer || "",
-          user_agent: pageview.userAgent || "",
-          ip_address: pageview.ip_address || "",
-          browser: getBrowserDetails(pageview.userAgent || ""),
-          language: pageview.language || "",
-          screen_width: pageview.screenWidth || 0,
-          screen_height: pageview.screenHeight || 0,
-          duration: pageview.duration || 0,
-        },
-      ],
-      format: "JSONEachRow",
-    });
-    return true;
-  } catch (error) {
-    console.error("Error inserting pageview:", error);
-    return false;
-  }
-};
-
 export const insertEvent = async (event: Record<string, any>) => {
   try {
-    await client.insert({
+    await clickhouse.insert({
       table: "events",
       values: [
         {
@@ -135,7 +101,7 @@ export const insertEvent = async (event: Record<string, any>) => {
 // Function to insert session data
 export const insertSession = async (session: Record<string, any>) => {
   try {
-    await client.insert({
+    await clickhouse.insert({
       table: "sessions",
       values: [
         {
@@ -164,4 +130,4 @@ export const insertSession = async (session: Record<string, any>) => {
   }
 };
 
-export default client;
+export default clickhouse;

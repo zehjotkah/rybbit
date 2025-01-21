@@ -4,29 +4,6 @@
   const scriptTag = document.currentScript;
   const ANALYTICS_URL = scriptTag.getAttribute("src").split("/analytics.js")[0];
 
-  // Generate a unique session ID
-  const generateSessionId = () => {
-    const existingId = localStorage.getItem("frogstats_session_id");
-    const lastActivity = localStorage.getItem("frogstats_last_activity");
-    const now = Date.now();
-
-    // Check if we have an existing session that's less than 30 minutes old
-    if (
-      existingId &&
-      lastActivity &&
-      now - parseInt(lastActivity) < 30 * 60 * 1000
-    ) {
-      localStorage.setItem("frogstats_last_activity", now.toString());
-      return existingId;
-    }
-
-    // Generate new session ID if none exists or if expired
-    const newId = Math.random().toString(36).substring(2) + now.toString(36);
-    localStorage.setItem("frogstats_session_id", newId);
-    localStorage.setItem("frogstats_last_activity", now.toString());
-    return newId;
-  };
-
   // Track pageview
   const trackPageview = () => {
     const url = new URL(window.location.href);
@@ -36,7 +13,6 @@
       querystring: url.search,
       referrer: document.referrer,
       timestamp: new Date().toISOString(),
-      sessionId: generateSessionId(),
       userAgent: navigator.userAgent,
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
@@ -61,7 +37,6 @@
       eventData,
       url: window.location.href,
       timestamp: new Date().toISOString(),
-      sessionId: generateSessionId(),
     };
 
     fetch(`${ANALYTICS_URL}/track/event`, {
@@ -82,7 +57,6 @@
     const payload = {
       url: window.location.href,
       timestamp: new Date().toISOString(),
-      sessionId: generateSessionId(),
       duration,
     };
 
