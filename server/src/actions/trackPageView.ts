@@ -1,20 +1,22 @@
 import { FastifyRequest } from "fastify";
 import { TrackingPayload } from "../types";
-import { generateUserId, getDeviceType, getIpAddress } from "../utils";
+import { getUserId, getDeviceType, getIpAddress } from "../utils";
 import crypto from "crypto";
-import clickhouse from "../db/clickhouse";
+import clickhouse from "../db/clickhouse/clickhouse";
 import { DateTime } from "luxon";
-import { sql } from "../db/postgres";
+import { sql } from "../db/postgres/postgres";
 import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
+import { Pageview } from "../db/clickhouse/types";
 
-const insertPageview = async (
-  pageview: TrackingPayload & {
-    userId: string;
-    timestamp: string;
-    sessionId: string;
-    ua: UAParser.IResult;
-  }
-) => {
+type TotalPayload = TrackingPayload & {
+  userId: string;
+  timestamp: string;
+  sessionId: string;
+  ua: UAParser.IResult;
+  referrer: string;
+};
+
+const insertPageview = async (pageview: TotalPayload) => {
   try {
     const formattedTimestamp = DateTime.fromISO(pageview.timestamp).toFormat(
       "yyyy-MM-dd HH:mm:ss"
@@ -29,8 +31,8 @@ const insertPageview = async (
           hostname: pageview.hostname || "",
           pathname: pageview.pathname || "",
           querystring: pageview.querystring || "",
+          page_title: pageview.page_title || "",
           referrer: pageview.referrer || "",
-          user_agent: pageview.userAgent || "",
           browser: pageview.ua.browser.name,
           operating_system: pageview.ua.os.name,
           language: pageview.language || "",
@@ -51,17 +53,17 @@ const insertPageview = async (
   }
 };
 
-const updateSession = async (
-  pageview: TrackingPayload & {
-    userId: string;
-    timestamp: string;
-    sessionId: string;
-    ua: UAParser.IResult;
-  }
-) => {
-  const [existingSession] = await sql`
-    SELECT * FROM active_sessions WHERE user_id = ${pageview.userId}
+const getExistingSession = async (userId: string): Promise<Pageview | null> => {
+  const [existingSession] = await sql<Pageview[]>`
+    SELECT * FROM active_sessions WHERE user_id = ${userId}
   `;
+  return existingSession;
+};
+
+const updateSession = async (
+  pageview: TotalPayload,
+  existingSession: Pageview | null
+) => {
   if (existingSession) {
     await sql`
       UPDATE active_sessions SET last_activity = ${pageview.timestamp}, pageviews = pageviews + 1 WHERE user_id = ${pageview.userId}
@@ -92,27 +94,24 @@ const updateSession = async (
   `;
 };
 
-export function trackPageView(
+export async function trackPageView(
   request: FastifyRequest<{ Body: TrackingPayload }>
 ) {
+  const userAgent = request.headers["user-agent"] || "";
+  const referrer = request.headers["referer"] || "";
+  const ip_address = getIpAddress(request);
+  const userId = getUserId(ip_address, userAgent);
+  const existingSession = await getExistingSession(userId);
   const payload = {
     ...request.body,
-    ip_address: getIpAddress(request),
+    ip_address: ip_address,
     timestamp: new Date().toISOString(),
-    ua: userAgentParser(request.body.userAgent),
+    ua: userAgentParser(userAgent),
+    referrer: referrer,
+    userId: userId,
+    sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
 
-  const userId = generateUserId(payload.ip_address, payload.userAgent);
-  const timestamp = new Date().toISOString();
-  const sessionId = crypto.randomUUID();
-
-  const insertPayload = {
-    ...payload,
-    userId,
-    timestamp,
-    sessionId,
-  };
-
-  insertPageview(insertPayload);
-  updateSession(insertPayload);
+  insertPageview(payload);
+  updateSession(payload, existingSession);
 }

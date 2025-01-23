@@ -1,7 +1,7 @@
 import { FastifyRequest } from "fastify";
 import crypto from "crypto";
 
-export function generateUserId(ip: string, userAgent: string) {
+export function getUserId(ip: string, userAgent: string) {
   return crypto
     .createHash("sha256")
     .update(ip + userAgent)

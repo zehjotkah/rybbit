@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import { Session } from "./types";
 
 export const sql = postgres({
   host: process.env.POSTGRES_HOST || "postgres",
@@ -10,7 +11,7 @@ export const sql = postgres({
 
 export async function initializePostgres() {
   try {
-    await sql`
+    await sql<Session[]>`
       CREATE TABLE IF NOT EXISTS active_sessions (
         session_id TEXT PRIMARY KEY,
         user_id TEXT,

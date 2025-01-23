@@ -3,11 +3,11 @@ import fastifyStatic from "@fastify/static";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import path from "path";
 import { trackPageView } from "./actions/trackPageView";
-import { initializeClickhouse, insertEvent } from "./db/clickhouse";
+import { initializeClickhouse } from "./db/clickhouse/clickhouse";
 import { TrackingPayload } from "./types";
-import { getIpAddress } from "./utils";
-import { initializePostgres } from "./db/postgres";
-import { UAParser } from "ua-parser-js";
+import { initializePostgres } from "./db/postgres/postgres";
+import cron from "node-cron";
+import { cleanupOldSessions } from "./db/postgres/session-cleanup";
 
 const server = Fastify({
   logger: {
@@ -55,43 +55,11 @@ server.post<{ Body: TrackingPayload }>(
   }
 );
 
-const uaParser = new UAParser();
-
-// Track event endpoint
-server.post<{ Body: TrackingPayload }>(
-  "/track/event",
-  async (
-    request: FastifyRequest<{ Body: TrackingPayload }>,
-    reply: FastifyReply
-  ) => {
-    try {
-      const payload = {
-        ...request.body,
-        ip_address: getIpAddress(request),
-        timestamp: new Date().toISOString(),
-      };
-
-      const success = await insertEvent(payload);
-      if (!success) {
-        throw new Error("Failed to insert event");
-      }
-
-      return { success: true };
-    } catch (error) {
-      request.log.error(error);
-      return reply.status(500).send({
-        success: false,
-        error: "Failed to track event",
-      });
-    }
-  }
-);
-
 const start = async () => {
   try {
+    console.info("Starting server...");
     // Initialize the database
     await Promise.allSettled([initializeClickhouse(), initializePostgres()]);
-
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
   } catch (err) {
@@ -101,3 +69,8 @@ const start = async () => {
 };
 
 start();
+
+cron.schedule("* * * * *", () => {
+  console.log("Cleaning up old sessions");
+  cleanupOldSessions();
+});
