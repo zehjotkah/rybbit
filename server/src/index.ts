@@ -62,6 +62,10 @@ const start = async () => {
     await Promise.allSettled([initializeClickhouse(), initializePostgres()]);
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
+    cron.schedule("* * * * * *", () => {
+      console.log("Cleaning up old sessions");
+      cleanupOldSessions();
+    });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
@@ -69,8 +73,3 @@ const start = async () => {
 };
 
 start();
-
-cron.schedule("* * * * *", () => {
-  console.log("Cleaning up old sessions");
-  cleanupOldSessions();
-});
