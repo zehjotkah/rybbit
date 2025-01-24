@@ -62,7 +62,7 @@ const start = async () => {
     await Promise.allSettled([initializeClickhouse(), initializePostgres()]);
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
-    cron.schedule("* * * * * *", () => {
+    cron.schedule("*/60 * * * * *", () => {
       console.log("Cleaning up old sessions");
       cleanupOldSessions();
     });
