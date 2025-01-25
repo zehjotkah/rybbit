@@ -3,22 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 4000",
+    "dev": "next dev --turbopack -p 3002",
     "build": "next build",
-    "start": "next start -p 4000",
+    "start": "next start -p 3002",
     "lint": "next lint"
   },
   "dependencies": {
+    "@clickhouse/client": "^1.10.1",
+    "@nivo/bar": "^0.88.0",
+    "@nivo/core": "^0.88.0",
+    "@nivo/line": "^0.88.0",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@tanstack/react-query": "^5.64.2",
+    "@tanstack/react-query-devtools": "^5.64.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.474.0",
+    "next": "15.1.6",
+    "next-themes": "^0.4.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.6"
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
