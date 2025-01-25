@@ -2,7 +2,9 @@
 (function () {
   // Get the script tag that loaded this script
   const scriptTag = document.currentScript;
-  const ANALYTICS_URL = scriptTag.getAttribute("src").split("/analytics.js")[0];
+  const ANALYTICS_HOST = scriptTag
+    .getAttribute("src")
+    .split("/analytics.js")[0];
 
   // Get debounce duration from data attribute or default to 300ms
   const debounceDuration = scriptTag.getAttribute("data-debounce")
@@ -32,7 +34,7 @@
       referrer: document.referrer,
     };
 
-    fetch(`${ANALYTICS_URL}/track/pageview`, {
+    fetch(`${ANALYTICS_HOST}/track/pageview`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
