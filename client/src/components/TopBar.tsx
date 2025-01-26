@@ -3,7 +3,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export function TopBar() {
   return (
-    <div className="border-b">
+    <div className="border-b border-neutral-200 dark:border-neutral-800">
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center space-x-4">
           <Link href="/" className="font-bold text-xl">

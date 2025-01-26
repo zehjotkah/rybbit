@@ -8,6 +8,7 @@ import { TrackingPayload } from "./types";
 import { initializePostgres } from "./db/postgres/postgres";
 import cron from "node-cron";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup";
+import { getLiveUsercount } from "./api/getLiveUsercount";
 
 const server = Fastify({
   logger: {
@@ -33,6 +34,10 @@ server.register(fastifyStatic, {
 // Health check endpoint
 server.get("/health", async () => {
   return { status: "ok" };
+});
+
+server.get("/live-user-count", async () => {
+  return { count: await getLiveUsercount() };
 });
 
 // Track pageview endpoint
