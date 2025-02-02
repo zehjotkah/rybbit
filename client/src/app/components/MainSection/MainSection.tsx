@@ -6,14 +6,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useQuery } from "@tanstack/react-query";
-import { DateTime } from "luxon";
-import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { formatter } from "../../../lib/utils";
-import { getPageViews } from "../../actions/getPageviews";
 import { Spinner } from "@/components/ui/spinner";
-import { useStore } from "../../../lib/store";
+import { DateTime } from "luxon";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { useTimeSelection } from "../../../lib/timeSelectionStore";
+import { formatter } from "../../../lib/utils";
+import { useGetPageviews } from "../../hooks/useGetPageviews";
 
 const chartConfig = {
   visitors: {
@@ -31,32 +29,24 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function MainSection() {
-  const { date } = useStore();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["pageviews"],
-    queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return getPageViews({
-        startDate: date[0],
-        endDate: date[1],
-        timezone,
-      });
-    },
-  });
+  const { time } = useTimeSelection();
 
+  console.log(time);
+
+  const { data, isLoading, error } = useGetPageviews();
   let body = <Spinner />;
 
   if (data?.data) {
-    const filteredData = data.data.map((e) => ({
+    const processed = data.data.map((e) => ({
       date: e.time,
       desktop: e.pageviews,
       // mobile: e.pageviews,
     }));
 
-    const maxPageviews = Math.max(...filteredData.map((e) => e.desktop));
+    const maxPageviews = Math.max(...processed.map((e) => e.desktop));
 
     body = (
-      <AreaChart data={filteredData}>
+      <AreaChart data={processed}>
         <defs>
           <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
             <stop

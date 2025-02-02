@@ -2,19 +2,10 @@
 import { Circle } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { goBack, goForward, useTimeSelection } from "@/lib/timeSelectionStore";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CustomDateRangePicker } from "./CustomDateRangePicker";
-import { DateTime } from "luxon";
+import { DateSelector } from "./DateSelector";
 
 export function Header() {
   const { data } = useQuery<{ count: number }>({
@@ -24,7 +15,7 @@ export function Header() {
         res.json()
       ),
   });
-  const { date, setDate } = useStore();
+  const { time, setTime } = useTimeSelection();
 
   const DATE_OPTIONS = [
     { value: 1, label: "Today" },
@@ -45,44 +36,15 @@ export function Header() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <DateSelector />
         <div className="flex items-center">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={goBack}>
             <ChevronLeft />
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={goForward}>
             <ChevronRight />
           </Button>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="outline">
-              {
-                DATE_OPTIONS.find(
-                  (option) =>
-                    DateTime.now().minus({ days: option.value }).toISODate() ===
-                    date[0]
-                )?.label
-              }
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {DATE_OPTIONS.map((option) => (
-              <DropdownMenuItem
-                onClick={() =>
-                  setDate([
-                    DateTime.now().minus({ days: option.value }).toISODate(),
-                    DateTime.now().toISODate(),
-                  ])
-                }
-                key={option.value}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <CustomDateRangePicker />
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </div>
   );
