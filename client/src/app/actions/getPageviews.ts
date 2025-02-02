@@ -5,16 +5,14 @@ import { clickhouse } from "@/lib/clickhouse";
 type Response = { time: string; pageviews: number }[];
 
 export async function getPageViews({
-  days = 1,
+  startDate,
+  endDate,
   timezone = "America/Los_Angeles",
 }: {
-  days: number;
+  startDate: string;
+  endDate: string;
   timezone: string;
 }): Promise<{ data?: Response; error?: string }> {
-  if (isNaN(days)) {
-    days = 1;
-  }
-
   const query = `
     SELECT
         toStartOfHour(toTimeZone(timestamp, '${timezone}')) AS time,
@@ -22,14 +20,24 @@ export async function getPageViews({
     FROM pageviews
     WHERE
         timestamp >= toTimeZone(
-            toStartOfDay(toTimeZone(now(), '${timezone}')),
+            toStartOfDay(toDateTime('${startDate}', '${timezone}')),
             'UTC'
+        )
+        AND timestamp < if(
+            toDate('${endDate}') = toDate(now(), '${timezone}'),
+            now(),
+            toTimeZone(
+                toStartOfDay(toDateTime('${endDate}', '${timezone}')) + INTERVAL 1 DAY,
+                'UTC'
+            )
         )
     GROUP BY
         time
     ORDER BY
         time ASC
   `;
+
+  console.info(query);
 
   try {
     const result = await clickhouse.query({

@@ -14,13 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CustomDateRangePicker } from "./CustomDateRangePicker";
-
-const DATE_OPTIONS = [
-  { value: "1d", label: "Today" },
-  { value: "7d", label: "Last 7 days" },
-  { value: "30d", label: "Last 30 days" },
-  { value: "90d", label: "Last 3 months" },
-];
+import { DateTime } from "luxon";
 
 export function Header() {
   const { data } = useQuery<{ count: number }>({
@@ -31,6 +25,13 @@ export function Header() {
       ),
   });
   const { date, setDate } = useStore();
+
+  const DATE_OPTIONS = [
+    { value: 1, label: "Today" },
+    { value: 7, label: "Last 7 days" },
+    { value: 30, label: "Last 30 days" },
+    { value: 90, label: "Last 3 months" },
+  ];
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -55,13 +56,24 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button variant="outline">
-              {DATE_OPTIONS.find((option) => option.value === date)?.label}
+              {
+                DATE_OPTIONS.find(
+                  (option) =>
+                    DateTime.now().minus({ days: option.value }).toISODate() ===
+                    date[0]
+                )?.label
+              }
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {DATE_OPTIONS.map((option) => (
               <DropdownMenuItem
-                onClick={() => setDate(option.value)}
+                onClick={() =>
+                  setDate([
+                    DateTime.now().minus({ days: option.value }).toISODate(),
+                    DateTime.now().toISODate(),
+                  ])
+                }
                 key={option.value}
               >
                 {option.label}
