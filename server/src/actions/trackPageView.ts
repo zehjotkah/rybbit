@@ -98,7 +98,6 @@ export async function trackPageView(
   request: FastifyRequest<{ Body: TrackingPayload }>
 ) {
   const userAgent = request.headers["user-agent"] || "";
-  const referrer = request.headers["referer"] || "";
   const ip_address = getIpAddress(request);
   const userId = getUserId(ip_address, userAgent);
   const existingSession = await getExistingSession(userId);
@@ -107,7 +106,6 @@ export async function trackPageView(
     ip_address: ip_address,
     timestamp: new Date().toISOString(),
     ua: userAgentParser(userAgent),
-    referrer: referrer,
     userId: userId,
     sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
