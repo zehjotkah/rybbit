@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetBrowsersResponse = {
   browser: string;
@@ -35,7 +35,7 @@ export async function getBrowsers({
       format: "JSONEachRow",
     });
 
-    const data: GetBrowsersResponse = await result.json();
+    const data = await processResults<GetBrowsersResponse[number]>(result);
     return { data };
   } catch (error) {
     console.error("Error fetching browsers:", error);

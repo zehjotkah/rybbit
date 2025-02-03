@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetPagesResponse = {
   pathname: string;
@@ -37,7 +37,7 @@ export async function getPages({
       format: "JSONEachRow",
     });
 
-    const data: GetPagesResponse = await result.json();
+    const data = await processResults<GetPagesResponse[number]>(result);
     return { data };
   } catch (error) {
     console.error("Error fetching pages:", error);

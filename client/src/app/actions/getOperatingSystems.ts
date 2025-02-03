@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetOperatingSystemsResponse = {
   operating_system: string;
@@ -35,7 +35,9 @@ export async function getOperatingSystems({
       format: "JSONEachRow",
     });
 
-    const data: GetOperatingSystemsResponse = await result.json();
+    const data = await processResults<GetOperatingSystemsResponse[number]>(
+      result
+    );
     return { data };
   } catch (error) {
     console.error("Error fetching operating systems:", error);

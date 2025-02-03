@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetCountriesResponse = {
   country: string;
@@ -35,7 +35,7 @@ export async function getCountries({
       format: "JSONEachRow",
     });
 
-    const data: GetCountriesResponse = await result.json();
+    const data = await processResults<GetCountriesResponse[number]>(result);
     return { data };
   } catch (error) {
     console.error("Error fetching countries:", error);

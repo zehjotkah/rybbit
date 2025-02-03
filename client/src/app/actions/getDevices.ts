@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetDevicesResponse = {
   device_type: string;
@@ -35,7 +35,7 @@ export async function getDevices({
       format: "JSONEachRow",
     });
 
-    const data: GetDevicesResponse = await result.json();
+    const data = await processResults<GetDevicesResponse[number]>(result);
     return { data };
   } catch (error) {
     console.error("Error fetching devices:", error);

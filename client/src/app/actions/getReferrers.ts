@@ -1,7 +1,7 @@
 "use server";
 
 import { clickhouse } from "@/lib/clickhouse";
-import { getTimeStatement } from "./utils";
+import { getTimeStatement, processResults } from "./utils";
 
 type GetReferrersResponse = {
   referrer: string;
@@ -37,7 +37,7 @@ export async function getReferrers({
       format: "JSONEachRow",
     });
 
-    const data: GetReferrersResponse = await result.json();
+    const data = await processResults<GetReferrersResponse[number]>(result);
     return { data };
   } catch (error) {
     console.error("Error fetching referrers:", error);
