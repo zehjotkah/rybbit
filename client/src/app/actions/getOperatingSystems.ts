@@ -3,7 +3,7 @@
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
 
-type Response = {
+type GetOperatingSystemsResponse = {
   operating_system: string;
   count: number;
   percentage: number;
@@ -17,7 +17,7 @@ export async function getOperatingSystems({
   startDate: string;
   endDate: string;
   timezone: string;
-}): Promise<{ data?: Response; error?: string }> {
+}): Promise<{ data?: GetOperatingSystemsResponse; error?: string }> {
   const query = `
     SELECT
       operating_system,
@@ -35,7 +35,7 @@ export async function getOperatingSystems({
       format: "JSONEachRow",
     });
 
-    const data: Response = await result.json();
+    const data: GetOperatingSystemsResponse = await result.json();
     return { data };
   } catch (error) {
     console.error("Error fetching operating systems:", error);

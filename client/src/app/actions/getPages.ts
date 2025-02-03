@@ -3,7 +3,7 @@
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
 
-type Response = {
+type GetPagesResponse = {
   pathname: string;
   count: number;
   percentage: number;
@@ -17,7 +17,7 @@ export async function getPages({
   startDate: string;
   endDate: string;
   timezone: string;
-}): Promise<{ data?: Response; error?: string }> {
+}): Promise<{ data?: GetPagesResponse; error?: string }> {
   const query = `
     SELECT
       pathname,
@@ -37,7 +37,7 @@ export async function getPages({
       format: "JSONEachRow",
     });
 
-    const data: Response = await result.json();
+    const data: GetPagesResponse = await result.json();
     return { data };
   } catch (error) {
     console.error("Error fetching pages:", error);

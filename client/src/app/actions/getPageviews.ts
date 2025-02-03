@@ -3,7 +3,7 @@
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
 
-type Response = { time: string; pageviews: number }[];
+type GetPageViewsResponse = { time: string; pageviews: number }[];
 
 export async function getPageViews({
   startDate,
@@ -13,7 +13,7 @@ export async function getPageViews({
   startDate: string;
   endDate: string;
   timezone: string;
-}): Promise<{ data?: Response; error?: string }> {
+}): Promise<{ data?: GetPageViewsResponse; error?: string }> {
   const query = `
     SELECT
         toStartOfHour(toTimeZone(timestamp, '${timezone}')) AS time,
@@ -33,7 +33,7 @@ export async function getPageViews({
       format: "JSONEachRow",
     });
 
-    const data: Response = await result.json();
+    const data: GetPageViewsResponse = await result.json();
     return { data };
   } catch (error) {
     console.error("Error fetching pageviews:", error);
