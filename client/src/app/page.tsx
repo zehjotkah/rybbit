@@ -4,6 +4,7 @@ import { Browsers } from "./components/sections/Browsers/Browsers";
 import { Devices } from "./components/sections/Devices/Devices";
 import { OperatingSystems } from "./components/sections/OperatingSystems/OperatingSystems";
 import { Pages } from "./components/sections/Pages/Pages";
+import { Referrers } from "./components/sections/Referrers/Referrers";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
           <Browsers />
           <Devices />
           <Pages />
+          <Referrers />
         </div>
       </div>
     </main>
