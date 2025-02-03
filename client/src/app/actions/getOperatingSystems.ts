@@ -3,9 +3,13 @@
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
 
-type Response = { time: string; pageviews: number }[];
+type Response = {
+  operating_system: string;
+  count: number;
+  percentage: number;
+}[];
 
-export async function getPageViews({
+export async function getOperatingSystems({
   startDate,
   endDate,
   timezone = "America/Los_Angeles",
@@ -16,15 +20,13 @@ export async function getPageViews({
 }): Promise<{ data?: Response; error?: string }> {
   const query = `
     SELECT
-        toStartOfHour(toTimeZone(timestamp, '${timezone}')) AS time,
-        count() AS pageviews
+      operating_system,
+      COUNT(*) as count,
+      ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
-    GROUP BY
-        time
-    ORDER BY
-        time ASC
+    GROUP BY operating_system ORDER BY count desc;
   `;
 
   try {
@@ -36,7 +38,7 @@ export async function getPageViews({
     const data: Response = await result.json();
     return { data };
   } catch (error) {
-    console.error("Error fetching pageviews:", error);
-    return { error: "Failed to fetch pageviews" };
+    console.error("Error fetching operating systems:", error);
+    return { error: "Failed to fetch operating systems" };
   }
 }
