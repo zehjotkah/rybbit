@@ -16,7 +16,7 @@ export function OperatingSystems() {
       <CardHeader>
         <CardTitle>Operating Systems</CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 sm:px-6 sm:pt-6 flex flex-col gap-2">
+      <CardContent className="flex flex-col gap-2">
         {data?.data?.map((e) => (
           <div key={e.operating_system} className="relative">
             <div

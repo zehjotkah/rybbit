@@ -16,7 +16,7 @@ export function Devices() {
       <CardHeader>
         <CardTitle>Devices</CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 sm:px-6 sm:pt-6 flex flex-col gap-2">
+      <CardContent className="flex flex-col gap-2">
         {data?.data?.slice(0, 10).map((e) => (
           <div key={e.device_type} className="relative">
             <div
