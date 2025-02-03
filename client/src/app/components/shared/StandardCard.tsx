@@ -1,5 +1,6 @@
 "use client";
 
+import { ReactNode } from "react";
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -30,7 +31,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
       }
     | undefined;
   getKey: (item: T) => string;
-  getLabel: (item: T) => string;
+  getLabel: (item: T) => ReactNode;
 }) {
   return (
     <Card>
@@ -47,7 +48,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
             <div className="relative z-10 ml-1 flex justify-between items-center">
               <div>{getLabel(e)}</div>
               <div className="text-sm flex">
-                <div>{e.count}</div>
+                <div>{e.count.toLocaleString()}</div>
                 <div className="ml-1 text-neutral-500">|</div>
                 <div className="ml-1 w-10 text-neutral-500">
                   {e.percentage}%
@@ -75,7 +76,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                     <div className="relative z-10 ml-1 flex justify-between items-center pr-3">
                       <div>{getLabel(e)}</div>
                       <div className="text-sm flex">
-                        <div>{e.count}</div>
+                        <div>{e.count.toLocaleString()}</div>
                         <div className="ml-1 text-neutral-500">|</div>
                         <div className="ml-1 w-10 text-neutral-500">
                           {e.percentage}%

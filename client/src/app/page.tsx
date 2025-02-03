@@ -1,6 +1,7 @@
 import { Header } from "./components/Header/Header";
 import { MainSection } from "./components/MainSection/MainSection";
 import { Browsers } from "./components/sections/Browsers/Browsers";
+import { Countries } from "./components/sections/Countries/Countries";
 import { Devices } from "./components/sections/Devices/Devices";
 import { OperatingSystems } from "./components/sections/OperatingSystems/OperatingSystems";
 import { Pages } from "./components/sections/Pages/Pages";
@@ -18,6 +19,7 @@ export default function Home() {
           <Devices />
           <Pages />
           <Referrers />
+          <Countries />
         </div>
       </div>
     </main>
