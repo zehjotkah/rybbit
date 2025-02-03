@@ -46,10 +46,7 @@ class PageviewQueue {
         body: JSON.stringify({ ips }),
       });
 
-      console.info("ips: ", ips);
-
       const geoData: any = await geoResponse.json();
-      console.info("geoData: ", geoData);
 
       // Process each pageview with its geo data
       const processedPageviews = batch.map((pv) => ({
