@@ -34,6 +34,8 @@
       referrer: document.referrer,
     };
 
+    console.log(payload);
+
     fetch(`${ANALYTICS_HOST}/track/pageview`, {
       method: "POST",
       headers: {
