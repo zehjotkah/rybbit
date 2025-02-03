@@ -22,6 +22,7 @@ export const initializeClickhouse = async () => {
         browser LowCardinality(String),
         operating_system LowCardinality(String),
         language LowCardinality(String),
+        country LowCardinality(String),
         screen_width UInt16,
         screen_height UInt16,
         device_type LowCardinality(String)
@@ -49,7 +50,7 @@ export const initializeClickhouse = async () => {
         ip_address String,
         browser String,
         language String,
-        country_code String
+        country LowCardinality(String)
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(start_time)

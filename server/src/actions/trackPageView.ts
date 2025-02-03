@@ -7,6 +7,7 @@ import { DateTime } from "luxon";
 import { sql } from "../db/postgres/postgres";
 import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
 import { Pageview } from "../db/clickhouse/types";
+import { pageviewQueue } from "./pageviewQueue";
 
 type TotalPayload = TrackingPayload & {
   userId: string;
@@ -14,6 +15,7 @@ type TotalPayload = TrackingPayload & {
   sessionId: string;
   ua: UAParser.IResult;
   referrer: string;
+  ipAddress: string;
 };
 
 const insertPageview = async (pageview: TotalPayload) => {
@@ -98,18 +100,19 @@ export async function trackPageView(
   request: FastifyRequest<{ Body: TrackingPayload }>
 ) {
   const userAgent = request.headers["user-agent"] || "";
-  const ip_address = getIpAddress(request);
-  const userId = getUserId(ip_address, userAgent);
+  const ipAddress = getIpAddress(request);
+  const userId = getUserId(ipAddress, userAgent);
   const existingSession = await getExistingSession(userId);
   const payload = {
     ...request.body,
-    ip_address: ip_address,
+    ipAddress: ipAddress,
     timestamp: new Date().toISOString(),
     ua: userAgentParser(userAgent),
     userId: userId,
     sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
 
-  insertPageview(payload);
+  pageviewQueue.add(payload);
+  // insertPageview(payload);
   updateSession(payload, existingSession);
 }
