@@ -9,8 +9,8 @@ import { Referrers } from "./components/sections/Referrers/Referrers";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="w-full max-w-6xl">
+    <main className="flex min-h-screen flex-col items-center p-4 pt-12">
+      <div className="w-full max-w-5xl">
         <Header />
         <MainSection />
         <div className="grid grid-cols-2 gap-4 mt-4">

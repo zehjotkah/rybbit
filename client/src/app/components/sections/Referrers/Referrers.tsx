@@ -10,7 +10,25 @@ export function Referrers() {
       title="Referrers"
       data={data}
       getKey={(e) => e.referrer}
-      getLabel={(e) => e.referrer || "Other"}
+      getLabel={(e) => (
+        <div className="flex items-center">
+          <img
+            className="w-5 mr-2"
+            src={`https://www.google.com/s2/favicons?domain=${e.referrer}&sz=32`}
+          />
+          {e.referrer ? (
+            <a
+              href={`https://${e.referrer}`}
+              target="_blank"
+              className="hover:underline"
+            >
+              {e.referrer}
+            </a>
+          ) : (
+            "Direct"
+          )}
+        </div>
+      )}
     />
   );
 }

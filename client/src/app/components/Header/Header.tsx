@@ -3,7 +3,7 @@ import { Circle } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { goBack, goForward, useTimeSelection } from "@/lib/timeSelectionStore";
+import { goBack, goForward } from "@/lib/timeSelectionStore";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateSelector } from "./DateSelector";
 
@@ -15,14 +15,6 @@ export function Header() {
         res.json()
       ),
   });
-  const { time, setTime } = useTimeSelection();
-
-  const DATE_OPTIONS = [
-    { value: 1, label: "Today" },
-    { value: 7, label: "Last 7 days" },
-    { value: 30, label: "Last 30 days" },
-    { value: 90, label: "Last 3 months" },
-  ];
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -38,10 +30,10 @@ export function Header() {
       <div className="flex items-center gap-2">
         <DateSelector />
         <div className="flex items-center">
-          <Button variant="outline" size="icon" onClick={goBack}>
+          <Button variant="default" size="icon" onClick={goBack}>
             <ChevronLeft />
           </Button>
-          <Button variant="outline" size="icon" onClick={goForward}>
+          <Button variant="default" size="icon" onClick={goForward}>
             <ChevronRight />
           </Button>
         </div>
