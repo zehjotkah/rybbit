@@ -59,9 +59,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
         ))}
         {data?.data?.length && data?.data?.length > 10 && (
           <Dialog>
-            <DialogTrigger>
-              <Button variant="outline">View All</Button>
-            </DialogTrigger>
+            <Button variant="outline">View All</Button>
             <DialogContent className="max-w-[90vw] w-[1000px]">
               <DialogHeader>
                 <DialogTitle>{title}</DialogTitle>

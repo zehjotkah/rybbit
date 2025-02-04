@@ -3,7 +3,7 @@
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
 
-type GetPageViewsResponse = { time: string; pageviews: number }[];
+export type GetPageViewsResponse = { time: string; pageviews: number }[];
 
 export async function getPageViews({
   startDate,
