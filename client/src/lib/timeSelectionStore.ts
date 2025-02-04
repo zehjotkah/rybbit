@@ -2,8 +2,8 @@ import { DateTime } from "luxon";
 import { create } from "zustand";
 
 type DateMode = {
-  mode: "date";
-  date: string;
+  mode: "day";
+  day: string;
 };
 
 type DateRangeMode = {
@@ -40,12 +40,12 @@ type Store = {
 
 export const useTimeSelection = create<Store>((set) => ({
   time: {
-    mode: "date",
-    date: DateTime.now().toISODate(),
+    mode: "day",
+    day: DateTime.now().toISODate(),
   },
   setTime: (time) => {
     let bucketToUse: TimeBucket = "hour";
-    if (time.mode === "date") {
+    if (time.mode === "day") {
       bucketToUse = "hour";
     } else if (time.mode === "range") {
       const timeRangeLength = DateTime.fromISO(time.endDate).diff(
@@ -73,10 +73,10 @@ export const useTimeSelection = create<Store>((set) => ({
 export const goBack = () => {
   const { time, setTime } = useTimeSelection.getState();
 
-  if (time.mode === "date") {
+  if (time.mode === "day") {
     setTime({
-      mode: "date",
-      date: DateTime.fromISO(time.date).minus({ days: 1 }).toISODate() ?? "",
+      mode: "day",
+      day: DateTime.fromISO(time.day).minus({ days: 1 }).toISODate() ?? "",
     });
   } else if (time.mode === "range") {
     const startDate = DateTime.fromISO(time.startDate);
@@ -96,14 +96,14 @@ export const goBack = () => {
 export const goForward = () => {
   const { time, setTime } = useTimeSelection.getState();
 
-  if (time.mode === "date") {
+  if (time.mode === "day") {
     setTime({
-      mode: "date",
-      date:
-        DateTime.fromISO(time.date).plus({ days: 1 }).toISODate() ??
+      mode: "day",
+      day:
+        DateTime.fromISO(time.day).plus({ days: 1 }).toISODate() ??
         "" > DateTime.now().toISODate()
           ? DateTime.now().toISODate()
-          : DateTime.fromISO(time.date).plus({ days: 1 }).toISODate() ?? "",
+          : DateTime.fromISO(time.day).plus({ days: 1 }).toISODate() ?? "",
     });
   } else if (time.mode === "range") {
     const startDate = DateTime.fromISO(time.startDate);

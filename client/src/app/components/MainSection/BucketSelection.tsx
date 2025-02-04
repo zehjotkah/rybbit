@@ -11,7 +11,7 @@ import {
 import { DateTime } from "luxon";
 
 const getOptions = (time: Time) => {
-  if (time.mode === "date") {
+  if (time.mode === "day") {
     return (
       <SelectContent>
         <SelectItem size="sm" value="hour">

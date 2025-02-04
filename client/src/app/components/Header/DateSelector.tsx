@@ -17,14 +17,14 @@ const getLabel = (time: Time) => {
     return `${time.startDate} - ${time.endDate}`;
   }
 
-  if (time.mode === "date") {
-    if (time.date === DateTime.now().toISODate()) {
+  if (time.mode === "day") {
+    if (time.day === DateTime.now().toISODate()) {
       return "Today";
     }
-    if (time.date === DateTime.now().minus({ days: 1 }).toISODate()) {
+    if (time.day === DateTime.now().minus({ days: 1 }).toISODate()) {
       return "Yesterday";
     }
-    return time.date;
+    return time.day;
   }
 };
 
@@ -40,8 +40,8 @@ export function DateSelector() {
         <DropdownMenuItem
           onClick={() =>
             setTime({
-              mode: "date",
-              date: DateTime.now().toISODate(),
+              mode: "day",
+              day: DateTime.now().toISODate(),
             })
           }
         >
@@ -51,7 +51,7 @@ export function DateSelector() {
           onClick={() =>
             setTime({
               mode: "range",
-              startDate: DateTime.now().minus({ days: 7 }).toISODate(),
+              startDate: DateTime.now().minus({ days: 6 }).toISODate(),
               endDate: DateTime.now().toISODate(),
             })
           }
@@ -62,7 +62,7 @@ export function DateSelector() {
           onClick={() =>
             setTime({
               mode: "range",
-              startDate: DateTime.now().minus({ days: 30 }).toISODate(),
+              startDate: DateTime.now().minus({ days: 29 }).toISODate(),
               endDate: DateTime.now().toISODate(),
             })
           }

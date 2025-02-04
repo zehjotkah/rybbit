@@ -10,5 +10,8 @@ export function getStartAndEndDate(time: Time) {
   if (time.mode === "year") {
     return { startDate: time.year, endDate: time.year };
   }
-  return { startDate: time.date, endDate: time.date };
+  if (time.mode === "week") {
+    return { startDate: time.week, endDate: time.week };
+  }
+  return { startDate: time.day, endDate: time.day };
 }

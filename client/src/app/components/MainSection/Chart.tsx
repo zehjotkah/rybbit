@@ -4,7 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { GetPageViewsResponse } from "../../actions/getPageviews";
 import { DateTime } from "luxon";
 import { round } from "lodash";
-import { useTimeSelection } from "../../../lib/timeSelectionStore";
+import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
 
 export const nivoTheme: Theme = {
   axis: {
@@ -54,6 +54,22 @@ export const nivoTheme: Theme = {
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
+const getMax = (time: Time) => {
+  if (time.mode === "day") {
+    return DateTime.fromISO(time.day)
+      .endOf("day")
+      .minus({ minutes: 59 })
+      .toJSDate();
+  } else if (time.mode === "week") {
+    return DateTime.fromISO(time.week).endOf("week").toJSDate();
+  } else if (time.mode === "month") {
+    return DateTime.fromISO(time.month).endOf("month").toJSDate();
+  } else if (time.mode === "year") {
+    return DateTime.fromISO(time.year).endOf("year").toJSDate();
+  }
+  return undefined;
+};
+
 export function Chart({
   data,
 }: {
@@ -66,16 +82,17 @@ export function Chart({
 }) {
   const { time, bucket } = useTimeSelection();
 
+  const formattedData = data?.data?.map((e) => ({
+    x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
+    y: e.pageviews,
+  }));
+
   return (
     <ResponsiveLine
       data={[
         {
           id: "1",
-          data:
-            data?.data?.map((e) => ({
-              x: e.time,
-              y: e.pageviews,
-            })) ?? [],
+          data: formattedData ?? [],
         },
       ]}
       theme={nivoTheme}
@@ -84,6 +101,8 @@ export function Chart({
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
         precision: "second",
+        useUTC: true,
+        max: getMax(time),
       }}
       yScale={{
         type: "linear",
@@ -102,11 +121,11 @@ export function Chart({
         tickRotation: 0,
         truncateTickAt: 0,
         tickValues:
-          time.mode === "date"
+          time.mode === "day"
             ? Math.min(24, data?.data?.length ?? 0)
             : Math.min(12, data?.data?.length ?? 0),
         format: (value) => {
-          if (time.mode === "date") {
+          if (time.mode === "day") {
             return DateTime.fromJSDate(value).toFormat("ha");
           } else if (time.mode === "range") {
             return DateTime.fromJSDate(value).toFormat("MMM d");
