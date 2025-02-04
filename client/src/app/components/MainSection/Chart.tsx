@@ -4,6 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { GetPageViewsResponse } from "../../actions/getPageviews";
 import { DateTime } from "luxon";
 import { round } from "lodash";
+import { useTimeSelection } from "../../../lib/timeSelectionStore";
 
 export const nivoTheme: Theme = {
   axis: {
@@ -63,6 +64,8 @@ export function Chart({
       }
     | undefined;
 }) {
+  const { time, bucket } = useTimeSelection();
+
   return (
     <ResponsiveLine
       data={[
@@ -76,7 +79,7 @@ export function Chart({
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 20, right: 30, bottom: 20, left: 40 }}
+      margin={{ top: 20, right: 20, bottom: 20, left: 30 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
@@ -98,9 +101,20 @@ export function Chart({
         tickPadding: 10,
         tickRotation: 0,
         truncateTickAt: 0,
-        tickValues: 24,
+        tickValues:
+          time.mode === "date"
+            ? Math.min(24, data?.data?.length ?? 0)
+            : Math.min(12, data?.data?.length ?? 0),
         format: (value) => {
-          return DateTime.fromJSDate(value).toFormat("ha");
+          if (time.mode === "date") {
+            return DateTime.fromJSDate(value).toFormat("ha");
+          } else if (time.mode === "range") {
+            return DateTime.fromJSDate(value).toFormat("MMM d");
+          } else if (time.mode === "week") {
+            return DateTime.fromJSDate(value).toFormat("MMM d");
+          } else if (time.mode === "month") {
+            return DateTime.fromJSDate(value).toFormat("MMM d");
+          }
         },
       }}
       axisLeft={{
@@ -108,12 +122,13 @@ export function Chart({
         tickPadding: 10,
         tickRotation: 0,
         truncateTickAt: 0,
-        tickValues: 5,
+        tickValues: 4,
         format: formatter.format,
       }}
       enableTouchCrosshair={true}
       enablePoints={false}
       useMesh={true}
+      motionConfig="stiff"
       enableSlices={"x"}
       colors={["hsl(var(--fuchsia-400))"]}
       enableArea={true}

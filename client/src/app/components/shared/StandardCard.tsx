@@ -42,7 +42,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
         {data?.data?.slice(0, 10).map((e) => (
           <div key={getKey(e)} className="relative">
             <div
-              className="absolute inset-0 bg-red-500 py-2 opacity-50"
+              className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
               style={{ width: `${e.percentage}%` }}
             ></div>
             <div className="relative z-10 ml-1 flex justify-between items-center">
@@ -68,7 +68,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                 {data?.data?.map((e) => (
                   <div key={getKey(e)} className="relative">
                     <div
-                      className="absolute inset-0 bg-red-500 py-2 opacity-50"
+                      className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
                       style={{ width: `${e.percentage}%` }}
                     ></div>
                     <div className="relative z-10 ml-1 flex justify-between items-center pr-3">

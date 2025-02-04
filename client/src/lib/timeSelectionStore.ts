@@ -12,6 +12,11 @@ type DateRangeMode = {
   endDate: string;
 };
 
+type WeekMode = {
+  mode: "week";
+  week: string;
+};
+
 type MonthMode = {
   mode: "month";
   month: string;
@@ -22,11 +27,15 @@ type YearMode = {
   year: string;
 };
 
-export type Time = DateMode | DateRangeMode | MonthMode | YearMode;
+export type Time = DateMode | DateRangeMode | WeekMode | MonthMode | YearMode;
+
+export type TimeBucket = "hour" | "day" | "week" | "month";
 
 type Store = {
   time: Time;
   setTime: (time: Time) => void;
+  bucket: TimeBucket;
+  setBucket: (bucket: TimeBucket) => void;
 };
 
 export const useTimeSelection = create<Store>((set) => ({
@@ -34,7 +43,31 @@ export const useTimeSelection = create<Store>((set) => ({
     mode: "date",
     date: DateTime.now().toISODate(),
   },
-  setTime: (time) => set({ time }),
+  setTime: (time) => {
+    let bucketToUse: TimeBucket = "hour";
+    if (time.mode === "date") {
+      bucketToUse = "hour";
+    } else if (time.mode === "range") {
+      const timeRangeLength = DateTime.fromISO(time.endDate).diff(
+        DateTime.fromISO(time.startDate),
+        "days"
+      ).days;
+
+      if (timeRangeLength > 180) {
+        bucketToUse = "month";
+      } else if (timeRangeLength > 31) {
+        bucketToUse = "week";
+      }
+      bucketToUse = "day";
+    } else if (time.mode === "month") {
+      bucketToUse = "day";
+    } else if (time.mode === "year") {
+      bucketToUse = "month";
+    }
+    set({ time, bucket: bucketToUse });
+  },
+  bucket: "hour",
+  setBucket: (bucket) => set({ bucket }),
 }));
 
 export const goBack = () => {
