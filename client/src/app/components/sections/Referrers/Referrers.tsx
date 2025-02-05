@@ -13,7 +13,7 @@ export function Referrers() {
       getLabel={(e) => (
         <div className="flex items-center">
           <img
-            className="w-5 mr-2"
+            className="w-4 mr-2"
             src={`https://www.google.com/s2/favicons?domain=${e.referrer}&sz=32`}
           />
           {e.referrer ? (
