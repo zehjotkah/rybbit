@@ -2,8 +2,6 @@ import { FastifyRequest } from "fastify";
 import { TrackingPayload } from "../types";
 import { getUserId, getDeviceType, getIpAddress } from "../utils";
 import crypto from "crypto";
-import clickhouse from "../db/clickhouse/clickhouse";
-import { DateTime } from "luxon";
 import { sql } from "../db/postgres/postgres";
 import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
 
@@ -83,7 +81,11 @@ const updateSession = async (
     pageviews: 1,
     entry_page: pageview.pathname || "",
     // exit_page: pageview.pathname,
-    device_type: getDeviceType(pageview.ua),
+    device_type: getDeviceType(
+      pageview.screenWidth,
+      pageview.screenHeight,
+      pageview.ua
+    ),
     screen_width: pageview.screenWidth || 0,
     screen_height: pageview.screenHeight || 0,
     browser: pageview.ua.browser.name || "",

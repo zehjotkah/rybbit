@@ -60,14 +60,13 @@ class PageviewQueue {
         querystring: pv.querystring || "",
         page_title: pv.page_title || "",
         referrer: pv.referrer || "",
-        browser: pv.ua.browser.name,
-        operating_system: pv.ua.os.name,
+        browser: pv.ua.browser.name || "",
+        operating_system: pv.ua.os.name || "",
         language: pv.language || "",
         screen_width: pv.screenWidth || 0,
         screen_height: pv.screenHeight || 0,
-        device_type: getDeviceType(pv.ua),
+        device_type: getDeviceType(pv.screenWidth, pv.screenHeight, pv.ua),
         country: geoData[pv.ipAddress]?.data?.countryIso || "",
-        // countryIso: geoData[pv.ip]?.data?.countryIso || null,
       }));
 
       console.info("bulk insert: ", processedPageviews.length);

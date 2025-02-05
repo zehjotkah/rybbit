@@ -102,8 +102,13 @@ export const otherOS = new Set([
   "DragonFly",
 ]);
 
-export function getDeviceType(ua: UAParser.IResult): string {
+export function getDeviceType(
+  screenWidth: number,
+  screenHeight: number,
+  ua: UAParser.IResult
+): string {
   if (ua.device) {
+    console.info(ua.device.type);
     if (ua.device.type === "mobile") {
       return "Mobile";
     } else if (ua.device.type === "tablet") {
@@ -129,9 +134,16 @@ export function getDeviceType(ua: UAParser.IResult): string {
     return "TV";
   } else if (ua.os.name && gamingOS.has(ua.os.name)) {
     return "Console";
-  } else {
-    return "Other";
   }
+
+  const largerDimension = Math.max(screenWidth, screenHeight);
+  const smallerDimension = Math.min(screenWidth, screenHeight);
+  if (largerDimension > 1024) {
+    return "Desktop";
+  } else if (largerDimension > 768 && smallerDimension > 1024) {
+    return "Tablet";
+  }
+  return "Mobile";
 }
 
 // Helper function to get IP address
