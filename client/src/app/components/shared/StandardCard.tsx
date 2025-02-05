@@ -40,12 +40,12 @@ export function StandardCard<T extends { percentage: number; count: number }>({
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         {data?.data?.slice(0, 10).map((e) => (
-          <div key={getKey(e)} className="relative">
+          <div key={getKey(e)} className="relative h-7 flex items-center">
             <div
               className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
               style={{ width: `${e.percentage}%` }}
             ></div>
-            <div className="relative z-10 ml-1 flex justify-between items-center">
+            <div className="z-10 ml-1 flex justify-between items-center text-sm w-full">
               <div>{getLabel(e)}</div>
               <div className="text-sm flex">
                 <div>{e.count.toLocaleString()}</div>
@@ -68,17 +68,20 @@ export function StandardCard<T extends { percentage: number; count: number }>({
               </DialogHeader>
               <div className="flex flex-col gap-2 max-h-[90vh] overflow-x-hidden">
                 {data?.data?.map((e) => (
-                  <div key={getKey(e)} className="relative">
+                  <div
+                    key={getKey(e)}
+                    className="relative flex items-center mr-3"
+                  >
                     <div
                       className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
                       style={{ width: `${e.percentage}%` }}
                     ></div>
-                    <div className="relative z-10 ml-1 flex justify-between items-center pr-3">
+                    <div className="z-10 ml-1 flex justify-between items-center text-sm w-full h-7">
                       <div>{getLabel(e)}</div>
                       <div className="text-sm flex">
                         <div>{e.count.toLocaleString()}</div>
-                        <div className="ml-1 text-neutral-500">|</div>
-                        <div className="ml-1 w-10 text-neutral-500">
+                        <div className="mx-2 bg-neutral-400 w-[1px] rounded-full h-5"></div>
+                        <div className="w-10 text-neutral-500">
                           {e.percentage}%
                         </div>
                       </div>

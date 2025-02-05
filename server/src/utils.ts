@@ -107,34 +107,35 @@ export function getDeviceType(
   screenHeight: number,
   ua: UAParser.IResult
 ): string {
-  if (ua.device) {
-    console.info(ua.device.type);
-    if (ua.device.type === "mobile") {
-      return "Mobile";
-    } else if (ua.device.type === "tablet") {
-      return "Tablet";
-    } else if (ua.device.type === "console") {
-      return "Console";
-    } else if (ua.device.type === "smarttv") {
-      return "TV";
-    } else if (ua.device.type === "wearable") {
-      return "Wearable";
-    } else if (ua.device.type === "embedded") {
-      return "Embedded";
-    } else if (ua.device.type === "xr") {
-      return "XR";
-    }
-  }
+  // if (ua.device) {
+  //   if (ua.device.type === "mobile") {
+  //     return "Mobile";
+  //   } else if (ua.device.type === "tablet") {
+  //     return "Tablet";
+  //   } else if (ua.device.type === "console") {
+  //     return "Console";
+  //   } else if (ua.device.type === "smarttv") {
+  //     return "TV";
+  //   } else if (ua.device.type === "wearable") {
+  //     return "Wearable";
+  //   } else if (ua.device.type === "embedded") {
+  //     return "Embedded";
+  //   } else if (ua.device.type === "xr") {
+  //     return "XR";
+  //   }
+  // }
 
-  if (ua.os.name && desktopOS.has(ua.os.name)) {
-    return "Desktop";
-  } else if (ua.os.name && mobileOS.has(ua.os.name)) {
-    return "Mobile";
-  } else if (ua.os.name && tvOS.has(ua.os.name)) {
-    return "TV";
-  } else if (ua.os.name && gamingOS.has(ua.os.name)) {
-    return "Console";
-  }
+  // if (ua.os.name) {
+  //   if (desktopOS.has(ua.os.name)) {
+  //     return "Desktop";
+  //   } else if (mobileOS.has(ua.os.name)) {
+  //     return "Mobile";
+  //   } else if (tvOS.has(ua.os.name)) {
+  //     return "TV";
+  //   } else if (gamingOS.has(ua.os.name)) {
+  //     return "Console";
+  //   }
+  // }
 
   const largerDimension = Math.max(screenWidth, screenHeight);
   const smallerDimension = Math.min(screenWidth, screenHeight);
