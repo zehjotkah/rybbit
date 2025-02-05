@@ -65,7 +65,11 @@ class PageviewQueue {
         language: pv.language || "",
         screen_width: pv.screenWidth || 0,
         screen_height: pv.screenHeight || 0,
-        device_type: getDeviceType(pv.screenWidth, pv.screenHeight),
+        device_type: getDeviceType(
+          pv.screenWidth,
+          pv.screenHeight,
+          pv.ua.os.name
+        ),
         country: geoData[pv.ipAddress]?.data?.countryIso || "",
         // countryIso: geoData[pv.ip]?.data?.countryIso || null,
       }));

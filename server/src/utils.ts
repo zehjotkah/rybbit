@@ -8,16 +8,115 @@ export function getUserId(ip: string, userAgent: string) {
     .digest("hex");
 }
 
+export const desktopOS = new Set([
+  "Windows",
+  "macOS",
+  "Linux",
+  "Ubuntu",
+  "Fedora",
+  "Debian",
+  "Mint",
+  "Arch",
+  "CentOS",
+  "elementary OS",
+  "Gentoo",
+  "Kubuntu",
+  "Manjaro",
+  "RedHat",
+  "SUSE",
+  "Slackware",
+  "Deepin",
+  "FreeBSD",
+  "OpenBSD",
+  "NetBSD",
+  "GhostBSD",
+  "PC-BSD",
+  "Solaris",
+  "AIX",
+  "HP-UX",
+  "OS/2",
+  "BeOS",
+  "Haiku",
+  "Amiga OS",
+  "Morph OS",
+  "SerenityOS",
+]);
+
+export const mobileOS = new Set([
+  "iOS",
+  "Android",
+  "Windows Phone",
+  "Windows Mobile",
+  "BlackBerry",
+  "Symbian",
+  "Firefox OS",
+  "Ubuntu Touch",
+  "Sailfish",
+  "Tizen",
+  "KaiOS",
+  "HarmonyOS",
+  "OpenHarmony",
+  "watchOS",
+  "Android-x86",
+  "RIM Tablet OS",
+  "Bada",
+  "WebOS",
+  "Maemo",
+  "MeeGo",
+]);
+
+export const tvOS = new Set([
+  "Chromecast",
+  "Chromecast Android",
+  "Chromecast Fuchsia",
+  "Chromecast Linux",
+  "Chromecast SmartSpeaker",
+  "NetTV",
+  "NetRange",
+]);
+
+export const gamingOS = new Set(["PlayStation", "Xbox", "Nintendo"]);
+
+export const otherOS = new Set([
+  "Fuchsia",
+  "GNU",
+  "Hurd",
+  "Plan9",
+  "Contiki",
+  "Pico",
+  "Minix",
+  "Unix",
+  "OpenVMS",
+  "RISC OS",
+  "QNX",
+  "Series40",
+  "PCLinuxOS",
+  "Linpus",
+  "Linspire",
+  "Mageia",
+  "Mandriva",
+  "Raspbian",
+  "Sabayon",
+  "VectorLinux",
+  "Zenwalk",
+  "DragonFly",
+]);
+
 export function getDeviceType(
   screenWidth: number,
-  screenHeight: number
+  screenHeight: number,
+  os = ""
 ): string {
-  if (screenWidth < 768) {
-    return "Mobile";
-  } else if (screenWidth >= 768 && screenWidth < 1024) {
-    return "Tablet";
-  } else {
+  if (desktopOS.has(os)) {
     return "Desktop";
+  } else if (mobileOS.has(os)) {
+    return "Mobile";
+  } else if (tvOS.has(os)) {
+    return "TV";
+  } else if (gamingOS.has(os)) {
+    return "Gaming";
+  } else {
+    return "Other";
   }
 }
 

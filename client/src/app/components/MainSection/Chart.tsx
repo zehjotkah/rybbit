@@ -121,9 +121,7 @@ export function Chart({
         tickRotation: 0,
         truncateTickAt: 0,
         tickValues:
-          time.mode === "day"
-            ? Math.min(24, data?.data?.length ?? 0)
-            : Math.min(12, data?.data?.length ?? 0),
+          time.mode === "day" ? 24 : Math.min(12, data?.data?.length ?? 0),
         format: (value) => {
           if (time.mode === "day") {
             return DateTime.fromJSDate(value).toFormat("ha");
