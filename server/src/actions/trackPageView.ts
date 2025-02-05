@@ -83,11 +83,7 @@ const updateSession = async (
     pageviews: 1,
     entry_page: pageview.pathname || "",
     // exit_page: pageview.pathname,
-    device_type: getDeviceType(
-      pageview.screenWidth,
-      pageview.screenHeight,
-      pageview.ua.os.name
-    ),
+    device_type: getDeviceType(pageview.ua),
     screen_width: pageview.screenWidth || 0,
     screen_height: pageview.screenHeight || 0,
     browser: pageview.ua.browser.name || "",
@@ -117,8 +113,6 @@ export async function trackPageView(
     userId: userId,
     sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
-  console.info(payload.ua.device);
-  console.info(payload.ua.os);
 
   pageviewQueue.add(payload);
   // insertPageview(payload);

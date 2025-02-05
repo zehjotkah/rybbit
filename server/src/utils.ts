@@ -102,19 +102,33 @@ export const otherOS = new Set([
   "DragonFly",
 ]);
 
-export function getDeviceType(
-  screenWidth: number,
-  screenHeight: number,
-  os = ""
-): string {
-  if (desktopOS.has(os)) {
+export function getDeviceType(ua: UAParser.IResult): string {
+  if (ua.device) {
+    if (ua.device.type === "mobile") {
+      return "Mobile";
+    } else if (ua.device.type === "tablet") {
+      return "Tablet";
+    } else if (ua.device.type === "console") {
+      return "Console";
+    } else if (ua.device.type === "smarttv") {
+      return "TV";
+    } else if (ua.device.type === "wearable") {
+      return "Wearable";
+    } else if (ua.device.type === "embedded") {
+      return "Embedded";
+    } else if (ua.device.type === "xr") {
+      return "XR";
+    }
+  }
+
+  if (ua.os.name && desktopOS.has(ua.os.name)) {
     return "Desktop";
-  } else if (mobileOS.has(os)) {
+  } else if (ua.os.name && mobileOS.has(ua.os.name)) {
     return "Mobile";
-  } else if (tvOS.has(os)) {
+  } else if (ua.os.name && tvOS.has(ua.os.name)) {
     return "TV";
-  } else if (gamingOS.has(os)) {
-    return "Gaming";
+  } else if (ua.os.name && gamingOS.has(ua.os.name)) {
+    return "Console";
   } else {
     return "Other";
   }
