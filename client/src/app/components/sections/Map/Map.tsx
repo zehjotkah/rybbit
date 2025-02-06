@@ -14,6 +14,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CardLoader,
   CardTitle,
 } from "../../../../components/ui/card";
 import { countries } from "countries-list";
@@ -46,6 +47,7 @@ export function Map() {
 
   return (
     <Card>
+      {isLoading && <CardLoader />}
       <CardHeader>
         <CardTitle>Map</CardTitle>
       </CardHeader>

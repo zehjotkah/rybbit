@@ -26,6 +26,7 @@ export function OperatingSystems() {
     <StandardCard
       title="Operating Systems"
       data={data}
+      isLoading={isLoading}
       getKey={(e) => e.operating_system}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">

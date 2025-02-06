@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardLoader } from "@/components/ui/card";
 import { useTimeSelection } from "../../../lib/timeSelectionStore";
 import { useGetPageviews } from "../../hooks/useGetPageviews";
 import { BucketSelection } from "./BucketSelection";
@@ -10,6 +10,7 @@ export function MainSection() {
 
   return (
     <Card>
+      {isLoading && <CardLoader />}
       <CardContent className="pt-4 w-full">
         <BucketSelection />
         <div className="h-[350px]">

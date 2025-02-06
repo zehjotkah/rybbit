@@ -6,12 +6,12 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CardLoader,
   CardTitle,
 } from "../../../components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,6 +22,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
   data,
   getKey,
   getLabel,
+  isLoading,
 }: {
   title: string;
   data:
@@ -30,11 +31,13 @@ export function StandardCard<T extends { percentage: number; count: number }>({
         error?: string;
       }
     | undefined;
+  isLoading?: boolean;
   getKey: (item: T) => string;
   getLabel: (item: T) => ReactNode;
 }) {
   return (
     <Card>
+      {isLoading && <CardLoader />}
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>

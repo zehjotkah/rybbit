@@ -1,6 +1,9 @@
 import * as React from "react";
-
+import { zoomies } from "ldrs";
 import { cn } from "@/lib/utils";
+import { useMeasure } from "@uidotdev/usehooks";
+
+zoomies.register();
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -9,13 +12,33 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50",
+      "rounded-xl border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50 overflow-hidden",
       className
     )}
     {...props}
   />
 ));
 Card.displayName = "Card";
+
+const CardLoader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const [ref2, { width }] = useMeasure();
+  return (
+    <div ref={ref2} className="mt-[-15px]">
+      {/* @ts-ignore */}
+      <l-zoomies
+        size={width}
+        stroke="3"
+        bg-opacity="0.1"
+        speed="1.4"
+        color="hsl(var(--fuchsia-400))"
+      />
+    </div>
+  );
+});
+CardLoader.displayName = "CardLoader";
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -75,6 +98,7 @@ CardFooter.displayName = "CardFooter";
 
 export {
   Card,
+  CardLoader,
   CardHeader,
   CardFooter,
   CardTitle,

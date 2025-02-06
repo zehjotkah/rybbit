@@ -10,6 +10,7 @@ export function Referrers() {
       title="Referrers"
       data={data}
       getKey={(e) => e.referrer}
+      isLoading={isLoading}
       getLabel={(e) => (
         <div className="flex items-center">
           <img

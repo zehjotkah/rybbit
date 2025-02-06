@@ -60,6 +60,7 @@ export function Browsers() {
     <StandardCard
       title="Browsers"
       data={data}
+      isLoading={isLoading}
       getKey={(e) => e.browser}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">

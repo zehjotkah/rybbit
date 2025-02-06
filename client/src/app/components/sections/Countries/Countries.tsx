@@ -13,6 +13,7 @@ export function Countries() {
     <StandardCard
       title="Countries"
       data={data}
+      isLoading={isLoading}
       getKey={(e) => e.country}
       getLabel={(e) => (
         <span className="flex items-center gap-2">

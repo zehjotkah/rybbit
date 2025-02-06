@@ -9,6 +9,7 @@ export function Pages() {
     <StandardCard
       title="Pages"
       data={data}
+      isLoading={isLoading}
       getKey={(e) => e.pathname}
       getLabel={(e) => e.pathname || "Other"}
     />
