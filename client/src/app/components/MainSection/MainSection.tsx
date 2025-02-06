@@ -10,7 +10,7 @@ export function MainSection() {
 
   return (
     <Card>
-      <CardContent className="pt-4 sm:px-6 sm:pt-6 w-full">
+      <CardContent className="pt-4 w-full">
         <BucketSelection />
         <div className="h-[350px]">
           <Chart data={data} />

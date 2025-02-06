@@ -3,6 +3,7 @@ import { MainSection } from "./components/MainSection/MainSection";
 import { Browsers } from "./components/sections/Browsers/Browsers";
 import { Countries } from "./components/sections/Countries/Countries";
 import { Devices } from "./components/sections/Devices/Devices";
+import { Map } from "./components/sections/Map/Map";
 import { OperatingSystems } from "./components/sections/OperatingSystems/OperatingSystems";
 import { Pages } from "./components/sections/Pages/Pages";
 import { Referrers } from "./components/sections/Referrers/Referrers";
@@ -20,6 +21,8 @@ export default function Home() {
           <Pages />
           <Referrers />
           <Countries />
+          <Map />
+          {/* <Chloropleth /> */}
         </div>
       </div>
     </main>
