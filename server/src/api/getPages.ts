@@ -1,7 +1,7 @@
-"use server";
-
-import { clickhouse } from "@/lib/clickhouse";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { getTimeStatement, processResults } from "./utils";
+import clickhouse from "../db/clickhouse/clickhouse";
+import { GenericRequest } from "./types";
 
 type GetPagesResponse = {
   pathname: string;
@@ -9,15 +9,10 @@ type GetPagesResponse = {
   percentage: number;
 }[];
 
-export async function getPages({
-  startDate,
-  endDate,
-  timezone = "America/Los_Angeles",
-}: {
-  startDate: string;
-  endDate: string;
-  timezone: string;
-}): Promise<{ data?: GetPagesResponse; error?: string }> {
+export async function getPages(
+  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  res: FastifyReply
+) {
   const query = `
     SELECT
       pathname,
@@ -38,9 +33,9 @@ export async function getPages({
     });
 
     const data = await processResults<GetPagesResponse[number]>(result);
-    return { data };
+    return res.send({ data });
   } catch (error) {
     console.error("Error fetching pages:", error);
-    return { error: "Failed to fetch pages" };
+    return res.status(500).send({ error: "Failed to fetch pages" });
   }
 }

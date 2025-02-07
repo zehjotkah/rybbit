@@ -20,8 +20,8 @@ import {
 import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";
 
-import { useGetCountries } from "../../../../hooks/useGetCountries";
 import React from "react";
+import { useGetCountries } from "../../../../hooks/api";
 
 const geoUrl = "/countries.geojson";
 

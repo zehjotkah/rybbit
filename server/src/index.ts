@@ -9,6 +9,13 @@ import { initializePostgres } from "./db/postgres/postgres";
 import cron from "node-cron";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup";
 import { getLiveUsercount } from "./api/getLiveUsercount";
+import { getCountries } from "./api/getCountries";
+import { getOperatingSystems } from "./api/getOperatingSystems";
+import { getBrowsers } from "./api/getBrowsers";
+import { getDevices } from "./api/getDevices";
+import { getReferrers } from "./api/getReferrers";
+import { getPages } from "./api/getPages";
+import { getPageViews } from "./api/getPageViews";
 
 const server = Fastify({
   logger: {
@@ -39,6 +46,13 @@ server.get("/health", async () => {
 server.get("/live-user-count", async () => {
   return { count: await getLiveUsercount() };
 });
+server.get("/countries", getCountries);
+server.get("/browsers", getBrowsers);
+server.get("/operating-systems", getOperatingSystems);
+server.get("/devices", getDevices);
+server.get("/pages", getPages);
+server.get("/referrers", getReferrers);
+server.get("/pageviews", getPageViews);
 
 // Track pageview endpoint
 server.post<{ Body: TrackingPayload }>(

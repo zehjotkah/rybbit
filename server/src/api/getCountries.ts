@@ -1,6 +1,6 @@
-"use server";
-
-import { clickhouse } from "@/lib/clickhouse";
+import { FastifyReply, FastifyRequest } from "fastify";
+import clickhouse from "../db/clickhouse/clickhouse";
+import { GenericRequest } from "./types";
 import { getTimeStatement, processResults } from "./utils";
 
 type GetCountriesResponse = {
@@ -9,15 +9,10 @@ type GetCountriesResponse = {
   percentage: number;
 }[];
 
-export async function getCountries({
-  startDate,
-  endDate,
-  timezone = "America/Los_Angeles",
-}: {
-  startDate: string;
-  endDate: string;
-  timezone: string;
-}): Promise<{ data?: GetCountriesResponse; error?: string }> {
+export async function getCountries(
+  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  res: FastifyReply
+) {
   const query = `
     SELECT
       country,
@@ -36,9 +31,9 @@ export async function getCountries({
     });
 
     const data = await processResults<GetCountriesResponse[number]>(result);
-    return { data };
+    return res.send({ data });
   } catch (error) {
     console.error("Error fetching countries:", error);
-    return { error: "Failed to fetch countries" };
+    return res.status(500).send({ error: "Failed to fetch countries" });
   }
 }

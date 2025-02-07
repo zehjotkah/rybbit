@@ -1,6 +1,6 @@
-"use server";
-
-import { clickhouse } from "@/lib/clickhouse";
+import { FastifyReply, FastifyRequest } from "fastify";
+import clickhouse from "../db/clickhouse/clickhouse";
+import { GenericRequest } from "./types";
 import { getTimeStatement, processResults } from "./utils";
 
 type GetDevicesResponse = {
@@ -9,15 +9,10 @@ type GetDevicesResponse = {
   percentage: number;
 }[];
 
-export async function getDevices({
-  startDate,
-  endDate,
-  timezone = "America/Los_Angeles",
-}: {
-  startDate: string;
-  endDate: string;
-  timezone: string;
-}): Promise<{ data?: GetDevicesResponse; error?: string }> {
+export async function getDevices(
+  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  res: FastifyReply
+) {
   const query = `
     SELECT
       device_type,
@@ -36,9 +31,9 @@ export async function getDevices({
     });
 
     const data = await processResults<GetDevicesResponse[number]>(result);
-    return { data };
+    return res.send({ data });
   } catch (error) {
     console.error("Error fetching devices:", error);
-    return { error: "Failed to fetch devices" };
+    return res.status(500).send({ error: "Failed to fetch devices" });
   }
 }

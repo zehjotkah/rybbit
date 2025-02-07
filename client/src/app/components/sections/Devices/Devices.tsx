@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetDevices } from "../../../../hooks/useGetDevices";
+import { useGetDevices } from "../../../../hooks/api";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Devices() {

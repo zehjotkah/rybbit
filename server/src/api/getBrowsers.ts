@@ -1,6 +1,6 @@
-"use server";
-
-import { clickhouse } from "@/lib/clickhouse";
+import { FastifyReply, FastifyRequest } from "fastify";
+import clickhouse from "../db/clickhouse/clickhouse";
+import { GenericRequest } from "./types";
 import { getTimeStatement, processResults } from "./utils";
 
 type GetBrowsersResponse = {
@@ -9,15 +9,10 @@ type GetBrowsersResponse = {
   percentage: number;
 }[];
 
-export async function getBrowsers({
-  startDate,
-  endDate,
-  timezone = "America/Los_Angeles",
-}: {
-  startDate: string;
-  endDate: string;
-  timezone: string;
-}): Promise<{ data?: GetBrowsersResponse; error?: string }> {
+export async function getBrowsers(
+  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  res: FastifyReply
+) {
   const query = `
     SELECT
       browser,
@@ -36,9 +31,9 @@ export async function getBrowsers({
     });
 
     const data = await processResults<GetBrowsersResponse[number]>(result);
-    return { data };
+    return res.send({ data });
   } catch (error) {
     console.error("Error fetching browsers:", error);
-    return { error: "Failed to fetch browsers" };
+    return res.status(500).send({ error: "Failed to fetch browsers" });
   }
 }
