@@ -53,6 +53,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BACKEND_URL: ${BASE_URL}
     ports:
       - "3002:3002"
     environment:
