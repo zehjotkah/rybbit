@@ -16,6 +16,7 @@ import { getDevices } from "./api/getDevices";
 import { getReferrers } from "./api/getReferrers";
 import { getPages } from "./api/getPages";
 import { getPageViews } from "./api/getPageViews";
+import { getOverview } from "./api/getOverview";
 
 const server = Fastify({
   logger: {
@@ -46,6 +47,8 @@ server.get("/health", async () => {
 server.get("/live-user-count", async () => {
   return { count: await getLiveUsercount() };
 });
+
+server.get("/overview", getOverview);
 server.get("/countries", getCountries);
 server.get("/browsers", getBrowsers);
 server.get("/operating-systems", getOperatingSystems);

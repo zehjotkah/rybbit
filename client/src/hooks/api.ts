@@ -25,6 +25,7 @@ export function useGenericQuery<T>(
         `${process.env.BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`
       ).then((res) => res.json());
     },
+    staleTime: Infinity,
   });
 }
 
@@ -109,5 +110,16 @@ export function useGetPageviews(): UseQueryResult<
       ).then((res) => res.json());
     },
     placeholderData: keepPreviousData,
+    staleTime: Infinity,
   });
+}
+
+export type GetOverviewResponse = {
+  sessions: number;
+  pageviews: number;
+  users: number;
+};
+
+export function useGetOverview() {
+  return useGenericQuery<GetOverviewResponse>("overview");
 }

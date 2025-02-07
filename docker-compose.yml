@@ -59,7 +59,7 @@ services:
       - NODE_ENV=production
       - CLICKHOUSE_HOST=http://clickhouse:8123
       - CLICKHOUSE_DB=analytics
-      - BACKEND_URL=http://backend:3001
+      - BACKEND_URL=http://localhost:3001
     depends_on:
       - backend
 
