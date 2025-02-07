@@ -1,4 +1,8 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  UseQueryResult,
+} from "@tanstack/react-query";
 import { useTimeSelection } from "../lib/timeSelectionStore";
 import { getStartAndEndDate } from "./utils";
 
@@ -34,7 +38,7 @@ export function useGetCountries() {
   return useGenericQuery<GetCountriesResponse>("countries");
 }
 
-type GetDevicesResponse = {
+export type GetDevicesResponse = {
   device_type: string;
   count: number;
   percentage: number;
@@ -44,7 +48,7 @@ export function useGetDevices() {
   return useGenericQuery<GetDevicesResponse>("devices");
 }
 
-type GetOperatingSystemsResponse = {
+export type GetOperatingSystemsResponse = {
   operating_system: string;
   count: number;
   percentage: number;
@@ -54,7 +58,7 @@ export function useGetOperatingSystems() {
   return useGenericQuery<GetOperatingSystemsResponse>("operating-systems");
 }
 
-type GetBrowsersResponse = {
+export type GetBrowsersResponse = {
   browser: string;
   count: number;
   percentage: number;
@@ -64,7 +68,7 @@ export function useGetBrowsers() {
   return useGenericQuery<GetBrowsersResponse>("browsers");
 }
 
-type GetPagesResponse = {
+export type GetPagesResponse = {
   pathname: string;
   count: number;
   percentage: number;
@@ -74,7 +78,7 @@ export function useGetPages() {
   return useGenericQuery<GetPagesResponse>("pages");
 }
 
-type GetReferrersResponse = {
+export type GetReferrersResponse = {
   referrer: string;
   count: number;
   percentage: number;
@@ -84,7 +88,7 @@ export function useGetReferrers() {
   return useGenericQuery<GetReferrersResponse>("referrers");
 }
 
-type GetPageViewsResponse = {
+export type GetPageViewsResponse = {
   time: string;
   pageviews: number;
 }[];
@@ -104,5 +108,6 @@ export function useGetPageviews(): UseQueryResult<
         `${process.env.BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}`
       ).then((res) => res.json());
     },
+    placeholderData: keepPreviousData,
   });
 }

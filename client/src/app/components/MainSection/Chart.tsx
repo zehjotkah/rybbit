@@ -1,10 +1,10 @@
 "use client";
 import { Theme } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
-import { GetPageViewsResponse } from "../../../actions/getPageviews";
 import { DateTime } from "luxon";
 import { round } from "lodash";
 import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { GetPageViewsResponse } from "../../../hooks/api";
 
 export const nivoTheme: Theme = {
   axis: {
@@ -55,17 +55,22 @@ export const nivoTheme: Theme = {
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
 const getMax = (time: Time) => {
+  const now = DateTime.now();
+
   if (time.mode === "day") {
-    return DateTime.fromISO(time.day)
+    const dayDate = DateTime.fromISO(time.day)
       .endOf("day")
-      .minus({ minutes: 59 })
-      .toJSDate();
+      .minus({ minutes: 59 });
+    return now < dayDate ? dayDate.toJSDate() : undefined;
   } else if (time.mode === "week") {
-    return DateTime.fromISO(time.week).endOf("week").toJSDate();
+    const weekDate = DateTime.fromISO(time.week).endOf("week");
+    return now < weekDate ? weekDate.toJSDate() : undefined;
   } else if (time.mode === "month") {
-    return DateTime.fromISO(time.month).endOf("month").toJSDate();
+    const monthDate = DateTime.fromISO(time.month).endOf("month");
+    return now < monthDate ? monthDate.toJSDate() : undefined;
   } else if (time.mode === "year") {
-    return DateTime.fromISO(time.year).endOf("year").toJSDate();
+    const yearDate = DateTime.fromISO(time.year).endOf("year");
+    return now < yearDate ? yearDate.toJSDate() : undefined;
   }
   return undefined;
 };
@@ -80,7 +85,7 @@ export function Chart({
       }
     | undefined;
 }) {
-  const { time, bucket } = useTimeSelection();
+  const { time } = useTimeSelection();
 
   const formattedData = data?.data?.map((e) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
