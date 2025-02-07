@@ -22,7 +22,7 @@ export function useGenericQuery<T>(
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return fetch(
-        `${process.env.BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,
@@ -106,7 +106,7 @@ export function useGetPageviews(): UseQueryResult<
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return fetch(
-        `${process.env.BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}`
       ).then((res) => res.json());
     },
     placeholderData: keepPreviousData,

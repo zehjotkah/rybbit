@@ -11,8 +11,8 @@ export function Header() {
   const { data } = useQuery<{ count: number }>({
     queryKey: ["active-sessions"],
     queryFn: () =>
-      fetch(`${process.env.BACKEND_URL}/live-user-count`).then((res) =>
-        res.json()
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count`).then(
+        (res) => res.json()
       ),
   });
 
