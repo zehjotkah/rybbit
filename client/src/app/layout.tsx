@@ -22,6 +22,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} h-full bg-background text-foreground`}
       >
+        <script
+          type="module"
+          defer
+          src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/zoomies.js"
+        ></script>
         <ThemeProvider>
           <QueryProvider>
             <div className="min-h-full">

@@ -30,6 +30,7 @@ export async function getOperatingSystems({
   `;
 
   try {
+    const start = performance.now();
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
@@ -38,6 +39,8 @@ export async function getOperatingSystems({
     const data = await processResults<GetOperatingSystemsResponse[number]>(
       result
     );
+    const end = performance.now();
+    console.log(`Operating systems query took ${end - start}ms`);
     return { data };
   } catch (error) {
     console.error("Error fetching operating systems:", error);

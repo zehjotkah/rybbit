@@ -1,9 +1,6 @@
 import * as React from "react";
-import { zoomies } from "ldrs";
 import { cn } from "@/lib/utils";
 import { useMeasure } from "@uidotdev/usehooks";
-
-zoomies.register();
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -12,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50 overflow-hidden",
+      "relative rounded-xl border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50 overflow-hidden transition-all duration-300 animate-in fade-in-0 zoom-in-95",
       className
     )}
     {...props}
@@ -25,8 +22,9 @@ const CardLoader = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const [ref2, { width }] = useMeasure();
+
   return (
-    <div ref={ref2} className="mt-[-15px]">
+    <div ref={ref2} className="mt-[-15px] absolute top-0 left-0 w-full">
       {/* @ts-ignore */}
       <l-zoomies
         size={width}
@@ -80,7 +78,14 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-4 pt-0", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn(
+      "p-4 pt-0 transition-all duration-300 animate-in fade-in-0 zoom-in-95",
+      className
+    )}
+    {...props}
+  />
 ));
 CardContent.displayName = "CardContent";
 
