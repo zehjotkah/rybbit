@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTimeSelection } from "../../lib/timeSelectionStore";
-import { getPageViews } from "../actions/getPageviews";
+import { getPageViews } from "../../actions/getPageviews";
 import { getStartAndEndDate } from "./utils";
 
 export function useGetPageviews() {

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTimeSelection } from "../../lib/timeSelectionStore";
 import { getStartAndEndDate } from "./utils";
-import { getOperatingSystems } from "../actions/getOperatingSystems";
+import { getOperatingSystems } from "../../actions/getOperatingSystems";
 
 export function useGetOperatingSystems() {
   const { time } = useTimeSelection();

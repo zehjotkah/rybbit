@@ -1,7 +1,7 @@
 "use client";
 import { Theme } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
-import { GetPageViewsResponse } from "../../actions/getPageviews";
+import { GetPageViewsResponse } from "../../../actions/getPageviews";
 import { DateTime } from "luxon";
 import { round } from "lodash";
 import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";

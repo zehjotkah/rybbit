@@ -2,7 +2,7 @@
 
 import { clickhouse } from "@/lib/clickhouse";
 import { getTimeStatement } from "./utils";
-import { TimeBucket } from "../../lib/timeSelectionStore";
+import { TimeBucket } from "../lib/timeSelectionStore";
 
 export type GetPageViewsResponse = { time: string; pageviews: number }[];
 

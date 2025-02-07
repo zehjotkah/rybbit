@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTimeSelection } from "../../lib/timeSelectionStore";
-import { getCountries } from "../actions/getCountries";
+import { getCountries } from "../../actions/getCountries";
 import { getStartAndEndDate } from "./utils";
 
 export function useGetCountries() {

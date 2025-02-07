@@ -99,11 +99,7 @@ export const goForward = () => {
   if (time.mode === "day") {
     setTime({
       mode: "day",
-      day:
-        DateTime.fromISO(time.day).plus({ days: 1 }).toISODate() ??
-        "" > DateTime.now().toISODate()
-          ? DateTime.now().toISODate()
-          : DateTime.fromISO(time.day).plus({ days: 1 }).toISODate() ?? "",
+      day: DateTime.fromISO(time.day).plus({ days: 1 }).toISODate() ?? "",
     });
   } else if (time.mode === "range") {
     const startDate = DateTime.fromISO(time.startDate);
