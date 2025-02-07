@@ -1,22 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { useTimeSelection } from "../../lib/timeSelectionStore";
-import { getPageViews } from "../../actions/getPageviews";
+import { useTimeSelection } from "../lib/timeSelectionStore";
+import { getReferrers } from "../actions/getReferrers";
 import { getStartAndEndDate } from "./utils";
 
-export function useGetPageviews() {
-  const { time, bucket } = useTimeSelection();
+export function useGetReferrers() {
+  const { time } = useTimeSelection();
 
   const { startDate, endDate } = getStartAndEndDate(time);
 
   return useQuery({
-    queryKey: ["pageviews", time, bucket],
+    queryKey: ["referrers", time],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return getPageViews({
+      return getReferrers({
         startDate,
         endDate,
         timezone,
-        bucket,
       });
     },
   });

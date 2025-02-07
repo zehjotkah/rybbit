@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetReferrers } from "../../../hooks/useGetReferrers";
+import { useGetReferrers } from "../../../../hooks/useGetReferrers";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Referrers() {

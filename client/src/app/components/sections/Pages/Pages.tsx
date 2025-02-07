@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetPages } from "../../../hooks/useGetPages";
+import { useGetPages } from "../../../../hooks/useGetPages";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Pages() {

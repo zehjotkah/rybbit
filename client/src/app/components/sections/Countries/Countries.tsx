@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useGetCountries } from "../../../hooks/useGetCountries";
+import { useGetCountries } from "../../../../hooks/useGetCountries";
 import { StandardCard } from "../../shared/StandardCard";
 import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";

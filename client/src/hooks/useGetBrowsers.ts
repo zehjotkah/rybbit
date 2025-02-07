@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useTimeSelection } from "../../lib/timeSelectionStore";
-import { getBrowsers } from "../../actions/getBrowsers";
+import { useTimeSelection } from "../lib/timeSelectionStore";
+import { getBrowsers } from "../actions/getBrowsers";
 import { getStartAndEndDate } from "./utils";
 
 export function useGetBrowsers() {

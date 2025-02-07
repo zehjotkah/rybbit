@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { useTimeSelection } from "../../lib/timeSelectionStore";
+import { useTimeSelection } from "../lib/timeSelectionStore";
+import { getDevices } from "../actions/getDevices";
 import { getStartAndEndDate } from "./utils";
-import { getOperatingSystems } from "../../actions/getOperatingSystems";
 
-export function useGetOperatingSystems() {
+export function useGetDevices() {
   const { time } = useTimeSelection();
 
   const { startDate, endDate } = getStartAndEndDate(time);
 
   return useQuery({
-    queryKey: ["operating-systems", time],
+    queryKey: ["devices", time],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return getOperatingSystems({
+      return getDevices({
         startDate,
         endDate,
         timezone,

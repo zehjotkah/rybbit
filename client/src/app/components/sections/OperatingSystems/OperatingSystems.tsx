@@ -1,7 +1,7 @@
 "use client";
 
 import { Compass } from "lucide-react";
-import { useGetOperatingSystems } from "../../../hooks/useGetOperatingSystems";
+import { useGetOperatingSystems } from "../../../../hooks/useGetOperatingSystems";
 import { StandardCard } from "../../shared/StandardCard";
 import Image from "next/image";
 

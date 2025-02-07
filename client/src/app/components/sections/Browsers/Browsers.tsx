@@ -2,7 +2,7 @@
 
 import { Compass } from "lucide-react";
 import Image from "next/image";
-import { useGetBrowsers } from "../../../hooks/useGetBrowsers";
+import { useGetBrowsers } from "../../../../hooks/useGetBrowsers";
 import { StandardCard } from "../../shared/StandardCard";
 
 const BROWSER_TO_LOGO: Record<string, string> = {
