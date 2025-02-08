@@ -29,6 +29,27 @@ const getMax = (time: Time) => {
   return undefined;
 };
 
+const getMin = (time: Time) => {
+  if (time.mode === "day") {
+    const dayDate = DateTime.fromISO(time.day).startOf("day");
+    return dayDate.toJSDate();
+  } else if (time.mode === "week") {
+    const weekDate = DateTime.fromISO(time.week).startOf("week");
+    return weekDate.toJSDate();
+  } else if (time.mode === "month") {
+    const monthDate = DateTime.fromISO(time.month).startOf("month");
+    return monthDate.toJSDate();
+  } else if (time.mode === "year") {
+    const yearDate = DateTime.fromISO(time.year).startOf("year");
+    return yearDate.toJSDate();
+  } else if (time.mode === "range") {
+    const startDate = DateTime.fromISO(time.startDate).startOf("day");
+    const endDate = DateTime.fromISO(time.endDate).startOf("day");
+    return startDate.toJSDate();
+  }
+  return undefined;
+};
+
 export function Chart({
   data,
   previousData,
@@ -36,17 +57,26 @@ export function Chart({
 }: {
   data: APIResponse<GetPageViewsResponse> | undefined;
   previousData: APIResponse<GetPageViewsResponse> | undefined;
-  max?: number;
+  max: number;
 }) {
   const { time } = useTimeSelection();
+
+  const lengthDiff =
+    (data?.data?.length ?? 0) - (previousData?.data?.length ?? 0);
 
   const formattedData = data?.data?.map((e, i) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
     y: e.pageviews,
-    previousY: previousData?.data?.[i]?.pageviews,
+    previousY:
+      i >= lengthDiff && previousData?.data?.[i - lengthDiff]?.pageviews,
 
     currentTime: DateTime.fromSQL(e.time).toUTC(),
-    previousTime: DateTime.fromSQL(previousData?.data?.[i]?.time ?? "").toUTC(),
+    previousTime:
+      i >= lengthDiff
+        ? DateTime.fromSQL(
+            previousData?.data?.[i - lengthDiff]?.time ?? ""
+          ).toUTC()
+        : undefined,
   }));
 
   const timeRange =
@@ -73,6 +103,7 @@ export function Chart({
         precision: "second",
         useUTC: true,
         max: getMax(time),
+        min: getMin(time),
       }}
       yScale={{
         type: "linear",
@@ -135,7 +166,7 @@ export function Chart({
       fill={[{ match: (d) => d.id === "1", id: "gradient" }]}
       sliceTooltip={({ slice }: any) => {
         const currentY = Number(slice.points[0].data.yFormatted);
-        const previousY = Number(slice.points[0].data.previousY);
+        const previousY = Number(slice.points[0].data.previousY) || 0;
         const currentTime = slice.points[0].data.currentTime as DateTime;
         const previousTime = slice.points[0].data.previousTime as DateTime;
 
@@ -164,14 +195,16 @@ export function Chart({
               </div>
               <div>{round(currentY).toLocaleString()}</div>
             </div>
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <div>
-                {time.mode === "day"
-                  ? previousTime.toFormat("M/d h a")
-                  : previousTime.toLocaleString()}
+            {previousTime && (
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <div>
+                  {time.mode === "day"
+                    ? previousTime.toFormat("M/d h a")
+                    : previousTime.toLocaleString()}
+                </div>
+                <div>{round(previousY).toLocaleString()}</div>
               </div>
-              <div>{round(previousY).toLocaleString()}</div>
-            </div>
+            )}
           </div>
         );
       }}

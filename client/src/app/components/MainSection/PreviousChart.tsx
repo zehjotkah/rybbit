@@ -3,29 +3,45 @@ import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { APIResponse, GetPageViewsResponse } from "../../../hooks/api";
 import { nivoTheme } from "../../../lib/nivo";
-import { useTimeSelection } from "../../../lib/timeSelectionStore";
+import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { useMemo } from "react";
+
+const getMin = (time: Time) => {
+  if (time.mode === "day") {
+    const dayDate = DateTime.fromISO(time.day).startOf("day");
+    return dayDate.toJSDate();
+  } else if (time.mode === "week") {
+    const weekDate = DateTime.fromISO(time.week).startOf("week");
+    return weekDate.toJSDate();
+  } else if (time.mode === "month") {
+    const monthDate = DateTime.fromISO(time.month).startOf("month");
+    return monthDate.toJSDate();
+  } else if (time.mode === "year") {
+    const yearDate = DateTime.fromISO(time.year).startOf("year");
+    return yearDate.toJSDate();
+  } else if (time.mode === "range") {
+    const startDate = DateTime.fromISO(time.startDate).startOf("day");
+    const endDate = DateTime.fromISO(time.endDate).startOf("day");
+    return startDate.toJSDate();
+  }
+  return undefined;
+};
 
 export function PreviousChart({
   data,
   max,
 }: {
   data: APIResponse<GetPageViewsResponse> | undefined;
-  max?: number;
+  max: number;
 }) {
-  const { time } = useTimeSelection();
+  const { previousTime: time } = useTimeSelection();
 
   const formattedData = data?.data?.map((e) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
     y: e.pageviews,
   }));
 
-  const timeRange =
-    time.mode === "range"
-      ? DateTime.fromISO(time.startDate).diff(
-          DateTime.fromISO(time.endDate),
-          "days"
-        ).days
-      : 0;
+  const min = useMemo(() => getMin(time), [data]);
 
   return (
     <ResponsiveLine
@@ -42,13 +58,14 @@ export function PreviousChart({
         format: "%Y-%m-%d %H:%M:%S",
         precision: "second",
         useUTC: true,
+        min,
       }}
       yScale={{
         type: "linear",
         min: 0,
         stacked: false,
         reverse: false,
-        max: max,
+        max,
       }}
       enableGridX={false}
       enableGridY={false}
@@ -86,23 +103,6 @@ export function PreviousChart({
       motionConfig="stiff"
       enableSlices={"x"}
       colors={["hsl(var(--neutral-700))"]}
-      //   sliceTooltip={({ slice }) => {
-      //     // if (isPrevious) return null;
-      //     return (
-      //       <div className="text-sm bg-neutral-900 p-2 rounded-md">
-      //         <div>
-      //           {DateTime.fromJSDate(
-      //             slice.points[0].data.x as any
-      //           ).toLocaleString(DateTime.DATETIME_SHORT)}
-      //         </div>
-      //         <div>
-      //           {round(Number(slice.points[0].data.yFormatted)).toLocaleString()}
-      //         </div>
-      //       </div>
-      //     );
-      //   }}
-
-      // layers={["grid", "markers", "areas", "", "lines", "points", "slices", "axes", "legends"]}
     />
   );
 }

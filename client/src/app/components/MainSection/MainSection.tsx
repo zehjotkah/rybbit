@@ -58,7 +58,7 @@ export function MainSection() {
         </div>
         <div className="h-[350px] relative">
           <div className="absolute top-0 left-0 w-full h-full">
-            <PreviousChart data={previousData} />
+            <PreviousChart data={previousData} max={maxOfDataAndPreviousData} />
           </div>
           <div className="absolute top-0 left-0 w-full h-full">
             <Chart

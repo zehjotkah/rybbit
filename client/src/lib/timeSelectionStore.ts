@@ -59,10 +59,11 @@ export const useTimeSelection = create<Store>((set) => ({
         day: DateTime.fromISO(time.day).minus({ days: 1 }).toISODate() ?? "",
       };
     } else if (time.mode === "range") {
-      const timeRangeLength = DateTime.fromISO(time.endDate).diff(
-        DateTime.fromISO(time.startDate),
-        "days"
-      ).days;
+      const timeRangeLength =
+        DateTime.fromISO(time.endDate).diff(
+          DateTime.fromISO(time.startDate),
+          "days"
+        ).days + 1;
 
       if (timeRangeLength > 180) {
         bucketToUse = "month";
