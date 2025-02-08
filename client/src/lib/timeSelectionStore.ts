@@ -33,6 +33,7 @@ export type TimeBucket = "hour" | "day" | "week" | "month";
 
 type Store = {
   time: Time;
+  previousTime: Time;
   setTime: (time: Time) => void;
   bucket: TimeBucket;
   setBucket: (bucket: TimeBucket) => void;
@@ -43,10 +44,20 @@ export const useTimeSelection = create<Store>((set) => ({
     mode: "day",
     day: DateTime.now().toISODate(),
   },
+  previousTime: {
+    mode: "day",
+    day: DateTime.now().minus({ days: 1 }).toISODate(),
+  },
   setTime: (time) => {
     let bucketToUse: TimeBucket = "hour";
+    let previousTime: Time;
+
     if (time.mode === "day") {
       bucketToUse = "hour";
+      previousTime = {
+        mode: "day",
+        day: DateTime.fromISO(time.day).minus({ days: 1 }).toISODate() ?? "",
+      };
     } else if (time.mode === "range") {
       const timeRangeLength = DateTime.fromISO(time.endDate).diff(
         DateTime.fromISO(time.startDate),
@@ -59,12 +70,34 @@ export const useTimeSelection = create<Store>((set) => ({
         bucketToUse = "week";
       }
       bucketToUse = "day";
+
+      previousTime = {
+        mode: "range",
+        startDate:
+          DateTime.fromISO(time.startDate)
+            .minus({ days: timeRangeLength })
+            .toISODate() ?? "",
+        endDate:
+          DateTime.fromISO(time.startDate).minus({ days: 1 }).toISODate() ?? "",
+      };
     } else if (time.mode === "month") {
       bucketToUse = "day";
+      previousTime = {
+        mode: "month",
+        month:
+          DateTime.fromISO(time.month).minus({ months: 1 }).toISODate() ?? "",
+      };
     } else if (time.mode === "year") {
       bucketToUse = "month";
+      previousTime = {
+        mode: "year",
+        year: DateTime.fromISO(time.year).minus({ years: 1 }).toISODate() ?? "",
+      };
+    } else {
+      previousTime = time; // fallback case
     }
-    set({ time, bucket: bucketToUse });
+
+    set({ time, previousTime, bucket: bucketToUse });
   },
   bucket: "hour",
   setBucket: (bucket) => set({ bucket }),

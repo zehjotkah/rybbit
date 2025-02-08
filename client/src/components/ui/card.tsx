@@ -81,7 +81,7 @@ const CardContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "p-4 pt-0 transition-all duration-300 animate-in fade-in-0 zoom-in-95",
+      "relative p-4 pt-0 transition-all duration-300 animate-in fade-in-0 zoom-in-95",
       className
     )}
     {...props}

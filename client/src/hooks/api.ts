@@ -94,15 +94,16 @@ export type GetPageViewsResponse = {
   pageviews: number;
 }[];
 
-export function useGetPageviews(): UseQueryResult<
-  APIResponse<GetPageViewsResponse>
-> {
-  const { time, bucket } = useTimeSelection();
+export function useGetPageviews(
+  usePrevious?: boolean
+): UseQueryResult<APIResponse<GetPageViewsResponse>> {
+  const { time, previousTime, bucket } = useTimeSelection();
+  const timeToUse = usePrevious ? previousTime : time;
 
-  const { startDate, endDate } = getStartAndEndDate(time);
+  const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: ["pageviews", time, bucket],
+    queryKey: ["pageviews", timeToUse, bucket],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return fetch(

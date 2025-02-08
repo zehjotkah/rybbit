@@ -4,7 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { round } from "lodash";
 import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
-import { GetPageViewsResponse } from "../../../hooks/api";
+import { APIResponse, GetPageViewsResponse } from "../../../hooks/api";
 
 export const nivoTheme: Theme = {
   axis: {
@@ -77,13 +77,10 @@ const getMax = (time: Time) => {
 
 export function Chart({
   data,
+  previousData,
 }: {
-  data:
-    | {
-        data?: GetPageViewsResponse;
-        error?: string;
-      }
-    | undefined;
+  data: APIResponse<GetPageViewsResponse> | undefined;
+  previousData: APIResponse<GetPageViewsResponse> | undefined;
 }) {
   const { time } = useTimeSelection();
 
@@ -92,9 +89,29 @@ export function Chart({
     y: e.pageviews,
   }));
 
+  const timeRange =
+    time.mode === "range"
+      ? DateTime.fromISO(time.startDate).diff(
+          DateTime.fromISO(time.endDate),
+          "days"
+        ).days
+      : 0;
+
+  const formattedPreviousData = previousData?.data?.map((e) => ({
+    x: DateTime.fromSQL(e.time)
+      .plus({ days: timeRange || 1 })
+      .toUTC()
+      .toFormat("yyyy-MM-dd HH:mm:ss"),
+    y: e.pageviews,
+  }));
+
   return (
     <ResponsiveLine
       data={[
+        {
+          id: "2",
+          data: formattedPreviousData ?? [],
+        },
         {
           id: "1",
           data: formattedData ?? [],
@@ -113,7 +130,7 @@ export function Chart({
         type: "linear",
         min: 0,
         max: "auto",
-        stacked: true,
+        stacked: false,
         reverse: false,
       }}
       enableGridX={false}
@@ -152,7 +169,7 @@ export function Chart({
       useMesh={true}
       motionConfig="stiff"
       enableSlices={"x"}
-      colors={["hsl(var(--fuchsia-400))"]}
+      colors={["hsl(var(--neutral-700))", "hsl(var(--fuchsia-400))"]}
       enableArea={true}
       areaBaselineValue={0}
       areaOpacity={0.3}
@@ -166,7 +183,7 @@ export function Chart({
           ],
         },
       ]}
-      fill={[{ match: "*", id: "gradient" }]}
+      fill={[{ match: (d) => d.id === "1", id: "gradient" }]}
       sliceTooltip={({ slice }) => {
         return (
           <div className="text-sm bg-neutral-900 p-2 rounded-md">
@@ -181,6 +198,7 @@ export function Chart({
           </div>
         );
       }}
+      // layers={["grid", "markers", "areas", "", "lines", "points", "slices", "axes", "legends"]}
     />
   );
 }

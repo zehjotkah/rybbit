@@ -7,6 +7,11 @@ import { Chart } from "./Chart";
 export function MainSection() {
   const { data, isFetching, error } = useGetPageviews();
   const {
+    data: previousData,
+    isFetching: isPreviousFetching,
+    error: previousError,
+  } = useGetPageviews(true);
+  const {
     data: overviewData,
     isFetching: isOverviewFetching,
     error: overviewError,
@@ -46,7 +51,7 @@ export function MainSection() {
           <BucketSelection />
         </div>
         <div className="h-[350px]">
-          <Chart data={data} />
+          <Chart data={data} previousData={previousData} />
         </div>
       </CardContent>
     </Card>
