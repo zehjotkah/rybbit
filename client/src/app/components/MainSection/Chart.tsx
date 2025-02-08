@@ -10,7 +10,6 @@ export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
 const getMax = (time: Time) => {
   const now = DateTime.now();
-
   if (time.mode === "day") {
     const dayDate = DateTime.fromISO(time.day)
       .endOf("day")
@@ -59,23 +58,24 @@ export function Chart({
   previousData: APIResponse<GetPageViewsResponse> | undefined;
   max: number;
 }) {
-  const { time } = useTimeSelection();
+  const { time, bucket } = useTimeSelection();
 
-  const lengthDiff =
-    (data?.data?.length ?? 0) - (previousData?.data?.length ?? 0);
+  // When the current period has more datapoints than the previous period,
+  // we need to shift the previous datapoints to the right by the difference in length
+  const lengthDiff = Math.max(
+    (data?.data?.length ?? 0) - (previousData?.data?.length ?? 0),
+    0
+  );
 
   const formattedData = data?.data?.map((e, i) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
     y: e.pageviews,
     previousY:
       i >= lengthDiff && previousData?.data?.[i - lengthDiff]?.pageviews,
-
-    currentTime: DateTime.fromSQL(e.time).toUTC(),
+    currentTime: DateTime.fromSQL(e.time),
     previousTime:
       i >= lengthDiff
-        ? DateTime.fromSQL(
-            previousData?.data?.[i - lengthDiff]?.time ?? ""
-          ).toUTC()
+        ? DateTime.fromSQL(previousData?.data?.[i - lengthDiff]?.time ?? "")
         : undefined,
   }));
 
@@ -175,21 +175,23 @@ export function Chart({
 
         return (
           <div className="text-sm bg-neutral-900 p-2 rounded-md">
-            <div
-              className="text-lg font-medium"
-              style={{
-                color:
-                  diffPercentage > 0
-                    ? "hsl(var(--green-400))"
-                    : "hsl(var(--red-400))",
-              }}
-            >
-              {diffPercentage > 0 ? "+" : ""}
-              {diffPercentage.toFixed(2)}%
-            </div>
+            {previousY ? (
+              <div
+                className="text-lg font-medium"
+                style={{
+                  color:
+                    diffPercentage > 0
+                      ? "hsl(var(--green-400))"
+                      : "hsl(var(--red-400))",
+                }}
+              >
+                {diffPercentage > 0 ? "+" : ""}
+                {diffPercentage.toFixed(2)}%
+              </div>
+            ) : null}
             <div className="flex justify-between text-sm w-36">
               <div>
-                {time.mode === "day"
+                {bucket === "hour"
                   ? currentTime.toFormat("M/d h a")
                   : currentTime.toLocaleString()}
               </div>
@@ -198,7 +200,7 @@ export function Chart({
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
                 <div>
-                  {time.mode === "day"
+                  {bucket === "hour"
                     ? previousTime.toFormat("M/d h a")
                     : previousTime.toLocaleString()}
                 </div>
