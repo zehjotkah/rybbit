@@ -3,6 +3,7 @@ import { Card, CardContent, CardLoader } from "@/components/ui/card";
 import { useGetOverview, useGetPageviews } from "../../../hooks/api";
 import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
+import { PreviousChart } from "./PreviousChart";
 
 export function MainSection() {
   const { data, isFetching, error } = useGetPageviews();
@@ -16,6 +17,11 @@ export function MainSection() {
     isFetching: isOverviewFetching,
     error: overviewError,
   } = useGetOverview();
+
+  const maxOfDataAndPreviousData = Math.max(
+    Math.max(...(data?.data?.map((d) => d.pageviews) ?? [])),
+    Math.max(...(previousData?.data?.map((d) => d.pageviews) ?? []))
+  );
 
   return (
     <Card>
@@ -50,8 +56,17 @@ export function MainSection() {
           </div>
           <BucketSelection />
         </div>
-        <div className="h-[350px]">
-          <Chart data={data} previousData={previousData} />
+        <div className="h-[350px] relative">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <PreviousChart data={previousData} />
+          </div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <Chart
+              data={data}
+              max={maxOfDataAndPreviousData}
+              previousData={previousData}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

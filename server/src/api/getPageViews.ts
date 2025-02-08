@@ -39,6 +39,8 @@ export async function getPageViews(
         time ASC
   `;
 
+  console.info(query);
+
   try {
     const result = await clickhouse.query({
       query,

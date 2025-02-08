@@ -1,56 +1,10 @@
 "use client";
-import { Theme } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
-import { DateTime } from "luxon";
 import { round } from "lodash";
-import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { DateTime } from "luxon";
 import { APIResponse, GetPageViewsResponse } from "../../../hooks/api";
-
-export const nivoTheme: Theme = {
-  axis: {
-    legend: {
-      text: {
-        fill: "hsl(var(--neutral-400))",
-      },
-    },
-    ticks: {
-      line: {},
-      text: {
-        fill: "hsl(var(--neutral-400))",
-      },
-    },
-  },
-  grid: {
-    line: {
-      stroke: "hsl(var(--neutral-800))",
-      strokeWidth: 1,
-    },
-  },
-  tooltip: {
-    basic: {
-      fontFamily: "Roboto Mono",
-    },
-    container: {
-      backdropFilter: "blur( 7px )",
-      background: "rgb(40, 40, 40, 0.8)",
-      color: "rgb(255, 255, 255)",
-    },
-  },
-  crosshair: { line: { stroke: "hsl(var(--neutral-50))" } },
-  annotations: {
-    text: {
-      fill: "hsl(var(--neutral-400))",
-    },
-  },
-  text: {
-    fill: "hsl(var(--neutral-400))",
-  },
-  labels: {
-    text: {
-      fill: "hsl(var(--neutral-400))",
-    },
-  },
-};
+import { nivoTheme } from "../../../lib/nivo";
+import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -78,15 +32,21 @@ const getMax = (time: Time) => {
 export function Chart({
   data,
   previousData,
+  max,
 }: {
   data: APIResponse<GetPageViewsResponse> | undefined;
   previousData: APIResponse<GetPageViewsResponse> | undefined;
+  max?: number;
 }) {
   const { time } = useTimeSelection();
 
-  const formattedData = data?.data?.map((e) => ({
+  const formattedData = data?.data?.map((e, i) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
     y: e.pageviews,
+    previousY: previousData?.data?.[i]?.pageviews,
+
+    currentTime: DateTime.fromSQL(e.time).toUTC(),
+    previousTime: DateTime.fromSQL(previousData?.data?.[i]?.time ?? "").toUTC(),
   }));
 
   const timeRange =
@@ -97,28 +57,16 @@ export function Chart({
         ).days
       : 0;
 
-  const formattedPreviousData = previousData?.data?.map((e) => ({
-    x: DateTime.fromSQL(e.time)
-      .plus({ days: timeRange || 1 })
-      .toUTC()
-      .toFormat("yyyy-MM-dd HH:mm:ss"),
-    y: e.pageviews,
-  }));
-
   return (
     <ResponsiveLine
       data={[
-        {
-          id: "2",
-          data: formattedPreviousData ?? [],
-        },
         {
           id: "1",
           data: formattedData ?? [],
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 20, right: 20, bottom: 20, left: 30 }}
+      margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
@@ -129,11 +77,12 @@ export function Chart({
       yScale={{
         type: "linear",
         min: 0,
-        max: "auto",
         stacked: false,
         reverse: false,
+        max: max,
       }}
       enableGridX={false}
+      enableGridY={true}
       yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}
@@ -169,7 +118,7 @@ export function Chart({
       useMesh={true}
       motionConfig="stiff"
       enableSlices={"x"}
-      colors={["hsl(var(--neutral-700))", "hsl(var(--fuchsia-400))"]}
+      colors={["hsl(var(--fuchsia-400))"]}
       enableArea={true}
       areaBaselineValue={0}
       areaOpacity={0.3}
@@ -184,21 +133,48 @@ export function Chart({
         },
       ]}
       fill={[{ match: (d) => d.id === "1", id: "gradient" }]}
-      sliceTooltip={({ slice }) => {
+      sliceTooltip={({ slice }: any) => {
+        const currentY = Number(slice.points[0].data.yFormatted);
+        const previousY = Number(slice.points[0].data.previousY);
+        const currentTime = slice.points[0].data.currentTime as DateTime;
+        const previousTime = slice.points[0].data.previousTime as DateTime;
+
+        const diff = currentY - previousY;
+        const diffPercentage = (diff / previousY) * 100;
+
         return (
           <div className="text-sm bg-neutral-900 p-2 rounded-md">
-            <div>
-              {DateTime.fromJSDate(
-                slice.points[0].data.x as any
-              ).toLocaleString(DateTime.DATETIME_SHORT)}
+            <div
+              className="text-lg font-medium"
+              style={{
+                color:
+                  diffPercentage > 0
+                    ? "hsl(var(--green-400))"
+                    : "hsl(var(--red-400))",
+              }}
+            >
+              {diffPercentage > 0 ? "+" : ""}
+              {diffPercentage.toFixed(2)}%
             </div>
-            <div>
-              {round(Number(slice.points[0].data.yFormatted)).toLocaleString()}
+            <div className="flex justify-between text-sm w-36">
+              <div>
+                {time.mode === "day"
+                  ? currentTime.toFormat("M/d h a")
+                  : currentTime.toLocaleString()}
+              </div>
+              <div>{round(currentY).toLocaleString()}</div>
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <div>
+                {time.mode === "day"
+                  ? previousTime.toFormat("M/d h a")
+                  : previousTime.toLocaleString()}
+              </div>
+              <div>{round(previousY).toLocaleString()}</div>
             </div>
           </div>
         );
       }}
-      // layers={["grid", "markers", "areas", "", "lines", "points", "slices", "axes", "legends"]}
     />
   );
 }

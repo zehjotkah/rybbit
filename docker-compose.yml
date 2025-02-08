@@ -33,7 +33,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - CLICKHOUSE_HOST=http://clickhouse:8123
       - CLICKHOUSE_DB=analytics
       - POSTGRES_HOST=postgres
