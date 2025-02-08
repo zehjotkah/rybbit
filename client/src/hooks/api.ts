@@ -11,14 +11,18 @@ export type APIResponse<T> = {
   error?: string;
 };
 
+type PeriodTime = "current" | "previous";
+
 export function useGenericQuery<T>(
-  endpoint: string
+  endpoint: string,
+  periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<T>> {
-  const { time } = useTimeSelection();
-  const { startDate, endDate } = getStartAndEndDate(time);
+  const { time, previousTime } = useTimeSelection();
+  const timeToUse = periodTime === "previous" ? previousTime : time;
+  const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [endpoint, time],
+    queryKey: [endpoint, timeToUse],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return fetch(
@@ -95,10 +99,10 @@ export type GetPageViewsResponse = {
 }[];
 
 export function useGetPageviews(
-  usePrevious?: boolean
+  periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<GetPageViewsResponse>> {
   const { time, previousTime, bucket } = useTimeSelection();
-  const timeToUse = usePrevious ? previousTime : time;
+  const timeToUse = periodTime === "previous" ? previousTime : time;
 
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
@@ -121,6 +125,6 @@ export type GetOverviewResponse = {
   users: number;
 };
 
-export function useGetOverview() {
-  return useGenericQuery<GetOverviewResponse>("overview");
+export function useGetOverview(periodTime?: PeriodTime) {
+  return useGenericQuery<GetOverviewResponse>("overview", periodTime);
 }
