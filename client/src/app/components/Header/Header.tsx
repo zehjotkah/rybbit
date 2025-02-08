@@ -3,9 +3,40 @@ import { Circle } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { goBack, goForward } from "@/lib/timeSelectionStore";
+import {
+  goBack,
+  goForward,
+  Time,
+  useTimeSelection,
+} from "@/lib/timeSelectionStore";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateSelector } from "./DateSelector";
+import { DateTime } from "luxon";
+
+const canGoForward = (time: Time) => {
+  const currentDay = DateTime.now().startOf("day");
+  if (time.mode === "day") {
+    return !(DateTime.fromISO(time.day).startOf("day") >= currentDay);
+  }
+
+  if (time.mode === "range") {
+    return !(DateTime.fromISO(time.endDate).startOf("day") >= currentDay);
+  }
+
+  if (time.mode === "week") {
+    return !(DateTime.fromISO(time.week).startOf("week") >= currentDay);
+  }
+
+  if (time.mode === "month") {
+    return !(DateTime.fromISO(time.month).startOf("month") >= currentDay);
+  }
+
+  if (time.mode === "year") {
+    return !(DateTime.fromISO(time.year).startOf("year") >= currentDay);
+  }
+
+  return false;
+};
 
 export function Header() {
   const { data } = useQuery<{ count: number }>({
@@ -15,6 +46,8 @@ export function Header() {
         (res) => res.json()
       ),
   });
+
+  const { time } = useTimeSelection();
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -33,7 +66,12 @@ export function Header() {
           <Button variant="default" size="icon" onClick={goBack}>
             <ChevronLeft />
           </Button>
-          <Button variant="default" size="icon" onClick={goForward}>
+          <Button
+            variant="default"
+            size="icon"
+            onClick={goForward}
+            disabled={!canGoForward(time)}
+          >
             <ChevronRight />
           </Button>
         </div>
