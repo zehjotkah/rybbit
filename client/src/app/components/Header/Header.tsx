@@ -53,6 +53,10 @@ export function Header() {
     <div className="flex items-center justify-between py-2">
       <div className="flex gap-3">
         <div className="flex items-center gap-2 text-xl font-bold">
+          <img
+            className="w-7 mr-1"
+            src={`https://www.google.com/s2/favicons?domain=${`tomato.gg`}&sz=64`}
+          />
           <div>Tomato.gg</div>
         </div>
         <div className="flex items-center gap-1 text-base text-neutral-600 dark:text-neutral-400">

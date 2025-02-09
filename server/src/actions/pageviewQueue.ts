@@ -31,46 +31,50 @@ class PageviewQueue {
     if (this.processing || this.queue.length === 0) return;
     this.processing = true;
 
-    try {
-      // Get batch of pageviews
-      const batch = this.queue.splice(0, this.batchSize);
-      const ips = [...new Set(batch.map((pv) => pv.ipAddress))];
+    // Get batch of pageviews
+    const batch = this.queue.splice(0, this.batchSize);
+    const ips = [...new Set(batch.map((pv) => pv.ipAddress))];
 
+    let geoData: any;
+
+    try {
       // Get geo data for all IPs in batch
       const geoResponse = await fetch("https://tracking.tomato.gg/geoip/bulk", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
           //   "Accept-Encoding": "gzip",
         },
         body: JSON.stringify({ ips }),
       });
+      geoData = await geoResponse.json();
+    } catch (error) {
+      console.error("Error getting geo data:", error);
+    }
 
-      const geoData: any = await geoResponse.json();
+    // Process each pageview with its geo data
+    const processedPageviews = batch.map((pv) => ({
+      timestamp: DateTime.fromISO(pv.timestamp).toFormat("yyyy-MM-dd HH:mm:ss"),
+      session_id: pv.sessionId,
+      user_id: pv.userId,
+      hostname: pv.hostname || "",
+      pathname: pv.pathname || "",
+      querystring: pv.querystring || "",
+      page_title: pv.page_title || "",
+      referrer: pv.referrer || "",
+      browser: pv.ua.browser.name || "",
+      operating_system: pv.ua.os.name || "",
+      language: pv.language || "",
+      screen_width: pv.screenWidth || 0,
+      screen_height: pv.screenHeight || 0,
+      device_type: getDeviceType(pv.screenWidth, pv.screenHeight, pv.ua),
+      country: geoData?.[pv.ipAddress]?.data?.countryIso || "",
+    }));
 
-      // Process each pageview with its geo data
-      const processedPageviews = batch.map((pv) => ({
-        timestamp: DateTime.fromISO(pv.timestamp).toFormat(
-          "yyyy-MM-dd HH:mm:ss"
-        ),
-        session_id: pv.sessionId,
-        user_id: pv.userId,
-        hostname: pv.hostname || "",
-        pathname: pv.pathname || "",
-        querystring: pv.querystring || "",
-        page_title: pv.page_title || "",
-        referrer: pv.referrer || "",
-        browser: pv.ua.browser.name || "",
-        operating_system: pv.ua.os.name || "",
-        language: pv.language || "",
-        screen_width: pv.screenWidth || 0,
-        screen_height: pv.screenHeight || 0,
-        device_type: getDeviceType(pv.screenWidth, pv.screenHeight, pv.ua),
-        country: geoData[pv.ipAddress]?.data?.countryIso || "",
-      }));
-
-      console.info("bulk insert: ", processedPageviews.length);
-      // Bulk insert into database
+    console.info("bulk insert: ", processedPageviews.length);
+    // Bulk insert into database
+    try {
       await clickhouse.insert({
         table: "pageviews",
         values: processedPageviews,

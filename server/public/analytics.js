@@ -58,13 +58,11 @@
   const originalReplaceState = history.replaceState;
 
   history.pushState = function (...args) {
-    console.info("pushState");
     originalPushState.apply(this, args);
     debouncedTrackPageview();
   };
 
   history.replaceState = function (...args) {
-    console.info("replaceState");
     originalReplaceState.apply(this, args);
     debouncedTrackPageview();
   };

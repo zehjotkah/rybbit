@@ -39,7 +39,7 @@ function convertPostgresToClickhouse(postgresTimestamp: string): string {
 export async function cleanupOldSessions() {
   const deletedSessions = await sql<Session[]>`
     DELETE FROM active_sessions 
-    WHERE last_activity < NOW() - INTERVAL '10 minute'
+    WHERE last_activity < NOW() - INTERVAL '30 minute'
     RETURNING *
   `;
 
