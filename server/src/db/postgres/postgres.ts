@@ -1,5 +1,8 @@
 import postgres from "postgres";
 import { Session } from "./types";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const sql = postgres({
   host: process.env.POSTGRES_HOST || "postgres",

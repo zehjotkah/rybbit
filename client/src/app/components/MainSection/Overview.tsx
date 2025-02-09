@@ -1,7 +1,32 @@
 import { Badge } from "../../../components/ui/badge";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { useGetOverview } from "../../../hooks/api";
-import CountUp from "react-countup";
 import { formatter } from "../../../lib/utils";
+
+const ChangePercentage = ({
+  current,
+  previous,
+}: {
+  current: number;
+  previous: number;
+}) => {
+  const change = ((current - previous) / previous) * 100;
+
+  if (change === 0) {
+    return (
+      <Badge variant="minimal" className="text-xs">
+        0%
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant={change > 0 ? "green" : "red"} className="text-xs">
+      {change > 0 ? "+" : ""}
+      {change.toFixed(0)}%
+    </Badge>
+  );
+};
 
 export function Overview() {
   const {
@@ -17,24 +42,12 @@ export function Overview() {
 
   const currentUsers = overviewData?.data?.users ?? 0;
   const previousUsers = overviewDataPrevious?.data?.users ?? 0;
-  const usersChange = ((currentUsers - previousUsers) / previousUsers) * 100;
-  const usersChangePercentage = usersChange;
 
   const currentSessions = overviewData?.data?.sessions ?? 0;
   const previousSessions = overviewDataPrevious?.data?.sessions ?? 0;
-  const sessionsChange =
-    ((currentSessions - previousSessions) / previousSessions) * 100;
-  const sessionsChangePercentage = sessionsChange;
 
   const currentPageviews = overviewData?.data?.pageviews ?? 0;
   const previousPageviews = overviewDataPrevious?.data?.pageviews ?? 0;
-  const pageviewsChange =
-    ((currentPageviews - previousPageviews) / previousPageviews) * 100;
-  const pageviewsChangePercentage = pageviewsChange;
-
-  if (isLoading) {
-    return <div className="h-[60px]"></div>;
-  }
 
   return (
     <div className="flex gap-8 items-center">
@@ -43,21 +56,20 @@ export function Overview() {
           Unique Users
         </div>
         <div className="text-3xl font-medium flex gap-2 items-center">
-          <CountUp
-            start={previousUsers}
-            end={currentUsers}
-            duration={0.5}
-            separator=","
-            formattingFn={formatter}
-          />
-          {!isLoading && (
-            <Badge
-              variant={usersChangePercentage > 0 ? "green" : "red"}
-              className="text-xs"
-            >
-              {usersChangePercentage > 0 ? "+" : ""}
-              {usersChangePercentage.toFixed(0)}%
-            </Badge>
+          {isLoading ? (
+            <>
+              <Skeleton className="w-[60px] h-7 rounded-md" />
+              <Skeleton className="w-[30px] h-5 rounded-md" />
+            </>
+          ) : (
+            <>
+              {formatter(currentUsers)}
+
+              <ChangePercentage
+                current={currentUsers}
+                previous={previousUsers}
+              />
+            </>
           )}
         </div>
       </div>
@@ -67,22 +79,19 @@ export function Overview() {
           Sessions
         </div>
         <div className="text-3xl font-medium flex gap-2 items-center">
-          <CountUp
-            start={previousSessions}
-            end={currentSessions}
-            duration={0.5}
-            separator=","
-            formattingFn={formatter}
-          />
-
-          {!isLoading && (
-            <Badge
-              variant={sessionsChangePercentage > 0 ? "green" : "red"}
-              className="text-xs"
-            >
-              {sessionsChangePercentage > 0 ? "+" : ""}
-              {sessionsChangePercentage.toFixed(0)}%
-            </Badge>
+          {isLoading ? (
+            <>
+              <Skeleton className="w-[60px] h-7 rounded-md" />
+              <Skeleton className="w-[30px] h-5 rounded-md" />
+            </>
+          ) : (
+            <>
+              {formatter(currentSessions)}
+              <ChangePercentage
+                current={currentSessions}
+                previous={previousSessions}
+              />
+            </>
           )}
         </div>
       </div>
@@ -91,21 +100,19 @@ export function Overview() {
           Pageviews
         </div>
         <div className="text-3xl font-medium flex gap-2 items-center">
-          <CountUp
-            start={previousPageviews}
-            end={currentPageviews}
-            duration={0.5}
-            separator=","
-            formattingFn={formatter}
-          />
-          {!isLoading && (
-            <Badge
-              variant={pageviewsChangePercentage > 0 ? "green" : "red"}
-              className="text-xs"
-            >
-              {pageviewsChangePercentage > 0 ? "+" : ""}
-              {pageviewsChangePercentage.toFixed(0)}%
-            </Badge>
+          {isLoading ? (
+            <>
+              <Skeleton className="w-[60px] h-7 rounded-md" />
+              <Skeleton className="w-[30px] h-5 rounded-md" />
+            </>
+          ) : (
+            <>
+              {formatter(currentPageviews)}
+              <ChangePercentage
+                current={currentPageviews}
+                previous={previousPageviews}
+              />
+            </>
           )}
         </div>
       </div>

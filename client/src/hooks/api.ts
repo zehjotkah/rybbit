@@ -30,6 +30,7 @@ export function useGenericQuery<T>(
       ).then((res) => res.json());
     },
     staleTime: Infinity,
+    placeholderData: keepPreviousData,
   });
 }
 
