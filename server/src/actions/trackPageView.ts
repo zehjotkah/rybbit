@@ -52,9 +52,7 @@ const updateSession = async (
     screen_width: pageview.screenWidth || 0,
     screen_height: pageview.screenHeight || 0,
     browser: pageview.ua.browser.name || "",
-    browser_version: pageview.ua.browser.major || "",
     operating_system: pageview.ua.os.name || "",
-    operating_system_version: pageview.ua.os.version || "",
     language: pageview.language || "",
     referrer: pageview.referrer || "",
   };
