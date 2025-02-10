@@ -116,6 +116,11 @@ export async function trackPageView(
     sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
 
+  console.info(
+    userAgentParser(userAgent).browser,
+    userAgentParser(userAgent).os
+  );
+
   pageviewQueue.add(payload);
   // insertPageview(payload);
   updateSession(payload, existingSession);
