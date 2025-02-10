@@ -17,43 +17,6 @@ type TotalPayload = TrackingPayload & {
   ipAddress: string;
 };
 
-// const insertPageview = async (pageview: TotalPayload) => {
-//   try {
-//     const formattedTimestamp = DateTime.fromISO(pageview.timestamp).toFormat(
-//       "yyyy-MM-dd HH:mm:ss"
-//     );
-//     await clickhouse.insert({
-//       table: "pageviews",
-//       values: [
-//         {
-//           timestamp: formattedTimestamp,
-//           session_id: pageview.sessionId,
-//           user_id: pageview.userId,
-//           hostname: pageview.hostname || "",
-//           pathname: pageview.pathname || "",
-//           querystring: pageview.querystring || "",
-//           page_title: pageview.page_title || "",
-//           referrer: pageview.referrer || "",
-//           browser: pageview.ua.browser.name,
-//           operating_system: pageview.ua.os.name,
-//           language: pageview.language || "",
-//           screen_width: pageview.screenWidth || 0,
-//           screen_height: pageview.screenHeight || 0,
-//           device_type: getDeviceType(
-//             pageview.screenWidth,
-//             pageview.screenHeight
-//           ),
-//         },
-//       ],
-//       format: "JSONEachRow",
-//     });
-//     return true;
-//   } catch (error) {
-//     console.error("Error inserting pageview:", error);
-//     return false;
-//   }
-// };
-
 const getExistingSession = async (userId: string): Promise<Pageview | null> => {
   const [existingSession] = await sql<Pageview[]>`
     SELECT * FROM active_sessions WHERE user_id = ${userId}
@@ -89,7 +52,9 @@ const updateSession = async (
     screen_width: pageview.screenWidth || 0,
     screen_height: pageview.screenHeight || 0,
     browser: pageview.ua.browser.name || "",
+    browser_version: pageview.ua.browser.major || "",
     operating_system: pageview.ua.os.name || "",
+    operating_system_version: pageview.ua.os.version || "",
     language: pageview.language || "",
     referrer: pageview.referrer || "",
   };
@@ -115,11 +80,6 @@ export async function trackPageView(
     userId: userId,
     sessionId: existingSession?.session_id || crypto.randomUUID(),
   };
-
-  console.info(
-    userAgentParser(userAgent).browser,
-    userAgentParser(userAgent).os
-  );
 
   pageviewQueue.add(payload);
   // insertPageview(payload);
