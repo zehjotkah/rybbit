@@ -1,3 +1,4 @@
+import { Duration } from "luxon";
 import { Badge } from "../../../components/ui/badge";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useGetOverview } from "../../../hooks/api";
@@ -28,6 +29,39 @@ const ChangePercentage = ({
   );
 };
 
+const Stat = ({
+  title,
+  value,
+  previous,
+  valueFormatter,
+  isLoading,
+}: {
+  title: string;
+  value: number;
+  previous: number;
+  valueFormatter?: (value: number) => string;
+  isLoading: boolean;
+}) => {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="text-sm font-medium text-muted-foreground">{title}</div>
+      <div className="text-3xl font-medium flex gap-2 items-center">
+        {isLoading ? (
+          <>
+            <Skeleton className="w-[60px] h-7 rounded-md" />
+            <Skeleton className="w-[30px] h-5 rounded-md" />
+          </>
+        ) : (
+          <>
+            {valueFormatter ? valueFormatter(value) : value}
+            <ChangePercentage current={value} previous={previous} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export function Overview() {
   const {
     data: overviewData,
@@ -49,73 +83,74 @@ export function Overview() {
   const currentPageviews = overviewData?.data?.pageviews ?? 0;
   const previousPageviews = overviewDataPrevious?.data?.pageviews ?? 0;
 
+  const currentPagesPerSession = overviewData?.data?.pages_per_session ?? 0;
+  const previousPagesPerSession =
+    overviewDataPrevious?.data?.pages_per_session ?? 0;
+
+  const currentBounceRate = overviewData?.data?.bounce_rate ?? 0;
+  const previousBounceRate = overviewDataPrevious?.data?.bounce_rate ?? 0;
+
+  const currentSessionDuration = overviewData?.data?.session_duration ?? 0;
+  const previousSessionDuration =
+    overviewDataPrevious?.data?.session_duration ?? 0;
+
   return (
-    <div className="flex gap-8 items-center">
-      <div className="flex flex-col gap-1">
-        <div className="text-sm font-medium text-muted-foreground">
-          Unique Users
-        </div>
-        <div className="text-3xl font-medium flex gap-2 items-center">
-          {isLoading ? (
-            <>
-              <Skeleton className="w-[60px] h-7 rounded-md" />
-              <Skeleton className="w-[30px] h-5 rounded-md" />
-            </>
-          ) : (
-            <>
-              {formatter(currentUsers)}
+    <div className="flex gap-6 items-center">
+      <Stat
+        title="Unique Users"
+        value={currentUsers}
+        previous={previousUsers}
+        isLoading={isLoading}
+        valueFormatter={formatter}
+      />
+      <Stat
+        title="Sessions"
+        value={currentSessions}
+        previous={previousSessions}
+        isLoading={isLoading}
+        valueFormatter={formatter}
+      />
+      <Stat
+        title="Pageviews"
+        value={currentPageviews}
+        previous={previousPageviews}
+        isLoading={isLoading}
+        valueFormatter={formatter}
+      />
+      <Stat
+        title="Pages per Session"
+        value={currentPagesPerSession}
+        previous={previousPagesPerSession}
+        isLoading={isLoading}
+        valueFormatter={(value) => value.toFixed(1)}
+      />
+      <Stat
+        title="Bounce Rate"
+        value={currentBounceRate}
+        previous={previousBounceRate}
+        isLoading={isLoading}
+        valueFormatter={(value) => `${(value * 100).toFixed(1)}%`}
+      />
+      <Stat
+        title="Session Duration"
+        value={currentSessionDuration}
+        previous={previousSessionDuration}
+        isLoading={isLoading}
+        valueFormatter={(value) => {
+          const duration = Duration.fromMillis(value * 1000);
+          const hours = Math.floor(duration.as("hours"));
+          const minutes = Math.floor(duration.as("minutes") % 60);
+          const seconds = Math.floor(duration.as("seconds") % 60);
 
-              <ChangePercentage
-                current={currentUsers}
-                previous={previousUsers}
-              />
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <div className="text-sm font-medium text-muted-foreground">
-          Sessions
-        </div>
-        <div className="text-3xl font-medium flex gap-2 items-center">
-          {isLoading ? (
-            <>
-              <Skeleton className="w-[60px] h-7 rounded-md" />
-              <Skeleton className="w-[30px] h-5 rounded-md" />
-            </>
-          ) : (
-            <>
-              {formatter(currentSessions)}
-              <ChangePercentage
-                current={currentSessions}
-                previous={previousSessions}
-              />
-            </>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col gap-1">
-        <div className="text-sm font-medium text-muted-foreground">
-          Pageviews
-        </div>
-        <div className="text-3xl font-medium flex gap-2 items-center">
-          {isLoading ? (
-            <>
-              <Skeleton className="w-[60px] h-7 rounded-md" />
-              <Skeleton className="w-[30px] h-5 rounded-md" />
-            </>
-          ) : (
-            <>
-              {formatter(currentPageviews)}
-              <ChangePercentage
-                current={currentPageviews}
-                previous={previousPageviews}
-              />
-            </>
-          )}
-        </div>
-      </div>
+          if (hours > 0) {
+            return `${hours}hr ${minutes}min`;
+          } else if (minutes > 0) {
+            return `${minutes}m ${seconds}s`;
+          } else {
+            return `${seconds}s`;
+          }
+        }}
+      />
     </div>
   );
 }

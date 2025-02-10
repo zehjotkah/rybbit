@@ -124,6 +124,9 @@ export type GetOverviewResponse = {
   sessions: number;
   pageviews: number;
   users: number;
+  pages_per_session: number;
+  bounce_rate: number;
+  session_duration: number;
 };
 
 export function useGetOverview(periodTime?: PeriodTime) {
