@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Self-hosted analytics backend using ClickHouse",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "dev": "tsc && node dist/index.js",
     "build": "tsc",
@@ -13,12 +14,17 @@
     "@fastify/cors": "^10.0.2",
     "@fastify/one-line-logger": "^1.4.0",
     "@fastify/static": "^8.0.4",
+    "@types/pg": "^8.11.11",
+    "better-auth": "^1.1.16",
     "dotenv": "^16.4.7",
     "fastify": "^5.1.0",
+    "fastify-better-auth": "^1.0.0",
     "luxon": "^3.5.0",
     "node-cron": "^3.0.3",
+    "pg": "^8.13.1",
     "postgres": "^3.4.5",
-    "ua-parser-js": "^2.0.0"
+    "ua-parser-js": "^2.0.0",
+    "undici": "^7.3.0"
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",
