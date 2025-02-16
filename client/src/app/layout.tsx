@@ -47,7 +47,9 @@ export default function RootLayout({
           <QueryProvider>
             <div className="min-h-full">
               <TopBar />
-              <main className="flex-1">{children}</main>
+              <main className="flex min-h-screen flex-col items-center p-4">
+                <div className="w-full max-w-6xl">{children}</div>
+              </main>
             </div>
           </QueryProvider>
         </ThemeProvider>
