@@ -1,5 +1,14 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "./ui/navigation-menu";
 
 export function TopBar() {
   return (
@@ -10,7 +19,25 @@ export function TopBar() {
         </Link>
       </div>
       <div className="ml-auto flex items-center space-x-4">
-        <nav className="flex items-center space-x-4">
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <Link href="/">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Dashboard
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/settings">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Settings
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+        {/* <nav className="flex items-center space-x-4">
           <Link
             href="/"
             className="text-sm font-medium transition-colors hover:text-primary"
@@ -23,7 +50,7 @@ export function TopBar() {
           >
             Settings
           </Link>
-        </nav>
+        </nav> */}
         <ThemeToggle />
       </div>
     </div>

@@ -15,6 +15,21 @@ const ChangePercentage = ({
 }) => {
   const change = ((current - previous) / previous) * 100;
 
+  if (previous === 0) {
+    if (current === 0) {
+      return (
+        <Badge variant="minimal" className="text-xs">
+          0%
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="text-xs" variant="green">
+        +999%
+      </Badge>
+    );
+  }
+
   if (change === 0) {
     return (
       <Badge variant="minimal" className="text-xs">

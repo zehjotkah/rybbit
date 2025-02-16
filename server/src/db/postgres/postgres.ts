@@ -59,6 +59,17 @@ export async function initializePostgres() {
           referrer TEXT
         );
       `,
+
+      sql`
+        CREATE TABLE IF NOT EXISTS sites (
+          site_id SERIAL PRIMARY KEY,
+          name TEXT NOT NULL,
+          domain TEXT NOT NULL UNIQUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          created_by TEXT NOT NULL REFERENCES "user" ("id")
+        );
+      `,
     ]);
 
     // Phase 2: Create tables with foreign key dependencies

@@ -1,16 +1,14 @@
 "use client";
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import { TopBar } from "@/components/TopBar";
 import QueryProvider from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { TopBar } from "@/components/TopBar";
-import { authClient } from "../lib/auth";
-import { redirect } from "next/navigation";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { redirect, usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { userStore } from "../lib/useStore";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

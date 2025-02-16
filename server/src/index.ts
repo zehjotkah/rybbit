@@ -23,6 +23,7 @@ import { auth } from "./lib/auth.js";
 import { TrackingPayload } from "./types.js";
 import { toNodeHandler } from "better-auth/node";
 import { mapHeaders } from "./lib/betterAuth.js";
+import { addSite } from "./actions/sites/addSite.js";
 
 // ESM replacement for __dirname:
 const __filename = fileURLToPath(import.meta.url);
@@ -44,7 +45,7 @@ server.register(cors, {
     "http://localhost:3002",
     "https://tracking.tomato.gg",
     "https://tomato.gg",
-  ], // In production, you should specify your frontend domain
+  ],
   credentials: true,
 });
 
@@ -113,11 +114,6 @@ server.addHook("onRequest", async (request, reply) => {
   }
 });
 
-// Health check endpoint
-server.get("/health", async () => {
-  return { status: "ok" };
-});
-
 server.get("/live-user-count", async () => {
   return { count: await getLiveUsercount() };
 });
@@ -130,6 +126,8 @@ server.get("/devices", getDevices);
 server.get("/pages", getPages);
 server.get("/referrers", getReferrers);
 server.get("/pageviews", getPageViews);
+
+server.post("/add-site", addSite);
 
 // Track pageview endpoint
 server.post<{ Body: TrackingPayload }>(
