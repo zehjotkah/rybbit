@@ -1,9 +1,9 @@
 "use client";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
-import { APIResponse, GetPageViewsResponse } from "../../../hooks/api";
-import { nivoTheme } from "../../../lib/nivo";
-import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
+import { nivoTheme } from "@/lib/nivo";
+import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
 import { useMemo } from "react";
 
 const getMin = (time: Time) => {

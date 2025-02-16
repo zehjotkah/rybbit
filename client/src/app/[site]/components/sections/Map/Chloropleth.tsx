@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Feature, FeatureCollection } from "geojson";
 import { scaleLinear } from "d3-scale";
 import dynamic from "next/dynamic";
-import { useGetCountries } from "../../../../hooks/api";
+import { useGetCountries } from "@/hooks/api";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),

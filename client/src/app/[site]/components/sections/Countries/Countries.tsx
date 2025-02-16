@@ -4,7 +4,7 @@ import React from "react";
 import { StandardCard } from "../../shared/StandardCard";
 import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";
-import { useGetCountries } from "../../../../hooks/api";
+import { useGetCountries } from "@/hooks/api";
 
 export function Countries() {
   const { data, isLoading } = useGetCountries();

@@ -3,7 +3,7 @@
 import { Compass } from "lucide-react";
 import Image from "next/image";
 import { StandardCard } from "../../shared/StandardCard";
-import { useGetBrowsers } from "../../../../hooks/api";
+import { useGetBrowsers } from "@/hooks/api";
 
 const BROWSER_TO_LOGO: Record<string, string> = {
   Chrome: "Chrome.svg",

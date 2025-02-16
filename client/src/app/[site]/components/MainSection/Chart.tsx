@@ -2,9 +2,9 @@
 import { ResponsiveLine } from "@nivo/line";
 import { round } from "lodash";
 import { DateTime } from "luxon";
-import { APIResponse, GetPageViewsResponse } from "../../../hooks/api";
-import { nivoTheme } from "../../../lib/nivo";
-import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
+import { nivoTheme } from "@/lib/nivo";
+import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 

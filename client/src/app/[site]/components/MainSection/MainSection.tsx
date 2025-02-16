@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardLoader } from "@/components/ui/card";
-import { useGetOverview, useGetPageviews } from "../../../hooks/api";
+import { useGetOverview, useGetPageviews } from "@/hooks/api";
 import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";

@@ -12,7 +12,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateSelector } from "./DateSelector";
 import { DateTime } from "luxon";
-import { authedFetch } from "../../../hooks/utils";
+import { authedFetch } from "@/hooks/utils";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");

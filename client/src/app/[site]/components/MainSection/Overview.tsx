@@ -1,10 +1,10 @@
 "use client";
 
 import { Duration } from "luxon";
-import { Badge } from "../../../components/ui/badge";
-import { Skeleton } from "../../../components/ui/skeleton";
-import { useGetOverview } from "../../../hooks/api";
-import { formatter } from "../../../lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetOverview } from "@/hooks/api";
+import { formatter } from "@/lib/utils";
 
 const ChangePercentage = ({
   current,

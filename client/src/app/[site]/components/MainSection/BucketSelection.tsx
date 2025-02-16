@@ -1,13 +1,13 @@
 "use client";
 
-import { Time, useTimeSelection } from "../../../lib/timeSelectionStore";
+import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
 import {
   SelectItem,
   Select,
   SelectContent,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/components/ui/select";
 import { DateTime } from "luxon";
 
 const getOptions = (time: Time) => {

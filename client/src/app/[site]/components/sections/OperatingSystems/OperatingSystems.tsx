@@ -3,7 +3,7 @@
 import { Compass } from "lucide-react";
 import { StandardCard } from "../../shared/StandardCard";
 import Image from "next/image";
-import { useGetOperatingSystems } from "../../../../hooks/api";
+import { useGetOperatingSystems } from "@/hooks/api";
 
 const OS_TO_LOGO: Record<string, string> = {
   Windows: "Windows.svg",
