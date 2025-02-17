@@ -1,9 +1,9 @@
 import { createAuthClient } from "better-auth/react";
 import { usernameClient } from "better-auth/client/plugins";
+import { BACKEND_URL } from "./const";
 
 export const authClient = createAuthClient({
-  // baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL?.replace("/api", ""), // the base url of your auth server
+  baseURL: BACKEND_URL,
   plugins: [usernameClient()],
   fetchOptions: {
     credentials: "include",

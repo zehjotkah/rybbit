@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
+import { BACKEND_URL } from "../lib/const";
 
 export type APIResponse<T> = {
   data: T;
@@ -16,9 +17,9 @@ export function useGetLiveUsercount() {
   return useQuery({
     queryKey: ["live-user-count", site],
     queryFn: () =>
-      authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count/${site}`
-      ).then((res) => res.json()),
+      authedFetch(`${BACKEND_URL}/live-user-count/${site}`).then((res) =>
+        res.json()
+      ),
   });
 }
 
@@ -37,7 +38,7 @@ export function useGenericQuery<T>(
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&site=${site}`
+        `${BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&site=${site}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,
@@ -123,7 +124,7 @@ export function useGetPageviews(
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
+        `${BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
       ).then((res) => res.json());
     },
     placeholderData: keepPreviousData,
@@ -158,7 +159,7 @@ export function useGetSites() {
 }
 
 export function addSite(domain: string, name: string) {
-  return authedFetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/add-site`, {
+  return authedFetch(`${BACKEND_URL}/add-site`, {
     method: "POST",
     body: JSON.stringify({
       domain,
@@ -168,10 +169,7 @@ export function addSite(domain: string, name: string) {
 }
 
 export function deleteSite(siteId: string) {
-  return authedFetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-site/${siteId}`,
-    {
-      method: "POST",
-    }
-  );
+  return authedFetch(`${BACKEND_URL}/delete-site/${siteId}`, {
+    method: "POST",
+  });
 }
