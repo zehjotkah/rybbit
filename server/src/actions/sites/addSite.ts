@@ -11,7 +11,7 @@ export async function addSite(
 ) {
   const { domain, name } = request.body;
 
-  const session = await auth.api.getSession({
+  const session = await auth!.api.getSession({
     headers: fromNodeHeaders(request.headers),
   });
 

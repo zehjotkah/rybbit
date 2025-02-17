@@ -20,9 +20,9 @@ import { getPages } from "./api/getPages.js";
 import { getPageViews } from "./api/getPageViews.js";
 import { getReferrers } from "./api/getReferrers.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
-import { initializePostgres } from "./db/postgres/postgres.js";
+import { initializePostgres, sql } from "./db/postgres/postgres.js";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
-import { auth } from "./lib/auth.js";
+import { auth, initAuth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,13 +39,16 @@ const server = Fastify({
 });
 
 // Register CORS
-server.register(cors, {
-  origin: [
-    "http://localhost:3002",
-    "https://tracking.tomato.gg",
-    "https://tomato.gg",
-  ],
-  credentials: true,
+server.register(async (fastify) => {
+  const domains = await sql`SELECT domain FROM sites`;
+  fastify.register(cors, {
+    origin: [
+      "http://localhost:3002",
+      "https://tracking.tomato.gg",
+      ...domains.map(({ domain }) => `https://${domain}`),
+    ],
+    credentials: true,
+  });
 });
 
 // Serve static files
@@ -53,6 +56,8 @@ server.register(fastifyStatic, {
   root: join(__dirname, "../public"),
   prefix: "/", // or whatever prefix you need
 });
+
+await initAuth();
 
 server.register(
   async (fastify, options) => {
@@ -77,7 +82,7 @@ server.register(
       });
     });
   },
-  { auth }
+  { auth: auth! }
 );
 
 server.addHook("onRequest", async (request, reply) => {
@@ -99,7 +104,7 @@ server.addHook("onRequest", async (request, reply) => {
     const headers = new Headers(request.headers as HeadersInit);
 
     // Get session from BetterAuth
-    const session = await auth.api.getSession({ headers });
+    const session = await auth!.api.getSession({ headers });
 
     if (!session) {
       return reply.status(401).send({ error: "Unauthorized" });
