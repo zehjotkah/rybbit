@@ -36,7 +36,7 @@ const updateSession = async (
   }
 
   const inserts = {
-    site_id: pageview.site_id,
+    site_id: pageview.site_id || 0,
     session_id: pageview.sessionId,
     user_id: pageview.userId,
     hostname: pageview.hostname || "",
