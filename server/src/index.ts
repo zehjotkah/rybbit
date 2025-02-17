@@ -1,11 +1,14 @@
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
-import Fastify, { FastifyReply, FastifyRequest } from "fastify";
-import FastifyBetterAuth from "fastify-better-auth";
+import { toNodeHandler } from "better-auth/node";
+import Fastify from "fastify";
 import cron from "node-cron";
 import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 import { Headers, HeadersInit } from "undici"; // Ensure Undici is used for Headers
+import { fileURLToPath } from "url";
+import { addSite } from "./actions/sites/addSite.js";
+import { deleteSite } from "./actions/sites/deleteSite.js";
+import { getSites } from "./actions/sites/getSites.js";
 import { trackPageView } from "./actions/trackPageView.js";
 import { getBrowsers } from "./api/getBrowsers.js";
 import { getCountries } from "./api/getCountries.js";
@@ -20,12 +23,7 @@ import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initializePostgres } from "./db/postgres/postgres.js";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
 import { auth } from "./lib/auth.js";
-import { TrackingPayload } from "./types.js";
-import { toNodeHandler } from "better-auth/node";
 import { mapHeaders } from "./lib/betterAuth.js";
-import { addSite } from "./actions/sites/addSite.js";
-import { getSites } from "./actions/sites/getSites.js";
-import { deleteSite } from "./actions/sites/deleteSite.js";
 
 // ESM replacement for __dirname:
 const __filename = fileURLToPath(import.meta.url);
@@ -134,24 +132,7 @@ server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 
 // Track pageview endpoint
-server.post<{ Body: TrackingPayload }>(
-  "/track/pageview",
-  async (
-    request: FastifyRequest<{ Body: TrackingPayload }>,
-    reply: FastifyReply
-  ) => {
-    try {
-      await trackPageView(request);
-      return { success: true };
-    } catch (error) {
-      request.log.error(error);
-      return reply.status(500).send({
-        success: false,
-        error: "Failed to track pageview",
-      });
-    }
-  }
-);
+server.post("/track/pageview", trackPageView);
 
 const start = async () => {
   try {

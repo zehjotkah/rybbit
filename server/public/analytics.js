@@ -6,7 +6,17 @@
     .getAttribute("src")
     .split("/analytics.js")[0];
 
+  if (!ANALYTICS_HOST) {
+    console.error("Please provide a valid analytics host");
+    return;
+  }
+
   const SITE_ID = scriptTag.getAttribute("site-id");
+
+  if (!SITE_ID || isNaN(Number(SITE_ID))) {
+    console.error("Please provide a valid site ID");
+    return;
+  }
 
   // Get debounce duration from data attribute or default to 300ms
   const debounceDuration = scriptTag.getAttribute("data-debounce")

@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { TrackingPayload } from "../types.js";
 import { getUserId, getDeviceType, getIpAddress } from "../utils.js";
 import crypto from "crypto";
@@ -64,23 +64,34 @@ const updateSession = async (
 };
 
 export async function trackPageView(
-  request: FastifyRequest<{ Body: TrackingPayload }>
+  request: FastifyRequest<{ Body: TrackingPayload }>,
+  reply: FastifyReply
 ) {
-  const userAgent = request.headers["user-agent"] || "";
-  const ipAddress = getIpAddress(request);
-  const userId = getUserId(ipAddress, userAgent);
-  const existingSession = await getExistingSession(userId);
+  try {
+    const userAgent = request.headers["user-agent"] || "";
+    const ipAddress = getIpAddress(request);
+    const userId = getUserId(ipAddress, userAgent);
+    const existingSession = await getExistingSession(userId);
 
-  const payload = {
-    ...request.body,
-    ipAddress: ipAddress,
-    timestamp: new Date().toISOString(),
-    ua: userAgentParser(userAgent),
-    userId: userId,
-    sessionId: existingSession?.session_id || crypto.randomUUID(),
-  };
+    const payload = {
+      ...request.body,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+      ua: userAgentParser(userAgent),
+      userId: userId,
+      sessionId: existingSession?.session_id || crypto.randomUUID(),
+    };
 
-  pageviewQueue.add(payload);
-  // insertPageview(payload);
-  updateSession(payload, existingSession);
+    pageviewQueue.add(payload);
+    // insertPageview(payload);
+    await updateSession(payload, existingSession);
+
+    return reply.status(200).send();
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      error: "Failed to track pageview",
+    });
+  }
 }
