@@ -1,4 +1,5 @@
 export interface TrackingPayload {
+  site_id: string;
   hostname: string;
   pathname: string;
   querystring: string;

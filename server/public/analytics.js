@@ -6,6 +6,8 @@
     .getAttribute("src")
     .split("/analytics.js")[0];
 
+  const SITE_ID = scriptTag.getAttribute("site-id");
+
   // Get debounce duration from data attribute or default to 300ms
   const debounceDuration = scriptTag.getAttribute("data-debounce")
     ? Math.max(0, parseInt(scriptTag.getAttribute("data-debounce")))
@@ -24,6 +26,7 @@
   const trackPageview = () => {
     const url = new URL(window.location.href);
     const payload = {
+      site_id: SITE_ID,
       hostname: url.hostname,
       pathname: url.pathname,
       querystring: url.search,

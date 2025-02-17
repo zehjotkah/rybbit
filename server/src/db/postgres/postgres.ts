@@ -43,6 +43,7 @@ export async function initializePostgres() {
       sql<Session[]>`
         CREATE TABLE IF NOT EXISTS active_sessions (
           session_id TEXT PRIMARY KEY,
+          site_id INT,
           user_id TEXT,
           hostname TEXT,
           start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

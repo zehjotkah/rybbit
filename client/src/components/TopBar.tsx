@@ -1,14 +1,5 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "./ui/navigation-menu";
 
 export function TopBar() {
   return (
@@ -19,47 +10,15 @@ export function TopBar() {
             🐸 Frogstats
           </Link>
         </div>
-        <div className="ml-auto flex items-center space-x-4">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <Link href="/">
-                  <NavigationMenuLink
-                    className={navigationMenuTriggerStyle()}
-                    asChild
-                  >
-                    Dashboard
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/settings">
-                  <NavigationMenuLink
-                    className={navigationMenuTriggerStyle()}
-                    asChild
-                  >
-                    Settings
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-          {/* <nav className="flex items-center space-x-4">
-          <Link
-          href="/"
-          className="text-sm font-medium transition-colors hover:text-primary"
-          >
-          Dashboard
+        <nav className="ml-auto flex items-center space-x-6">
+          <Link href="/" className="text-neutral-100">
+            Websites
           </Link>
-          <Link
-          href="/settings"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-          >
-          Settings
+          <Link href="/settings" className="text-neutral-100">
+            Settings
           </Link>
-          </nav> */}
           <ThemeToggle />
-        </div>
+        </nav>
       </div>
     </div>
   );

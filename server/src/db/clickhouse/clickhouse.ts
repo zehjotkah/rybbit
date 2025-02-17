@@ -11,6 +11,7 @@ export const initializeClickhouse = async () => {
   await clickhouse.exec({
     query: `
       CREATE TABLE IF NOT EXISTS pageviews (
+        site_id Uint16,
         timestamp DateTime,
         session_id String,
         user_id String,
@@ -39,6 +40,7 @@ export const initializeClickhouse = async () => {
   await clickhouse.exec({
     query: `
       CREATE TABLE IF NOT EXISTS sessions (
+        site_id Uint16,
         hostname String,
         session_id String,
         start_time DateTime,

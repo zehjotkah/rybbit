@@ -55,6 +55,7 @@ class PageviewQueue {
 
     // Process each pageview with its geo data
     const processedPageviews = batch.map((pv) => ({
+      site_id: pv.site_id,
       timestamp: DateTime.fromISO(pv.timestamp).toFormat("yyyy-MM-dd HH:mm:ss"),
       session_id: pv.sessionId,
       user_id: pv.userId,
