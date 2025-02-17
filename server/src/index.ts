@@ -38,17 +38,17 @@ const server = Fastify({
   trustProxy: true,
 });
 
-// Register CORS
-server.register(async (fastify) => {
-  const domains = await sql`SELECT domain FROM sites`;
-  fastify.register(cors, {
-    origin: [
-      "http://localhost:3002",
-      "https://tracking.tomato.gg",
-      ...domains.map(({ domain }) => `https://${domain}`),
-    ],
-    credentials: true,
-  });
+const domains = await sql`SELECT domain FROM sites`;
+const allowList = [
+  "http://localhost:3002",
+  "https://tracking.tomato.gg",
+  ...domains.map(({ domain }) => `https://${domain}`),
+];
+initAuth(allowList);
+
+server.register(cors, {
+  origin: allowList,
+  credentials: true,
 });
 
 // Serve static files
@@ -56,8 +56,6 @@ server.register(fastifyStatic, {
   root: join(__dirname, "../public"),
   prefix: "/", // or whatever prefix you need
 });
-
-await initAuth();
 
 server.register(
   async (fastify, options) => {

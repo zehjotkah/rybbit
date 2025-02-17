@@ -1,8 +1,7 @@
 import { betterAuth } from "better-auth";
-import pg from "pg";
 import { username } from "better-auth/plugins";
 import dotenv from "dotenv";
-import { sql } from "../db/postgres/postgres.js";
+import pg from "pg";
 
 dotenv.config();
 
@@ -10,9 +9,7 @@ type AuthType = ReturnType<typeof betterAuth> | null;
 
 export let auth: AuthType | null = null;
 
-export const initAuth = async () => {
-  const domains = await sql`SELECT domain FROM sites`;
-  console.info(domains);
+export const initAuth = (allowList: string[]) => {
   auth = betterAuth({
     basePath: "/auth",
     database: new pg.Pool({
@@ -26,11 +23,6 @@ export const initAuth = async () => {
       enabled: true,
     },
     plugins: [username()],
-    trustedOrigins: [
-      "http://localhost:3002",
-      "http://localhost:3001",
-      "https://tracking.tomato.gg",
-      ...domains.map(({ domain }) => `https://${domain}`),
-    ],
+    trustedOrigins: allowList,
   });
 };
