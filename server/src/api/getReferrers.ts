@@ -10,7 +10,9 @@ type GetReferrersResponse = {
 }[];
 
 export async function getReferrers(
-  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  {
+    query: { startDate, endDate, timezone, site },
+  }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const query = `
@@ -21,6 +23,7 @@ export async function getReferrers(
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND site_id = ${site}
     GROUP BY referrer 
     ORDER BY count desc
     LIMIT 100;

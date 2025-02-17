@@ -13,7 +13,9 @@ type GetOverviewResponse = {
 };
 
 export async function getOverview(
-  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  {
+    query: { startDate, endDate, timezone, site },
+  }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const query = `
@@ -43,6 +45,7 @@ export async function getOverview(
             FROM pageviews
             WHERE
                 ${getTimeStatement(startDate, endDate, timezone)}
+                AND site_id = ${site}
             GROUP BY session_id
         )
     ) AS session_stats
@@ -55,6 +58,7 @@ export async function getOverview(
         FROM pageviews
         WHERE 
             ${getTimeStatement(startDate, endDate, timezone)}
+            AND site_id = ${site}
     ) AS page_stats
   `;
 

@@ -1,3 +1,8 @@
 export interface GenericRequest {
-  Querystring: { startDate: string; endDate: string; timezone: string };
+  Querystring: {
+    startDate: string;
+    endDate: string;
+    timezone: string;
+    site: string;
+  };
 }

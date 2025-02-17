@@ -4,7 +4,7 @@ import { round } from "lodash";
 import { DateTime } from "luxon";
 import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
-import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
+import { Time, useStore } from "@/lib/store";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -58,7 +58,7 @@ export function Chart({
   previousData: APIResponse<GetPageViewsResponse> | undefined;
   max: number;
 }) {
-  const { time, bucket } = useTimeSelection();
+  const { time, bucket } = useStore();
 
   // When the current period has more datapoints than the previous period,
   // we need to shift the previous datapoints to the right by the difference in length

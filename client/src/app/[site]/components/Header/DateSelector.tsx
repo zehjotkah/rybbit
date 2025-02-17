@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
+import { Time, useStore } from "@/lib/store";
 import { DateTime } from "luxon";
 import { CustomDateRangePicker } from "./CustomDateRangePicker";
 
@@ -28,7 +28,7 @@ const getLabel = (time: Time) => {
 };
 
 export function DateSelector() {
-  const { time, setTime } = useTimeSelection();
+  const { time, setTime } = useStore();
 
   return (
     <DropdownMenu>

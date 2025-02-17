@@ -1,6 +1,6 @@
 "use client";
 
-import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
+import { Time, useStore } from "@/lib/store";
 import {
   SelectItem,
   Select,
@@ -78,7 +78,7 @@ const getOptions = (time: Time) => {
 };
 
 export function BucketSelection() {
-  const { bucket, setBucket, time } = useTimeSelection();
+  const { bucket, setBucket, time } = useStore();
 
   return (
     <Select value={bucket} onValueChange={setBucket}>

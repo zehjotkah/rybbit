@@ -10,7 +10,9 @@ type GetDevicesResponse = {
 }[];
 
 export async function getDevices(
-  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  {
+    query: { startDate, endDate, timezone, site },
+  }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const query = `
@@ -21,6 +23,7 @@ export async function getDevices(
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND site_id = ${site}
     GROUP BY device_type ORDER BY count desc;
   `;
 

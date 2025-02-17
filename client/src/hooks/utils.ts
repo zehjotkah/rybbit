@@ -1,4 +1,4 @@
-import { Time } from "@/lib/timeSelectionStore";
+import { Time } from "@/lib/store";
 
 export function getStartAndEndDate(time: Time) {
   if (time.mode === "range") {

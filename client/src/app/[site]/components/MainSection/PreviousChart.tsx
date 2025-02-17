@@ -3,7 +3,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
-import { Time, useTimeSelection } from "@/lib/timeSelectionStore";
+import { Time, useStore } from "@/lib/store";
 import { useMemo } from "react";
 
 const getMin = (time: Time) => {
@@ -34,7 +34,7 @@ export function PreviousChart({
   data: APIResponse<GetPageViewsResponse> | undefined;
   max: number;
 }) {
-  const { previousTime: time } = useTimeSelection();
+  const { previousTime: time } = useStore();
 
   const formattedData = data?.data?.map((e) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),

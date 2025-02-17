@@ -10,7 +10,9 @@ type GetBrowsersResponse = {
 }[];
 
 export async function getBrowsers(
-  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  {
+    query: { startDate, endDate, timezone, site },
+  }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const query = `
@@ -21,6 +23,7 @@ export async function getBrowsers(
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND site_id = ${site}
     GROUP BY browser ORDER BY count desc;
   `;
 

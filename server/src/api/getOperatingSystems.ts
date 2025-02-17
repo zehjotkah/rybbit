@@ -10,7 +10,9 @@ type GetOperatingSystemsResponse = {
 }[];
 
 export async function getOperatingSystems(
-  { query: { startDate, endDate, timezone } }: FastifyRequest<GenericRequest>,
+  {
+    query: { startDate, endDate, timezone, site },
+  }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const query = `
@@ -21,6 +23,7 @@ export async function getOperatingSystems(
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND site_id = ${site}
     GROUP BY operating_system ORDER BY count desc;
   `;
 

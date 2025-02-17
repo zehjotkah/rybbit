@@ -3,16 +3,12 @@ import { Circle } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import {
-  goBack,
-  goForward,
-  Time,
-  useTimeSelection,
-} from "@/lib/timeSelectionStore";
+import { goBack, goForward, Time, useStore } from "@/lib/store";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateSelector } from "./DateSelector";
 import { DateTime } from "luxon";
 import { authedFetch } from "@/hooks/utils";
+import { useGetLiveUsercount } from "../../../../hooks/api";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -40,15 +36,8 @@ const canGoForward = (time: Time) => {
 };
 
 export function Header() {
-  const { data } = useQuery<{ count: number }>({
-    queryKey: ["active-sessions"],
-    queryFn: () =>
-      authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count`
-      ).then((res) => res.json()),
-  });
-
-  const { time } = useTimeSelection();
+  const { data } = useGetLiveUsercount();
+  const { time } = useStore();
 
   return (
     <div className="flex items-center justify-between py-2">

@@ -32,6 +32,8 @@ export type Time = DateMode | DateRangeMode | WeekMode | MonthMode | YearMode;
 export type TimeBucket = "hour" | "day" | "week" | "month";
 
 type Store = {
+  site: string;
+  setSite: (site: string) => void;
   time: Time;
   previousTime: Time;
   setTime: (time: Time) => void;
@@ -39,7 +41,9 @@ type Store = {
   setBucket: (bucket: TimeBucket) => void;
 };
 
-export const useTimeSelection = create<Store>((set) => ({
+export const useStore = create<Store>((set) => ({
+  site: "",
+  setSite: (site) => set({ site }),
   time: {
     mode: "day",
     day: DateTime.now().toISODate(),
@@ -105,7 +109,7 @@ export const useTimeSelection = create<Store>((set) => ({
 }));
 
 export const goBack = () => {
-  const { time, setTime } = useTimeSelection.getState();
+  const { time, setTime } = useStore.getState();
 
   if (time.mode === "day") {
     setTime({
@@ -128,7 +132,7 @@ export const goBack = () => {
 };
 
 export const goForward = () => {
-  const { time, setTime } = useTimeSelection.getState();
+  const { time, setTime } = useStore.getState();
 
   if (time.mode === "day") {
     setTime({

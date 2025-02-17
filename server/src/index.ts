@@ -4,7 +4,7 @@ import { toNodeHandler } from "better-auth/node";
 import Fastify from "fastify";
 import cron from "node-cron";
 import { dirname, join } from "path";
-import { Headers, HeadersInit } from "undici"; // Ensure Undici is used for Headers
+import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
 import { addSite } from "./actions/sites/addSite.js";
 import { deleteSite } from "./actions/sites/deleteSite.js";
@@ -25,7 +25,6 @@ import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
 import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
 
-// ESM replacement for __dirname:
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -114,10 +113,7 @@ server.addHook("onRequest", async (request, reply) => {
   }
 });
 
-server.get("/live-user-count", async () => {
-  return { count: await getLiveUsercount() };
-});
-
+server.get("/live-user-count/:site", getLiveUsercount);
 server.get("/overview", getOverview);
 server.get("/countries", getCountries);
 server.get("/browsers", getBrowsers);

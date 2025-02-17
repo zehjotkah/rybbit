@@ -3,7 +3,7 @@ import {
   useQuery,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { useTimeSelection } from "../lib/timeSelectionStore";
+import { useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
 
 export type APIResponse<T> = {
@@ -11,22 +11,33 @@ export type APIResponse<T> = {
   error?: string;
 };
 
+export function useGetLiveUsercount() {
+  const { site } = useStore();
+  return useQuery({
+    queryKey: ["live-user-count", site],
+    queryFn: () =>
+      authedFetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count/${site}`
+      ).then((res) => res.json()),
+  });
+}
+
 type PeriodTime = "current" | "previous";
 
 export function useGenericQuery<T>(
   endpoint: string,
   periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<T>> {
-  const { time, previousTime } = useTimeSelection();
+  const { time, previousTime, site } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [endpoint, timeToUse],
+    queryKey: [endpoint, timeToUse, site],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&site=${site}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,
@@ -102,17 +113,17 @@ export type GetPageViewsResponse = {
 export function useGetPageviews(
   periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<GetPageViewsResponse>> {
-  const { time, previousTime, bucket } = useTimeSelection();
+  const { time, previousTime, bucket, site } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: ["pageviews", timeToUse, bucket],
+    queryKey: ["pageviews", timeToUse, bucket, site],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
       ).then((res) => res.json());
     },
     placeholderData: keepPreviousData,

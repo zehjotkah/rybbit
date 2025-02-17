@@ -15,13 +15,14 @@ type GetPageViewsResponse = { time: string; pageviews: number }[];
 
 export async function getPageViews(
   {
-    query: { startDate, endDate, timezone, bucket },
+    query: { startDate, endDate, timezone, bucket, site },
   }: FastifyRequest<{
     Querystring: {
       startDate: string;
       endDate: string;
       timezone: string;
       bucket: TimeBucket;
+      site: string;
     };
   }>,
   res: FastifyReply
@@ -33,6 +34,7 @@ export async function getPageViews(
     FROM pageviews
     WHERE
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND site_id = ${site}
     GROUP BY
         time
     ORDER BY

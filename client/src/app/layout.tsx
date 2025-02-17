@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { userStore } from "../lib/useStore";
+import { userStore } from "../lib/userStore";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
