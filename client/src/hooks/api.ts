@@ -27,7 +27,7 @@ export function useGenericQuery<T>(
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`
-      );
+      ).then((res) => res.json());
     },
     staleTime: Infinity,
     placeholderData: keepPreviousData,
@@ -113,7 +113,7 @@ export function useGetPageviews(
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}`
-      );
+      ).then((res) => res.json());
     },
     placeholderData: keepPreviousData,
     staleTime: Infinity,
@@ -131,4 +131,36 @@ export type GetOverviewResponse = {
 
 export function useGetOverview(periodTime?: PeriodTime) {
   return useGenericQuery<GetOverviewResponse>("overview", periodTime);
+}
+
+export type GetSitesResponse = {
+  site_id: string;
+  site_name: string;
+  domain: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+}[];
+
+export function useGetSites() {
+  return useGenericQuery<GetSitesResponse>("get-sites");
+}
+
+export function addSite(domain: string, name: string) {
+  return authedFetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/add-site`, {
+    method: "POST",
+    body: JSON.stringify({
+      domain,
+      name,
+    }),
+  });
+}
+
+export function deleteSite(siteId: string) {
+  return authedFetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-site/${siteId}`,
+    {
+      method: "POST",
+    }
+  );
 }

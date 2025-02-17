@@ -24,14 +24,20 @@ export function TopBar() {
             <NavigationMenuList>
               <NavigationMenuItem>
                 <Link href="/">
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                    asChild
+                  >
                     Dashboard
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href="/settings">
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                    asChild
+                  >
                     Settings
                   </NavigationMenuLink>
                 </Link>

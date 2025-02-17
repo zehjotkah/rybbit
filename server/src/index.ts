@@ -24,6 +24,8 @@ import { TrackingPayload } from "./types.js";
 import { toNodeHandler } from "better-auth/node";
 import { mapHeaders } from "./lib/betterAuth.js";
 import { addSite } from "./actions/sites/addSite.js";
+import { getSites } from "./actions/sites/getSites.js";
+import { deleteSite } from "./actions/sites/deleteSite.js";
 
 // ESM replacement for __dirname:
 const __filename = fileURLToPath(import.meta.url);
@@ -128,6 +130,8 @@ server.get("/referrers", getReferrers);
 server.get("/pageviews", getPageViews);
 
 server.post("/add-site", addSite);
+server.post("/delete-site/:id", deleteSite);
+server.get("/get-sites", getSites);
 
 // Track pageview endpoint
 server.post<{ Body: TrackingPayload }>(

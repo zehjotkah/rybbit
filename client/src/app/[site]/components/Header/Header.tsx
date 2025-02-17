@@ -43,7 +43,9 @@ export function Header() {
   const { data } = useQuery<{ count: number }>({
     queryKey: ["active-sessions"],
     queryFn: () =>
-      authedFetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count`),
+      authedFetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/live-user-count`
+      ).then((res) => res.json()),
   });
 
   const { time } = useTimeSelection();

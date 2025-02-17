@@ -1,17 +1,28 @@
 import { FastifyReply } from "fastify";
 
 import { FastifyRequest } from "fastify";
+import { auth } from "../../lib/auth.js";
+import { fromNodeHeaders } from "better-auth/node";
+import { sql } from "../../db/postgres/postgres.js";
 
-export function addSite(
-  request: FastifyRequest<{ Params: { domain: string } }>,
+export async function addSite(
+  request: FastifyRequest<{ Body: { domain: string; name: string } }>,
   reply: FastifyReply
 ) {
-  const { domain } = request.params;
-  const { user } = request.user;
+  const { domain, name } = request.body;
 
-  console.info(request);
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(request.headers),
+  });
 
-  //   if (!user) {
-  //     return reply.status(401).send({ error: "Unauthorized" });
-  //   }
+  if (!session?.user.id) {
+    return reply.status(500).send({ error: "Could not find user id" });
+  }
+  try {
+    await sql`INSERT INTO sites (domain, name, created_by) VALUES (${domain}, ${name}, ${session?.user.id})`;
+
+    return reply.status(200).send();
+  } catch (err) {
+    return reply.status(500).send({ error: String(err) });
+  }
 }

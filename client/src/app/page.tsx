@@ -1,7 +1,30 @@
+"use client";
+
+import Link from "next/link";
+import { useGetSites } from "../hooks/api";
+import { AddSite } from "./components/AddSite";
 export default function Home() {
+  const { data: sites, refetch } = useGetSites();
+
   return (
-    <main className="flex min-h-screen flex-col items-center p-4 pt-1">
-      home
-    </main>
+    <div className="flex min-h-screen flex-col pt-1">
+      <div className="flex justify-between">
+        <div className="text-2xl font-bold">Websites</div>
+        <AddSite />
+      </div>
+      <div className="grid grid-cols-3 gap-4 mt-4">
+        {sites?.data?.map((site) => (
+          <Link href={`/${site.domain}`} key={site.site_id}>
+            <div className="flex p-4 rounded-lg bg-neutral-900 text-lg font-semibold gap-2">
+              <img
+                className="w-6 mr-1"
+                src={`https://www.google.com/s2/favicons?domain=${site.domain}&sz=48`}
+              />
+              {site.domain}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
