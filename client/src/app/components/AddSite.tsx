@@ -16,6 +16,18 @@ import { addSite, useGetSites } from "../../hooks/api";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
+/**
+ * A simple domain validation function:
+ * - Ensures at least one dot separator
+ * - Allows subdomains (e.g. sub.example.com)
+ * - Requires the TLD to be alphabetical (e.g. .com)
+ */
+function isValidDomain(domain: string): boolean {
+  const domainRegex =
+    /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+  return domainRegex.test(domain);
+}
+
 export function AddSite() {
   const { data: sites, refetch } = useGetSites();
 
@@ -29,8 +41,16 @@ export function AddSite() {
 
   const handleSubmit = async () => {
     setError("");
+
+    // Validate before attempting to add
+    if (!isValidDomain(domain)) {
+      setError(
+        "Invalid domain format. Must be a valid domain like example.com or sub.example.com"
+      );
+      return;
+    }
+
     const response = await addSite(domain, domain);
-    console.info(response);
     if (!response.ok) {
       const errorMessage = await response.json();
       setError(errorMessage.error);
@@ -62,13 +82,13 @@ export function AddSite() {
             <Input
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              placeholder="frogstats.com"
+              placeholder="example.com or sub.example.com"
             />
           </div>
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error Adding Websites</AlertTitle>
+              <AlertTitle>Error Adding Website</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}

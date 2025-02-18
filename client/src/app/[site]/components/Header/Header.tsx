@@ -8,7 +8,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateSelector } from "./DateSelector";
 import { DateTime } from "luxon";
 import { authedFetch } from "@/hooks/utils";
-import { useGetLiveUsercount } from "../../../../hooks/api";
+import { useGetLiveUsercount, useGetSites } from "../../../../hooks/api";
+import { usePathname } from "next/navigation";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -38,6 +39,12 @@ const canGoForward = (time: Time) => {
 export function Header() {
   const { data } = useGetLiveUsercount();
   const { time } = useStore();
+  const { data: sites } = useGetSites();
+  const pathname = usePathname();
+
+  const site = sites?.data?.find(
+    (site) => site.site_id === Number(pathname.slice(1))
+  );
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -45,9 +52,9 @@ export function Header() {
         <div className="flex items-center gap-2 text-xl font-bold">
           <img
             className="w-7 mr-1"
-            src={`https://www.google.com/s2/favicons?domain=${`tomato.gg`}&sz=64`}
+            src={`https://www.google.com/s2/favicons?domain=${site?.domain}&sz=64`}
           />
-          <div>Tomato.gg</div>
+          <div>{site?.domain}</div>
         </div>
         <div className="flex items-center gap-1 text-base text-neutral-600 dark:text-neutral-400">
           <Circle size={12} weight="fill" color="hsl(var(--green-500))" />

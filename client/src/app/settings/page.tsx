@@ -9,7 +9,7 @@ export default function SettingsPage() {
   const router = useRouter();
 
   return (
-    <div className="container max-w-6xl py-6">
+    <div className="max-w-6xl">
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-medium">Settings</h3>

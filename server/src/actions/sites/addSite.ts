@@ -11,6 +11,18 @@ export async function addSite(
 ) {
   const { domain, name } = request.body;
 
+  // Validate domain format using regex
+  const domainRegex =
+    /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+  if (!domainRegex.test(domain)) {
+    return reply
+      .status(400)
+      .send({
+        error:
+          "Invalid domain format. Must be a valid domain like example.com or sub.example.com",
+      });
+  }
+
   const session = await auth!.api.getSession({
     headers: fromNodeHeaders(request.headers),
   });

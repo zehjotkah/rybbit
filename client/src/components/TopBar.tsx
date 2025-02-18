@@ -1,3 +1,4 @@
+import { GearSix } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -10,11 +11,15 @@ export function TopBar() {
             🐸 Frogstats
           </Link>
         </div>
-        <nav className="ml-auto flex items-center space-x-6">
+        <nav className="ml-auto flex items-center space-x-6 text-sm">
           <Link href="/" className="text-neutral-100">
             Websites
           </Link>
-          <Link href="/settings" className="text-neutral-100">
+          <Link
+            href="/settings"
+            className="text-neutral-100 flex items-center gap-1"
+          >
+            <GearSix size={18} />
             Settings
           </Link>
           <ThemeToggle />

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useGetSites } from "../hooks/api";
 import { AddSite } from "./components/AddSite";
+
 export default function Home() {
-  const { data: sites, refetch } = useGetSites();
+  const { data: sites } = useGetSites();
 
   return (
     <div className="flex min-h-screen flex-col pt-1">

@@ -146,7 +146,7 @@ export function useGetOverview(periodTime?: PeriodTime) {
 }
 
 export type GetSitesResponse = {
-  site_id: string;
+  site_id: number;
   site_name: string;
   domain: string;
   created_at: string;
