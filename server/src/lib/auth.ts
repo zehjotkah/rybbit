@@ -24,5 +24,14 @@ export const initAuth = (allowList: string[]) => {
     },
     plugins: [username()],
     trustedOrigins: allowList,
+    advanced: {
+      useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
+      defaultCookieAttributes: {
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
+        // httpOnly: true is default
+        // secure: false (implied by useSecureCookies false)
+      },
+    },
   });
 };
