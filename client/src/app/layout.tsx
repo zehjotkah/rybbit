@@ -45,12 +45,18 @@ export default function RootLayout({
         ></script>
         <ThemeProvider>
           <QueryProvider>
-            <div className="min-h-full">
-              <TopBar />
-              <main className="flex min-h-screen flex-col items-center p-4">
-                <div className="w-full max-w-6xl">{children}</div>
-              </main>
-            </div>
+            {pathname === "/login" ? (
+              <div className="min-h-full flex items-center justify-center">
+                {children}
+              </div>
+            ) : (
+              <div className="min-h-full">
+                <TopBar />
+                <main className="flex min-h-screen flex-col items-center p-4">
+                  <div className="w-full max-w-6xl">{children}</div>
+                </main>
+              </div>
+            )}
           </QueryProvider>
         </ThemeProvider>
       </body>

@@ -29,8 +29,6 @@ export const initAuth = (allowList: string[]) => {
       defaultCookieAttributes: {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
-        // httpOnly: true is default
-        // secure: false (implied by useSecureCookies false)
       },
     },
   });
