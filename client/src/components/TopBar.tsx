@@ -19,7 +19,7 @@ export function TopBar() {
             href="/settings"
             className="text-neutral-100 flex items-center gap-1"
           >
-            <GearSix size={18} />
+            <GearSix size={18} weight="bold" />
             Settings
           </Link>
           <ThemeToggle />
