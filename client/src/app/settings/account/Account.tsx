@@ -11,6 +11,7 @@ import { Label } from "../../../components/ui/label";
 import { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { ChangePassword } from "./ChangePassword";
+import { DeleteAccount } from "./DeleteAccount";
 
 export function Account({
   session,
@@ -60,9 +61,7 @@ export function Account({
       <Card className="p-2 pt-6">
         <CardContent className="flex flex-col gap-4">
           <ChangePassword />
-          <Button variant={"destructive"} className="w-60">
-            Delete Account
-          </Button>
+          <DeleteAccount />
         </CardContent>
       </Card>
     </div>

@@ -22,6 +22,9 @@ export const initAuth = (allowList: string[]) => {
     emailAndPassword: {
       enabled: true,
     },
+    deleteUser: {
+      enabled: true,
+    },
     plugins: [username()],
     trustedOrigins: allowList,
     advanced: {
