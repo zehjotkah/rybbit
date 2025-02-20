@@ -19,7 +19,7 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Switch } from "../../../components/ui/switch";
 
-export function AddUser() {
+export function AddUser({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ export function AddUser() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("New password and confirm password do not match");
+      setError("password and confirm password do not match");
       return;
     }
     try {
@@ -52,6 +52,7 @@ export function AddUser() {
       }
 
       setOpen(false);
+      refetch();
     } catch (error) {
       setError(String(error));
     }

@@ -1,7 +1,6 @@
 "use client";
-
+import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
-import { Button } from "../../../components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,11 +15,22 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { useListUsers } from "../../../hooks/api";
+import { authClient } from "../../../lib/auth";
 import { AddUser } from "./AddUser";
+import { DeleteUser } from "./DeleteUser";
 
 export function Users() {
-  const { data: users, refetch } = useListUsers();
+  const { data: users, refetch } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const users = await authClient.admin.listUsers({ query: { limit: 100 } });
+      return users;
+    },
+  });
+
+  if (users?.error) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,7 +38,7 @@ export function Users() {
         <CardHeader>
           <CardTitle className="text-xl flex justify-between items-center">
             Users
-            <AddUser />
+            <AddUser refetch={refetch} />
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -44,35 +54,24 @@ export function Users() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users?.data?.map((user) => (
+              {users?.data?.users?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.role || "admin"}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {DateTime.fromISO(user.createdAt).toLocaleString()}
+                    {DateTime.fromJSDate(user.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     {user.name !== "admin" && (
-                      <Button variant={"destructive"} size={"sm"}>
-                        Delete
-                      </Button>
+                      <DeleteUser user={user} refetch={refetch} />
                     )}
                   </TableCell>
                 </TableRow>
               ))}
-              {/* <TableRow>
-                <TableCell>Paid</TableCell>
-                <TableCell>Credit Card</TableCell>
-              </TableRow> */}
             </TableBody>
           </Table>
         </CardContent>
-        {/* <CardFooter className="flex justify-end">
-          <Button variant={"accent"} disabled={!hasChanges}>
-            Save Changes
-          </Button>
-        </CardFooter> */}
       </Card>
     </div>
   );

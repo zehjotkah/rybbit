@@ -3,9 +3,9 @@ import {
   useQuery,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { BACKEND_URL } from "../lib/const";
 import { useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
-import { BACKEND_URL } from "../lib/const";
 
 export type APIResponse<T> = {
   data: T;
@@ -172,19 +172,4 @@ export function deleteSite(siteId: string) {
   return authedFetch(`${BACKEND_URL}/delete-site/${siteId}`, {
     method: "POST",
   });
-}
-
-export type ListUsersResponse = {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  emailVerified: boolean;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-}[];
-
-export function useListUsers() {
-  return useGenericQuery<ListUsersResponse>("list-users");
 }
