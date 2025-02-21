@@ -19,9 +19,9 @@ export function getStartAndEndDate(time: Time) {
 export async function authedFetch(url: string, opts: RequestInit = {}) {
   return fetch(url, {
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
     ...opts,
   });
 }
