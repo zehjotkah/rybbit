@@ -37,10 +37,6 @@ function SitePageInner({ site }: { site: string }) {
 
   const siteMetadata = allSites?.data?.find((s) => s.site_id === Number(site));
 
-  console.info({
-    siteHasData,
-  });
-
   if (isLoadingAllSites || isLoading) {
     return null;
   }

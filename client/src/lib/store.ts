@@ -43,7 +43,20 @@ type Store = {
 
 export const useStore = create<Store>((set) => ({
   site: "",
-  setSite: (site) => set({ site }),
+  setSite: (site) => {
+    set({
+      site,
+      time: {
+        mode: "day",
+        day: DateTime.now().toISODate(),
+      },
+      previousTime: {
+        mode: "day",
+        day: DateTime.now().minus({ days: 1 }).toISODate(),
+      },
+      bucket: "hour",
+    });
+  },
   time: {
     mode: "day",
     day: DateTime.now().toISODate(),
