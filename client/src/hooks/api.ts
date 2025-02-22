@@ -165,11 +165,18 @@ export function addSite(domain: string, name: string) {
       domain,
       name,
     }),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 }
 
-export function deleteSite(siteId: string) {
+export function deleteSite(siteId: number) {
   return authedFetch(`${BACKEND_URL}/delete-site/${siteId}`, {
     method: "POST",
   });
+}
+
+export function useSiteHasData(siteId: string) {
+  return useGenericQuery<boolean>(`site-has-data/${siteId}`);
 }

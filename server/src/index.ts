@@ -6,10 +6,10 @@ import cron from "node-cron";
 import { dirname, join } from "path";
 import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
-import { addSite } from "./actions/sites/addSite.js";
-import { deleteSite } from "./actions/sites/deleteSite.js";
-import { getSites } from "./actions/sites/getSites.js";
-import { trackPageView } from "./actions/trackPageView.js";
+import { addSite } from "./api/sites/addSite.js";
+import { deleteSite } from "./api/sites/deleteSite.js";
+import { getSites } from "./api/sites/getSites.js";
+import { trackPageView } from "./tracker/trackPageView.js";
 import { getBrowsers } from "./api/getBrowsers.js";
 import { getCountries } from "./api/getCountries.js";
 import { getDevices } from "./api/getDevices.js";
@@ -26,6 +26,7 @@ import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
 import { listUsers } from "./api/listUsers.js";
+import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -127,6 +128,7 @@ server.get("/devices", getDevices);
 server.get("/pages", getPages);
 server.get("/referrers", getReferrers);
 server.get("/pageviews", getPageViews);
+server.get("/site-has-data/:site", getSiteHasData);
 
 // Administrative
 server.post("/add-site", addSite);
