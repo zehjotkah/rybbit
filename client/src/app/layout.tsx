@@ -40,10 +40,17 @@ export default function RootLayout({
       <body
         className={`${inter.className} h-full bg-background text-foreground`}
       >
+        {/* The ldrs are very pretty but it's super annoying to load them
+        https://github.com/GriffinJohnston/ldrs/blob/main/framework-guides.md#nextjs */}
         <script
           type="module"
           defer
           src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/zoomies.js"
+        ></script>
+        <script
+          type="module"
+          defer
+          src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/ping.js"
         ></script>
         <ThemeProvider>
           <Theme appearance="dark">

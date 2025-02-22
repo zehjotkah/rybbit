@@ -42,7 +42,16 @@ export function useGenericQuery<T>(
       ).then((res) => res.json());
     },
     staleTime: Infinity,
-    placeholderData: keepPreviousData,
+    placeholderData: (_, query: any) => {
+      if (!query?.queryKey) return undefined;
+      const prevQueryKey = query.queryKey as [string, string, string];
+      const [, , prevSite] = prevQueryKey;
+
+      if (prevSite === site) {
+        return query.state.data;
+      }
+      return undefined;
+    },
   });
 }
 
@@ -127,7 +136,16 @@ export function useGetPageviews(
         `${BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
       ).then((res) => res.json());
     },
-    placeholderData: keepPreviousData,
+    placeholderData: (_, query: any) => {
+      if (!query?.queryKey) return undefined;
+      const prevQueryKey = query.queryKey as [string, string, string];
+      const [, , prevSite] = prevQueryKey;
+
+      if (prevSite === site) {
+        return query.state.data;
+      }
+      return undefined;
+    },
     staleTime: Infinity,
   });
 }

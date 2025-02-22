@@ -10,10 +10,14 @@ export function NoData({
 }) {
   return (
     <div className="flex justify-center items-center mt-5">
-      <Card className="w-[600px]">
-        <CardHeader>
-          <div className=" text-xl font-medium text-center w-full">
+      <Card className="w-[500px] p-2">
+        <CardHeader className="flex justify-center items-center">
+          <div className="text-xl font-medium text-center w-full">
             Waiting for analytics from {siteMetadata?.domain}...
+          </div>
+          <div className="p-5">
+            {/* @ts-ignore */}
+            <l-ping size={50} color="hsl(var(--emerald-400))" speed="3" />
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
