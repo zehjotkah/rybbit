@@ -16,6 +16,28 @@ const bucketIntervalMap = {
   month: "1 MONTH",
 } as const;
 
+function getTimeStatementFill(
+  startDate: string,
+  endDate: string,
+  timezone: string,
+  bucket: TimeBucket
+) {
+  return `
+    WITH FILL FROM toTimeZone(
+      toStartOfDay(toDateTime('${startDate}', '${timezone}')),
+      'UTC'
+    )
+    TO if(
+      toDate('${endDate}') = toDate(now(), '${timezone}'),
+      now(),
+      toTimeZone(
+        toStartOfDay(toDateTime('${endDate}', '${timezone}')) + INTERVAL 1 DAY,
+        'UTC'
+      )
+    ) STEP INTERVAL ${bucketIntervalMap[bucket]}
+  `;
+}
+
 type TimeBucket = "hour" | "day" | "week" | "month";
 
 type GetPageViewsResponse = { time: string; pageviews: number }[];
@@ -45,12 +67,7 @@ export async function getPageViews(
     GROUP BY
         time
     ORDER BY
-        time WITH FILL
-        FROM ${
-          TimeBucketToFn[bucket]
-        }(toDateTime('${startDate}', '${timezone}'))
-        TO ${TimeBucketToFn[bucket]}(toDateTime('${endDate}', '${timezone}'))
-        STEP INTERVAL ${bucketIntervalMap[bucket]}
+        time ${getTimeStatementFill(startDate, endDate, timezone, bucket)}
   `;
 
   try {
