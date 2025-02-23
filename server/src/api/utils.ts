@@ -5,8 +5,7 @@ export function getTimeStatement(
   endDate: string,
   timezone: string
 ) {
-  return `
-    timestamp >= toTimeZone(
+  return `timestamp >= toTimeZone(
       toStartOfDay(toDateTime('${startDate}', '${timezone}')),
       'UTC'
     )
@@ -17,8 +16,7 @@ export function getTimeStatement(
         toStartOfDay(toDateTime('${endDate}', '${timezone}')) + INTERVAL 1 DAY,
         'UTC'
       )
-    )
-  `;
+    )`;
 }
 
 export async function processResults<T>(

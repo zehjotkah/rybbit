@@ -60,7 +60,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
             </div>
           </div>
         ))}
-        {data?.data?.length && data?.data?.length > 10 && (
+        {data?.data?.length && data?.data?.length > 10 ? (
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">View All</Button>
@@ -94,7 +94,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
               </div>
             </DialogContent>
           </Dialog>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

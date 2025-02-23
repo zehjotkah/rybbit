@@ -1,18 +1,18 @@
 "use client";
 import { Card, CardContent, CardLoader } from "@/components/ui/card";
-import { useGetOverview, useGetPageviews } from "@/hooks/api";
+import { useGetOverview, useGetOverviewBucketed } from "@/hooks/api";
 import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
 
 export function MainSection() {
-  const { data, isFetching, error } = useGetPageviews();
+  const { data, isFetching, error } = useGetOverviewBucketed();
   const {
     data: previousData,
     isFetching: isPreviousFetching,
     error: previousError,
-  } = useGetPageviews("previous");
+  } = useGetOverviewBucketed("previous");
   const { isFetching: isOverviewFetching } = useGetOverview();
   const { isFetching: isOverviewFetchingPrevious } = useGetOverview("previous");
 

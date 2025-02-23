@@ -1,7 +1,7 @@
 "use client";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
-import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
+import { APIResponse, GetOverviewBucketedResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
 import { Time, useStore } from "@/lib/store";
 import { useMemo } from "react";
@@ -31,7 +31,7 @@ export function PreviousChart({
   data,
   max,
 }: {
-  data: APIResponse<GetPageViewsResponse> | undefined;
+  data: APIResponse<GetOverviewBucketedResponse> | undefined;
   max: number;
 }) {
   const { previousTime: time } = useStore();
@@ -65,7 +65,7 @@ export function PreviousChart({
         min: 0,
         stacked: false,
         reverse: false,
-        max,
+        max: Math.max(max, 10),
       }}
       enableGridX={false}
       enableGridY={false}

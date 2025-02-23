@@ -17,7 +17,7 @@ import { getLiveUsercount } from "./api/getLiveUsercount.js";
 import { getOperatingSystems } from "./api/getOperatingSystems.js";
 import { getOverview } from "./api/getOverview.js";
 import { getPages } from "./api/getPages.js";
-import { getPageViews } from "./api/getPageViews.js";
+import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
 import { getReferrers } from "./api/getReferrers.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initializePostgres } from "./db/postgres/postgres.js";
@@ -121,13 +121,13 @@ server.addHook("onRequest", async (request, reply) => {
 
 server.get("/live-user-count/:site", getLiveUsercount);
 server.get("/overview", getOverview);
+server.get("/overview-bucketed", getOverviewBucketed);
 server.get("/countries", getCountries);
 server.get("/browsers", getBrowsers);
 server.get("/operating-systems", getOperatingSystems);
 server.get("/devices", getDevices);
 server.get("/pages", getPages);
 server.get("/referrers", getReferrers);
-server.get("/pageviews", getPageViews);
 server.get("/site-has-data/:site", getSiteHasData);
 
 // Administrative

@@ -2,7 +2,7 @@
 import { ResponsiveLine } from "@nivo/line";
 import { round } from "lodash";
 import { DateTime } from "luxon";
-import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
+import { APIResponse, GetOverviewBucketedResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
 import { Time, TimeBucket, useStore } from "@/lib/store";
 
@@ -67,8 +67,8 @@ export function Chart({
   previousData,
   max,
 }: {
-  data: APIResponse<GetPageViewsResponse> | undefined;
-  previousData: APIResponse<GetPageViewsResponse> | undefined;
+  data: APIResponse<GetOverviewBucketedResponse> | undefined;
+  previousData: APIResponse<GetOverviewBucketedResponse> | undefined;
   max: number;
 }) {
   const { time, bucket } = useStore();
@@ -124,7 +124,7 @@ export function Chart({
         min: 0,
         stacked: false,
         reverse: false,
-        max: max,
+        max: Math.max(max, 10),
       }}
       enableGridX={false}
       enableGridY={true}

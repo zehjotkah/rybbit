@@ -18,8 +18,7 @@ export async function getOverview(
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
-  const query = `
-    SELECT 
+  const query = `SELECT 
         session_stats.sessions,
         session_stats.pages_per_session,
         session_stats.bounce_rate,
@@ -59,8 +58,10 @@ export async function getOverview(
         WHERE 
             ${getTimeStatement(startDate, endDate, timezone)}
             AND site_id = ${site}
-    ) AS page_stats
-  `;
+    ) AS page_stats`;
+
+  console.info;
+  console.info(query);
 
   try {
     const result = await clickhouse.query({

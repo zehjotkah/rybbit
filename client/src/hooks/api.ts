@@ -115,25 +115,30 @@ export function useGetReferrers() {
   return useGenericQuery<GetReferrersResponse>("referrers");
 }
 
-export type GetPageViewsResponse = {
+export type GetOverviewBucketedResponse = {
   time: string;
   pageviews: number;
+  sessions: number;
+  pages_per_session: number;
+  bounce_rate: number;
+  session_duration: number;
+  users: number;
 }[];
 
-export function useGetPageviews(
+export function useGetOverviewBucketed(
   periodTime?: PeriodTime
-): UseQueryResult<APIResponse<GetPageViewsResponse>> {
+): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
   const { time, previousTime, bucket, site } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: ["pageviews", timeToUse, bucket, site],
+    queryKey: ["overview-bucketed", timeToUse, bucket, site],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${BACKEND_URL}/pageviews?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
+        `${BACKEND_URL}/overview-bucketed?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
       ).then((res) => res.json());
     },
     placeholderData: (_, query: any) => {
