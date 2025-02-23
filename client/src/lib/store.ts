@@ -42,7 +42,7 @@ type Store = {
   setSite: (site: string) => void;
   time: Time;
   previousTime: Time;
-  setTime: (time: Time) => void;
+  setTime: (time: Time, changeBucket?: boolean) => void;
   bucket: TimeBucket;
   setBucket: (bucket: TimeBucket) => void;
 };
@@ -71,7 +71,7 @@ export const useStore = create<Store>((set) => ({
     mode: "day",
     day: DateTime.now().minus({ days: 1 }).toISODate(),
   },
-  setTime: (time) => {
+  setTime: (time, changeBucket = true) => {
     let bucketToUse: TimeBucket = "hour";
     let previousTime: Time;
 
@@ -127,7 +127,11 @@ export const useStore = create<Store>((set) => ({
       previousTime = time; // fallback case
     }
 
-    set({ time, previousTime, bucket: bucketToUse });
+    if (changeBucket) {
+      set({ time, previousTime, bucket: bucketToUse });
+    } else {
+      set({ time, previousTime });
+    }
   },
   bucket: "hour",
   setBucket: (bucket) => set({ bucket }),
@@ -147,28 +151,40 @@ export const goBack = () => {
 
     const daysBetweenStartAndEnd = endDate.diff(startDate, "days").days;
 
-    setTime({
-      mode: "range",
-      startDate:
-        startDate.minus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
-      endDate: startDate.toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "range",
+        startDate:
+          startDate.minus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
+        endDate: startDate.toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "week") {
-    setTime({
-      mode: "week",
-      week: DateTime.fromISO(time.week).minus({ weeks: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "week",
+        week: DateTime.fromISO(time.week).minus({ weeks: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "month") {
-    setTime({
-      mode: "month",
-      month:
-        DateTime.fromISO(time.month).minus({ months: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "month",
+        month:
+          DateTime.fromISO(time.month).minus({ months: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "year") {
-    setTime({
-      mode: "year",
-      year: DateTime.fromISO(time.year).minus({ years: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "year",
+        year: DateTime.fromISO(time.year).minus({ years: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   }
 };
 
@@ -193,27 +209,40 @@ export const goForward = () => {
       return;
     }
 
-    setTime({
-      mode: "range",
-      startDate:
-        startDate.plus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
-      // Cap the end date at today
-      endDate: proposedEndDate.toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "range",
+        startDate:
+          startDate.plus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
+        // Cap the end date at today
+        endDate: proposedEndDate.toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "week") {
-    setTime({
-      mode: "week",
-      week: DateTime.fromISO(time.week).plus({ weeks: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "week",
+        week: DateTime.fromISO(time.week).plus({ weeks: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "month") {
-    setTime({
-      mode: "month",
-      month: DateTime.fromISO(time.month).plus({ months: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "month",
+        month:
+          DateTime.fromISO(time.month).plus({ months: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "year") {
-    setTime({
-      mode: "year",
-      year: DateTime.fromISO(time.year).plus({ years: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "year",
+        year: DateTime.fromISO(time.year).plus({ years: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   }
 };

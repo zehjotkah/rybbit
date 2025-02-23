@@ -24,8 +24,13 @@ const getMax = (time: Time, bucket: TimeBucket) => {
     }
     return undefined;
   } else if (time.mode === "week") {
-    const weekDate = DateTime.fromISO(time.week).endOf("week");
-    return now < weekDate ? weekDate.toJSDate() : undefined;
+    if (bucket === "hour") {
+      const endDate = DateTime.fromISO(time.week).endOf("week").minus({
+        minutes: 59,
+      });
+      return now < endDate ? endDate.toJSDate() : undefined;
+    }
+    return undefined;
   } else if (time.mode === "month") {
     const monthDate = DateTime.fromISO(time.month).endOf("month");
     return now < monthDate ? monthDate.toJSDate() : undefined;
