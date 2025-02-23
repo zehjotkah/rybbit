@@ -87,8 +87,6 @@ export function Chart({
         : undefined,
   }));
 
-  console.info(getMax(time, bucket));
-
   return (
     <ResponsiveLine
       data={[

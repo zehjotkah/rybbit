@@ -13,6 +13,9 @@ import { CustomDateRangePicker } from "./CustomDateRangePicker";
 
 const getLabel = (time: Time) => {
   if (time.mode === "range") {
+    if (time.wellKnown) {
+      return `${time.wellKnown}`;
+    }
     return `${time.startDate} - ${time.endDate}`;
   }
 
@@ -24,6 +27,38 @@ const getLabel = (time: Time) => {
       return "Yesterday";
     }
     return time.day;
+  }
+  if (time.mode === "week") {
+    if (time.week === DateTime.now().startOf("week").toISODate()) {
+      return "This Week";
+    }
+    if (
+      time.week ===
+      DateTime.now().minus({ weeks: 1 }).startOf("week").toISODate()
+    ) {
+      return "Last Week";
+    }
+    return `${time.week} - ${DateTime.fromISO(time.week)
+      .endOf("week")
+      .toISODate()}`;
+  }
+  if (time.mode === "month") {
+    if (time.month === DateTime.now().startOf("month").toISODate()) {
+      return "This Month";
+    }
+    if (
+      time.month ===
+      DateTime.now().minus({ months: 1 }).startOf("month").toISODate()
+    ) {
+      return "Last Month";
+    }
+    return time.month;
+  }
+  if (time.mode === "year") {
+    if (time.year === DateTime.now().startOf("year").toISODate()) {
+      return "This Year";
+    }
+    return time.year;
   }
 };
 
@@ -50,6 +85,7 @@ export function DateSelector() {
               mode: "range",
               startDate: DateTime.now().minus({ days: 2 }).toISODate(),
               endDate: DateTime.now().toISODate(),
+              wellKnown: "Last 3 days",
             })
           }
         >
@@ -61,6 +97,7 @@ export function DateSelector() {
               mode: "range",
               startDate: DateTime.now().minus({ days: 6 }).toISODate(),
               endDate: DateTime.now().toISODate(),
+              wellKnown: "Last 7 days",
             })
           }
         >
@@ -72,6 +109,7 @@ export function DateSelector() {
               mode: "range",
               startDate: DateTime.now().minus({ days: 13 }).toISODate(),
               endDate: DateTime.now().toISODate(),
+              wellKnown: "Last 14 days",
             })
           }
         >
@@ -83,6 +121,7 @@ export function DateSelector() {
               mode: "range",
               startDate: DateTime.now().minus({ days: 29 }).toISODate(),
               endDate: DateTime.now().toISODate(),
+              wellKnown: "Last 30 days",
             })
           }
         >
@@ -94,6 +133,7 @@ export function DateSelector() {
               mode: "range",
               startDate: DateTime.now().minus({ days: 59 }).toISODate(),
               endDate: DateTime.now().toISODate(),
+              wellKnown: "Last 60 days",
             })
           }
         >

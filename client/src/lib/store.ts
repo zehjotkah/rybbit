@@ -10,6 +10,12 @@ type DateRangeMode = {
   mode: "range";
   startDate: string;
   endDate: string;
+  wellKnown?:
+    | "Last 3 days"
+    | "Last 7 days"
+    | "Last 14 days"
+    | "Last 30 days"
+    | "Last 60 days";
 };
 
 type WeekMode = {
