@@ -80,17 +80,26 @@ export function Chart({
     0
   );
 
-  const formattedData = data?.data?.map((e, i) => ({
-    x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
-    y: e.pageviews,
-    previousY:
-      i >= lengthDiff && previousData?.data?.[i - lengthDiff]?.pageviews,
-    currentTime: DateTime.fromSQL(e.time),
-    previousTime:
-      i >= lengthDiff
-        ? DateTime.fromSQL(previousData?.data?.[i - lengthDiff]?.time ?? "")
-        : undefined,
-  }));
+  const formattedData = data?.data
+    ?.map((e, i) => {
+      // filter out dates from the future
+      if (DateTime.fromSQL(e.time).toUTC() > DateTime.now()) {
+        return null;
+      }
+
+      return {
+        x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
+        y: e.pageviews,
+        previousY:
+          i >= lengthDiff && previousData?.data?.[i - lengthDiff]?.pageviews,
+        currentTime: DateTime.fromSQL(e.time),
+        previousTime:
+          i >= lengthDiff
+            ? DateTime.fromSQL(previousData?.data?.[i - lengthDiff]?.time ?? "")
+            : undefined,
+      };
+    })
+    .filter((e) => e !== null);
 
   return (
     <ResponsiveLine
