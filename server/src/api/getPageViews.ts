@@ -9,6 +9,13 @@ const TimeBucketToFn = {
   month: "toStartOfMonth",
 };
 
+const bucketIntervalMap = {
+  hour: "1 HOUR",
+  day: "1 DAY",
+  week: "7 DAY",
+  month: "1 MONTH",
+} as const;
+
 type TimeBucket = "hour" | "day" | "week" | "month";
 
 type GetPageViewsResponse = { time: string; pageviews: number }[];
@@ -38,7 +45,12 @@ export async function getPageViews(
     GROUP BY
         time
     ORDER BY
-        time ASC
+        time WITH FILL
+        FROM ${
+          TimeBucketToFn[bucket]
+        }(toDateTime('${startDate}', '${timezone}'))
+        TO ${TimeBucketToFn[bucket]}(toDateTime('${endDate}', '${timezone}'))
+        STEP INTERVAL ${bucketIntervalMap[bucket]}
   `;
 
   try {

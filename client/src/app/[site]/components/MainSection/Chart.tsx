@@ -4,17 +4,25 @@ import { round } from "lodash";
 import { DateTime } from "luxon";
 import { APIResponse, GetPageViewsResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
-import { Time, useStore } from "@/lib/store";
+import { Time, TimeBucket, useStore } from "@/lib/store";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
-const getMax = (time: Time) => {
+const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
   if (time.mode === "day") {
     const dayDate = DateTime.fromISO(time.day)
       .endOf("day")
       .minus({ minutes: 59 });
     return now < dayDate ? dayDate.toJSDate() : undefined;
+  } else if (time.mode === "range") {
+    if (bucket === "hour") {
+      const endDate = DateTime.fromISO(time.endDate).endOf("day").minus({
+        minutes: 59,
+      });
+      return now < endDate ? endDate.toJSDate() : undefined;
+    }
+    return undefined;
   } else if (time.mode === "week") {
     const weekDate = DateTime.fromISO(time.week).endOf("week");
     return now < weekDate ? weekDate.toJSDate() : undefined;
@@ -28,7 +36,7 @@ const getMax = (time: Time) => {
   return undefined;
 };
 
-const getMin = (time: Time) => {
+const getMin = (time: Time, bucket: TimeBucket) => {
   if (time.mode === "day") {
     const dayDate = DateTime.fromISO(time.day).startOf("day");
     return dayDate.toJSDate();
@@ -79,13 +87,7 @@ export function Chart({
         : undefined,
   }));
 
-  const timeRange =
-    time.mode === "range"
-      ? DateTime.fromISO(time.startDate).diff(
-          DateTime.fromISO(time.endDate),
-          "days"
-        ).days
-      : 0;
+  console.info(getMax(time, bucket));
 
   return (
     <ResponsiveLine
@@ -102,8 +104,8 @@ export function Chart({
         format: "%Y-%m-%d %H:%M:%S",
         precision: "second",
         useUTC: true,
-        max: getMax(time),
-        min: getMin(time),
+        max: getMax(time, bucket),
+        min: getMin(time, bucket),
       }}
       yScale={{
         type: "linear",

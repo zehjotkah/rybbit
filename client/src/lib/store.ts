@@ -29,7 +29,7 @@ type YearMode = {
 
 export type Time = DateMode | DateRangeMode | WeekMode | MonthMode | YearMode;
 
-export type TimeBucket = "hour" | "day" | "week" | "month";
+export type TimeBucket = "hour" | "day" | "week" | "month" | "year";
 
 type Store = {
   site: string;
@@ -98,6 +98,12 @@ export const useStore = create<Store>((set) => ({
         endDate:
           DateTime.fromISO(time.startDate).minus({ days: 1 }).toISODate() ?? "",
       };
+    } else if (time.mode === "week") {
+      bucketToUse = "day";
+      previousTime = {
+        mode: "week",
+        week: DateTime.fromISO(time.week).minus({ weeks: 1 }).toISODate() ?? "",
+      };
     } else if (time.mode === "month") {
       bucketToUse = "day";
       previousTime = {
@@ -141,6 +147,22 @@ export const goBack = () => {
         startDate.minus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
       endDate: startDate.toISODate() ?? "",
     });
+  } else if (time.mode === "week") {
+    setTime({
+      mode: "week",
+      week: DateTime.fromISO(time.week).minus({ weeks: 1 }).toISODate() ?? "",
+    });
+  } else if (time.mode === "month") {
+    setTime({
+      mode: "month",
+      month:
+        DateTime.fromISO(time.month).minus({ months: 1 }).toISODate() ?? "",
+    });
+  } else if (time.mode === "year") {
+    setTime({
+      mode: "year",
+      year: DateTime.fromISO(time.year).minus({ years: 1 }).toISODate() ?? "",
+    });
   }
 };
 
@@ -171,6 +193,21 @@ export const goForward = () => {
         startDate.plus({ days: daysBetweenStartAndEnd }).toISODate() ?? "",
       // Cap the end date at today
       endDate: proposedEndDate.toISODate() ?? "",
+    });
+  } else if (time.mode === "week") {
+    setTime({
+      mode: "week",
+      week: DateTime.fromISO(time.week).plus({ weeks: 1 }).toISODate() ?? "",
+    });
+  } else if (time.mode === "month") {
+    setTime({
+      mode: "month",
+      month: DateTime.fromISO(time.month).plus({ months: 1 }).toISODate() ?? "",
+    });
+  } else if (time.mode === "year") {
+    setTime({
+      mode: "year",
+      year: DateTime.fromISO(time.year).plus({ years: 1 }).toISODate() ?? "",
     });
   }
 };

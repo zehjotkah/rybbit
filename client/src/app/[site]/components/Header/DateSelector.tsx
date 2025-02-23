@@ -48,12 +48,34 @@ export function DateSelector() {
           onClick={() =>
             setTime({
               mode: "range",
+              startDate: DateTime.now().minus({ days: 2 }).toISODate(),
+              endDate: DateTime.now().toISODate(),
+            })
+          }
+        >
+          Last 3 Days
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "range",
               startDate: DateTime.now().minus({ days: 6 }).toISODate(),
               endDate: DateTime.now().toISODate(),
             })
           }
         >
           Last 7 Days
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "range",
+              startDate: DateTime.now().minus({ days: 13 }).toISODate(),
+              endDate: DateTime.now().toISODate(),
+            })
+          }
+        >
+          Last 14 Days
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
@@ -66,8 +88,48 @@ export function DateSelector() {
         >
           Last 30 Days
         </DropdownMenuItem>
-
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "range",
+              startDate: DateTime.now().minus({ days: 59 }).toISODate(),
+              endDate: DateTime.now().toISODate(),
+            })
+          }
+        >
+          Last 60 Days
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "week",
+              week: DateTime.now().startOf("week").toISODate(),
+            })
+          }
+        >
+          This Week
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "month",
+              month: DateTime.now().startOf("month").toISODate(),
+            })
+          }
+        >
+          This Month
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "year",
+              year: DateTime.now().startOf("year").toISODate(),
+            })
+          }
+        >
+          This Year
+        </DropdownMenuItem>
         <CustomDateRangePicker />
       </DropdownMenuContent>
     </DropdownMenu>
