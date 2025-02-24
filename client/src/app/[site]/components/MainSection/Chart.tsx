@@ -1,10 +1,10 @@
 "use client";
-import { ResponsiveLine } from "@nivo/line";
-import { round } from "lodash";
-import { DateTime } from "luxon";
 import { APIResponse, GetOverviewBucketedResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
-import { Time, TimeBucket, useStore } from "@/lib/store";
+import { StatType, Time, TimeBucket, useStore } from "@/lib/store";
+import { ResponsiveLine } from "@nivo/line";
+import { DateTime } from "luxon";
+import { formatSecondsAsMinutesAndSeconds } from "../../../../lib/utils";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -62,6 +62,16 @@ const getMin = (time: Time, bucket: TimeBucket) => {
   return undefined;
 };
 
+const formatTooltipValue = (value: number, selectedStat: StatType) => {
+  if (selectedStat === "bounce_rate") {
+    return `${value.toFixed(1)}%`;
+  }
+  if (selectedStat === "session_duration") {
+    return formatSecondsAsMinutesAndSeconds(value);
+  }
+  return value.toLocaleString();
+};
+
 export function Chart({
   data,
   previousData,
@@ -71,7 +81,7 @@ export function Chart({
   previousData: APIResponse<GetOverviewBucketedResponse> | undefined;
   max: number;
 }) {
-  const { time, bucket } = useStore();
+  const { time, bucket, selectedStat } = useStore();
 
   // When the current period has more datapoints than the previous period,
   // we need to shift the previous datapoints to the right by the difference in length
@@ -89,9 +99,9 @@ export function Chart({
 
       return {
         x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
-        y: e.pageviews,
+        y: e[selectedStat],
         previousY:
-          i >= lengthDiff && previousData?.data?.[i - lengthDiff]?.pageviews,
+          i >= lengthDiff && previousData?.data?.[i - lengthDiff][selectedStat],
         currentTime: DateTime.fromSQL(e.time),
         previousTime:
           i >= lengthDiff
@@ -209,7 +219,7 @@ export function Chart({
                   ? currentTime.toFormat("M/d h a")
                   : currentTime.toLocaleString()}
               </div>
-              <div>{round(currentY).toLocaleString()}</div>
+              <div>{formatTooltipValue(currentY, selectedStat)}</div>
             </div>
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
@@ -218,7 +228,7 @@ export function Chart({
                     ? previousTime.toFormat("M/d h a")
                     : previousTime.toLocaleString()}
                 </div>
-                <div>{round(previousY).toLocaleString()}</div>
+                <div>{formatTooltipValue(previousY, selectedStat)}</div>
               </div>
             )}
           </div>

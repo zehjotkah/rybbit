@@ -1,9 +1,9 @@
 "use client";
-import { ResponsiveLine } from "@nivo/line";
-import { DateTime } from "luxon";
 import { APIResponse, GetOverviewBucketedResponse } from "@/hooks/api";
 import { nivoTheme } from "@/lib/nivo";
 import { Time, useStore } from "@/lib/store";
+import { ResponsiveLine } from "@nivo/line";
+import { DateTime } from "luxon";
 import { useMemo } from "react";
 
 const getMin = (time: Time) => {
@@ -34,11 +34,11 @@ export function PreviousChart({
   data: APIResponse<GetOverviewBucketedResponse> | undefined;
   max: number;
 }) {
-  const { previousTime: time } = useStore();
+  const { previousTime: time, selectedStat } = useStore();
 
   const formattedData = data?.data?.map((e) => ({
     x: DateTime.fromSQL(e.time).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
-    y: e.pageviews,
+    y: e[selectedStat],
   }));
 
   const min = useMemo(() => getMin(time), [data]);

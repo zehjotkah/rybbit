@@ -37,6 +37,14 @@ export type Time = DateMode | DateRangeMode | WeekMode | MonthMode | YearMode;
 
 export type TimeBucket = "hour" | "day" | "week" | "month" | "year";
 
+export type StatType =
+  | "pageviews"
+  | "sessions"
+  | "users"
+  | "pages_per_session"
+  | "bounce_rate"
+  | "session_duration";
+
 type Store = {
   site: string;
   setSite: (site: string) => void;
@@ -45,6 +53,8 @@ type Store = {
   setTime: (time: Time, changeBucket?: boolean) => void;
   bucket: TimeBucket;
   setBucket: (bucket: TimeBucket) => void;
+  selectedStat: StatType;
+  setSelectedStat: (stat: StatType) => void;
 };
 
 export const useStore = create<Store>((set) => ({
@@ -61,6 +71,7 @@ export const useStore = create<Store>((set) => ({
         day: DateTime.now().minus({ days: 1 }).toISODate(),
       },
       bucket: "hour",
+      selectedStat: "users",
     });
   },
   time: {
@@ -135,6 +146,8 @@ export const useStore = create<Store>((set) => ({
   },
   bucket: "hour",
   setBucket: (bucket) => set({ bucket }),
+  selectedStat: "users",
+  setSelectedStat: (stat) => set({ selectedStat: stat }),
 }));
 
 export const goBack = () => {

@@ -1,10 +1,10 @@
 "use client";
 
-import { Duration } from "luxon";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetOverview } from "@/hooks/api";
-import { formatter } from "@/lib/utils";
+import { cn, formatSecondsAsMinutesAndSeconds, formatter } from "@/lib/utils";
+import { StatType, useStore } from "../../../../lib/store";
 
 const ChangePercentage = ({
   current,
@@ -48,21 +48,30 @@ const ChangePercentage = ({
 
 const Stat = ({
   title,
+  id,
   value,
   previous,
   valueFormatter,
   isLoading,
 }: {
   title: string;
+  id: StatType;
   value: number;
   previous: number;
   valueFormatter?: (value: number) => string;
   isLoading: boolean;
 }) => {
+  const { selectedStat, setSelectedStat } = useStore();
   return (
-    <div className="flex flex-col gap-1">
+    <div
+      className={cn(
+        "flex flex-col hover:bg-neutral-800 rounded-md px-3 py-2 cursor-pointer",
+        selectedStat === id && "bg-neutral-850"
+      )}
+      onClick={() => setSelectedStat(id)}
+    >
       <div className="text-sm font-medium text-muted-foreground">{title}</div>
-      <div className="text-3xl font-medium flex gap-2 items-center">
+      <div className="text-2xl font-medium flex gap-2 items-center">
         {isLoading ? (
           <>
             <Skeleton className="w-[60px] h-7 rounded-md" />
@@ -112,9 +121,10 @@ export function Overview() {
     overviewDataPrevious?.data?.session_duration ?? 0;
 
   return (
-    <div className="flex gap-6 items-center">
+    <div className="flex gap-0 items-center">
       <Stat
         title="Unique Users"
+        id="users"
         value={currentUsers}
         previous={previousUsers}
         isLoading={isLoading}
@@ -122,6 +132,7 @@ export function Overview() {
       />
       <Stat
         title="Sessions"
+        id="sessions"
         value={currentSessions}
         previous={previousSessions}
         isLoading={isLoading}
@@ -129,6 +140,7 @@ export function Overview() {
       />
       <Stat
         title="Pageviews"
+        id="pageviews"
         value={currentPageviews}
         previous={previousPageviews}
         isLoading={isLoading}
@@ -136,6 +148,7 @@ export function Overview() {
       />
       <Stat
         title="Pages per Session"
+        id="pages_per_session"
         value={currentPagesPerSession}
         previous={previousPagesPerSession}
         isLoading={isLoading}
@@ -143,30 +156,19 @@ export function Overview() {
       />
       <Stat
         title="Bounce Rate"
+        id="bounce_rate"
         value={currentBounceRate}
         previous={previousBounceRate}
         isLoading={isLoading}
-        valueFormatter={(value) => `${(value * 100).toFixed(1)}%`}
+        valueFormatter={(value) => `${value.toFixed(1)}%`}
       />
       <Stat
         title="Session Duration"
+        id="session_duration"
         value={currentSessionDuration}
         previous={previousSessionDuration}
         isLoading={isLoading}
-        valueFormatter={(value) => {
-          const duration = Duration.fromMillis(value * 1000);
-          const hours = Math.floor(duration.as("hours"));
-          const minutes = Math.floor(duration.as("minutes") % 60);
-          const seconds = Math.floor(duration.as("seconds") % 60);
-
-          if (hours > 0) {
-            return `${hours}hr ${minutes}min`;
-          } else if (minutes > 0) {
-            return `${minutes}m ${seconds}s`;
-          } else {
-            return `${seconds}s`;
-          }
-        }}
+        valueFormatter={formatSecondsAsMinutesAndSeconds}
       />
     </div>
   );

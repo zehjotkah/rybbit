@@ -5,8 +5,11 @@ import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
+import { useStore } from "../../../../lib/store";
 
 export function MainSection() {
+  const { selectedStat } = useStore();
+
   const { data, isFetching, error } = useGetOverviewBucketed();
   const {
     data: previousData,
@@ -17,8 +20,8 @@ export function MainSection() {
   const { isFetching: isOverviewFetchingPrevious } = useGetOverview("previous");
 
   const maxOfDataAndPreviousData = Math.max(
-    Math.max(...(data?.data?.map((d) => d.pageviews) ?? [])),
-    Math.max(...(previousData?.data?.map((d) => d.pageviews) ?? []))
+    Math.max(...(data?.data?.map((d) => d[selectedStat]) ?? [])),
+    Math.max(...(previousData?.data?.map((d) => d[selectedStat]) ?? []))
   );
 
   return (

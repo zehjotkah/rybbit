@@ -21,7 +21,7 @@ export async function getOverview(
   const query = `SELECT 
         session_stats.sessions,
         session_stats.pages_per_session,
-        session_stats.bounce_rate,
+        session_stats.bounce_rate * 100 AS bounce_rate,
         session_stats.session_duration,
         page_stats.pageviews,
         page_stats.users
