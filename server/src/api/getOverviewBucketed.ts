@@ -54,6 +54,8 @@ export async function getOverviewBucketed(
   }>,
   res: FastifyReply
 ) {
+  const isAllTime = !startDate && !endDate;
+
   const query = `SELECT
     session_stats.time AS time,
     session_stats.sessions,
@@ -82,16 +84,15 @@ FROM
             COUNT(*) AS pages_in_session
         FROM pageviews
         WHERE 
+            site_id = ${site}
             ${getTimeStatement(startDate, endDate, timezone)}
-            AND site_id = ${site}
         GROUP BY session_id
     )
-    GROUP BY time ORDER BY time ${getTimeStatementFill(
-      startDate,
-      endDate,
-      timezone,
-      bucket
-    )}
+    GROUP BY time ORDER BY time ${
+      isAllTime
+        ? ""
+        : getTimeStatementFill(startDate, endDate, timezone, bucket)
+    }
 ) AS session_stats
 FULL JOIN
 (
@@ -103,17 +104,18 @@ FULL JOIN
         COUNT(DISTINCT user_id) AS users
     FROM pageviews
     WHERE
+        site_id = ${site}
         ${getTimeStatement(startDate, endDate, timezone)}
-        AND site_id = ${site}
-    GROUP BY time ORDER BY time ${getTimeStatementFill(
-      startDate,
-      endDate,
-      timezone,
-      bucket
-    )}
+    GROUP BY time ORDER BY time ${
+      isAllTime
+        ? ""
+        : getTimeStatementFill(startDate, endDate, timezone, bucket)
+    }
 ) AS page_stats
 USING time
 ORDER BY time`;
+
+  console.info(query);
 
   try {
     const result = await clickhouse.query({

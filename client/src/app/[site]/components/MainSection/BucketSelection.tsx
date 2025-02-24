@@ -44,6 +44,22 @@ const getOptions = (time: Time) => {
       </SelectContent>
     );
   }
+  if (time.mode === "year" || time.mode === "all-time") {
+    return (
+      <SelectContent>
+        <SelectItem size="sm" value="day">
+          Day
+        </SelectItem>
+        <SelectItem size="sm" value="week">
+          Week
+        </SelectItem>
+        <SelectItem size="sm" value="month">
+          Month
+        </SelectItem>
+      </SelectContent>
+    );
+  }
+
   if (time.mode === "range") {
     const timeRangeLength = DateTime.fromISO(time.endDate).diff(
       DateTime.fromISO(time.startDate),

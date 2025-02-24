@@ -33,7 +33,17 @@ type YearMode = {
   year: string;
 };
 
-export type Time = DateMode | DateRangeMode | WeekMode | MonthMode | YearMode;
+type AllTimeMode = {
+  mode: "all-time";
+};
+
+export type Time =
+  | DateMode
+  | DateRangeMode
+  | WeekMode
+  | MonthMode
+  | YearMode
+  | AllTimeMode;
 
 export type TimeBucket = "hour" | "day" | "week" | "month" | "year";
 
@@ -133,6 +143,11 @@ export const useStore = create<Store>((set) => ({
       previousTime = {
         mode: "year",
         year: DateTime.fromISO(time.year).minus({ years: 1 }).toISODate() ?? "",
+      };
+    } else if (time.mode === "all-time") {
+      bucketToUse = "day";
+      previousTime = {
+        mode: "all-time",
       };
     } else {
       previousTime = time; // fallback case

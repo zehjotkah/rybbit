@@ -5,7 +5,10 @@ export function getTimeStatement(
   endDate: string,
   timezone: string
 ) {
-  return `timestamp >= toTimeZone(
+  if (!startDate && !endDate) {
+    return "";
+  }
+  return `AND timestamp >= toTimeZone(
       toStartOfDay(toDateTime('${startDate}', '${timezone}')),
       'UTC'
     )

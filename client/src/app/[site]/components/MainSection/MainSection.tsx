@@ -8,7 +8,7 @@ import { PreviousChart } from "./PreviousChart";
 import { useStore } from "../../../../lib/store";
 
 export function MainSection() {
-  const { selectedStat } = useStore();
+  const { selectedStat, time } = useStore();
 
   const { data, isFetching, error } = useGetOverviewBucketed();
   const {
@@ -43,7 +43,7 @@ export function MainSection() {
             <Chart
               data={data}
               max={maxOfDataAndPreviousData}
-              previousData={previousData}
+              previousData={time.mode === "all-time" ? undefined : previousData}
             />
           </div>
         </div>

@@ -22,8 +22,8 @@ export async function getDevices(
       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
     FROM pageviews
     WHERE
+        site_id = ${site}
         ${getTimeStatement(startDate, endDate, timezone)}
-        AND site_id = ${site}
     GROUP BY device_type ORDER BY count desc;
   `;
 

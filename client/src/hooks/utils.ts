@@ -23,6 +23,9 @@ export function getStartAndEndDate(time: Time) {
       endDate: DateTime.fromISO(time.year).endOf("year").toISODate(),
     };
   }
+  if (time.mode === "all-time") {
+    return { startDate: null, endDate: null };
+  }
   return { startDate: time.day, endDate: time.day };
 }
 

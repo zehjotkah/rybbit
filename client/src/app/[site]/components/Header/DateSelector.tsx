@@ -60,6 +60,9 @@ const getLabel = (time: Time) => {
     }
     return time.year;
   }
+  if (time.mode === "all-time") {
+    return "All Time";
+  }
 };
 
 export function DateSelector() {
@@ -173,8 +176,7 @@ export function DateSelector() {
         <DropdownMenuItem
           onClick={() =>
             setTime({
-              mode: "year",
-              year: DateTime.now().startOf("year").toISODate(),
+              mode: "all-time",
             })
           }
         >

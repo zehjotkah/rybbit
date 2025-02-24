@@ -1,8 +1,4 @@
-import {
-  keepPreviousData,
-  useQuery,
-  UseQueryResult,
-} from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { BACKEND_URL } from "../lib/const";
 import { useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
@@ -38,7 +34,11 @@ export function useGenericQuery<T>(
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${BACKEND_URL}/${endpoint}?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&site=${site}`
+        `${BACKEND_URL}/${endpoint}?${
+          startDate ? `startDate=${startDate}&` : ""
+        }${
+          endDate ? `endDate=${endDate}&` : ""
+        }timezone=${timezone}&site=${site}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,
@@ -138,7 +138,11 @@ export function useGetOverviewBucketed(
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
-        `${BACKEND_URL}/overview-bucketed?startDate=${startDate}&endDate=${endDate}&timezone=${timezone}&bucket=${bucket}&site=${site}`
+        `${BACKEND_URL}/overview-bucketed?${
+          startDate ? `startDate=${startDate}&` : ""
+        }${
+          endDate ? `endDate=${endDate}&` : ""
+        }timezone=${timezone}&bucket=${bucket}&site=${site}`
       ).then((res) => res.json());
     },
     placeholderData: (_, query: any) => {

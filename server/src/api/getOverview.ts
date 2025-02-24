@@ -43,8 +43,8 @@ export async function getOverview(
                 COUNT(*)      AS pages_in_session
             FROM pageviews
             WHERE
+                site_id = ${site}
                 ${getTimeStatement(startDate, endDate, timezone)}
-                AND site_id = ${site}
             GROUP BY session_id
         )
     ) AS session_stats
@@ -56,12 +56,9 @@ export async function getOverview(
             COUNT(DISTINCT user_id)    AS users
         FROM pageviews
         WHERE 
+            site_id = ${site}
             ${getTimeStatement(startDate, endDate, timezone)}
-            AND site_id = ${site}
     ) AS page_stats`;
-
-  console.info;
-  console.info(query);
 
   try {
     const result = await clickhouse.query({
