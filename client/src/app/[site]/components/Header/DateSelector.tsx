@@ -170,6 +170,17 @@ export function DateSelector() {
         >
           This Year
         </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            setTime({
+              mode: "year",
+              year: DateTime.now().startOf("year").toISODate(),
+            })
+          }
+        >
+          All Time
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <CustomDateRangePicker />
       </DropdownMenuContent>
     </DropdownMenu>

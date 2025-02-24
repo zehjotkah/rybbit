@@ -134,7 +134,7 @@ export function Chart({
         min: 0,
         stacked: false,
         reverse: false,
-        max: Math.max(max, 10),
+        max: Math.max(max, 1),
       }}
       enableGridX={false}
       enableGridY={true}
