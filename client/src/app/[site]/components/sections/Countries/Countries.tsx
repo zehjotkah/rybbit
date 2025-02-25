@@ -36,6 +36,8 @@ export function Countries() {
           )}
         </span>
       )}
+      getValue={(e) => e.country}
+      filterParameter="country"
     />
   );
 }

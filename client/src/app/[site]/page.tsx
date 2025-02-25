@@ -13,6 +13,7 @@ import { Map } from "./components/sections/Map/Map";
 import { OperatingSystems } from "./components/sections/OperatingSystems/OperatingSystems";
 import { Pages } from "./components/sections/Pages/Pages";
 import { Referrers } from "./components/sections/Referrers/Referrers";
+import { Filters } from "./components/Filters/Filters";
 
 export default function SitePage() {
   const pathname = usePathname();
@@ -48,6 +49,7 @@ function SitePageInner({ site }: { site: string }) {
   return (
     <>
       <Header />
+      <Filters />
       <MainSection />
       <div className="grid grid-cols-2 gap-4 mt-4">
         <OperatingSystems />

@@ -55,6 +55,22 @@ export type StatType =
   | "bounce_rate"
   | "session_duration";
 
+export type FilterType = "equals" | "not_equals" | "contains" | "not_contains";
+
+export type FilterParameter =
+  | "browser"
+  | "operating_system"
+  | "country"
+  | "device_type"
+  | "referrer"
+  | "pathname";
+
+export type Filter = {
+  parameter: FilterParameter;
+  value: string;
+  type: FilterType;
+};
+
 type Store = {
   site: string;
   setSite: (site: string) => void;
@@ -65,6 +81,8 @@ type Store = {
   setBucket: (bucket: TimeBucket) => void;
   selectedStat: StatType;
   setSelectedStat: (stat: StatType) => void;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
 };
 
 export const useStore = create<Store>((set) => ({
@@ -163,6 +181,8 @@ export const useStore = create<Store>((set) => ({
   setBucket: (bucket) => set({ bucket }),
   selectedStat: "users",
   setSelectedStat: (stat) => set({ selectedStat: stat }),
+  filters: [],
+  setFilters: (filters) => set({ filters }),
 }));
 
 export const goBack = () => {
@@ -273,4 +293,14 @@ export const goForward = () => {
       false
     );
   }
+};
+
+export const addFilter = (filter: Filter) => {
+  const { filters, setFilters } = useStore.getState();
+  setFilters([...filters, filter]);
+};
+
+export const removeFilter = (filter: Filter) => {
+  const { filters, setFilters } = useStore.getState();
+  setFilters(filters.filter((f) => f !== filter));
 };

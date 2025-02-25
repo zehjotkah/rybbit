@@ -1,6 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
-import { getTimeStatement, processResults } from "./utils.js";
+import {
+  getFilterStatement,
+  getTimeStatement,
+  processResults,
+} from "./utils.js";
 
 const TimeBucketToFn = {
   hour: "toStartOfHour",
@@ -42,7 +46,7 @@ type getOverviewBucketed = { time: string; pageviews: number }[];
 
 export async function getOverviewBucketed(
   {
-    query: { startDate, endDate, timezone, bucket, site },
+    query: { startDate, endDate, timezone, bucket, site, filters },
   }: FastifyRequest<{
     Querystring: {
       startDate: string;
@@ -50,11 +54,13 @@ export async function getOverviewBucketed(
       timezone: string;
       bucket: TimeBucket;
       site: string;
+      filters: string;
     };
   }>,
   res: FastifyReply
 ) {
   const isAllTime = !startDate && !endDate;
+  const filterStatement = getFilterStatement(filters);
 
   const query = `SELECT
     session_stats.time AS time,
@@ -85,6 +91,7 @@ FROM
         FROM pageviews
         WHERE 
             site_id = ${site}
+            ${filterStatement}
             ${getTimeStatement(startDate, endDate, timezone)}
         GROUP BY session_id
     )
@@ -105,6 +112,7 @@ FULL JOIN
     FROM pageviews
     WHERE
         site_id = ${site}
+        ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
     GROUP BY time ORDER BY time ${
       isAllTime
@@ -114,8 +122,6 @@ FULL JOIN
 ) AS page_stats
 USING time
 ORDER BY time`;
-
-  console.info(query);
 
   try {
     const result = await clickhouse.query({

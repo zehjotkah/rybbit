@@ -78,6 +78,8 @@ export function Browsers() {
           {e.browser || "Other"}
         </div>
       )}
+      getValue={(e) => e.browser}
+      filterParameter="browser"
     />
   );
 }

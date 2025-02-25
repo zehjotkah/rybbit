@@ -7,6 +7,7 @@ export function Referrers() {
   const { data, isLoading } = useGetReferrers();
   return (
     <StandardCard
+      filterParameter="referrer"
       title="Referrers"
       data={data}
       getKey={(e) => e.referrer}
@@ -30,6 +31,7 @@ export function Referrers() {
           )}
         </div>
       )}
+      getValue={(e) => e.referrer}
     />
   );
 }

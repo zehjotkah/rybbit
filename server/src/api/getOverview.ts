@@ -1,7 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
 import { GenericRequest } from "./types.js";
-import { getTimeStatement, processResults } from "./utils.js";
+import {
+  getFilterStatement,
+  getTimeStatement,
+  processResults,
+} from "./utils.js";
 
 type GetOverviewResponse = {
   sessions: number;
@@ -14,10 +18,11 @@ type GetOverviewResponse = {
 
 export async function getOverview(
   {
-    query: { startDate, endDate, timezone, site },
+    query: { startDate, endDate, timezone, site, filters },
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
+  const filterStatement = getFilterStatement(filters);
   const query = `SELECT 
         session_stats.sessions,
         session_stats.pages_per_session,
@@ -44,6 +49,7 @@ export async function getOverview(
             FROM pageviews
             WHERE
                 site_id = ${site}
+                ${filterStatement}
                 ${getTimeStatement(startDate, endDate, timezone)}
             GROUP BY session_id
         )
@@ -57,6 +63,7 @@ export async function getOverview(
         FROM pageviews
         WHERE 
             site_id = ${site}
+            ${filterStatement}
             ${getTimeStatement(startDate, endDate, timezone)}
     ) AS page_stats`;
 

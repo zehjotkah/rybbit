@@ -1,7 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { getTimeStatement, processResults } from "./utils.js";
 import clickhouse from "../db/clickhouse/clickhouse.js";
 import { GenericRequest } from "./types.js";
+import {
+  getFilterStatement,
+  getTimeStatement,
+  processResults,
+} from "./utils.js";
 
 type GetReferrersResponse = {
   referrer: string;
@@ -11,10 +15,12 @@ type GetReferrersResponse = {
 
 export async function getReferrers(
   {
-    query: { startDate, endDate, timezone, site },
+    query: { startDate, endDate, timezone, site, filters },
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
+  const filterStatement = getFilterStatement(filters);
+
   const query = `
     SELECT
       domainWithoutWWW(referrer) AS referrer,
@@ -23,6 +29,7 @@ export async function getReferrers(
     FROM pageviews
     WHERE
         site_id = ${site}
+        ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
     GROUP BY referrer 
     ORDER BY count desc

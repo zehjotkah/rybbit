@@ -16,13 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { addFilter, FilterParameter, useStore } from "../../../../lib/store";
 
 export function StandardCard<T extends { percentage: number; count: number }>({
   title,
   data,
   getKey,
   getLabel,
+  getValue,
   isLoading,
+  filterParameter,
 }: {
   title: string;
   data:
@@ -34,7 +37,11 @@ export function StandardCard<T extends { percentage: number; count: number }>({
   isLoading?: boolean;
   getKey: (item: T) => string;
   getLabel: (item: T) => ReactNode;
+  getValue: (item: T) => string;
+  filterParameter: FilterParameter;
 }) {
+  const { filters, setFilters } = useStore();
+
   return (
     <Card>
       {isLoading && <CardLoader />}
@@ -43,7 +50,17 @@ export function StandardCard<T extends { percentage: number; count: number }>({
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         {data?.data?.slice(0, 10).map((e) => (
-          <div key={getKey(e)} className="relative h-7 flex items-center">
+          <div
+            key={getKey(e)}
+            className="relative h-7 flex items-center cursor-pointer hover:bg-neutral-850 "
+            onClick={() =>
+              addFilter({
+                parameter: filterParameter,
+                value: getValue(e),
+                type: "equals",
+              })
+            }
+          >
             <div
               className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
               style={{ width: `${e.percentage}%` }}

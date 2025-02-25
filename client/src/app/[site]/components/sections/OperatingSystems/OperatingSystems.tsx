@@ -27,6 +27,7 @@ export function OperatingSystems() {
       title="Operating Systems"
       data={data}
       isLoading={isLoading}
+      getValue={(e) => e.operating_system}
       getKey={(e) => e.operating_system}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">
@@ -44,6 +45,7 @@ export function OperatingSystems() {
           {e.operating_system || "Other"}
         </div>
       )}
+      filterParameter="operating_system"
     />
   );
 }

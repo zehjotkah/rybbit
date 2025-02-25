@@ -1,7 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
 import { GenericRequest } from "./types.js";
-import { getTimeStatement, processResults } from "./utils.js";
+import {
+  getFilterStatement,
+  getTimeStatement,
+  processResults,
+} from "./utils.js";
 
 type GetBrowsersResponse = {
   browser: string;
@@ -11,10 +15,12 @@ type GetBrowsersResponse = {
 
 export async function getBrowsers(
   {
-    query: { startDate, endDate, timezone, site },
+    query: { startDate, endDate, timezone, site, filters },
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
+  const filterStatement = getFilterStatement(filters);
+
   const query = `
     SELECT
       browser,
@@ -23,6 +29,7 @@ export async function getBrowsers(
     FROM pageviews
     WHERE
         site_id = ${site}
+        ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
     GROUP BY browser ORDER BY count desc;
   `;

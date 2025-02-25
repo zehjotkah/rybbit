@@ -22,15 +22,29 @@ export function useGetLiveUsercount() {
 type PeriodTime = "current" | "previous";
 
 export function useGenericQuery<T>(
+  endpoint: string
+): UseQueryResult<APIResponse<T>> {
+  return useQuery({
+    queryKey: [endpoint],
+    queryFn: () => {
+      return authedFetch(`${BACKEND_URL}/${endpoint}`).then((res) =>
+        res.json()
+      );
+    },
+    staleTime: Infinity,
+  });
+}
+
+export function useGenericSiteDataQuery<T>(
   endpoint: string,
   periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<T>> {
-  const { time, previousTime, site } = useStore();
+  const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [endpoint, timeToUse, site],
+    queryKey: [endpoint, timeToUse, site, filters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
@@ -38,7 +52,7 @@ export function useGenericQuery<T>(
           startDate ? `startDate=${startDate}&` : ""
         }${
           endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&site=${site}`
+        }timezone=${timezone}&site=${site}&filters=${JSON.stringify(filters)}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,
@@ -62,7 +76,7 @@ export type GetCountriesResponse = {
 }[];
 
 export function useGetCountries() {
-  return useGenericQuery<GetCountriesResponse>("countries");
+  return useGenericSiteDataQuery<GetCountriesResponse>("countries");
 }
 
 export type GetDevicesResponse = {
@@ -72,7 +86,7 @@ export type GetDevicesResponse = {
 }[];
 
 export function useGetDevices() {
-  return useGenericQuery<GetDevicesResponse>("devices");
+  return useGenericSiteDataQuery<GetDevicesResponse>("devices");
 }
 
 export type GetOperatingSystemsResponse = {
@@ -82,7 +96,9 @@ export type GetOperatingSystemsResponse = {
 }[];
 
 export function useGetOperatingSystems() {
-  return useGenericQuery<GetOperatingSystemsResponse>("operating-systems");
+  return useGenericSiteDataQuery<GetOperatingSystemsResponse>(
+    "operating-systems"
+  );
 }
 
 export type GetBrowsersResponse = {
@@ -92,7 +108,7 @@ export type GetBrowsersResponse = {
 }[];
 
 export function useGetBrowsers() {
-  return useGenericQuery<GetBrowsersResponse>("browsers");
+  return useGenericSiteDataQuery<GetBrowsersResponse>("browsers");
 }
 
 export type GetPagesResponse = {
@@ -102,7 +118,7 @@ export type GetPagesResponse = {
 }[];
 
 export function useGetPages() {
-  return useGenericQuery<GetPagesResponse>("pages");
+  return useGenericSiteDataQuery<GetPagesResponse>("pages");
 }
 
 export type GetReferrersResponse = {
@@ -112,7 +128,7 @@ export type GetReferrersResponse = {
 }[];
 
 export function useGetReferrers() {
-  return useGenericQuery<GetReferrersResponse>("referrers");
+  return useGenericSiteDataQuery<GetReferrersResponse>("referrers");
 }
 
 export type GetOverviewBucketedResponse = {
@@ -128,13 +144,13 @@ export type GetOverviewBucketedResponse = {
 export function useGetOverviewBucketed(
   periodTime?: PeriodTime
 ): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
-  const { time, previousTime, bucket, site } = useStore();
+  const { time, previousTime, bucket, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: ["overview-bucketed", timeToUse, bucket, site],
+    queryKey: ["overview-bucketed", timeToUse, bucket, site, filters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
@@ -142,7 +158,9 @@ export function useGetOverviewBucketed(
           startDate ? `startDate=${startDate}&` : ""
         }${
           endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&bucket=${bucket}&site=${site}`
+        }timezone=${timezone}&bucket=${bucket}&site=${site}&filters=${JSON.stringify(
+          filters
+        )}`
       ).then((res) => res.json());
     },
     placeholderData: (_, query: any) => {
@@ -169,7 +187,7 @@ export type GetOverviewResponse = {
 };
 
 export function useGetOverview(periodTime?: PeriodTime) {
-  return useGenericQuery<GetOverviewResponse>("overview", periodTime);
+  return useGenericSiteDataQuery<GetOverviewResponse>("overview", periodTime);
 }
 
 export type GetSitesResponse = {
