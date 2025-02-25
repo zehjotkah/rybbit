@@ -90,7 +90,14 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                 {data?.data?.map((e) => (
                   <div
                     key={getKey(e)}
-                    className="relative flex items-center mr-3"
+                    className="relative flex items-center mr-3 cursor-pointer hover:bg-neutral-850 "
+                    onClick={() =>
+                      addFilter({
+                        parameter: filterParameter,
+                        value: getValue(e),
+                        type: "equals",
+                      })
+                    }
                   >
                     <div
                       className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"

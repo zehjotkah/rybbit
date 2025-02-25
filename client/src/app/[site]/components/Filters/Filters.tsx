@@ -5,6 +5,7 @@ import {
   removeFilter,
   useStore,
 } from "../../../../lib/store";
+import { countries } from "countries-list";
 
 function getParameterNameLabel(parameter: FilterParameter) {
   switch (parameter) {
@@ -28,7 +29,9 @@ function getParameterNameLabel(parameter: FilterParameter) {
 function getParameterValueLabel(filter: Filter) {
   switch (filter.parameter) {
     case "country":
-      return filter.value;
+      return (
+        countries[filter.value as keyof typeof countries]?.name ?? filter.value
+      );
     case "device_type":
       return filter.value;
     case "operating_system":

@@ -297,7 +297,15 @@ export const goForward = () => {
 
 export const addFilter = (filter: Filter) => {
   const { filters, setFilters } = useStore.getState();
-  setFilters([...filters, filter]);
+  const filterExists = filters.some(
+    (f) =>
+      f.parameter === filter.parameter &&
+      f.value === filter.value &&
+      f.type === filter.type
+  );
+  if (!filterExists) {
+    setFilters([...filters, filter]);
+  }
 };
 
 export const removeFilter = (filter: Filter) => {
