@@ -1,5 +1,14 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardLoader,
+  CardTitle,
+} from "@/components/ui/card";
+import { countries } from "countries-list";
+import * as CountryFlags from "country-flag-icons/react/3x2";
 import { scaleLinear } from "d3-scale";
 import { Feature, Geometry } from "geojson";
 import { useMemo, useState } from "react";
@@ -10,18 +19,9 @@ import {
   Sphere,
   ZoomableGroup,
 } from "react-simple-maps";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardLoader,
-  CardTitle,
-} from "@/components/ui/card";
-import { countries } from "countries-list";
-import * as CountryFlags from "country-flag-icons/react/3x2";
 
+import { useSingleCol } from "@/hooks/api";
 import React from "react";
-import { useGetCountries } from "@/hooks/api";
 
 const geoUrl = "/countries.geojson";
 
@@ -34,7 +34,7 @@ interface TooltipData {
 }
 
 export function Map() {
-  const { data, isLoading } = useGetCountries();
+  const { data, isLoading } = useSingleCol("country");
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
   const colorScale = useMemo(() => {
@@ -71,7 +71,7 @@ export function Map() {
                   }) =>
                     geographies.map((geo, index) => {
                       const foundCountry = data?.data?.find(
-                        ({ country }) => country === geo.properties?.["ISO_A2"]
+                        ({ value }) => value === geo.properties?.["ISO_A2"]
                       );
                       const count = foundCountry?.count || 0;
                       const percentage = foundCountry?.percentage || 0;

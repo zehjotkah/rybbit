@@ -1,10 +1,14 @@
 "use client";
-import { Circle } from "@phosphor-icons/react";
+import { Filters } from "./Filters/Filters";
 
-import { Time, useStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { goBack, goForward, Time, useStore } from "@/lib/store";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
+
 import { usePathname } from "next/navigation";
-import { useGetLiveUsercount, useGetSites } from "../../../../hooks/api";
+import { useGetSites } from "../../../../hooks/api";
+import { DateSelector } from "./DateSelector";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -31,8 +35,7 @@ const canGoForward = (time: Time) => {
   return false;
 };
 
-export function Header() {
-  const { data } = useGetLiveUsercount();
+export function SubHeader() {
   const { time } = useStore();
   const { data: sites } = useGetSites();
   const pathname = usePathname();
@@ -42,18 +45,22 @@ export function Header() {
   );
 
   return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex gap-3">
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <img
-            className="w-7 mr-1"
-            src={`https://www.google.com/s2/favicons?domain=${site?.domain}&sz=64`}
-          />
-          <div>{site?.domain}</div>
-        </div>
-        <div className="flex items-center gap-1 text-base text-neutral-600 dark:text-neutral-400">
-          <Circle size={12} weight="fill" color="hsl(var(--green-500))" />
-          {data?.count} users online
+    <div className="flex gap-2 mb-3 mt-1 justify-between">
+      <Filters />
+      <div className="flex items-center gap-2">
+        <DateSelector />
+        <div className="flex items-center">
+          <Button variant="default" size="icon" onClick={goBack}>
+            <ChevronLeft />
+          </Button>
+          <Button
+            variant="default"
+            size="icon"
+            onClick={goForward}
+            disabled={!canGoForward(time)}
+          >
+            <ChevronRight />
+          </Button>
         </div>
       </div>
     </div>

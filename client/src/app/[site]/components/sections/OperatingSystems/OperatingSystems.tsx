@@ -3,7 +3,7 @@
 import { Compass } from "lucide-react";
 import { StandardCard } from "../../shared/StandardCard";
 import Image from "next/image";
-import { useGetOperatingSystems } from "@/hooks/api";
+import { useSingleCol } from "@/hooks/api";
 
 const OS_TO_LOGO: Record<string, string> = {
   Windows: "Windows.svg",
@@ -21,20 +21,21 @@ const OS_TO_LOGO: Record<string, string> = {
 };
 
 export function OperatingSystems() {
-  const { data, isLoading } = useGetOperatingSystems();
+  const { data, isLoading } = useSingleCol("operating_system");
+
   return (
     <StandardCard
       title="Operating Systems"
       data={data}
       isLoading={isLoading}
-      getValue={(e) => e.operating_system}
-      getKey={(e) => e.operating_system}
+      getValue={(e) => e.value}
+      getKey={(e) => e.value}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">
-          {OS_TO_LOGO[e.operating_system] ? (
+          {OS_TO_LOGO[e.value] ? (
             <Image
-              src={`/operating-systems/${OS_TO_LOGO[e.operating_system]}`}
-              alt={e.operating_system || "Other"}
+              src={`/operating-systems/${OS_TO_LOGO[e.value]}`}
+              alt={e.value || "Other"}
               className="w-4 h-4"
               width={16}
               height={16}
@@ -42,7 +43,7 @@ export function OperatingSystems() {
           ) : (
             <Compass width={16} />
           )}
-          {e.operating_system || "Other"}
+          {e.value || "Other"}
         </div>
       )}
       filterParameter="operating_system"

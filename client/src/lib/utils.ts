@@ -24,3 +24,6 @@ export function formatSecondsAsMinutesAndSeconds(value: number) {
     return `${seconds}s`;
   }
 }
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { BACKEND_URL } from "../lib/const";
-import { useStore } from "../lib/store";
+import { FilterParameter, useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
 
 export type APIResponse<T> = {
@@ -20,6 +20,44 @@ export function useGetLiveUsercount() {
 }
 
 type PeriodTime = "current" | "previous";
+
+export function useSingleCol(
+  parameter: FilterParameter,
+  periodTime?: PeriodTime
+): UseQueryResult<
+  APIResponse<{ value: string; count: number; percentage: number }[]>
+> {
+  const { time, previousTime, site, filters } = useStore();
+  const timeToUse = periodTime === "previous" ? previousTime : time;
+  const { startDate, endDate } = getStartAndEndDate(timeToUse);
+
+  return useQuery({
+    queryKey: [parameter, timeToUse, site, filters],
+    queryFn: () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return authedFetch(
+        `${BACKEND_URL}/single-col?${
+          startDate ? `startDate=${startDate}&` : ""
+        }${
+          endDate ? `endDate=${endDate}&` : ""
+        }timezone=${timezone}&site=${site}&parameter=${parameter}&filters=${JSON.stringify(
+          filters
+        )}`
+      ).then((res) => res.json());
+    },
+    staleTime: Infinity,
+    placeholderData: (_, query: any) => {
+      if (!query?.queryKey) return undefined;
+      const prevQueryKey = query.queryKey as [string, string, string];
+      const [, , prevSite] = prevQueryKey;
+
+      if (prevSite === site) {
+        return query.state.data;
+      }
+      return undefined;
+    },
+  });
+}
 
 export function useGenericQuery<T>(
   endpoint: string
@@ -67,68 +105,6 @@ export function useGenericSiteDataQuery<T>(
       return undefined;
     },
   });
-}
-
-export type GetCountriesResponse = {
-  country: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetCountries() {
-  return useGenericSiteDataQuery<GetCountriesResponse>("countries");
-}
-
-export type GetDevicesResponse = {
-  device_type: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetDevices() {
-  return useGenericSiteDataQuery<GetDevicesResponse>("devices");
-}
-
-export type GetOperatingSystemsResponse = {
-  operating_system: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetOperatingSystems() {
-  return useGenericSiteDataQuery<GetOperatingSystemsResponse>(
-    "operating-systems"
-  );
-}
-
-export type GetBrowsersResponse = {
-  browser: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetBrowsers() {
-  return useGenericSiteDataQuery<GetBrowsersResponse>("browsers");
-}
-
-export type GetPagesResponse = {
-  pathname: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetPages() {
-  return useGenericSiteDataQuery<GetPagesResponse>("pages");
-}
-
-export type GetReferrersResponse = {
-  referrer: string;
-  count: number;
-  percentage: number;
-}[];
-
-export function useGetReferrers() {
-  return useGenericSiteDataQuery<GetReferrersResponse>("referrers");
 }
 
 export type GetOverviewBucketedResponse = {

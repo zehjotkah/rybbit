@@ -4,9 +4,12 @@ export type FilterParameter =
   | "browser"
   | "operating_system"
   | "country"
+  | "region"
+  | "city"
   | "device_type"
   | "referrer"
-  | "pathname";
+  | "pathname"
+  | "query";
 
 export type Filter = {
   parameter: FilterParameter;
@@ -21,5 +24,6 @@ export interface GenericRequest {
     timezone: string;
     site: string;
     filters: string;
+    parameter: FilterParameter;
   };
 }

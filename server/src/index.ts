@@ -6,27 +6,22 @@ import cron from "node-cron";
 import { dirname, join } from "path";
 import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
+import { getLiveUsercount } from "./api/getLiveUsercount.js";
+import { getOverview } from "./api/getOverview.js";
+import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
+import { getSingleCol } from "./api/getSingleCol.js";
+import { listUsers } from "./api/listUsers.js";
 import { addSite } from "./api/sites/addSite.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
+import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSites } from "./api/sites/getSites.js";
-import { trackPageView } from "./tracker/trackPageView.js";
-import { getBrowsers } from "./api/getBrowsers.js";
-import { getCountries } from "./api/getCountries.js";
-import { getDevices } from "./api/getDevices.js";
-import { getLiveUsercount } from "./api/getLiveUsercount.js";
-import { getOperatingSystems } from "./api/getOperatingSystems.js";
-import { getOverview } from "./api/getOverview.js";
-import { getPages } from "./api/getPages.js";
-import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
-import { getReferrers } from "./api/getReferrers.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initializePostgres } from "./db/postgres/postgres.js";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
-import { listUsers } from "./api/listUsers.js";
-import { getSiteHasData } from "./api/sites/getSiteHasData.js";
+import { trackPageView } from "./tracker/trackPageView.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -122,12 +117,7 @@ server.addHook("onRequest", async (request, reply) => {
 server.get("/live-user-count/:site", getLiveUsercount);
 server.get("/overview", getOverview);
 server.get("/overview-bucketed", getOverviewBucketed);
-server.get("/countries", getCountries);
-server.get("/browsers", getBrowsers);
-server.get("/operating-systems", getOperatingSystems);
-server.get("/devices", getDevices);
-server.get("/pages", getPages);
-server.get("/referrers", getReferrers);
+server.get("/single-col", getSingleCol);
 server.get("/site-has-data/:site", getSiteHasData);
 
 // Administrative

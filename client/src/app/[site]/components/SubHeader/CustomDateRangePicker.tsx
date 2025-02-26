@@ -1,7 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
 
@@ -33,7 +31,7 @@ export function CustomDateRangePicker({
             Custom Range
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 " align="start">
+        <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             initialFocus
             mode="range"

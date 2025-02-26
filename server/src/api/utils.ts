@@ -1,5 +1,5 @@
 import { ResultSet } from "@clickhouse/client";
-import { Filter } from "./types.js";
+import { Filter, FilterParameter, FilterType } from "./types.js";
 
 export function getTimeStatement(
   startDate: string,
@@ -37,6 +37,26 @@ export async function processResults<T>(
   return data;
 }
 
+const filterTypeToOperator = (type: FilterType) => {
+  switch (type) {
+    case "equals":
+      return "=";
+    case "not_equals":
+      return "!=";
+    case "contains":
+      return "LIKE";
+    case "not_contains":
+      return "NOT LIKE";
+  }
+};
+
+export const geSqlParam = (parameter: FilterParameter) => {
+  if (parameter === "referrer") {
+    return "domainWithoutWWW(referrer)";
+  }
+  return parameter;
+};
+
 export function getFilterStatement(filters: string) {
   const filtersArray = JSON.parse(filters);
   if (filtersArray.length === 0) {
@@ -46,18 +66,9 @@ export function getFilterStatement(filters: string) {
     "AND " +
     filtersArray
       .map((filter: Filter) => {
-        if (filter.type === "equals") {
-          return `${filter.parameter} = '${filter.value}'`;
-        }
-        if (filter.type === "not_equals") {
-          return `${filter.parameter} != '${filter.value}'`;
-        }
-        if (filter.type === "contains") {
-          return `${filter.parameter} LIKE '${filter.value}'`;
-        }
-        if (filter.type === "not_contains") {
-          return `${filter.parameter} NOT LIKE '${filter.value}'`;
-        }
+        return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
+          filter.type
+        )} '${filter.value}'`;
       })
       .join(" AND ")
   );

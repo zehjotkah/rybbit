@@ -2,20 +2,21 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
 import { GenericRequest } from "./types.js";
 import {
+  geSqlParam,
   getFilterStatement,
   getTimeStatement,
   processResults,
 } from "./utils.js";
 
-type GetReferrersResponse = {
-  referrer: string;
+type GetSingleColResponse = {
+  value: string;
   count: number;
   percentage: number;
 }[];
 
-export async function getReferrers(
+export async function getSingleCol(
   {
-    query: { startDate, endDate, timezone, site, filters },
+    query: { startDate, endDate, timezone, site, filters, parameter },
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
@@ -23,7 +24,7 @@ export async function getReferrers(
 
   const query = `
     SELECT
-      domainWithoutWWW(referrer) AS referrer,
+      ${geSqlParam(parameter)} as value,
       COUNT(*) as count,
       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
     FROM pageviews
@@ -31,9 +32,7 @@ export async function getReferrers(
         site_id = ${site}
         ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
-    GROUP BY referrer 
-    ORDER BY count desc
-    LIMIT 100;
+    GROUP BY value ORDER BY count desc;
   `;
 
   try {
@@ -42,10 +41,10 @@ export async function getReferrers(
       format: "JSONEachRow",
     });
 
-    const data = await processResults<GetReferrersResponse[number]>(result);
+    const data = await processResults<GetSingleColResponse[number]>(result);
     return res.send({ data });
   } catch (error) {
-    console.error("Error fetching referrers:", error);
-    return res.status(500).send({ error: "Failed to fetch referrers" });
+    console.error("Error fetching devices:", error);
+    return res.status(500).send({ error: "Failed to fetch devices" });
   }
 }

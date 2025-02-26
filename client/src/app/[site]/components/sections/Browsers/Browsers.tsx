@@ -1,9 +1,9 @@
 "use client";
 
+import { useSingleCol } from "@/hooks/api";
 import { Compass } from "lucide-react";
 import Image from "next/image";
 import { StandardCard } from "../../shared/StandardCard";
-import { useGetBrowsers } from "@/hooks/api";
 
 const BROWSER_TO_LOGO: Record<string, string> = {
   Chrome: "Chrome.svg",
@@ -54,20 +54,20 @@ const BROWSER_TO_LOGO: Record<string, string> = {
 };
 
 export function Browsers() {
-  const { data, isLoading } = useGetBrowsers();
+  const { data, isLoading } = useSingleCol("browser");
 
   return (
     <StandardCard
       title="Browsers"
       data={data}
       isLoading={isLoading}
-      getKey={(e) => e.browser}
+      getKey={(e) => e.value}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">
-          {BROWSER_TO_LOGO[e.browser] ? (
+          {BROWSER_TO_LOGO[e.value] ? (
             <Image
-              src={`/browsers/${BROWSER_TO_LOGO[e.browser]}`}
-              alt={e.browser || "Other"}
+              src={`/browsers/${BROWSER_TO_LOGO[e.value]}`}
+              alt={e.value || "Other"}
               className="w-4 h-4"
               width={16}
               height={16}
@@ -75,10 +75,10 @@ export function Browsers() {
           ) : (
             <Compass width={16} />
           )}
-          {e.browser || "Other"}
+          {e.value || "Other"}
         </div>
       )}
-      getValue={(e) => e.browser}
+      getValue={(e) => e.value}
       filterParameter="browser"
     />
   );

@@ -1,37 +1,37 @@
 "use client";
 
-import { useGetReferrers } from "@/hooks/api";
+import { useSingleCol } from "@/hooks/api";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Referrers() {
-  const { data, isLoading } = useGetReferrers();
+  const { data, isLoading } = useSingleCol("referrer");
   return (
     <StandardCard
       filterParameter="referrer"
       title="Referrers"
       data={data}
-      getKey={(e) => e.referrer}
+      getKey={(e) => e.value}
       isLoading={isLoading}
       getLabel={(e) => (
         <div className="flex items-center">
           <img
             className="w-4 mr-2"
-            src={`https://www.google.com/s2/favicons?domain=${e.referrer}&sz=32`}
+            src={`https://www.google.com/s2/favicons?domain=${e.value}&sz=32`}
           />
-          {e.referrer ? (
+          {e.value ? (
             <a
-              href={`https://${e.referrer}`}
+              href={`https://${e.value}`}
               target="_blank"
               className="hover:underline"
             >
-              {e.referrer}
+              {e.value}
             </a>
           ) : (
             "Direct"
           )}
         </div>
       )}
-      getValue={(e) => e.referrer}
+      getValue={(e) => e.value}
     />
   );
 }

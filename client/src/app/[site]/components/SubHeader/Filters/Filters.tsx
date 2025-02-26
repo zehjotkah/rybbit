@@ -1,11 +1,12 @@
+import { countries } from "countries-list";
 import { X } from "lucide-react";
 import {
   Filter,
   FilterParameter,
   removeFilter,
   useStore,
-} from "../../../../lib/store";
-import { countries } from "countries-list";
+} from "../../../../../lib/store";
+import { NewFilterButton } from "./NewFilterButton";
 
 function getParameterNameLabel(parameter: FilterParameter) {
   switch (parameter) {
@@ -49,11 +50,11 @@ function getParameterValueLabel(filter: Filter) {
 
 export function Filters() {
   const { filters } = useStore();
-  if (filters.length === 0) return null;
 
   return (
-    <div className="flex gap-2 mb-3">
-      {filters.map((filter) => (
+    <div className="flex gap-2">
+      <NewFilterButton />
+      {filters?.map((filter) => (
         <div
           key={filter.parameter}
           className="px-2 py-1 rounded-md bg-neutral-850 text-neutral-400 flex items-center gap-1 text-sm"

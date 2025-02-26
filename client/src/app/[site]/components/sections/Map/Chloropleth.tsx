@@ -1,12 +1,12 @@
 "use client";
 
+import { useSingleCol } from "@/hooks/api";
+import { scaleLinear } from "d3-scale";
+import { Feature, FeatureCollection } from "geojson";
 import { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useMemo, useState } from "react";
-import { Feature, FeatureCollection } from "geojson";
-import { scaleLinear } from "d3-scale";
 import dynamic from "next/dynamic";
-import { useGetCountries } from "@/hooks/api";
+import { useEffect, useMemo, useState } from "react";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -30,7 +30,7 @@ const GeoJSON = dynamic(
 );
 
 export function Chloropleth() {
-  const { data, isLoading } = useGetCountries();
+  const { data, isLoading } = useSingleCol("country");
   const [geoJson, setGeoJson] = useState<FeatureCollection | null>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function Chloropleth() {
 
   const countryData = useMemo(() => {
     if (!data?.data) return new Map();
-    return new Map(data.data.map((item) => [item.country, item]));
+    return new Map(data.data.map((item) => [item.value, item]));
   }, [data?.data]);
 
   const colorScale = useMemo(() => {
