@@ -22,6 +22,7 @@ import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
 import { trackPageView } from "./tracker/trackPageView.js";
+import { createAccount } from "./api/createAccount.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -125,6 +126,7 @@ server.post("/add-site", addSite);
 server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/list-users", listUsers);
+server.post("/create-account", createAccount);
 
 // Track pageview endpoint
 server.post("/track/pageview", trackPageView);

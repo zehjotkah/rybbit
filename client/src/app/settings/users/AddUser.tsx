@@ -18,10 +18,12 @@ import { AlertCircle } from "lucide-react";
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Switch } from "../../../components/ui/switch";
+import { authedFetch } from "../../../hooks/utils";
+import { BACKEND_URL } from "../../../lib/const";
 
 export function AddUser({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,15 +41,24 @@ export function AddUser({ refetch }: { refetch: () => void }) {
       return;
     }
     try {
-      const response = await authClient.admin.createUser({
-        password,
-        email,
-        name,
-        role: isAdmin ? "admin" : "user",
+      const response = await authedFetch(`${BACKEND_URL}/create-account`, {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          username,
+          name: username,
+          password,
+          isAdmin,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      if (response.error) {
-        setError(String(response.error.message));
+      if (response.status !== 201) {
+        const data = await response.json();
+        console.info(data);
+        setError(data.error);
         return;
       }
 
@@ -66,7 +77,7 @@ export function AddUser({ refetch }: { refetch: () => void }) {
           setOpen(isOpen);
           setPassword("");
           setConfirmPassword("");
-          setName("");
+          setUsername("");
           setEmail("");
           setError("");
           setIsAdmin(false);
@@ -80,12 +91,12 @@ export function AddUser({ refetch }: { refetch: () => void }) {
             <DialogTitle>Add User</DialogTitle>
           </DialogHeader>
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">Username</Label>
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Name"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
             />
           </div>
           <div className="grid w-full items-center gap-1.5">
@@ -142,7 +153,7 @@ export function AddUser({ refetch }: { refetch: () => void }) {
               type="submit"
               onClick={handleSubmit}
               disabled={
-                !password || !confirmPassword || !passwordsMatch || !name
+                !password || !confirmPassword || !passwordsMatch || !username
               }
             >
               Create
