@@ -6,9 +6,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const formatter = Intl.NumberFormat("en", {
-  notation: "compact",
-}).format;
+export const formatter = (value: number) =>
+  Intl.NumberFormat("en", {
+    notation: "compact",
+  })
+    .format(value)
+    .toLocaleLowerCase();
 
 export function formatSecondsAsMinutesAndSeconds(value: number) {
   const duration = Duration.fromMillis(value * 1000);

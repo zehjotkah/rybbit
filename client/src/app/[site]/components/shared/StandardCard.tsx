@@ -1,6 +1,5 @@
 "use client";
 
-import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +15,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { addFilter, FilterParameter, useStore } from "../../../../lib/store";
+import { round } from "lodash";
+import { ReactNode } from "react";
+import { addFilter, FilterParameter } from "../../../../lib/store";
+import { formatter } from "../../../../lib/utils";
 
 export function StandardCard<T extends { percentage: number; count: number }>({
   title,
@@ -40,7 +42,9 @@ export function StandardCard<T extends { percentage: number; count: number }>({
   getValue: (item: T) => string;
   filterParameter: FilterParameter;
 }) {
-  const { filters, setFilters } = useStore();
+  const ratio = data?.data?.[0]?.percentage
+    ? 100 / data?.data?.[0]?.percentage
+    : 1;
 
   return (
     <Card>
@@ -52,7 +56,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
         {data?.data?.slice(0, 10).map((e) => (
           <div
             key={getKey(e)}
-            className="relative h-7 flex items-center cursor-pointer hover:bg-neutral-850 "
+            className="relative h-7 flex items-center cursor-pointer hover:bg-neutral-850 group"
             onClick={() =>
               addFilter({
                 parameter: filterParameter,
@@ -63,16 +67,15 @@ export function StandardCard<T extends { percentage: number; count: number }>({
           >
             <div
               className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
-              style={{ width: `${e.percentage}%` }}
+              style={{ width: `${e.percentage * ratio}%` }}
             ></div>
-            <div className="z-10 ml-1 flex justify-between items-center text-sm w-full">
+            <div className="z-10 mx-2 flex justify-between items-center text-sm w-full">
               <div>{getLabel(e)}</div>
-              <div className="text-sm flex">
-                <div>{e.count.toLocaleString()}</div>
-                <div className="ml-1 text-neutral-500">|</div>
-                <div className="ml-1 w-10 text-neutral-500">
-                  {e.percentage}%
+              <div className="text-sm flex gap-2">
+                <div className="hidden group-hover:block text-neutral-400">
+                  {round(e.percentage, 1)}%
                 </div>
+                <div>{formatter(e.count)}</div>
               </div>
             </div>
           </div>
@@ -101,15 +104,15 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                   >
                     <div
                       className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
-                      style={{ width: `${e.percentage}%` }}
+                      style={{ width: `${e.percentage * ratio}%` }}
                     ></div>
-                    <div className="z-10 ml-1 flex justify-between items-center text-sm w-full h-7">
+                    <div className="z-10 ml-2 mr-4 flex justify-between items-center text-sm w-full h-7">
                       <div>{getLabel(e)}</div>
                       <div className="text-sm flex">
                         <div>{e.count.toLocaleString()}</div>
                         <div className="mx-2 bg-neutral-400 w-[1px] rounded-full h-5"></div>
-                        <div className="w-10 text-neutral-500">
-                          {e.percentage}%
+                        <div className="w-10 text-neutral-400">
+                          {round(e.percentage, 2)}%
                         </div>
                       </div>
                     </div>
