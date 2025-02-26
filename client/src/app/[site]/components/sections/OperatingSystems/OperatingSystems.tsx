@@ -21,13 +21,13 @@ const OS_TO_LOGO: Record<string, string> = {
 };
 
 export function OperatingSystems() {
-  const { data, isLoading } = useSingleCol({ parameter: "operating_system" });
+  const { data, isFetching } = useSingleCol({ parameter: "operating_system" });
 
   return (
     <StandardCard
       title="Operating Systems"
       data={data}
-      isLoading={isLoading}
+      isFetching={isFetching}
       getValue={(e) => e.value}
       getKey={(e) => e.value}
       getLabel={(e) => (

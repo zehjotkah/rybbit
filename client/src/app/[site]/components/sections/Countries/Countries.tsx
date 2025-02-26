@@ -7,13 +7,13 @@ import React from "react";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Countries() {
-  const { data, isLoading } = useSingleCol({ parameter: "country" });
+  const { data, isFetching } = useSingleCol({ parameter: "country" });
 
   return (
     <StandardCard
       title="Countries"
       data={data}
-      isLoading={isLoading}
+      isFetching={isFetching}
       getKey={(e) => e.value}
       getLabel={(e) => (
         <span className="flex items-center gap-2">

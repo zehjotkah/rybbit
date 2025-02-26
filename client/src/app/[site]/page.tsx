@@ -14,6 +14,7 @@ import { OperatingSystems } from "./components/sections/OperatingSystems/Operati
 import { Pages } from "./components/sections/Pages/Pages";
 import { Referrers } from "./components/sections/Referrers/Referrers";
 import { SubHeader } from "./components/SubHeader/SubHeader";
+import { useGetSiteMetadata } from "../../hooks/hooks";
 
 export default function SitePage() {
   const pathname = usePathname();
@@ -33,16 +34,16 @@ export default function SitePage() {
 }
 
 function SitePageInner({ site }: { site: string }) {
-  const { data: allSites, isLoading: isLoadingAllSites } = useGetSites();
   const { data: siteHasData, isLoading } = useSiteHasData(site);
 
-  const siteMetadata = allSites?.data?.find((s) => s.site_id === Number(site));
+  const { siteMetadata, isLoading: isLoadingSiteMetadata } =
+    useGetSiteMetadata(site);
 
-  if (isLoadingAllSites || isLoading) {
+  if (isLoadingSiteMetadata || isLoading || !siteMetadata) {
     return null;
   }
 
-  if (!siteHasData?.data && !isLoading && !isLoadingAllSites) {
+  if (!siteHasData?.data && !isLoading && !isLoadingSiteMetadata) {
     return <NoData siteMetadata={siteMetadata} />;
   }
 
@@ -55,7 +56,7 @@ function SitePageInner({ site }: { site: string }) {
         <OperatingSystems />
         <Browsers />
         <Devices />
-        <Pages />
+        <Pages siteMetadata={siteMetadata} />
         <Referrers />
         <Countries />
         <Map />

@@ -19,6 +19,7 @@ import { round } from "lodash";
 import { ReactNode } from "react";
 import { addFilter, FilterParameter } from "../../../../lib/store";
 import { formatter } from "../../../../lib/utils";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 export function StandardCard<T extends { percentage: number; count: number }>({
   title,
@@ -26,7 +27,8 @@ export function StandardCard<T extends { percentage: number; count: number }>({
   getKey,
   getLabel,
   getValue,
-  isLoading,
+  getLink,
+  isFetching,
   filterParameter,
 }: {
   title: string;
@@ -36,10 +38,11 @@ export function StandardCard<T extends { percentage: number; count: number }>({
         error?: string;
       }
     | undefined;
-  isLoading?: boolean;
+  isFetching?: boolean;
   getKey: (item: T) => string;
   getLabel: (item: T) => ReactNode;
   getValue: (item: T) => string;
+  getLink?: (item: T) => string;
   filterParameter: FilterParameter;
 }) {
   const ratio = data?.data?.[0]?.percentage
@@ -48,7 +51,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
 
   return (
     <Card>
-      {isLoading && <CardLoader />}
+      {isFetching && <CardLoader />}
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
@@ -70,7 +73,21 @@ export function StandardCard<T extends { percentage: number; count: number }>({
               style={{ width: `${e.percentage * ratio}%` }}
             ></div>
             <div className="z-10 mx-2 flex justify-between items-center text-sm w-full">
-              <div>{getLabel(e)}</div>
+              <div className="flex items-center gap-1">
+                {getLabel(e)}
+                {getLink && (
+                  <a
+                    href={getLink(e)}
+                    target="_blank"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <SquareArrowOutUpRight
+                      className="w-3 h-3 text-neutral-300 hover:text-neutral-100"
+                      strokeWidth={3}
+                    />
+                  </a>
+                )}
+              </div>
               <div className="text-sm flex gap-2">
                 <div className="hidden group-hover:block text-neutral-400">
                   {round(e.percentage, 1)}%
@@ -107,7 +124,21 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                       style={{ width: `${e.percentage * ratio}%` }}
                     ></div>
                     <div className="z-10 ml-2 mr-4 flex justify-between items-center text-sm w-full h-7">
-                      <div>{getLabel(e)}</div>
+                      <div className="flex items-center gap-1">
+                        {getLabel(e)}
+                        {getLink && (
+                          <a
+                            href={getLink(e)}
+                            target="_blank"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <SquareArrowOutUpRight
+                              className="w-3 h-3 text-neutral-300 hover:text-neutral-100"
+                              strokeWidth={3}
+                            />
+                          </a>
+                        )}
+                      </div>
                       <div className="text-sm flex">
                         <div>{e.count.toLocaleString()}</div>
                         <div className="mx-2 bg-neutral-400 w-[1px] rounded-full h-5"></div>

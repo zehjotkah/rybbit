@@ -54,13 +54,13 @@ const BROWSER_TO_LOGO: Record<string, string> = {
 };
 
 export function Browsers() {
-  const { data, isLoading } = useSingleCol({ parameter: "browser" });
+  const { data, isFetching } = useSingleCol({ parameter: "browser" });
 
   return (
     <StandardCard
       title="Browsers"
       data={data}
-      isLoading={isLoading}
+      isFetching={isFetching}
       getKey={(e) => e.value}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">
