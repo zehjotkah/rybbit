@@ -26,6 +26,7 @@ export const initializeClickhouse = async () => {
         operating_system_version LowCardinality(String),
         language LowCardinality(String),
         country LowCardinality(String),
+        iso_3166_2 LowCardinality(String),
         screen_width UInt16,
         screen_height UInt16,
         device_type LowCardinality(String)
