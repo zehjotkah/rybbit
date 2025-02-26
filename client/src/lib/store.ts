@@ -317,3 +317,8 @@ export const removeFilter = (filter: Filter) => {
   const { filters, setFilters } = useStore.getState();
   setFilters(filters.filter((f) => f !== filter));
 };
+
+export const updateFilter = (filter: Filter, index: number) => {
+  const { filters, setFilters } = useStore.getState();
+  setFilters(filters.map((f, i) => (i === index ? filter : f)));
+};

@@ -54,7 +54,7 @@ const BROWSER_TO_LOGO: Record<string, string> = {
 };
 
 export function Browsers() {
-  const { data, isLoading } = useSingleCol("browser");
+  const { data, isLoading } = useSingleCol({ parameter: "browser" });
 
   return (
     <StandardCard

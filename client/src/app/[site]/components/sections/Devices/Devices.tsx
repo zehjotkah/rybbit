@@ -4,7 +4,7 @@ import { useSingleCol } from "@/hooks/api";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Devices() {
-  const { data, isLoading } = useSingleCol("device_type");
+  const { data, isLoading } = useSingleCol({ parameter: "device_type" });
   return (
     <StandardCard
       filterParameter="device_type"

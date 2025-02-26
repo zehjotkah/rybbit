@@ -7,7 +7,7 @@ import React from "react";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Countries() {
-  const { data, isLoading } = useSingleCol("country");
+  const { data, isLoading } = useSingleCol({ parameter: "country" });
 
   return (
     <StandardCard

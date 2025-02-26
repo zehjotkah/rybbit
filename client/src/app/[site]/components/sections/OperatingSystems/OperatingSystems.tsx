@@ -21,7 +21,7 @@ const OS_TO_LOGO: Record<string, string> = {
 };
 
 export function OperatingSystems() {
-  const { data, isLoading } = useSingleCol("operating_system");
+  const { data, isLoading } = useSingleCol({ parameter: "operating_system" });
 
   return (
     <StandardCard

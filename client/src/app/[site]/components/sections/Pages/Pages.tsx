@@ -4,7 +4,7 @@ import { useSingleCol } from "@/hooks/api";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Pages() {
-  const { data, isLoading } = useSingleCol("pathname");
+  const { data, isLoading } = useSingleCol({ parameter: "pathname" });
 
   return (
     <StandardCard

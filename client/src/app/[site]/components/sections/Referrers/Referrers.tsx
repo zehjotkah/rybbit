@@ -4,7 +4,7 @@ import { useSingleCol } from "@/hooks/api";
 import { StandardCard } from "../../shared/StandardCard";
 
 export function Referrers() {
-  const { data, isLoading } = useSingleCol("referrer");
+  const { data, isLoading } = useSingleCol({ parameter: "referrer" });
   return (
     <StandardCard
       filterParameter="referrer"

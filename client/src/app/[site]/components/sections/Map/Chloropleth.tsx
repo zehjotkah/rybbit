@@ -30,7 +30,7 @@ const GeoJSON = dynamic(
 );
 
 export function Chloropleth() {
-  const { data, isLoading } = useSingleCol("country");
+  const { data, isLoading } = useSingleCol({ parameter: "country" });
   const [geoJson, setGeoJson] = useState<FeatureCollection | null>(null);
 
   useEffect(() => {

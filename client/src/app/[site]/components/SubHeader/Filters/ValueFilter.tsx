@@ -37,7 +37,7 @@ interface ValueFilterProps {
 }
 
 export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
-  const { data, isLoading } = useSingleCol(parameter, 1000);
+  const { data, isLoading } = useSingleCol({ parameter, limit: 1000 });
 
   const [open, setOpen] = useState(false);
 
@@ -93,7 +93,6 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
             className="min-w-[200px] justify-between text-left font-normal"
           >
             {value || "Select value..."}
-
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

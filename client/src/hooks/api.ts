@@ -21,11 +21,15 @@ export function useGetLiveUsercount() {
 
 type PeriodTime = "current" | "previous";
 
-export function useSingleCol(
-  parameter: FilterParameter,
-  limit?: number,
-  periodTime?: PeriodTime
-): UseQueryResult<
+export function useSingleCol({
+  parameter,
+  limit = 10000,
+  periodTime,
+}: {
+  parameter: FilterParameter;
+  limit?: number;
+  periodTime?: PeriodTime;
+}): UseQueryResult<
   APIResponse<{ value: string; count: number; percentage: number }[]>
 > {
   const { time, previousTime, site, filters } = useStore();

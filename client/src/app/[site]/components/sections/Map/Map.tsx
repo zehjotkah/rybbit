@@ -34,7 +34,7 @@ interface TooltipData {
 }
 
 export function Map() {
-  const { data, isLoading } = useSingleCol("country");
+  const { data, isLoading } = useSingleCol({ parameter: "country" });
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
   const colorScale = useMemo(() => {
