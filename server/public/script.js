@@ -2,9 +2,7 @@
 (function () {
   // Get the script tag that loaded this script
   const scriptTag = document.currentScript;
-  const ANALYTICS_HOST = scriptTag
-    .getAttribute("src")
-    .split("/analytics.js")[0];
+  const ANALYTICS_HOST = scriptTag.getAttribute("src").split("/script.js")[0];
 
   if (!ANALYTICS_HOST) {
     console.error("Please provide a valid analytics host");
