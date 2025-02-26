@@ -22,6 +22,10 @@ function getParameterNameLabel(parameter: FilterParameter) {
       return "Referrer";
     case "pathname":
       return "Pathname";
+    case "page_title":
+      return "Page Title";
+    case "querystring":
+      return "Query String";
     default:
       return parameter;
   }
@@ -33,16 +37,6 @@ function getParameterValueLabel(filter: Filter) {
       return (
         countries[filter.value as keyof typeof countries]?.name ?? filter.value
       );
-    case "device_type":
-      return filter.value;
-    case "operating_system":
-      return filter.value;
-    case "browser":
-      return filter.value;
-    case "referrer":
-      return filter.value;
-    case "pathname":
-      return filter.value;
     default:
       return filter.value;
   }

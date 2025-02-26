@@ -56,6 +56,14 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
     label: "Referrer",
     value: "referrer",
   },
+  {
+    label: "Page Title",
+    value: "page_title",
+  },
+  {
+    label: "Language",
+    value: "language",
+  },
 ];
 
 export function NewFilterButton() {
