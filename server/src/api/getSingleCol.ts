@@ -16,7 +16,7 @@ type GetSingleColResponse = {
 
 export async function getSingleCol(
   {
-    query: { startDate, endDate, timezone, site, filters, parameter },
+    query: { startDate, endDate, timezone, site, filters, parameter, limit },
   }: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
@@ -32,7 +32,8 @@ export async function getSingleCol(
         site_id = ${site}
         ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
-    GROUP BY value ORDER BY count desc;
+    GROUP BY value ORDER BY count desc
+     ${limit ? `LIMIT ${limit}` : ""};
   `;
 
   try {

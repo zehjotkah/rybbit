@@ -23,6 +23,9 @@ export function Referrers() {
               href={`https://${e.value}`}
               target="_blank"
               className="hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               {e.value}
             </a>

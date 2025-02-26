@@ -26,7 +26,11 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
   },
   {
     label: "Query",
-    value: "query",
+    value: "querystring",
+  },
+  {
+    label: "Country",
+    value: "country",
   },
   {
     label: "Region",
@@ -35,10 +39,6 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
   {
     label: "City",
     value: "city",
-  },
-  {
-    label: "Country",
-    value: "country",
   },
   {
     label: "Device Type",

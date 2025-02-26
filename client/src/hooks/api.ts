@@ -23,6 +23,7 @@ type PeriodTime = "current" | "previous";
 
 export function useSingleCol(
   parameter: FilterParameter,
+  limit?: number,
   periodTime?: PeriodTime
 ): UseQueryResult<
   APIResponse<{ value: string; count: number; percentage: number }[]>
@@ -32,7 +33,7 @@ export function useSingleCol(
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [parameter, timeToUse, site, filters],
+    queryKey: [parameter, timeToUse, site, filters, limit],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
@@ -42,7 +43,7 @@ export function useSingleCol(
           endDate ? `endDate=${endDate}&` : ""
         }timezone=${timezone}&site=${site}&parameter=${parameter}&filters=${JSON.stringify(
           filters
-        )}`
+        )}${limit ? `&limit=${limit}` : ""}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,

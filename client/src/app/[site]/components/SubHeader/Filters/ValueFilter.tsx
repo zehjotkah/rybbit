@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "../../../../../components/ui/button";
 
-import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
 
 import { cn } from "../../../../../lib/utils";
 
@@ -25,94 +25,60 @@ import {
 
 import { FilterParameter, addFilter } from "../../../../../lib/store";
 
-import { useRouter } from "next/navigation";
+import { useSingleCol } from "../../../../../hooks/api";
+import { countries } from "countries-list";
 
 interface ValueFilterProps {
-  parameter?: FilterParameter;
+  parameter: FilterParameter;
 
-  type?: "equals" | "not_equals" | "contains" | "not_contains";
+  type: "equals" | "not_equals" | "contains" | "not_contains";
 
   onComplete?: () => void;
 }
 
 export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
+  const { data, isLoading } = useSingleCol(parameter, 1000);
+
   const [open, setOpen] = useState(false);
 
   const [value, setValue] = useState("");
 
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  const router = useRouter();
-
-  // This would be replaced with actual data fetching based on the parameter
-
-  useEffect(() => {
-    // Mock suggestions based on parameter type
-
-    if (parameter) {
-      // In a real implementation, these would come from an API call based on the parameter
-
-      const mockSuggestions: Record<FilterParameter, string[]> = {
-        pathname: ["/", "/about", "/pricing", "/contact", "/blog"],
-
-        query: ["utm_source=google", "ref=homepage", "campaign=spring"],
-
-        region: ["California", "New York", "Texas", "Florida"],
-
-        city: ["San Francisco", "New York", "Austin", "Miami"],
-
-        country: [
-          "United States",
-          "United Kingdom",
-          "Canada",
-          "Germany",
-          "Japan",
-        ],
-
-        device_type: ["desktop", "mobile", "tablet"],
-
-        operating_system: ["Windows", "macOS", "iOS", "Android", "Linux"],
-
-        browser: ["Chrome", "Safari", "Firefox", "Edge"],
-
-        referrer: ["google.com", "facebook.com", "twitter.com", "direct"],
-      };
-
-      setSuggestions(mockSuggestions[parameter] || []);
-    }
-  }, [parameter]);
+  const suggestions = useMemo(() => {
+    return (
+      data?.data
+        ?.map((item) => item.value)
+        .filter(Boolean)
+        .map((val) => {
+          if (parameter === "country") {
+            return {
+              value: val,
+              label: countries[val as keyof typeof countries].name,
+            };
+          }
+          return {
+            value: val,
+            label: val,
+          };
+        }) || []
+    );
+  }, [data]);
 
   const handleSelect = (currentValue: string) => {
     setValue(currentValue);
-
     setOpen(false);
   };
 
   const handleApply = () => {
     if (parameter && type && value.trim()) {
-      // Add the filter using the store function
-
       addFilter({
         parameter,
-
         type,
-
         value: value.trim(),
       });
-
-      // Reset the component
-
       setValue("");
-
-      // Call the onComplete callback (if provided)
-
       if (onComplete) {
         onComplete();
       }
-
-      // Refresh the page to apply the filter
-
-      router.refresh();
     }
   };
 
@@ -131,8 +97,7 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent className="p-0" align="start">
           <Command>
             <CommandInput
               placeholder="Search values..."
@@ -140,26 +105,16 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
               onValueChange={setValue}
               className="h-9"
             />
-
             <CommandList>
               <CommandEmpty>No matching results</CommandEmpty>
-
               <CommandGroup>
                 {suggestions.map((suggestion) => (
                   <CommandItem
-                    key={suggestion}
-                    value={suggestion}
+                    key={suggestion.value}
+                    value={suggestion.value}
                     onSelect={handleSelect}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-
-                        value === suggestion ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-
-                    {suggestion}
+                    {suggestion.label}
                   </CommandItem>
                 ))}
               </CommandGroup>

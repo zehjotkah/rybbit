@@ -66,7 +66,7 @@ export type FilterParameter =
   | "device_type"
   | "referrer"
   | "pathname"
-  | "query";
+  | "querystring";
 
 export type Filter = {
   parameter: FilterParameter;

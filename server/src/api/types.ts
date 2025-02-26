@@ -9,7 +9,7 @@ export type FilterParameter =
   | "device_type"
   | "referrer"
   | "pathname"
-  | "query";
+  | "querystring";
 
 export type Filter = {
   parameter: FilterParameter;
@@ -25,5 +25,6 @@ export interface GenericRequest {
     site: string;
     filters: string;
     parameter: FilterParameter;
+    limit?: number;
   };
 }
