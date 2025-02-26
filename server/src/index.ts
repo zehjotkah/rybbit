@@ -89,7 +89,7 @@ server.addHook("onRequest", async (request, reply) => {
   if (
     url?.startsWith("/health") ||
     url?.startsWith("/track/pageview") ||
-    url?.startsWith("/analytics") ||
+    url?.startsWith("/script") ||
     url?.startsWith("/auth") ||
     url?.startsWith("/api/auth")
   ) {
