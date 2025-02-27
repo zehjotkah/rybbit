@@ -4,7 +4,7 @@ import { useSingleCol } from "@/hooks/api";
 import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";
 import React from "react";
-import { StandardCard } from "../../shared/StandardCard";
+import { StandardCard } from "../../../components/shared/StandardCard";
 
 export function Countries() {
   const { data, isFetching } = useSingleCol({ parameter: "country" });

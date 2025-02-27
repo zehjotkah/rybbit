@@ -4,7 +4,7 @@ import { nivoTheme } from "@/lib/nivo";
 import { StatType, Time, TimeBucket, useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
-import { formatSecondsAsMinutesAndSeconds } from "../../../../lib/utils";
+import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 

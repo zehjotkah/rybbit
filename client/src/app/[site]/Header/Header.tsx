@@ -3,7 +3,7 @@ import { Circle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { usePathname } from "next/navigation";
-import { useGetLiveUsercount, useGetSites } from "../../../../hooks/api";
+import { useGetLiveUsercount, useGetSites } from "../../../hooks/api";
 
 export function Header() {
   const { data } = useGetLiveUsercount();

@@ -3,7 +3,7 @@
 import { useSingleCol } from "@/hooks/api";
 import { Compass } from "lucide-react";
 import Image from "next/image";
-import { StandardCard } from "../../shared/StandardCard";
+import { StandardCard } from "../../../components/shared/StandardCard";
 
 const BROWSER_TO_LOGO: Record<string, string> = {
   Chrome: "Chrome.svg",

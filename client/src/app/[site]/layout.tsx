@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useStore } from "../../lib/store";
-import { Header } from "./components/Header/Header";
+import { Header } from "./Header/Header";
 
 export default function SiteLayout({
   children,

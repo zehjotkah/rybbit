@@ -5,7 +5,7 @@ import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
-import { useStore } from "../../../../lib/store";
+import { useStore } from "../../../../../lib/store";
 
 export function MainSection() {
   const { selectedStat, time } = useStore();

@@ -2,17 +2,17 @@
 import { usePathname } from "next/navigation";
 import { useGetSites, useSiteHasData } from "../../../hooks/api";
 import { useStore } from "../../../lib/store";
-import { MainSection } from "../components/MainSection/MainSection";
 import { NoData } from "../components/NoData";
-import { Browsers } from "../components/sections/Browsers/Browsers";
-import { Countries } from "../components/sections/Countries/Countries";
-import { Devices } from "../components/sections/Devices/Devices";
-import { Map } from "../components/sections/Map/Map";
-import { OperatingSystems } from "../components/sections/OperatingSystems/OperatingSystems";
-import { Pages } from "../components/sections/Pages/Pages";
-import { Referrers } from "../components/sections/Referrers/Referrers";
+import { Browsers } from "./components/sections/Browsers";
+import { Countries } from "./components/sections/Countries";
+import { Devices } from "./components/sections/Devices";
+import { Map } from "./components/sections/Map";
+import { OperatingSystems } from "./components/sections/OperatingSystems";
+import { Pages } from "./components/sections/Pages";
+import { Referrers } from "./components/sections/Referrers";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { useGetSiteMetadata } from "../../../hooks/hooks";
+import { MainSection } from "./components/MainSection/MainSection";
 
 export default function MainPage() {
   const { site } = useStore();

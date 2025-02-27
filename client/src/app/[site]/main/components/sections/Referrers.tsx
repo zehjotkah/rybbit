@@ -1,7 +1,7 @@
 "use client";
 
 import { useSingleCol } from "@/hooks/api";
-import { StandardCard } from "../../shared/StandardCard";
+import { StandardCard } from "../../../components/shared/StandardCard";
 
 export function Referrers() {
   const { data, isFetching } = useSingleCol({ parameter: "referrer" });

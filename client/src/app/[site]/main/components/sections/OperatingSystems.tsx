@@ -1,9 +1,9 @@
 "use client";
 
 import { Compass } from "lucide-react";
-import { StandardCard } from "../../shared/StandardCard";
 import Image from "next/image";
 import { useSingleCol } from "@/hooks/api";
+import { StandardCard } from "../../../components/shared/StandardCard";
 
 const OS_TO_LOGO: Record<string, string> = {
   Windows: "Windows.svg",
