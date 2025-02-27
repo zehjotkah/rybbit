@@ -1,35 +1,9 @@
 "use client";
 import { Circle } from "@phosphor-icons/react";
-
-import { Time, useStore } from "@/lib/store";
-import { DateTime } from "luxon";
+import Link from "next/link";
+import { useStore } from "@/lib/store";
 import { usePathname } from "next/navigation";
 import { useGetLiveUsercount, useGetSites } from "../../../../hooks/api";
-
-const canGoForward = (time: Time) => {
-  const currentDay = DateTime.now().startOf("day");
-  if (time.mode === "day") {
-    return !(DateTime.fromISO(time.day).startOf("day") >= currentDay);
-  }
-
-  if (time.mode === "range") {
-    return !(DateTime.fromISO(time.endDate).startOf("day") >= currentDay);
-  }
-
-  if (time.mode === "week") {
-    return !(DateTime.fromISO(time.week).startOf("week") >= currentDay);
-  }
-
-  if (time.mode === "month") {
-    return !(DateTime.fromISO(time.month).startOf("month") >= currentDay);
-  }
-
-  if (time.mode === "year") {
-    return !(DateTime.fromISO(time.year).startOf("year") >= currentDay);
-  }
-
-  return false;
-};
 
 export function Header() {
   const { data } = useGetLiveUsercount();
@@ -38,8 +12,20 @@ export function Header() {
   const pathname = usePathname();
 
   const site = sites?.data?.find(
-    (site) => site.site_id === Number(pathname.slice(1))
+    (site) => site.site_id === Number(pathname.split("/")[1])
   );
+
+  // Check which tab is active based on the current path
+  const getTabPath = (tabName: string) => {
+    return `/${pathname.split("/")[1]}/${tabName.toLowerCase()}`;
+  };
+
+  const isActiveTab = (tabName: string) => {
+    if (!pathname.includes("/")) return false;
+
+    const route = pathname.split("/")[2] || "main";
+    return route === tabName.toLowerCase();
+  };
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -56,6 +42,53 @@ export function Header() {
           {data?.count} users online
         </div>
       </div>
+      <div className="flex space-x-2">
+        <TabButton
+          label="Main"
+          active={isActiveTab("main")}
+          href={getTabPath("main")}
+        />
+        <TabButton
+          label="Sessions"
+          active={isActiveTab("sessions")}
+          href={getTabPath("sessions")}
+        />
+        <TabButton
+          label="Realtime"
+          active={isActiveTab("realtime")}
+          href={getTabPath("realtime")}
+        />
+        <TabButton
+          label="Reports"
+          active={isActiveTab("reports")}
+          href={getTabPath("reports")}
+        />
+      </div>
     </div>
+  );
+}
+
+// Tab Button component with navigation
+function TabButton({
+  label,
+  active = false,
+  href,
+}: {
+  label: string;
+  active?: boolean;
+  href: string;
+}) {
+  return (
+    <Link href={href} className="focus:outline-none">
+      <button
+        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+          active
+            ? "bg-neutral-800 text-white"
+            : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+        }`}
+      >
+        {label}
+      </button>
+    </Link>
   );
 }
