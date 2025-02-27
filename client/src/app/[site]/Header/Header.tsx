@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { usePathname } from "next/navigation";
 import { useGetLiveUsercount, useGetSites } from "../../../hooks/api";
+import { ChartBarDecreasing, ChartLine, Radio, User, Zap } from "lucide-react";
 
 export function Header() {
   const { data } = useGetLiveUsercount();
@@ -47,21 +48,25 @@ export function Header() {
           label="Main"
           active={isActiveTab("main")}
           href={getTabPath("main")}
+          icon={<ChartLine size={20} />}
         />
         <TabButton
           label="Sessions"
           active={isActiveTab("sessions")}
           href={getTabPath("sessions")}
+          icon={<User size={20} />}
         />
         <TabButton
           label="Realtime"
           active={isActiveTab("realtime")}
           href={getTabPath("realtime")}
+          icon={<Radio size={20} />}
         />
         <TabButton
           label="Reports"
           active={isActiveTab("reports")}
           href={getTabPath("reports")}
+          icon={<ChartBarDecreasing size={20} />}
         />
       </div>
     </div>
@@ -73,21 +78,26 @@ function TabButton({
   label,
   active = false,
   href,
+  icon,
 }: {
   label: string;
   active?: boolean;
   href: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <Link href={href} className="focus:outline-none">
       <button
         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
           active
-            ? "bg-neutral-800 text-white"
+            ? "bg-neutral-800 text-white  hover:bg-neutral-800/75 "
             : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
         }`}
       >
-        {label}
+        <div className="flex items-center gap-2">
+          {icon}
+          {label}
+        </div>
       </button>
     </Link>
   );

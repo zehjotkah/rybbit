@@ -203,10 +203,13 @@ export const goBack = () => {
   const { time, setTime } = useStore.getState();
 
   if (time.mode === "day") {
-    setTime({
-      mode: "day",
-      day: DateTime.fromISO(time.day).minus({ days: 1 }).toISODate() ?? "",
-    });
+    setTime(
+      {
+        mode: "day",
+        day: DateTime.fromISO(time.day).minus({ days: 1 }).toISODate() ?? "",
+      },
+      false
+    );
   } else if (time.mode === "range") {
     const startDate = DateTime.fromISO(time.startDate);
     const endDate = DateTime.fromISO(time.endDate);
