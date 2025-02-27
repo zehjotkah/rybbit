@@ -45,7 +45,16 @@ export type Time =
   | YearMode
   | AllTimeMode;
 
-export type TimeBucket = "hour" | "day" | "week" | "month" | "year";
+export type TimeBucket =
+  | "minute"
+  | "five_minutes"
+  | "ten_minutes"
+  | "fifteen_minutes"
+  | "hour"
+  | "day"
+  | "week"
+  | "month"
+  | "year";
 
 export type StatType =
   | "pageviews"

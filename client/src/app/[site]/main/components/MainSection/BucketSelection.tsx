@@ -14,6 +14,15 @@ const getOptions = (time: Time) => {
   if (time.mode === "day") {
     return (
       <SelectContent>
+        <SelectItem size="sm" value="minute">
+          Minute
+        </SelectItem>
+        <SelectItem size="sm" value="five_minutes">
+          5 Minutes
+        </SelectItem>
+        <SelectItem size="sm" value="fifteen_minutes">
+          15 Minutes
+        </SelectItem>
         <SelectItem size="sm" value="hour">
           Hour
         </SelectItem>

@@ -7,17 +7,27 @@ import {
 } from "./utils.js";
 
 const TimeBucketToFn = {
+  minute: "toStartOfMinute",
+  five_minutes: "toStartOfFiveMinutes",
+  ten_minutes: "toStartOfTenMinutes",
+  fifteen_minutes: "toStartOfFifteenMinutes",
   hour: "toStartOfHour",
   day: "toStartOfDay",
   week: "toStartOfWeek",
   month: "toStartOfMonth",
+  year: "toStartOfYear",
 };
 
 const bucketIntervalMap = {
+  minute: "1 MINUTE",
+  five_minutes: "5 MINUTES",
+  ten_minutes: "10 MINUTES",
+  fifteen_minutes: "15 MINUTES",
   hour: "1 HOUR",
   day: "1 DAY",
   week: "7 DAY",
   month: "1 MONTH",
+  year: "1 YEAR",
 } as const;
 
 function getTimeStatementFill(

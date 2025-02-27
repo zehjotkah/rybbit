@@ -13,7 +13,18 @@ const getMax = (time: Time, bucket: TimeBucket) => {
   if (time.mode === "day") {
     const dayDate = DateTime.fromISO(time.day)
       .endOf("day")
-      .minus({ minutes: 59 });
+      .minus({
+        minutes:
+          bucket === "hour"
+            ? 59
+            : bucket === "fifteen_minutes"
+            ? 14
+            : bucket === "ten_minutes"
+            ? 9
+            : bucket === "five_minutes"
+            ? 4
+            : 0,
+      });
     return now < dayDate ? dayDate.toJSDate() : undefined;
   } else if (time.mode === "range") {
     if (bucket === "hour") {
@@ -214,20 +225,12 @@ export function Chart({
               </div>
             ) : null}
             <div className="flex justify-between text-sm w-36">
-              <div>
-                {bucket === "hour"
-                  ? currentTime.toFormat("M/d h a")
-                  : currentTime.toLocaleString()}
-              </div>
+              <div>{formatTime(currentTime, bucket)}</div>
               <div>{formatTooltipValue(currentY, selectedStat)}</div>
             </div>
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
-                <div>
-                  {bucket === "hour"
-                    ? previousTime.toFormat("M/d h a")
-                    : previousTime.toLocaleString()}
-                </div>
+                <div>{formatTime(previousTime, bucket)}</div>
                 <div>{formatTooltipValue(previousY, selectedStat)}</div>
               </div>
             )}
@@ -237,3 +240,18 @@ export function Chart({
     />
   );
 }
+
+const formatTime = (time: DateTime<boolean>, bucket: TimeBucket) => {
+  if (
+    bucket === "minute" ||
+    bucket === "five_minutes" ||
+    bucket === "ten_minutes" ||
+    bucket === "fifteen_minutes"
+  ) {
+    return time.toFormat("M/d h:mm a");
+  } else if (bucket === "hour") {
+    return time.toFormat("M/d h a");
+  } else {
+    return time.toLocaleString();
+  }
+};
