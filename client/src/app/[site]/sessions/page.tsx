@@ -3,6 +3,7 @@
 import { useGetSessionsInfinite } from "@/hooks/api";
 import { useMemo } from "react";
 import SessionsTable from "./components/SessionsTable";
+import { SubHeader } from "../components/SubHeader/SubHeader";
 
 export default function SessionsPage() {
   const {
@@ -24,6 +25,7 @@ export default function SessionsPage() {
 
   return (
     <div>
+      <SubHeader />
       <SessionsTable
         data={flattenedData}
         isLoading={isLoading}

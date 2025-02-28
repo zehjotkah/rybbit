@@ -30,5 +30,5 @@ export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getCountryName = (countryCode: string) => {
-  return countries[countryCode as keyof typeof countries].name;
+  return countries[countryCode as keyof typeof countries]?.name;
 };

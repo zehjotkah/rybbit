@@ -1,8 +1,10 @@
 "use client";
-import { usePathname } from "next/navigation";
-import { useGetSites, useSiteHasData } from "../../../hooks/api";
+import { useSiteHasData } from "../../../hooks/api";
+import { useGetSiteMetadata } from "../../../hooks/hooks";
 import { useStore } from "../../../lib/store";
 import { NoData } from "../components/NoData";
+import { SubHeader } from "../components/SubHeader/SubHeader";
+import { MainSection } from "./components/MainSection/MainSection";
 import { Browsers } from "./components/sections/Browsers";
 import { Countries } from "./components/sections/Countries";
 import { Devices } from "./components/sections/Devices";
@@ -10,9 +12,6 @@ import { Map } from "./components/sections/Map";
 import { OperatingSystems } from "./components/sections/OperatingSystems";
 import { Pages } from "./components/sections/Pages";
 import { Referrers } from "./components/sections/Referrers";
-import { SubHeader } from "../components/SubHeader/SubHeader";
-import { useGetSiteMetadata } from "../../../hooks/hooks";
-import { MainSection } from "./components/MainSection/MainSection";
 
 export default function MainPage() {
   const { site } = useStore();
