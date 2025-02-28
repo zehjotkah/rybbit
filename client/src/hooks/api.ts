@@ -220,8 +220,10 @@ export type UserSessionsResponse = {
   country: string;
   firstTimestamp: string;
   lastTimestamp: string;
+  duration: number; // Duration in seconds
   pageviews: {
     pathname: string;
+    querystring: string;
     title: string;
     timestamp: string;
     referrer: string;

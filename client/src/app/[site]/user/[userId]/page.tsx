@@ -11,6 +11,49 @@ import { useGetSiteMetadata } from "../../../../hooks/hooks";
 import { useStore } from "../../../../lib/store";
 import { DateTime } from "luxon";
 
+// Helper function to format duration in seconds to a readable format
+const formatDuration = (seconds: number): string => {
+  if (seconds < 60) return `${seconds} sec`;
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (remainingSeconds === 0) return `${minutes} min`;
+  return `${minutes} min ${remainingSeconds} sec`;
+};
+
+// Helper function to combine pathname and querystring correctly
+const getFullPath = (pathname: string, querystring: string): string => {
+  if (!querystring) return pathname;
+
+  // Check if querystring already starts with ? and avoid adding another one
+  const prefix = querystring.startsWith("?") ? "" : "?";
+  return `${pathname}${prefix}${querystring}`;
+};
+
+// Referrer icon component
+const ReferrerIcon = ({ referrer }: { referrer: string }) => {
+  return (
+    <div
+      className="text-gray-400 hover:text-gray-300 cursor-help"
+      title={referrer}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          fillRule="evenodd"
+          d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z"
+          clipRule="evenodd"
+        />
+      </svg>
+    </div>
+  );
+};
+
 export default function UserPage() {
   const { userId } = useParams();
   const { data, isLoading, error } = useGetUserSessions(userId as string);
@@ -82,6 +125,7 @@ export default function UserPage() {
                     <CountryFlag country={session.country || "Unknown"} />
                     {getCountryName(session.country || "Unknown")}
                   </div>
+                  <div>Duration: {formatDuration(session.duration)}</div>
                 </div>
               </div>
 
@@ -90,38 +134,44 @@ export default function UserPage() {
                   (
                     pageview: {
                       pathname: string;
+                      querystring: string;
                       title: string;
                       timestamp: string;
                       referrer: string;
                     },
                     index: number
-                  ) => (
-                    <div
-                      key={index}
-                      className="pl-4 border-l-2 border-neutral-800 grid grid-cols-[100px_1fr_1fr] items-center"
-                    >
-                      <div className=" text-gray-400">
-                        {DateTime.fromSQL(pageview.timestamp).toFormat(
-                          "h:mm:ss a"
-                        )}
-                      </div>
-                      <div className="text-gray-200">
-                        <a
-                          href={`https://${siteMetadata?.domain}${pageview.pathname}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          {pageview.pathname}
-                        </a>
-                      </div>
-                      {pageview.referrer ? (
-                        <div className="text-sm text-gray-400">
-                          Referrer: {pageview.referrer}
+                  ) => {
+                    const fullPath = getFullPath(
+                      pageview.pathname,
+                      pageview.querystring
+                    );
+                    return (
+                      <div
+                        key={index}
+                        className="pl-4 border-l-2 border-neutral-800 grid grid-cols-[100px_1fr_auto] items-center gap-4"
+                      >
+                        <div className="text-gray-400">
+                          {DateTime.fromSQL(pageview.timestamp).toFormat(
+                            "h:mm:ss a"
+                          )}
                         </div>
-                      ) : null}
-                    </div>
-                  )
+                        <div className="text-gray-200 overflow-hidden">
+                          <a
+                            href={`https://${siteMetadata?.domain}${fullPath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline block truncate"
+                            title={`https://${siteMetadata?.domain}${fullPath}`}
+                          >
+                            {fullPath}
+                          </a>
+                        </div>
+                        {pageview.referrer ? (
+                          <ReferrerIcon referrer={pageview.referrer} />
+                        ) : null}
+                      </div>
+                    );
+                  }
                 )}
               </div>
             </div>
