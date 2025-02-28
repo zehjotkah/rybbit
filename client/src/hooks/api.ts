@@ -211,6 +211,43 @@ export function useSiteHasData(siteId: string) {
   return useGenericQuery<boolean>(`site-has-data/${siteId}`);
 }
 
+// Updated type for grouped sessions from the API
+export type UserSessionsResponse = {
+  session_id: string;
+  browser: string;
+  operating_system: string;
+  device_type: string;
+  country: string;
+  firstTimestamp: string;
+  lastTimestamp: string;
+  pageviews: {
+    pathname: string;
+    title: string;
+    timestamp: string;
+    referrer: string;
+  }[];
+}[];
+
+export function useGetUserSessions(userId: string) {
+  const { time, site, filters } = useStore();
+  const { startDate, endDate } = getStartAndEndDate(time);
+
+  return useQuery({
+    queryKey: ["user-sessions", userId, time, site, filters],
+    queryFn: () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return authedFetch(
+        `${BACKEND_URL}/user/${userId}/sessions?${
+          startDate ? `startDate=${startDate}&` : ""
+        }${
+          endDate ? `endDate=${endDate}&` : ""
+        }timezone=${timezone}&site=${site}&filters=${JSON.stringify(filters)}`
+      ).then((res) => res.json());
+    },
+    staleTime: Infinity,
+  });
+}
+
 type GetSessionsResponse = {
   session_id: string;
   user_id: string;

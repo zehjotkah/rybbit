@@ -24,6 +24,7 @@ import { mapHeaders } from "./lib/betterAuth.js";
 import { trackPageView } from "./tracker/trackPageView.js";
 import { createAccount } from "./api/createAccount.js";
 import { getSessions } from "./api/getSessions.js";
+import { getUserSessions } from "./api/getUserSessions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -122,6 +123,7 @@ server.get("/overview-bucketed", getOverviewBucketed);
 server.get("/single-col", getSingleCol);
 server.get("/site-has-data/:site", getSiteHasData);
 server.get("/sessions", getSessions);
+server.get("/user/:userId/sessions", getUserSessions);
 
 // Administrative
 server.post("/add-site", addSite);

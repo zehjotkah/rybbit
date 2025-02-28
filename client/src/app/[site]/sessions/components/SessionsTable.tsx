@@ -11,6 +11,8 @@ import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 type Session = {
   session_id: string;
@@ -54,6 +56,8 @@ export default function SessionsTable({
   hasNextPage,
   isFetchingNextPage,
 }: SessionsTableProps) {
+  const { site } = useParams();
+
   // Reference for the scroll container
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -89,6 +93,22 @@ export default function SessionsTable({
 
   const columns = useMemo(
     () => [
+      columnHelper.accessor("user_id", {
+        header: "User",
+        cell: (info) => {
+          const userId = info.getValue();
+          return userId ? (
+            <Link
+              href={`/${site}/user/${userId}`}
+              className="text-blue-400 hover:text-blue-300 hover:underline"
+            >
+              {userId}
+            </Link>
+          ) : (
+            "Unknown"
+          );
+        },
+      }),
       columnHelper.accessor("last_pageview_timestamp", {
         header: "Last Seen",
         cell: (info) => {
@@ -139,7 +159,7 @@ export default function SessionsTable({
         cell: (info) => info.getValue() || "-",
       }),
     ],
-    []
+    [site]
   );
 
   // Table instance
@@ -152,7 +172,7 @@ export default function SessionsTable({
   return (
     <div
       ref={tableContainerRef}
-      className="overflow-auto rounded-lg"
+      className="overflow-auto rounded-lg bg-neutral-900 border border-neutral-800"
       style={{ height: "calc(100vh - 200px)" }}
     >
       <table className="min-w-full divide-y divide-neutral-500">
