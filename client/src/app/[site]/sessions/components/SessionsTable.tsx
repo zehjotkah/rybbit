@@ -4,7 +4,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { format, parseISO } from "date-fns";
+import { DateTime } from "luxon";
 import { useEffect, useMemo, useRef } from "react";
 import { getCountryName } from "../../../../lib/utils";
 import { Browser } from "../../components/shared/icons/Browser";
@@ -112,8 +112,9 @@ export default function SessionsTable({
       columnHelper.accessor("last_pageview_timestamp", {
         header: "Last Seen",
         cell: (info) => {
-          const date = parseISO(info.getValue());
-          return format(date, "MMM d, yyyy h:mm a");
+          return DateTime.fromSQL(info.getValue()).toFormat(
+            "MMM d, yyyy h:mm a"
+          );
         },
       }),
       columnHelper.accessor("pageviews", {

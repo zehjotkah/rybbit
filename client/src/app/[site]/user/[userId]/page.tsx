@@ -2,15 +2,14 @@
 
 import { UserSessionsResponse, useGetUserSessions } from "@/hooks/api";
 import { useParams } from "next/navigation";
-import { format, parseISO } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import { Browser } from "../../components/shared/icons/Browser";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { getCountryName } from "@/lib/utils";
 import { useGetSiteMetadata } from "../../../../hooks/hooks";
 import { useStore } from "../../../../lib/store";
+import { DateTime } from "luxon";
 
 export default function UserPage() {
   const { userId } = useParams();
@@ -28,7 +27,7 @@ export default function UserPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">User Profile: {userId}</h1>
         <div className="text-sm text-gray-400">
@@ -64,8 +63,7 @@ export default function UserPage() {
               <div className="mb-4">
                 <h2 className="text-xl font-semibold mb-2">
                   Session from{" "}
-                  {format(
-                    parseISO(session.firstTimestamp),
+                  {DateTime.fromSQL(session.firstTimestamp).toFormat(
                     "MMM d, yyyy h:mm a"
                   )}
                 </h2>
@@ -107,7 +105,9 @@ export default function UserPage() {
                       className="pl-4 border-l-2 border-neutral-800"
                     >
                       <div className="text-sm text-gray-400 mb-1">
-                        {format(parseISO(pageview.timestamp), "h:mm:ss a")}
+                        {DateTime.fromSQL(pageview.timestamp).toFormat(
+                          "h:mm:ss a"
+                        )}
                       </div>
                       <div className="font-medium mb-1">
                         <a
