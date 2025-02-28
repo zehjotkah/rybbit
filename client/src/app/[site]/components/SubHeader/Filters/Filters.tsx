@@ -9,6 +9,7 @@ import {
   useStore,
 } from "../../../../../lib/store";
 import { NewFilterButton } from "./NewFilterButton";
+import { getCountryName } from "../../../../../lib/utils";
 
 function getParameterNameLabel(parameter: FilterParameter) {
   switch (parameter) {
@@ -49,9 +50,7 @@ const filterTypeToLabel = (type: FilterType) => {
 function getParameterValueLabel(filter: Filter) {
   switch (filter.parameter) {
     case "country":
-      return (
-        countries[filter.value as keyof typeof countries]?.name ?? filter.value
-      );
+      return getCountryName(filter.value as string);
     default:
       return filter.value;
   }

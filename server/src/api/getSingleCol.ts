@@ -45,7 +45,7 @@ export async function getSingleCol(
     const data = await processResults<GetSingleColResponse[number]>(result);
     return res.send({ data });
   } catch (error) {
-    console.error("Error fetching devices:", error);
-    return res.status(500).send({ error: "Failed to fetch devices" });
+    console.error(`Error fetching ${parameter}:`, error);
+    return res.status(500).send({ error: `Failed to fetch ${parameter}` });
   }
 }

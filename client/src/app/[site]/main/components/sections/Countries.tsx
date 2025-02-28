@@ -1,9 +1,9 @@
 "use client";
 
 import { useSingleCol } from "@/hooks/api";
-import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";
 import React from "react";
+import { getCountryName } from "../../../../../lib/utils";
 import { StandardCard } from "../../../components/shared/StandardCard";
 
 export function Countries() {
@@ -17,18 +17,18 @@ export function Countries() {
       getKey={(e) => e.value}
       getLabel={(e) => (
         <span className="flex items-center gap-2">
-          {e.value && countries[e.value as keyof typeof countries] ? (
+          {e.value && getCountryName(e.value) ? (
             <>
               {CountryFlags[e.value as keyof typeof CountryFlags]
                 ? React.createElement(
                     CountryFlags[e.value as keyof typeof CountryFlags],
                     {
-                      title: countries[e.value as keyof typeof countries].name,
+                      title: getCountryName(e.value),
                       className: "w-5",
                     }
                   )
                 : null}
-              {countries[e.value as keyof typeof countries].name}
+              {getCountryName(e.value)}
             </>
           ) : (
             "Unknown"

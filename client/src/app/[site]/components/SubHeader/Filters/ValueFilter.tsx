@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 
 import { Button } from "../../../../../components/ui/button";
 
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 
-import { cn } from "../../../../../lib/utils";
+import { getCountryName } from "../../../../../lib/utils";
 
 import {
   Command,
@@ -26,7 +26,6 @@ import {
 import { FilterParameter, addFilter } from "../../../../../lib/store";
 
 import { useSingleCol } from "../../../../../hooks/api";
-import { countries } from "countries-list";
 
 interface ValueFilterProps {
   parameter: FilterParameter;
@@ -52,7 +51,7 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
           if (parameter === "country") {
             return {
               value: val,
-              label: countries[val as keyof typeof countries].name,
+              label: getCountryName(val),
             };
           }
           return {

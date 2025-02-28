@@ -23,6 +23,7 @@ import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/betterAuth.js";
 import { trackPageView } from "./tracker/trackPageView.js";
 import { createAccount } from "./api/createAccount.js";
+import { getSessions } from "./api/getSessions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -120,6 +121,7 @@ server.get("/overview", getOverview);
 server.get("/overview-bucketed", getOverviewBucketed);
 server.get("/single-col", getSingleCol);
 server.get("/site-has-data/:site", getSiteHasData);
+server.get("/sessions", getSessions);
 
 // Administrative
 server.post("/add-site", addSite);

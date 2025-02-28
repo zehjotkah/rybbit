@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { countries } from "countries-list";
 import { Duration } from "luxon";
 import { twMerge } from "tailwind-merge";
 
@@ -27,3 +28,7 @@ export function formatSecondsAsMinutesAndSeconds(value: number) {
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getCountryName = (countryCode: string) => {
+  return countries[countryCode as keyof typeof countries].name;
+};

@@ -7,7 +7,6 @@ import {
   CardLoader,
   CardTitle,
 } from "@/components/ui/card";
-import { countries } from "countries-list";
 import * as CountryFlags from "country-flag-icons/react/3x2";
 import { scaleLinear } from "d3-scale";
 import { Feature, Geometry } from "geojson";
@@ -22,6 +21,7 @@ import {
 
 import { useSingleCol } from "@/hooks/api";
 import React from "react";
+import { getCountryName } from "../../../../../lib/utils";
 
 const geoUrl = "/countries.geojson";
 
@@ -146,15 +146,12 @@ export function Map() {
                           tooltipData.name as keyof typeof CountryFlags
                         ],
                         {
-                          title:
-                            countries[
-                              tooltipData.name as keyof typeof countries
-                            ].name,
+                          title: getCountryName(tooltipData.name),
                           className: "w-4",
                         }
                       )
                     : null}
-                  {countries[tooltipData.name as keyof typeof countries]?.name}
+                  {getCountryName(tooltipData.name)}
                 </div>
                 <>
                   <div>
