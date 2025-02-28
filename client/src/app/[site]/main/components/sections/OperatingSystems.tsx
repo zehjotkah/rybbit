@@ -1,24 +1,8 @@
 "use client";
 
-import { Compass } from "lucide-react";
-import Image from "next/image";
 import { useSingleCol } from "@/hooks/api";
 import { StandardCard } from "../../../components/shared/StandardCard";
-
-const OS_TO_LOGO: Record<string, string> = {
-  Windows: "Windows.svg",
-  Android: "Android.svg",
-  android: "Android.svg",
-  Linux: "Tux.svg",
-  macOS: "macOS.png",
-  iOS: "Apple.svg",
-  "Chrome OS": "Chrome.svg",
-  Ubuntu: "Ubuntu.svg",
-  HarmonyOS: "HarmonyOS.svg",
-  OpenHarmony: "OpenHarmony.png",
-  PlayStation: "PlayStation.svg",
-  Tizen: "Tizen.png",
-};
+import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
 
 export function OperatingSystems() {
   const { data, isFetching } = useSingleCol({ parameter: "operating_system" });
@@ -32,17 +16,7 @@ export function OperatingSystems() {
       getKey={(e) => e.value}
       getLabel={(e) => (
         <div className="flex gap-2 items-center">
-          {OS_TO_LOGO[e.value] ? (
-            <Image
-              src={`/operating-systems/${OS_TO_LOGO[e.value]}`}
-              alt={e.value || "Other"}
-              className="w-4 h-4"
-              width={16}
-              height={16}
-            />
-          ) : (
-            <Compass width={16} />
-          )}
+          <OperatingSystem os={e.value || "Other"} />
           {e.value || "Other"}
         </div>
       )}
