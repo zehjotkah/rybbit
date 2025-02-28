@@ -61,8 +61,7 @@ export default function UserPage() {
               className="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-6"
             >
               <div className="mb-4">
-                <h2 className="text-xl font-semibold mb-2">
-                  Session from{" "}
+                <h2 className="text-xl font-medium mb-2">
                   {DateTime.fromSQL(session.firstTimestamp).toFormat(
                     "MMM d, yyyy h:mm a"
                   )}
@@ -87,9 +86,6 @@ export default function UserPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-medium text-gray-300 mb-2">
-                  Pages Viewed:
-                </h3>
                 {session.pageviews.map(
                   (
                     pageview: {
@@ -102,14 +98,14 @@ export default function UserPage() {
                   ) => (
                     <div
                       key={index}
-                      className="pl-4 border-l-2 border-neutral-800"
+                      className="pl-4 border-l-2 border-neutral-800 grid grid-cols-[100px_1fr_1fr] items-center"
                     >
-                      <div className="text-sm text-gray-400 mb-1">
+                      <div className=" text-gray-400">
                         {DateTime.fromSQL(pageview.timestamp).toFormat(
                           "h:mm:ss a"
                         )}
                       </div>
-                      <div className="font-medium mb-1">
+                      <div className="text-gray-200">
                         <a
                           href={`https://${siteMetadata?.domain}${pageview.pathname}`}
                           target="_blank"
