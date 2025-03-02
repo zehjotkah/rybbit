@@ -63,7 +63,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
             onClick={() =>
               addFilter({
                 parameter: filterParameter,
-                value: getValue(e),
+                value: [getValue(e)],
                 type: "equals",
               })
             }
@@ -114,7 +114,7 @@ export function StandardCard<T extends { percentage: number; count: number }>({
                     onClick={() =>
                       addFilter({
                         parameter: filterParameter,
-                        value: getValue(e),
+                        value: [getValue(e)],
                         type: "equals",
                       })
                     }
