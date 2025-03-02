@@ -1,4 +1,3 @@
-import { countries } from "countries-list";
 import { X } from "lucide-react";
 import {
   Filter,
@@ -8,8 +7,8 @@ import {
   updateFilter,
   useStore,
 } from "../../../../../lib/store";
-import { NewFilterButton } from "./NewFilterButton";
 import { getCountryName } from "../../../../../lib/utils";
+import { NewFilterButton } from "./NewFilterButton";
 
 function getParameterNameLabel(parameter: FilterParameter) {
   switch (parameter) {

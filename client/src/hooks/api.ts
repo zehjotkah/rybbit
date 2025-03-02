@@ -29,10 +29,12 @@ export function useSingleCol({
   parameter,
   limit = 10000,
   periodTime,
+  useFilters = true,
 }: {
   parameter: FilterParameter;
   limit?: number;
   periodTime?: PeriodTime;
+  useFilters?: boolean;
 }): UseQueryResult<
   APIResponse<{ value: string; count: number; percentage: number }[]>
 > {
@@ -49,9 +51,9 @@ export function useSingleCol({
           startDate ? `startDate=${startDate}&` : ""
         }${
           endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&site=${site}&parameter=${parameter}&filters=${JSON.stringify(
-          filters
-        )}${limit ? `&limit=${limit}` : ""}`
+        }timezone=${timezone}&site=${site}&parameter=${parameter}${
+          limit ? `&limit=${limit}` : ""
+        }${useFilters ? `&filters=${JSON.stringify(filters)}` : ""}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,

@@ -58,6 +58,9 @@ export const geSqlParam = (parameter: FilterParameter) => {
 };
 
 export function getFilterStatement(filters: string) {
+  if (!filters) {
+    return "";
+  }
   const filtersArray = JSON.parse(filters);
   if (filtersArray.length === 0) {
     return "";

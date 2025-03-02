@@ -36,7 +36,11 @@ interface ValueFilterProps {
 }
 
 export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
-  const { data, isLoading } = useSingleCol({ parameter, limit: 1000 });
+  const { data, isLoading } = useSingleCol({
+    parameter,
+    limit: 1000,
+    useFilters: false,
+  });
 
   const [open, setOpen] = useState(false);
 

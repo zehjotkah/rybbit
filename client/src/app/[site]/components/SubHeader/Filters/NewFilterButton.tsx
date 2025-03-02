@@ -77,14 +77,18 @@ export function NewFilterButton() {
 
   const [open, setOpen] = useState(false);
 
+  const onClose = async () => {
+    setOpen(false);
+    await sleep(100);
+    setSelectedFilter(null);
+    setSelectedOperator("equals");
+  };
+
   return (
     <DropdownMenu
-      onOpenChange={async (isOpen) => {
+      onOpenChange={(isOpen) => {
         if (!isOpen) {
-          setOpen(false);
-          await sleep(100);
-          setSelectedFilter(null);
-          setSelectedOperator("equals");
+          onClose();
         }
       }}
       open={open}
@@ -124,7 +128,7 @@ export function NewFilterButton() {
               <ValueFilter
                 parameter={selectedFilter.value}
                 type={selectedOperator}
-                onComplete={() => setOpen(false)}
+                onComplete={() => onClose()}
               />
             </div>
           </div>
