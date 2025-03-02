@@ -102,19 +102,35 @@ type Store = {
 export const useStore = create<Store>((set) => ({
   site: "",
   setSite: (site) => {
-    set({
+    // Get current URL search params to check for stored state
+    let urlParams: URLSearchParams | null = null;
+    if (typeof window !== "undefined") {
+      urlParams = new URLSearchParams(window.location.search);
+    }
+
+    // Check if we have state stored in the URL
+    const hasTimeInUrl = urlParams?.has("timeMode");
+    const hasBucketInUrl = urlParams?.has("bucket");
+    const hasStatInUrl = urlParams?.has("stat");
+
+    // Only set defaults if not present in URL
+    set((state) => ({
       site,
-      time: {
-        mode: "day",
-        day: DateTime.now().toISODate(),
-      },
-      previousTime: {
-        mode: "day",
-        day: DateTime.now().minus({ days: 1 }).toISODate(),
-      },
-      bucket: "hour",
-      selectedStat: "users",
-    });
+      time: hasTimeInUrl
+        ? state.time
+        : {
+            mode: "day",
+            day: DateTime.now().toISODate(),
+          },
+      previousTime: hasTimeInUrl
+        ? state.previousTime
+        : {
+            mode: "day",
+            day: DateTime.now().minus({ days: 1 }).toISODate(),
+          },
+      bucket: hasBucketInUrl ? state.bucket : "hour",
+      selectedStat: hasStatInUrl ? state.selectedStat : "users",
+    }));
   },
   time: {
     mode: "day",
@@ -145,8 +161,9 @@ export const useStore = create<Store>((set) => ({
         bucketToUse = "month";
       } else if (timeRangeLength > 31) {
         bucketToUse = "week";
+      } else {
+        bucketToUse = "day";
       }
-      bucketToUse = "day";
 
       previousTime = {
         mode: "range",
