@@ -69,17 +69,22 @@ export function getFilterStatement(filters: string) {
     "AND " +
     filtersArray
       .map((filter: Filter) => {
+        const x =
+          filter.type === "contains" || filter.type === "not_contains"
+            ? "%"
+            : "";
+
         if (filter.value.length === 1) {
           return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
             filter.type
-          )} '${filter.value[0]}'`;
+          )} '${x}${filter.value[0]}${x}'`;
         }
 
         const valuesWithOperator = filter.value.map(
           (value) =>
             `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
               filter.type
-            )} '${value}'`
+            )} '${x}${value}${x}'`
         );
 
         return `(${valuesWithOperator.join(" OR ")})`;

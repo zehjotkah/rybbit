@@ -23,11 +23,17 @@ function getParameterNameLabel(parameter: FilterParameter) {
     case "referrer":
       return "Referrer";
     case "pathname":
-      return "Page";
+      return "Path";
     case "page_title":
       return "Page Title";
     case "querystring":
       return "Query String";
+    case "language":
+      return "Language";
+    case "city":
+      return "City";
+    case "region":
+      return "Region";
     default:
       return parameter;
   }
