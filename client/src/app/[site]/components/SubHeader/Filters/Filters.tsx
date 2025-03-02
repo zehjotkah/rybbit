@@ -47,12 +47,19 @@ const filterTypeToLabel = (type: FilterType) => {
 };
 
 function getParameterValueLabel(filter: Filter) {
-  switch (filter.parameter) {
-    case "country":
-      return getCountryName(filter.value as string);
-    default:
-      return filter.value;
+  const formatValue = (value: string) => {
+    if (filter.parameter === "country") {
+      return getCountryName(value);
+    }
+    return value;
+  };
+
+  if (filter.value.length === 1) {
+    return formatValue(filter.value[0]);
   }
+
+  // For multiple values, format them and join with commas
+  return filter.value.map(formatValue).join(", ");
 }
 
 export function Filters() {

@@ -69,9 +69,20 @@ export function getFilterStatement(filters: string) {
     "AND " +
     filtersArray
       .map((filter: Filter) => {
-        return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
-          filter.type
-        )} '${filter.value}'`;
+        if (filter.value.length === 1) {
+          return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
+            filter.type
+          )} '${filter.value[0]}'`;
+        }
+
+        const valuesWithOperator = filter.value.map(
+          (value) =>
+            `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
+              filter.type
+            )} '${value}'`
+        );
+
+        return `(${valuesWithOperator.join(" OR ")})`;
       })
       .join(" AND ")
   );

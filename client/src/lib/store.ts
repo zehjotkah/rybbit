@@ -81,7 +81,7 @@ export type FilterParameter =
 
 export type Filter = {
   parameter: FilterParameter;
-  value: string;
+  value: string[];
   type: FilterType;
 };
 
@@ -317,8 +317,8 @@ export const addFilter = (filter: Filter) => {
   const filterExists = filters.some(
     (f) =>
       f.parameter === filter.parameter &&
-      f.value === filter.value &&
-      f.type === filter.type
+      f.type === filter.type &&
+      JSON.stringify(f.value) === JSON.stringify(filter.value)
   );
   if (!filterExists) {
     setFilters([...filters, filter]);
