@@ -29,7 +29,6 @@ export default function SiteLayout({
   return (
     <>
       <Header />
-
       {children}
     </>
   );
