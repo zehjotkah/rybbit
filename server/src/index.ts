@@ -39,8 +39,6 @@ const server = Fastify({
   trustProxy: true,
 });
 
-await loadAllowedDomains();
-
 server.register(cors, {
   origin: (origin, callback) => {
     if (!origin || allowList.includes(origin)) {
@@ -140,6 +138,7 @@ const start = async () => {
     console.info("Starting server...");
     // Initialize the database
     await Promise.allSettled([initializeClickhouse(), initializePostgres()]);
+    await loadAllowedDomains();
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
     cron.schedule("*/60 * * * * *", () => {
