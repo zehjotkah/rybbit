@@ -1,6 +1,5 @@
-import postgres from "postgres";
-import { Session } from "./types.js";
 import dotenv from "dotenv";
+import postgres from "postgres";
 import { auth } from "../../lib/auth.js";
 
 dotenv.config();
@@ -17,8 +16,7 @@ export const sql = postgres({
 export async function initializePostgres() {
   try {
     // Phase 1: Create tables with no dependencies
-    await Promise.all([
-      sql`
+    await sql`
         CREATE TABLE IF NOT EXISTS "user" (
           "id" text not null primary key,
           "name" text not null,
@@ -30,9 +28,9 @@ export async function initializePostgres() {
           "updatedAt" timestamp not null,
           "role" text not null default 'user'
         );
-      `,
+      `;
 
-      sql`
+    await sql`
         CREATE TABLE IF NOT EXISTS "verification" (
           "id" text not null primary key,
           "identifier" text not null,
@@ -41,9 +39,9 @@ export async function initializePostgres() {
           "createdAt" timestamp,
           "updatedAt" timestamp
         );
-      `,
+      `;
 
-      sql<Session[]>`
+    await sql`
         CREATE TABLE IF NOT EXISTS active_sessions (
           session_id TEXT PRIMARY KEY,
           site_id INT,
@@ -62,9 +60,9 @@ export async function initializePostgres() {
           language TEXT,
           referrer TEXT
         );
-      `,
+      `;
 
-      sql`
+    await sql`
         CREATE TABLE IF NOT EXISTS sites (
           site_id SERIAL PRIMARY KEY,
           name TEXT NOT NULL,
@@ -73,42 +71,38 @@ export async function initializePostgres() {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           created_by TEXT NOT NULL REFERENCES "user" ("id")
         );
-      `,
-    ]);
+      `;
 
-    // Phase 2: Create tables with foreign key dependencies
-    await Promise.all([
-      sql`
-        CREATE TABLE IF NOT EXISTS "session" (
-          "id" text not null primary key,
-          "expiresAt" timestamp not null,
-          "token" text not null unique,
-          "createdAt" timestamp not null,
-          "updatedAt" timestamp not null,
-          "ipAddress" text,
-          "userAgent" text,
-          "userId" text not null references "user" ("id")
-        );
-      `,
+    await sql`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "id" text not null primary key,
+        "expiresAt" timestamp not null,
+        "token" text not null unique,
+        "createdAt" timestamp not null,
+        "updatedAt" timestamp not null,
+        "ipAddress" text,
+        "userAgent" text,
+        "userId" text not null references "user" ("id")
+      );
+    `;
 
-      sql`
-        CREATE TABLE IF NOT EXISTS "account" (
-          "id" text not null primary key,
-          "accountId" text not null,
-          "providerId" text not null,
-          "userId" text not null references "user" ("id"),
-          "accessToken" text,
-          "refreshToken" text,
-          "idToken" text,
-          "accessTokenExpiresAt" timestamp,
-          "refreshTokenExpiresAt" timestamp,
-          "scope" text,
-          "password" text,
-          "createdAt" timestamp not null,
-          "updatedAt" timestamp not null
-        );
-      `,
-    ]);
+    await sql`
+      CREATE TABLE IF NOT EXISTS "account" (
+        "id" text not null primary key,
+        "accountId" text not null,
+        "providerId" text not null,
+        "userId" text not null references "user" ("id"),
+        "accessToken" text,
+        "refreshToken" text,
+        "idToken" text,
+        "accessTokenExpiresAt" timestamp,
+        "refreshTokenExpiresAt" timestamp,
+        "scope" text,
+        "password" text,
+        "createdAt" timestamp not null,
+        "updatedAt" timestamp not null
+      );
+    `;
 
     const user =
       await sql`SELECT count(*) FROM "user" WHERE username = 'admin'`;
