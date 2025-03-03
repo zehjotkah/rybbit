@@ -17,7 +17,7 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: frog
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: frog
       POSTGRES_DB: analytics
     ports:
       - "5432:5432"
