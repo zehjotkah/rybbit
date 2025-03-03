@@ -7,11 +7,32 @@ dotenv.config();
 export let allowList: string[] = [];
 
 export const loadAllowedDomains = async () => {
-  const domains = await sql`SELECT domain FROM sites`;
-  allowList = [
-    "http://localhost:3002",
-    process.env.BASE_URL || "",
-    ...domains.map(({ domain }) => `https://${domain}`),
-  ];
-  initAuth(allowList);
+  try {
+    // Check if the sites table exists
+    const tableExists = await sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'sites'
+      );
+    `;
+
+    // Only query the sites table if it exists
+    let domains: { domain: string }[] = [];
+    if (tableExists[0].exists) {
+      domains = await sql`SELECT domain FROM sites`;
+    }
+
+    allowList = [
+      "http://localhost:3002",
+      process.env.BASE_URL || "",
+      ...domains.map(({ domain }) => `https://${domain}`),
+    ];
+    initAuth(allowList);
+  } catch (error) {
+    console.error("Error loading allowed domains:", error);
+    // Set default values in case of error
+    allowList = ["http://localhost:3002", process.env.BASE_URL || ""];
+    initAuth(allowList);
+  }
 };
