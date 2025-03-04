@@ -55,7 +55,7 @@ services:
       clickhouse:
         condition: service_healthy
       postgres:
-
+        condition: service_healthy
 
   client:
     container_name: client
