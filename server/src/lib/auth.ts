@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { username, admin } from "better-auth/plugins";
+import { username, admin, organization } from "better-auth/plugins";
 import dotenv from "dotenv";
 import pg from "pg";
 
@@ -22,8 +22,8 @@ export let auth: AuthType | null = betterAuth({
   deleteUser: {
     enabled: true,
   },
-  plugins: [username(), admin()],
-  trustedOrigins: [],
+  plugins: [username(), admin(), organization()],
+  trustedOrigins: ["http://localhost:3002"],
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
     defaultCookieAttributes: {
@@ -49,7 +49,7 @@ export const initAuth = (allowList: string[]) => {
     deleteUser: {
       enabled: true,
     },
-    plugins: [username(), admin()],
+    plugins: [username(), admin(), organization()],
     trustedOrigins: allowList,
     advanced: {
       useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
