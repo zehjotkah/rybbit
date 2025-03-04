@@ -13,6 +13,12 @@ services:
       - CLICKHOUSE_DB=analytics
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=frog
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   postgres:
     image: postgres:latest
@@ -46,8 +52,10 @@ services:
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BASE_URL=${BASE_URL}
     depends_on:
-      - clickhouse
-      - postgres
+      clickhouse:
+        condition: service_healthy
+      postgres:
+
 
   client:
     container_name: client
