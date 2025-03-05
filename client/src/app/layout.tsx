@@ -9,6 +9,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { userStore } from "../lib/userStore";
 import "./globals.css";
+import { Toaster } from "../components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} h-full bg-background text-foreground`}
       >
+        <Toaster />
         {/* The ldrs are very pretty but it's super annoying to load them
         https://github.com/GriffinJohnston/ldrs/blob/main/framework-guides.md#nextjs */}
         <script

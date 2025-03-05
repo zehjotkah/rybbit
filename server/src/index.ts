@@ -6,6 +6,8 @@ import cron from "node-cron";
 import { dirname, join } from "path";
 import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
+import { changeEmail } from "./api/changeEmail.js";
+import { changeUsername } from "./api/changeUsername.js";
 import { getLiveUsercount } from "./api/getLiveUsercount.js";
 import { getOverview } from "./api/getOverview.js";
 import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
@@ -131,6 +133,10 @@ server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/list-users", listUsers);
 server.post("/create-account", createAccount);
+
+// User management
+server.post("/change-username", changeUsername);
+server.post("/change-email", changeEmail);
 
 // Track pageview endpoint
 server.post("/track/pageview", trackPageView);
