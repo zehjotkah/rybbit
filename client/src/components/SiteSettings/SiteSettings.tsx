@@ -179,7 +179,7 @@ export function SiteSettingsInner({
                   <AlertDialogAction
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="bg-red-500 hover:bg-red-600"
+                    variant="destructive"
                   >
                     {isDeleting ? "Deleting..." : "Yes, delete site"}
                   </AlertDialogAction>
