@@ -12,6 +12,7 @@ import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
 import { getSingleCol } from "./api/getSingleCol.js";
 import { listUsers } from "./api/listUsers.js";
 import { addSite } from "./api/sites/addSite.js";
+import { changeSiteDomain } from "./api/sites/changeSiteDomain.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSites } from "./api/sites/getSites.js";
@@ -125,6 +126,7 @@ server.get("/user/:userId/sessions", getUserSessions);
 
 // Administrative
 server.post("/add-site", addSite);
+server.post("/change-site-domain", changeSiteDomain);
 server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/list-users", listUsers);

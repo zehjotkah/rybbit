@@ -25,6 +25,12 @@ export function useGetLiveUsercount() {
 
 type PeriodTime = "current" | "previous";
 
+export type SingleColResponse = {
+  value: string;
+  count: number;
+  percentage: number;
+};
+
 export function useSingleCol({
   parameter,
   limit = 10000,
@@ -35,9 +41,7 @@ export function useSingleCol({
   limit?: number;
   periodTime?: PeriodTime;
   useFilters?: boolean;
-}): UseQueryResult<
-  APIResponse<{ value: string; count: number; percentage: number }[]>
-> {
+}): UseQueryResult<APIResponse<SingleColResponse[]>> {
   const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
@@ -206,6 +210,19 @@ export function addSite(domain: string, name: string) {
 export function deleteSite(siteId: number) {
   return authedFetch(`${BACKEND_URL}/delete-site/${siteId}`, {
     method: "POST",
+  });
+}
+
+export function changeSiteDomain(siteId: number, newDomain: string) {
+  return authedFetch(`${BACKEND_URL}/change-site-domain`, {
+    method: "POST",
+    body: JSON.stringify({
+      siteId,
+      newDomain,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 }
 

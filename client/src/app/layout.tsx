@@ -9,8 +9,6 @@ import { redirect, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { userStore } from "../lib/userStore";
 import "./globals.css";
-import "@radix-ui/themes/styles.css";
-import { Theme } from "@radix-ui/themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -53,22 +51,20 @@ export default function RootLayout({
           src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/ping.js"
         ></script>
         <ThemeProvider>
-          <Theme appearance="dark">
-            <QueryProvider>
-              {pathname === "/login" ? (
-                <div className="min-h-full flex items-center justify-center">
-                  {children}
-                </div>
-              ) : (
-                <div className="min-h-full">
-                  <TopBar />
-                  <main className="flex min-h-screen flex-col items-center p-4">
-                    <div className="w-full max-w-6xl">{children}</div>
-                  </main>
-                </div>
-              )}
-            </QueryProvider>
-          </Theme>
+          <QueryProvider>
+            {pathname === "/login" ? (
+              <div className="min-h-full flex items-center justify-center">
+                {children}
+              </div>
+            ) : (
+              <div className="min-h-full">
+                <TopBar />
+                <main className="flex min-h-screen flex-col items-center p-4">
+                  <div className="w-full max-w-6xl">{children}</div>
+                </main>
+              </div>
+            )}
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
