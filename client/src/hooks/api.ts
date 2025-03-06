@@ -132,16 +132,30 @@ export type GetOverviewBucketedResponse = {
   users: number;
 }[];
 
-export function useGetOverviewBucketed(
-  periodTime?: PeriodTime
-): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
-  const { time, previousTime, bucket, site, filters } = useStore();
+export function useGetOverviewBucketed({
+  periodTime,
+  past24Hours,
+  site,
+}: {
+  periodTime?: PeriodTime;
+  past24Hours?: boolean;
+  site?: number | string;
+}): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
+  const { time, previousTime, bucket, filters } = useStore();
+
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: ["overview-bucketed", timeToUse, bucket, site, filters],
+    queryKey: [
+      "overview-bucketed",
+      timeToUse,
+      bucket,
+      site,
+      filters,
+      past24Hours,
+    ],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
@@ -151,7 +165,7 @@ export function useGetOverviewBucketed(
           endDate ? `endDate=${endDate}&` : ""
         }timezone=${timezone}&bucket=${bucket}&site=${site}&filters=${JSON.stringify(
           filters
-        )}`
+        )}${past24Hours ? `&past24Hours=${past24Hours}` : ""}`
       ).then((res) => res.json());
     },
     placeholderData: (_, query: any) => {
