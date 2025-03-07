@@ -67,6 +67,8 @@ const getQuery = ({
   filters: string;
   past24Hours: boolean;
 }) => {
+  const filterStatement = getFilterStatement(filters);
+
   if (past24Hours) {
     return `SELECT
     session_stats.time AS time,
@@ -96,6 +98,7 @@ FROM
         FROM pageviews
         WHERE
             site_id = ${site}
+            ${filterStatement}
             AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
             AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
         GROUP BY session_id
@@ -117,6 +120,7 @@ FULL JOIN
     FROM pageviews
     WHERE
         site_id = ${site}
+        ${filterStatement}
         -- Past 24 hours in LA time
         AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
         AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
@@ -131,7 +135,6 @@ USING time
 ORDER BY time;`;
   }
   const isAllTime = !startDate && !endDate;
-  const filterStatement = getFilterStatement(filters);
 
   const query = `SELECT
     session_stats.time AS time,

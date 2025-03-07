@@ -1,9 +1,10 @@
+import { useGetOverview, useGetOverviewBucketed } from "@/hooks/api";
 import Link from "next/link";
-import { SiteSettings } from "./SiteSettings/SiteSettings";
 import { SiteSessionChart } from "./SiteSessionChart";
-import { Activity, Users } from "lucide-react";
-import { useGetOverviewBucketed } from "@/hooks/api";
+import { SiteSettings } from "./SiteSettings/SiteSettings";
+import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { ArrowRight } from "lucide-react";
 
 interface SiteCardProps {
   siteId: number;
@@ -16,14 +17,12 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
     site: siteId,
   });
 
-  const totalSessions = data?.data?.reduce(
-    (acc, curr) => acc + curr.sessions,
-    0
-  );
+  const { data: overviewData, isLoading: isOverviewLoading } = useGetOverview({
+    site: siteId,
+    past24Hours: true,
+  });
 
-  const totalUsers = data?.data?.reduce((acc, curr) => acc + curr.users, 0);
-
-  if (isLoading) {
+  if (isLoading || isOverviewLoading) {
     return (
       <div className="flex flex-col rounded-lg bg-neutral-900 p-4" key={siteId}>
         <div className="flex justify-between items-center mb-3">
@@ -60,28 +59,28 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
         </Link>
         <SiteSettings siteId={siteId} />
       </div>
-
       <div className="mt-2">
         <SiteSessionChart data={data?.data ?? []} height={100} />
       </div>
-
-      <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
-        <div className="flex items-center gap-2">
-          <Activity size={16} className="text-blue-400" />
-          <div>
-            <div className="text-gray-400">Sessions</div>
-            <div className="font-semibold">
-              {totalSessions?.toLocaleString()}
-            </div>
+      <div className="flex gap-2 justify-between items-center mt-3 text-sm mx-2">
+        <div className="flex flex-col gap-1 items-center">
+          <div className="text-gray-400">Sessions</div>
+          <div className="font-semibold">
+            {overviewData?.data?.sessions?.toLocaleString()}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Users size={16} className="text-green-400" />
-          <div>
-            <div className="text-gray-400">Users</div>
-            <div className="font-semibold">{totalUsers?.toLocaleString()}</div>
+        <div className="flex flex-col gap-1 items-center">
+          <div className="text-gray-400 ">Users</div>
+          <div className="font-semibold">
+            {overviewData?.data?.users?.toLocaleString()}
           </div>
         </div>
+        <Link href={`/${siteId}`}>
+          <Button variant="outline" size="sm">
+            Analytics
+            <ArrowRight size={16} />
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -191,8 +191,43 @@ export type GetOverviewResponse = {
   session_duration: number;
 };
 
-export function useGetOverview(periodTime?: PeriodTime) {
-  return useGenericSiteDataQuery<GetOverviewResponse>("overview", periodTime);
+export function useGetOverview({
+  periodTime,
+  past24Hours,
+  site,
+}: {
+  periodTime?: PeriodTime;
+  past24Hours?: boolean;
+  site?: number | string;
+}) {
+  const { time, previousTime, filters } = useStore();
+  const timeToUse = periodTime === "previous" ? previousTime : time;
+  const { startDate, endDate } = getStartAndEndDate(timeToUse);
+
+  return useQuery({
+    queryKey: ["overview", timeToUse, site, filters, past24Hours],
+    queryFn: () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return authedFetch(
+        `${BACKEND_URL}/overview?${startDate ? `startDate=${startDate}&` : ""}${
+          endDate ? `endDate=${endDate}&` : ""
+        }timezone=${timezone}&site=${site}&filters=${JSON.stringify(filters)}${
+          past24Hours ? `&past24Hours=${past24Hours}` : ""
+        }`
+      ).then((res) => res.json());
+    },
+    staleTime: Infinity,
+    placeholderData: (_, query: any) => {
+      if (!query?.queryKey) return undefined;
+      const prevQueryKey = query.queryKey as [string, string, string];
+      const [, , prevSite] = prevQueryKey;
+
+      if (prevSite === site) {
+        return query.state.data;
+      }
+      return undefined;
+    },
+  });
 }
 
 export type GetSitesResponse = {
