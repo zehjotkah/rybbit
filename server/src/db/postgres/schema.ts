@@ -1,14 +1,11 @@
 import {
+  boolean,
+  integer,
+  jsonb,
   pgTable,
+  serial,
   text,
   timestamp,
-  integer,
-  boolean,
-  primaryKey,
-  foreignKey,
-  serial,
-  unique,
-  jsonb,
 } from "drizzle-orm/pg-core";
 
 // User table
@@ -48,6 +45,7 @@ export const sites = pgTable("sites", {
   createdBy: text("created_by")
     .notNull()
     .references(() => users.id),
+  organizationId: text("organization_id").references(() => organization.id),
 });
 
 // Active sessions table
