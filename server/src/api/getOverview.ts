@@ -6,6 +6,7 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
+import { getUserHasAccessToSite } from "../lib/auth-utils.js";
 
 type GetOverviewResponse = {
   sessions: number;
@@ -127,55 +128,17 @@ const getQuery = ({
 };
 
 export async function getOverview(
-  {
-    query: { startDate, endDate, timezone, site, filters, past24Hours },
-  }: FastifyRequest<GenericRequest & { Querystring: { past24Hours: boolean } }>,
+  req: FastifyRequest<
+    GenericRequest & { Querystring: { past24Hours: boolean } }
+  >,
   res: FastifyReply
 ) {
-  const filterStatement = getFilterStatement(filters);
-  // const query = `SELECT
-  //       session_stats.sessions,
-  //       session_stats.pages_per_session,
-  //       session_stats.bounce_rate * 100 AS bounce_rate,
-  //       session_stats.session_duration,
-  //       page_stats.pageviews,
-  //       page_stats.users
-  //   FROM
-  //   (
-  //       -- Session-level metrics
-  //       SELECT
-  //           COUNT() AS sessions,
-  //           AVG(pages_in_session) AS pages_per_session,
-  //           sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
-  //           AVG(end_time - start_time) AS session_duration
-  //       FROM
-  //       (
-  //           -- Build a summary row per session
-  //           SELECT
-  //               session_id,
-  //               MIN(timestamp) AS start_time,
-  //               MAX(timestamp) AS end_time,
-  //               COUNT(*)      AS pages_in_session
-  //           FROM pageviews
-  //           WHERE
-  //               site_id = ${site}
-  //               ${filterStatement}
-  //               ${getTimeStatement(startDate, endDate, timezone)}
-  //           GROUP BY session_id
-  //       )
-  //   ) AS session_stats
-  //   CROSS JOIN
-  //   (
-  //       -- Page-level and user-level metrics
-  //       SELECT
-  //           COUNT(*)                   AS pageviews,
-  //           COUNT(DISTINCT user_id)    AS users
-  //       FROM pageviews
-  //       WHERE
-  //           site_id = ${site}
-  //           ${filterStatement}
-  //           ${getTimeStatement(startDate, endDate, timezone)}
-  //   ) AS page_stats`;
+  const { startDate, endDate, timezone, site, filters, past24Hours } =
+    req.query;
+  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
+  if (!userHasAccessToSite) {
+    return res.status(403).send({ error: "Forbidden" });
+  }
 
   const query = getQuery({
     startDate,

@@ -243,12 +243,13 @@ export function useGetSites() {
   return useGenericQuery<GetSitesResponse>("get-sites");
 }
 
-export function addSite(domain: string, name: string) {
+export function addSite(domain: string, name: string, organizationId: string) {
   return authedFetch(`${BACKEND_URL}/add-site`, {
     method: "POST",
     body: JSON.stringify({
       domain,
       name,
+      organizationId,
     }),
     headers: {
       "Content-Type": "application/json",
@@ -277,30 +278,6 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
 
 export function useSiteHasData(siteId: string) {
   return useGenericQuery<boolean>(`site-has-data/${siteId}`);
-}
-
-export function changeUsername(newUsername: string) {
-  return authedFetch(`${BACKEND_URL}/change-username`, {
-    method: "POST",
-    body: JSON.stringify({
-      newUsername,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
-
-export function changeEmail(newEmail: string) {
-  return authedFetch(`${BACKEND_URL}/change-email`, {
-    method: "POST",
-    body: JSON.stringify({
-      newEmail,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 }
 
 // Updated type for grouped sessions from the API
@@ -388,3 +365,29 @@ export function useGetSessionsInfinite() {
     staleTime: Infinity,
   });
 }
+
+type GetOrganizationMembersResponse = {
+  data: {
+    id: string;
+    role: string;
+    userId: string;
+    organizationId: string;
+    createdAt: string;
+    user: {
+      id: string;
+      name: string | null;
+      email: string;
+    };
+  }[];
+};
+
+export const useOrganizationMembers = (organizationId: string) => {
+  return useQuery<GetOrganizationMembersResponse>({
+    queryKey: ["organization-members", organizationId],
+    queryFn: () =>
+      authedFetch(
+        `${BACKEND_URL}/list-organization-members/${organizationId}`
+      ).then((res) => res.json()),
+    staleTime: Infinity,
+  });
+};
