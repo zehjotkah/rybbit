@@ -1,20 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { authClient } from "../../lib/auth";
+import { CreditCard, User, Users as Users_ } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  GearSix,
-  User,
-  Users as Users_,
-  CreditCard,
-} from "@phosphor-icons/react";
+import { authClient } from "../../lib/auth";
 
-import { Input } from "../../components/ui/input";
 import { Account } from "./account/Account";
 import { Organizations } from "./organizations/Organizations";
-import { Settings } from "./settings/settings";
 import SubscriptionPage from "./subscription/page";
 
 export default function SettingsPage() {
@@ -37,14 +30,6 @@ export default function SettingsPage() {
             Account
           </Button>
           <Button
-            variant={selectedTab === "settings" ? "default" : "ghost"}
-            onClick={() => setSelectedTab("settings")}
-            className="justify-start"
-          >
-            <GearSix size={16} weight="bold" />
-            Settings
-          </Button>
-          <Button
             variant={selectedTab === "organizations" ? "default" : "ghost"}
             onClick={() => setSelectedTab("organizations")}
             className="justify-start"
@@ -65,7 +50,6 @@ export default function SettingsPage() {
           <Account session={session} />
         )}
         {selectedTab === "organizations" && <Organizations />}
-        {selectedTab === "settings" && <Settings />}
         {selectedTab === "subscription" && <SubscriptionPage />}
       </div>
     </div>
