@@ -53,6 +53,7 @@ services:
       - BASE_URL=${BASE_URL}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - CLOUD=${CLOUD}
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -71,7 +72,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_BACKEND_URL=${BASE_URL}
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - CLOUD=${CLOUD}
     depends_on:
       - backend
 
