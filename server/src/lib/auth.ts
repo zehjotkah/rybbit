@@ -7,8 +7,12 @@ import { db } from "../db/postgres/postgres.js";
 import { IS_CLOUD } from "./const.js";
 import * as schema from "../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
+import { stripe } from "@better-auth/stripe";
+import Stripe from "stripe";
 
 dotenv.config();
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 type AuthType = ReturnType<typeof betterAuth> | null;
 
@@ -20,6 +24,97 @@ const pluginList = IS_CLOUD
         allowUserToCreateOrganization: true,
         // Set the creator role to owner
         creatorRole: "owner",
+      }),
+      stripe({
+        stripeClient,
+        stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+        createCustomerOnSignUp: true,
+        subscription: {
+          enabled: true,
+          plans: [
+            {
+              priceId: "price_1R1fIVDFVprnAny2yJtRRPBm",
+              name: "basic100k",
+              interval: "month",
+              limits: {
+                events: 100_000,
+              },
+            },
+            {
+              priceId: "price_1R1fKJDFVprnAny2mfiBjkAQ",
+              name: "basic250k",
+              interval: "month",
+              limits: {
+                events: 250_000,
+              },
+            },
+            {
+              name: "basic500k",
+              priceId: "price_1R1fQlDFVprnAny2WwNdiRgT",
+              interval: "month",
+              limits: {
+                events: 500_000,
+              },
+            },
+            {
+              name: "basic1m",
+              priceId: "price_1R1fR2DFVprnAny28tPEQAwh",
+              interval: "month",
+              limits: {
+                events: 1_000_000,
+              },
+            },
+            {
+              name: "basic2m",
+              priceId: "price_1R1fRMDFVprnAny24AMo0Vuu",
+              interval: "month",
+              limits: {
+                events: 2_000_000,
+              },
+            },
+
+            {
+              name: "pro100k",
+              priceId: "price_1R1fRmDFVprnAny27gL7XFCY",
+              interval: "month",
+              limits: {
+                events: 100_000,
+              },
+            },
+            {
+              name: "pro250k",
+              priceId: "price_1R1fSADFVprnAny2d7d4tXTs",
+              interval: "month",
+              limits: {
+                events: 250_000,
+              },
+            },
+            {
+              name: "pro500k",
+              priceId: "price_1R1fSkDFVprnAny2MzBvhPKs",
+              interval: "month",
+              limits: {
+                events: 500_000,
+              },
+            },
+            {
+              name: "pro1m",
+              priceId: "price_1R1fTMDFVprnAny2IdeB1bLV",
+              interval: "month",
+              limits: {
+                events: 1_000_000,
+              },
+            },
+            {
+              name: "pro2m",
+              priceId: "price_1R1fTXDFVprnAny2JBLVtkIU",
+              interval: "month",
+              limits: {
+                events: 2_000_000,
+              },
+            },
+          ],
+        },
       }),
     ]
   : [
@@ -53,7 +148,7 @@ export let auth: AuthType | null = betterAuth({
       enabled: true,
     },
   },
-  plugins: pluginList,
+  plugins: pluginList as any,
   trustedOrigins: ["http://localhost:3002"],
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
@@ -63,6 +158,7 @@ export let auth: AuthType | null = betterAuth({
     },
   },
 });
+
 export function initAuth(allowedOrigins: string[]) {
   auth = betterAuth({
     basePath: "/auth",
@@ -132,42 +228,13 @@ export function initAuth(allowedOrigins: string[]) {
         },
       },
     },
-    plugins: pluginList,
+    plugins: pluginList as any,
     trustedOrigins: allowedOrigins,
     advanced: {
       useSecureCookies: process.env.NODE_ENV === "production",
       defaultCookieAttributes: {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
-      },
-    },
-    // Use database hooks to create an organization after user signup
-    databaseHooks: {
-      user: {
-        create: {
-          after: async (user) => {
-            // Create an organization for the new user
-            console.info(user);
-            // if (auth) {
-            //   try {
-            //     const orgName = user.name || user.username || "My Organization";
-            //     await auth.api.organization.createOrganization({
-            //       body: {
-            //         name: orgName,
-            //       },
-            //       headers: {
-            //         "x-user-id": user.id,
-            //       },
-            //     });
-            //   } catch (error) {
-            //     console.error(
-            //       "Error creating organization for new user:",
-            //       error
-            //     );
-            //   }
-            // }
-          },
-        },
       },
     },
   });
