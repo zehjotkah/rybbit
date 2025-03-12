@@ -14,7 +14,13 @@ import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { addSite, useGetSites } from "../../hooks/api";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
-import { AlertCircle, AppWindow, Building2 } from "lucide-react";
+import {
+  AlertCircle,
+  AppWindow,
+  Building2,
+  Plus,
+  PlusCircle,
+} from "lucide-react";
 import { authClient } from "../../lib/auth";
 import {
   Select,
@@ -36,7 +42,13 @@ function isValidDomain(domain: string): boolean {
   return domainRegex.test(domain);
 }
 
-export function AddSite() {
+export function AddSite({
+  trigger,
+  disabled,
+}: {
+  trigger?: React.ReactNode;
+  disabled?: boolean;
+}) {
   const { data: sites, refetch } = useGetSites();
   const { data: organizations } = authClient.useListOrganizations();
 
@@ -98,7 +110,12 @@ export function AddSite() {
         }}
       >
         <DialogTrigger asChild>
-          <Button>Add Website</Button>
+          {trigger || (
+            <Button disabled={disabled}>
+              <Plus className="h-4 w-4" />
+              Add Website
+            </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="max-w-lg">
           <DialogHeader>
