@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ConfirmationModal } from "../../../components/ConfirmationModal";
-import { Button } from "../../../components/ui/button";
+import { ConfirmationModal } from "@/components/ConfirmationModal";
+import { Button } from "@/components/ui/button";
 import { UserWithRole } from "better-auth/plugins/admin";
-import { authClient } from "../../../lib/auth";
+import { authClient } from "@/lib/auth";
 
 export function DeleteUser({
   user,

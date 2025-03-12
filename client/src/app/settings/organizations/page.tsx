@@ -18,10 +18,10 @@ import { useOrganizationMembers } from "../../../hooks/api";
 import { authClient } from "../../../lib/auth";
 
 // Import the separated dialog components
-import { DeleteOrganizationDialog } from "./DeleteOrganizationDialog";
-import { EditOrganizationDialog } from "./EditOrganizationDialog";
-import { RemoveMemberDialog } from "./RemoveMemberDialog";
-import { InviteMemberDialog } from "./InviteMemberDialog";
+import { DeleteOrganizationDialog } from "./components/DeleteOrganizationDialog";
+import { EditOrganizationDialog } from "./components/EditOrganizationDialog";
+import { InviteMemberDialog } from "./components/InviteMemberDialog";
+import { RemoveMemberDialog } from "./components/RemoveMemberDialog";
 
 // Types for our component
 export type Organization = {
@@ -163,7 +163,7 @@ function OrganizationsInner({
 }
 
 // Main Organizations component
-export function Organizations() {
+export default function Organizations() {
   const userOrganizations = authClient.useListOrganizations();
 
   if (userOrganizations.isPending) {

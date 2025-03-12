@@ -1,6 +1,8 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Button } from "../../../components/ui/button";
-import { authClient } from "../../../lib/auth";
+import { Button } from "../../../../components/ui/button";
+import { authClient } from "../../../../lib/auth";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "../../../components/ui/dialog";
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
+} from "../../../../components/ui/dialog";
+import { Label } from "../../../../components/ui/label";
+import { Input } from "../../../../components/ui/input";
 import {
   KeyRound,
   CheckCircle2,

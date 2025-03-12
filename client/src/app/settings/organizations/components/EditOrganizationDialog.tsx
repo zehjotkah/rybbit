@@ -1,20 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog } from "../../../components/ui/dialog";
-import { DialogContent } from "../../../components/ui/dialog";
-import { DialogHeader } from "../../../components/ui/dialog";
-import { DialogTitle } from "../../../components/ui/dialog";
-import { DialogTrigger } from "../../../components/ui/dialog";
-import { DialogFooter } from "../../../components/ui/dialog";
-import { DialogDescription } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
+import { DialogTrigger } from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
+import { DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Edit } from "lucide-react";
-import { authClient } from "../../../lib/auth";
+import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
-import { Organization } from "./Organizations";
+import { Organization } from "../page";
 
 interface EditOrganizationDialogProps {
   organization: Organization;

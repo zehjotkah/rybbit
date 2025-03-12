@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +12,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog";
-import { authClient } from "../../../lib/auth";
+} from "../../../../components/ui/alert-dialog";
+import { authClient } from "../../../../lib/auth";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
 import { useRouter } from "next/navigation";
 export function DeleteAccount() {
   const [isDeleting, setIsDeleting] = useState(false);

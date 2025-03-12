@@ -1,19 +1,21 @@
+"use client";
+
 import { authClient } from "@/lib/auth";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "../../../components/ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
+} from "../../../../components/ui/card";
+import { Input } from "../../../../components/ui/input";
+import { IS_CLOUD } from "../../../../lib/const";
 import { ChangePassword } from "./ChangePassword";
 import { DeleteAccount } from "./DeleteAccount";
-import { IS_CLOUD } from "../../../lib/const";
 
-export function Account({
+export function AccountInner({
   session,
 }: {
   session: ReturnType<typeof authClient.useSession>;

@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog } from "../../../components/ui/dialog";
-import { DialogContent } from "../../../components/ui/dialog";
-import { DialogHeader } from "../../../components/ui/dialog";
-import { DialogTitle } from "../../../components/ui/dialog";
-import { DialogTrigger } from "../../../components/ui/dialog";
-import { DialogFooter } from "../../../components/ui/dialog";
-import { DialogDescription } from "../../../components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
+import { DialogTrigger } from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
+import { DialogDescription } from "@/components/ui/dialog";
 import { UserMinus } from "lucide-react";
-import { authClient } from "../../../lib/auth";
+import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
-import { Member } from "./Organizations";
+import { Member } from "../page";
 
 interface RemoveMemberDialogProps {
   member: Member;

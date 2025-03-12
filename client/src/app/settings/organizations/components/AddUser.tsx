@@ -1,6 +1,7 @@
+import { AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { authClient } from "../../../lib/auth";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,18 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../components/ui/dialog";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "../../../components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
-import { Switch } from "../../../components/ui/switch";
-import { authedFetch } from "../../../hooks/utils";
-import { BACKEND_URL } from "../../../lib/const";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { authedFetch } from "@/hooks/utils";
+import { BACKEND_URL } from "@/lib/const";
 
 export function AddUser({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
