@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { CreditCard, User, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function SettingsLayout({
   children,
@@ -14,6 +14,14 @@ export default function SettingsLayout({
   const [selectedTab, setSelectedTab] = useState<
     "account" | "settings" | "organizations" | "subscription"
   >("account");
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setSelectedTab(
+      pathname.split("/").pop() as "account" | "organizations" | "subscription"
+    );
+  }, [pathname]);
 
   return (
     <div className="max-w-6xl grid grid-cols-[200px_1fr] gap-6">

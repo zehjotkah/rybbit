@@ -44,7 +44,7 @@ export default function Home() {
             </div>
             <CardTitle className="text-2xl">Welcome to Frogstats</CardTitle>
             <CardDescription>
-              You need to create an organization to get started
+              You need to create an organization before you add a website
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
