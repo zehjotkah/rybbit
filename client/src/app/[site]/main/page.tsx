@@ -1,8 +1,6 @@
 "use client";
-import { useSiteHasData } from "../../../api/admin/sites";
-import { useGetSiteMetadata } from "../../../api/hooks";
+import { useGetSiteMetadata } from "../../../api/admin/sites";
 import { useStore } from "../../../lib/store";
-import { NoData } from "../components/NoData";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { MainSection } from "./components/MainSection/MainSection";
 import { Browsers } from "./components/sections/Browsers";

@@ -21,8 +21,11 @@ import { DeleteOrganizationDialog } from "./components/DeleteOrganizationDialog"
 import { EditOrganizationDialog } from "./components/EditOrganizationDialog";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
 import { RemoveMemberDialog } from "./components/RemoveMemberDialog";
-import { useUserOrganizations } from "../../../api/hooks";
 import { useOrganizationMembers } from "../../../api/admin/auth";
+import {
+  UserOrganization,
+  useUserOrganizations,
+} from "../../../api/admin/organizations";
 
 // Types for our component
 export type Organization = {
@@ -47,7 +50,7 @@ export type Member = {
 };
 
 // Organization Component with Members Table
-function Organization({ org }: { org: Organization }) {
+function Organization({ org }: { org: UserOrganization }) {
   const { data: members, refetch } = useOrganizationMembers(org.id);
 
   const { data } = authClient.useSession();
@@ -143,30 +146,11 @@ function Organization({ org }: { org: Organization }) {
   );
 }
 
-// OrganizationsInner component
-function OrganizationsInner({
-  organizations,
-}: {
-  organizations: Organization[];
-}) {
-  return (
-    <div className="flex flex-col gap-6">
-      {organizations?.map((organization) => (
-        <Organization key={organization.id} org={organization} />
-      ))}
-    </div>
-  );
-}
-
 // Main Organizations component
 export default function Organizations() {
-  const userOrganizations = authClient.useListOrganizations();
+  const { data, isLoading } = useUserOrganizations();
 
-  const { organizations, isLoading } = useUserOrganizations();
-
-  console.log(organizations);
-
-  if (userOrganizations.isPending) {
+  if (isLoading) {
     return (
       <div className="flex justify-center py-8">
         <div className="animate-pulse">Loading organizations...</div>
@@ -174,7 +158,7 @@ export default function Organizations() {
     );
   }
 
-  if (!userOrganizations.data) {
+  if (!data?.length) {
     return (
       <Card className="p-6 text-center text-muted-foreground">
         No organizations found
@@ -182,5 +166,11 @@ export default function Organizations() {
     );
   }
 
-  return <OrganizationsInner organizations={userOrganizations.data as any} />;
+  return (
+    <div className="flex flex-col gap-6">
+      {data?.map((organization) => (
+        <Organization key={organization.id} org={organization} />
+      ))}
+    </div>
+  );
 }

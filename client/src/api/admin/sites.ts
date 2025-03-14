@@ -54,3 +54,11 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
 export function useSiteHasData(siteId: string) {
   return useGenericQuery<boolean>(`site-has-data/${siteId}`);
 }
+
+export function useGetSiteMetadata(siteId: string | number) {
+  const { data, isLoading } = useGetSites();
+  return {
+    siteMetadata: data?.data?.find((site) => site.siteId === Number(siteId)),
+    isLoading,
+  };
+}

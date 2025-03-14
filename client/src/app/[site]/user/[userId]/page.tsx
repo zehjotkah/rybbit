@@ -6,13 +6,13 @@ import { Browser } from "../../components/shared/icons/Browser";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { getCountryName } from "@/lib/utils";
-import { useGetSiteMetadata } from "../../../../api/hooks";
 import { useStore } from "../../../../lib/store";
 import { DateTime } from "luxon";
 import {
   useGetUserSessions,
   UserSessionsResponse,
 } from "../../../../api/analytics/userSessions";
+import { useGetSiteMetadata } from "../../../../api/admin/sites";
 
 // Helper function to format duration in seconds to a readable format
 const formatDuration = (seconds: number): string => {

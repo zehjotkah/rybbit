@@ -27,9 +27,9 @@ import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/auth-utils.js";
 import { trackPageView } from "./tracker/trackPageView.js";
 import { listOrganizationMembers } from "./api/listOrganizationMembers.js";
-import { getUserOrganizations } from "./api/getUserOrganizations.js";
+import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { initializeCronJobs } from "./cron/index.js";
-import { getUserSubscription } from "./api/getUserSubscription.js";
+import { getUserSubscription } from "./api/user/getUserSubscription.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -1,10 +1,10 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { getSession } from "../lib/auth-utils.js";
-import { getUserEventLimit } from "./sites/getSites.js";
-import { db } from "../db/postgres/postgres.js";
-import { user, subscription } from "../db/postgres/schema.js";
+import { getSession } from "../../lib/auth-utils.js";
+import { getUserEventLimit } from "../sites/getSites.js";
+import { db } from "../../db/postgres/postgres.js";
+import { user, subscription } from "../../db/postgres/schema.js";
 import { eq, and, inArray } from "drizzle-orm";
-import { STRIPE_PRICES } from "../lib/const.js";
+import { STRIPE_PRICES } from "../../lib/const.js";
 
 // Define the plan interface
 interface StripePlan {

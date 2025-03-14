@@ -34,10 +34,10 @@ import {
   changeSiteDomain,
   deleteSite,
   GetSitesResponse,
+  useGetSiteMetadata,
   useGetSites,
 } from "@/api/admin/sites";
 import { BACKEND_URL } from "@/lib/const";
-import { useGetSiteMetadata } from "../../api/hooks";
 
 interface SiteSettingsProps {
   siteId: number;
