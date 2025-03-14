@@ -40,9 +40,7 @@ export function SubHeader() {
   const { data: sites } = useGetSites();
   const pathname = usePathname();
 
-  const site = sites?.data?.find(
-    (site) => site.siteId === Number(pathname.slice(1))
-  );
+  const site = sites?.find((site) => site.siteId === Number(pathname.slice(1)));
 
   return (
     <div className="flex gap-2 mb-3 mt-1 justify-between">
