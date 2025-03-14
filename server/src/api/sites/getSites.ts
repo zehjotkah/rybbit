@@ -1,8 +1,42 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
-import { member, user } from "../../db/postgres/schema.js";
+import { member, user, subscription } from "../../db/postgres/schema.js";
 import { getSitesUserHasAccessTo } from "../../lib/auth-utils.js";
+import { STRIPE_PLANS } from "../../lib/const.js";
+
+// Default event limit for users without an active subscription
+const DEFAULT_EVENT_LIMIT = 20_000;
+
+/**
+ * Get subscription event limit for a user
+ */
+async function getUserEventLimit(userId: string): Promise<number> {
+  try {
+    // Find active subscription
+    const userSubscription = await db
+      .select()
+      .from(subscription)
+      .where(
+        and(
+          eq(subscription.referenceId, userId),
+          inArray(subscription.status, ["active", "trialing"])
+        )
+      )
+      .limit(1);
+
+    if (!userSubscription.length) {
+      return DEFAULT_EVENT_LIMIT;
+    }
+
+    // Find the plan in STRIPE_PLANS
+    const plan = STRIPE_PLANS.find((p) => p.name === userSubscription[0].plan);
+    return plan ? plan.limits.events : DEFAULT_EVENT_LIMIT;
+  } catch (error) {
+    console.error(`Error getting event limit for user ${userId}:`, error);
+    return DEFAULT_EVENT_LIMIT;
+  }
+}
 
 export async function getSites(req: FastifyRequest, reply: FastifyReply) {
   try {
@@ -14,7 +48,11 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
       sitesData.map(async (site) => {
         // Skip if no organization ID
         if (!site.organizationId) {
-          return { ...site, overMonthlyLimit: false };
+          return {
+            ...site,
+            overMonthlyLimit: false,
+            eventLimit: DEFAULT_EVENT_LIMIT,
+          };
         }
 
         // Get the organization owner
@@ -30,7 +68,11 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
           .limit(1);
 
         if (!orgOwner.length) {
-          return { ...site, overMonthlyLimit: false };
+          return {
+            ...site,
+            overMonthlyLimit: false,
+            eventLimit: DEFAULT_EVENT_LIMIT,
+          };
         }
 
         // Get the user data to check if they're over limit
@@ -44,14 +86,22 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
           .limit(1);
 
         if (!userData.length) {
-          return { ...site, overMonthlyLimit: false };
+          return {
+            ...site,
+            overMonthlyLimit: false,
+            eventLimit: DEFAULT_EVENT_LIMIT,
+          };
         }
+
+        // Get the user's event limit from their subscription
+        const eventLimit = await getUserEventLimit(orgOwner[0].userId);
 
         // Return site with usage limit info
         return {
           ...site,
           overMonthlyLimit: userData[0].overMonthlyLimit || false,
           monthlyEventCount: userData[0].monthlyEventCount || 0,
+          eventLimit,
         };
       })
     );

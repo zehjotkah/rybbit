@@ -40,6 +40,11 @@ export function Header() {
     return route === tabName.toLowerCase();
   };
 
+  // Format numbers with commas
+  const formatNumber = (num: number = 0) => {
+    return num.toLocaleString();
+  };
+
   return (
     <div className="flex flex-col">
       {/* Usage Limit Banner */}
@@ -48,8 +53,9 @@ export function Header() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Monthly Event Limit Exceeded</AlertTitle>
           <AlertDescription>
-            This site's organization has exceeded its monthly event limit (
-            {site.monthlyEventCount?.toLocaleString()} events recorded). Please
+            This site's organization has exceeded its monthly event limit.
+            You've used {formatNumber(site.monthlyEventCount || 0)} events out
+            of your {formatNumber(site.eventLimit || 20000)} event limit. Please
             upgrade your plan to continue collecting analytics.
           </AlertDescription>
           <Link
