@@ -1,7 +1,5 @@
-import { insertSessions } from "../clickhouse/clickhouse.js";
 import { sql } from "./postgres.js";
 import { Session } from "./types.js";
-import { DateTime } from "luxon";
 
 // function convertPostgresToClickhouse(postgresTimestamp: string): string {
 //   console.log("Parsing timestamp:", postgresTimestamp);
@@ -45,13 +43,14 @@ export async function cleanupOldSessions() {
 
   // console.log(`Cleaned up ${deletedSessions.length} sessions`);
 
-  if (deletedSessions.length > 0) {
-    await insertSessions(
-      deletedSessions.map((e) => ({
-        ...e,
-        start_time: convertPostgresToClickhouse(e.start_time),
-        last_activity: convertPostgresToClickhouse(e.last_activity),
-      }))
-    );
-  }
+  // disabled for now dubvious if we need sessions in clikchouse
+  // if (deletedSessions.length > 0) {
+  //   await insertSessions(
+  //     deletedSessions.map((e) => ({
+  //       ...e,
+  //       start_time: convertPostgresToClickhouse(e.start_time),
+  //       last_activity: convertPostgresToClickhouse(e.last_activity),
+  //     }))
+  //   );
+  // }
 }

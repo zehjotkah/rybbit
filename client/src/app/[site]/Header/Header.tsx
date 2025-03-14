@@ -1,16 +1,26 @@
 "use client";
 import { useStore } from "@/lib/store";
 import { Circle } from "@phosphor-icons/react";
-import { ChartBarDecreasing, ChartLine, Radio, User } from "lucide-react";
+import {
+  ChartBarDecreasing,
+  ChartLine,
+  Radio,
+  User,
+  AlertTriangle,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiteSettings } from "../../../components/SiteSettings/SiteSettings";
 import { useGetSites } from "../../../api/admin/sites";
 import { useGetLiveUsercount } from "../../../api/analytics/useLiveUserCount";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../components/ui/alert";
 
 export function Header() {
   const { data } = useGetLiveUsercount();
-  const { time } = useStore();
   const { data: sites } = useGetSites();
   const pathname = usePathname();
 
@@ -31,46 +41,67 @@ export function Header() {
   };
 
   return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex gap-3">
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <img
-            className="w-7 mr-1"
-            src={`https://www.google.com/s2/favicons?domain=${site?.domain}&sz=64`}
+    <div className="flex flex-col">
+      {/* Usage Limit Banner */}
+      {site?.overMonthlyLimit && (
+        <Alert variant="destructive" className="mb-3">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Monthly Event Limit Exceeded</AlertTitle>
+          <AlertDescription>
+            This site's organization has exceeded its monthly event limit (
+            {site.monthlyEventCount?.toLocaleString()} events recorded). Please
+            upgrade your plan to continue collecting analytics.
+          </AlertDescription>
+          <Link
+            href="/settings/subscription"
+            className="underline ml-1 font-medium"
+          >
+            Upgrade Plan
+          </Link>
+        </Alert>
+      )}
+
+      <div className="flex items-center justify-between py-2">
+        <div className="flex gap-3">
+          <div className="flex items-center gap-2 text-xl font-bold">
+            <img
+              className="w-7 mr-1"
+              src={`https://www.google.com/s2/favicons?domain=${site?.domain}&sz=64`}
+            />
+            <div>{site?.domain}</div>
+          </div>
+          <div className="flex items-center gap-1 text-base text-neutral-600 dark:text-neutral-400">
+            <Circle size={12} weight="fill" color="hsl(var(--green-500))" />
+            {data?.count} users online
+            <SiteSettings siteId={site?.siteId ?? 0} />
+          </div>
+        </div>
+        <div className="flex space-x-2">
+          <TabButton
+            label="Main"
+            active={isActiveTab("main")}
+            href={getTabPath("main")}
+            icon={<ChartLine size={20} />}
           />
-          <div>{site?.domain}</div>
+          <TabButton
+            label="Sessions"
+            active={isActiveTab("sessions")}
+            href={getTabPath("sessions")}
+            icon={<User size={20} />}
+          />
+          <TabButton
+            label="Realtime"
+            active={isActiveTab("realtime")}
+            href={getTabPath("realtime")}
+            icon={<Radio size={20} />}
+          />
+          <TabButton
+            label="Reports"
+            active={isActiveTab("reports")}
+            href={getTabPath("reports")}
+            icon={<ChartBarDecreasing size={20} />}
+          />
         </div>
-        <div className="flex items-center gap-1 text-base text-neutral-600 dark:text-neutral-400">
-          <Circle size={12} weight="fill" color="hsl(var(--green-500))" />
-          {data?.count} users online
-          <SiteSettings siteId={site?.siteId ?? 0} />
-        </div>
-      </div>
-      <div className="flex space-x-2">
-        <TabButton
-          label="Main"
-          active={isActiveTab("main")}
-          href={getTabPath("main")}
-          icon={<ChartLine size={20} />}
-        />
-        <TabButton
-          label="Sessions"
-          active={isActiveTab("sessions")}
-          href={getTabPath("sessions")}
-          icon={<User size={20} />}
-        />
-        <TabButton
-          label="Realtime"
-          active={isActiveTab("realtime")}
-          href={getTabPath("realtime")}
-          icon={<Radio size={20} />}
-        />
-        <TabButton
-          label="Reports"
-          active={isActiveTab("reports")}
-          href={getTabPath("reports")}
-          icon={<ChartBarDecreasing size={20} />}
-        />
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ export type GetSitesResponse = {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  overMonthlyLimit?: boolean;
+  monthlyEventCount?: number;
 }[];
 
 export function useGetSites() {
