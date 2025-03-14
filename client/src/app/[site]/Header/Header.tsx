@@ -1,23 +1,13 @@
 "use client";
 import { useStore } from "@/lib/store";
 import { Circle } from "@phosphor-icons/react";
-import {
-  ChartBarDecreasing,
-  ChartLine,
-  Radio,
-  User,
-  AlertTriangle,
-} from "lucide-react";
+import { ChartBarDecreasing, ChartLine, Radio, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiteSettings } from "../../../components/SiteSettings/SiteSettings";
 import { useGetSites } from "../../../api/admin/sites";
 import { useGetLiveUsercount } from "../../../api/analytics/useLiveUserCount";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "../../../components/ui/alert";
+import { UsageBanners } from "./UsageBanners";
 
 export function Header() {
   const { data } = useGetLiveUsercount();
@@ -40,32 +30,10 @@ export function Header() {
     return route === tabName.toLowerCase();
   };
 
-  // Format numbers with commas
-  const formatNumber = (num: number = 0) => {
-    return num.toLocaleString();
-  };
-
   return (
     <div className="flex flex-col">
-      {/* Usage Limit Banner */}
-      {site?.overMonthlyLimit && (
-        <Alert variant="destructive" className="mb-3">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Monthly Event Limit Exceeded</AlertTitle>
-          <AlertDescription>
-            This site's organization has exceeded its monthly event limit.
-            You've used {formatNumber(site.monthlyEventCount || 0)} events out
-            of your {formatNumber(site.eventLimit || 20000)} event limit. Please
-            upgrade your plan to continue collecting analytics.
-          </AlertDescription>
-          <Link
-            href="/settings/subscription"
-            className="underline ml-1 font-medium"
-          >
-            Upgrade Plan
-          </Link>
-        </Alert>
-      )}
+      {/* Usage Banners */}
+      <UsageBanners site={site} />
 
       <div className="flex items-center justify-between py-2">
         <div className="flex gap-3">

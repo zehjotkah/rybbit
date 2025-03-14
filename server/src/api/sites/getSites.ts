@@ -52,6 +52,7 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
             ...site,
             overMonthlyLimit: false,
             eventLimit: DEFAULT_EVENT_LIMIT,
+            isOwner: false,
           };
         }
 
@@ -72,8 +73,12 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
             ...site,
             overMonthlyLimit: false,
             eventLimit: DEFAULT_EVENT_LIMIT,
+            isOwner: false,
           };
         }
+
+        // Check if the current user is the organization owner
+        const isOwner = orgOwner[0].userId === req.user?.id;
 
         // Get the user data to check if they're over limit
         const userData = await db
@@ -90,6 +95,7 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
             ...site,
             overMonthlyLimit: false,
             eventLimit: DEFAULT_EVENT_LIMIT,
+            isOwner,
           };
         }
 
@@ -102,6 +108,7 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
           overMonthlyLimit: userData[0].overMonthlyLimit || false,
           monthlyEventCount: userData[0].monthlyEventCount || 0,
           eventLimit,
+          isOwner,
         };
       })
     );

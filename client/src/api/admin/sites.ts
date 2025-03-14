@@ -12,6 +12,7 @@ export type GetSitesResponse = {
   overMonthlyLimit?: boolean;
   monthlyEventCount?: number;
   eventLimit?: number;
+  isOwner?: boolean;
 }[];
 
 export function useGetSites() {
