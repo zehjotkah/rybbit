@@ -1,5 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { AlertCircle, AppWindow, Building2, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { addSite, useGetSites } from "../../api/admin/sites";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -9,19 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../components/ui/dialog";
-import { useState, useEffect } from "react";
-import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { addSite, useGetSites } from "../../api/admin/sites";
-import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
-import {
-  AlertCircle,
-  AppWindow,
-  Building2,
-  Plus,
-  PlusCircle,
-} from "lucide-react";
-import { authClient } from "../../lib/auth";
+import { Label } from "../../components/ui/label";
 import {
   Select,
   SelectContent,
@@ -29,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import { authClient } from "../../lib/auth";
 
 /**
  * A simple domain validation function:
@@ -52,7 +46,7 @@ export function AddSite({
   const { data: sites, refetch } = useGetSites();
   const { data: organizations } = authClient.useListOrganizations();
 
-  const existingSites = sites?.data?.map((site) => site.domain);
+  const existingSites = sites?.map((site) => site.domain);
 
   const [open, setOpen] = useState(false);
   const [domain, setDomain] = useState("");

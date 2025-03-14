@@ -15,6 +15,7 @@ export default function SiteLayout({
   const pathname = usePathname();
   const { setSite, site } = useStore();
   const { data: siteHasData, isLoading } = useSiteHasData(site);
+
   const { siteMetadata, isLoading: isLoadingSiteMetadata } =
     useGetSiteMetadata(site);
 
@@ -35,7 +36,7 @@ export default function SiteLayout({
     return null;
   }
 
-  if (!siteHasData?.data && !isLoading && !isLoadingSiteMetadata) {
+  if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
     return <NoData siteMetadata={siteMetadata} />;
   }
 

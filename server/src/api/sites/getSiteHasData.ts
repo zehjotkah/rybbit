@@ -15,8 +15,8 @@ export async function getSiteHasData(
       })
       .then((res) => res.json());
 
-    return reply.status(200).send({ data: sites[0].count > 0 });
+    return reply.status(200).send(sites[0].count > 0);
   } catch (err) {
-    return reply.status(500).send({ error: String(err) });
+    return reply.status(500).send(String(err));
   }
 }

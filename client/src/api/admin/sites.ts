@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch, useGenericQuery } from "../utils";
+import { authedFetch, genericQuery, useGenericQuery } from "../utils";
 
 export type GetSitesResponse = {
   siteId: number;
@@ -16,6 +16,10 @@ export type GetSitesResponse = {
 
 export function useGetSites() {
   return useGenericQuery<GetSitesResponse>("get-sites");
+}
+
+export async function getSites() {
+  return genericQuery<GetSitesResponse>("get-sites");
 }
 
 export function addSite(domain: string, name: string, organizationId: string) {
@@ -58,7 +62,7 @@ export function useSiteHasData(siteId: string) {
 export function useGetSiteMetadata(siteId: string | number) {
   const { data, isLoading } = useGetSites();
   return {
-    siteMetadata: data?.data?.find((site) => site.siteId === Number(siteId)),
+    siteMetadata: data?.find((site) => site.siteId === Number(siteId)),
     isLoading,
   };
 }

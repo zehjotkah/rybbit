@@ -39,9 +39,7 @@ export async function authedFetch(url: string, opts: RequestInit = {}) {
   });
 }
 
-export function useGenericQuery<T>(
-  endpoint: string
-): UseQueryResult<APIResponse<T>> {
+export function useGenericQuery<T>(endpoint: string): UseQueryResult<T> {
   return useQuery({
     queryKey: [endpoint],
     queryFn: () => {
@@ -51,4 +49,8 @@ export function useGenericQuery<T>(
     },
     staleTime: Infinity,
   });
+}
+
+export async function genericQuery<T>(endpoint: string): Promise<T> {
+  return authedFetch(`${BACKEND_URL}/${endpoint}`).then((res) => res.json());
 }

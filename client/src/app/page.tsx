@@ -1,23 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { SiteCard } from "../components/SiteCard";
+import { Building, Plus } from "lucide-react";
+import { useState } from "react";
 import { useGetSites } from "../api/admin/sites";
+import { SiteCard } from "../components/SiteCard";
+import { Button } from "../components/ui/button";
+import { Card, CardDescription, CardTitle } from "../components/ui/card";
 import { authClient } from "../lib/auth";
 import { AddSite } from "./components/AddSite";
 import { CreateOrganizationDialog } from "./components/CreateOrganizationDialog";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Plus, Building } from "lucide-react";
 
 export default function Home() {
-  const { data: sites, refetch: refetchSites } = useGetSites();
+  const {
+    data: sites,
+    refetch: refetchSites,
+    isLoading: isLoadingSites,
+  } = useGetSites();
   const userOrganizations = authClient.useListOrganizations();
   const [createOrgDialogOpen, setCreateOrgDialogOpen] = useState(false);
 
@@ -65,7 +63,7 @@ export default function Home() {
 
         {/* Sites list */}
         {!hasNoOrganizations &&
-          sites?.data?.map((site) => {
+          sites?.map((site) => {
             return (
               <SiteCard
                 key={site.siteId}
@@ -77,8 +75,9 @@ export default function Home() {
 
         {/* No websites message */}
         {!hasNoOrganizations &&
-          (!sites?.data || sites.data.length === 0) &&
-          !userOrganizations.isPending && (
+          (!sites || sites.length === 0) &&
+          !userOrganizations.isPending &&
+          !isLoadingSites && (
             <Card className="col-span-full p-6 flex flex-col items-center text-center">
               <CardTitle className="mb-2 text-xl">No websites yet</CardTitle>
               <CardDescription className="mb-4">

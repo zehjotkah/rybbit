@@ -14,7 +14,7 @@ export function Header() {
   const { data: sites } = useGetSites();
   const pathname = usePathname();
 
-  const site = sites?.data?.find(
+  const site = sites?.find(
     (site) => site.siteId === Number(pathname.split("/")[1])
   );
 

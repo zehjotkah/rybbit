@@ -113,9 +113,9 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
       })
     );
 
-    return reply.status(200).send({ data: enhancedSitesData });
+    return reply.status(200).send(enhancedSitesData);
   } catch (err) {
     console.error("Error in getSites:", err);
-    return reply.status(500).send({ error: String(err) });
+    return reply.status(500).send(String(err));
   }
 }
