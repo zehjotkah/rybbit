@@ -18,7 +18,7 @@ import { AlertCircle, ArrowRight, X } from "lucide-react";
 interface CurrentPlanCardProps {
   activeSubscription: Subscription;
   currentPlan: PlanTemplate | null;
-  currentUsage: { events: number };
+  currentUsage: number;
   eventLimit: number;
   usagePercentage: number;
   isProcessing: boolean;
@@ -126,7 +126,7 @@ export function CurrentPlanCard({
                 <div className="flex justify-between mb-1">
                   <span className="text-sm">Events</span>
                   <span className="text-sm">
-                    {currentUsage.events.toLocaleString()} /{" "}
+                    {currentUsage.toLocaleString()} /{" "}
                     {eventLimit.toLocaleString()}
                   </span>
                 </div>

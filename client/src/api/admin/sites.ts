@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { authedFetch, useGenericQuery } from "../utils";
 

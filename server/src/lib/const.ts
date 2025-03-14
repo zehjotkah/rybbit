@@ -4,7 +4,7 @@ dotenv.config();
 
 export const IS_CLOUD = process.env.CLOUD === "true";
 
-export const STRIPE_PLANS = [
+export const STRIPE_PRICES = [
   {
     priceId: "price_1R1fIVDFVprnAny2yJtRRPBm",
     name: "basic100k",

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "../../lib/auth";
+import { BACKEND_URL } from "../../lib/const";
+import { authedFetch } from "../utils";
 
 export type Subscription = {
   id: string;
@@ -25,29 +26,18 @@ export type Subscription = {
   metadata?: Record<string, any>;
 };
 
-export function useSubscription() {
-  return useQuery({
-    queryKey: ["subscription"],
+export type SubscriptionWithUsage = Subscription & {
+  monthlyEventCount: number;
+  overMonthlyLimit: boolean;
+  monthlyEventLimit: number;
+};
+
+export function useSubscriptionWithUsage() {
+  return useQuery<SubscriptionWithUsage>({
+    queryKey: ["subscriptionWithUsage"],
     queryFn: async () => {
-      try {
-        const { data, error } = await authClient.subscription.list();
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        // Find the active subscription
-        const activeSubscription =
-          data?.find(
-            (sub) => sub.status === "active" || sub.status === "trialing"
-          ) || null;
-
-        // Ensure the returned data has the correct shape for our frontend
-        return activeSubscription as Subscription | null;
-      } catch (error) {
-        console.error("Failed to fetch subscription:", error);
-        throw error;
-      }
+      const res = await authedFetch(`${BACKEND_URL}/user/subscription`);
+      return res.json();
     },
   });
 }

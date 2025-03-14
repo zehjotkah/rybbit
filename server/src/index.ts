@@ -29,6 +29,7 @@ import { trackPageView } from "./tracker/trackPageView.js";
 import { listOrganizationMembers } from "./api/listOrganizationMembers.js";
 import { getUserOrganizations } from "./api/getUserOrganizations.js";
 import { initializeCronJobs } from "./cron/index.js";
+import { getUserSubscription } from "./api/getUserSubscription.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -139,6 +140,7 @@ server.get(
   listOrganizationMembers
 );
 server.get("/user/organizations", getUserOrganizations);
+server.get("/user/subscription", getUserSubscription);
 
 // Track pageview endpoint
 server.post("/track/pageview", trackPageView);

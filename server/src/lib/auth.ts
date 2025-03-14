@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db/postgres/postgres.js";
-import { IS_CLOUD, STRIPE_PLANS } from "./const.js";
+import { IS_CLOUD, STRIPE_PRICES } from "./const.js";
 import * as schema from "../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
 import { stripe } from "@better-auth/stripe";
@@ -31,7 +31,7 @@ const pluginList = IS_CLOUD
         createCustomerOnSignUp: true,
         subscription: {
           enabled: true,
-          plans: STRIPE_PLANS,
+          plans: STRIPE_PRICES,
         },
       }),
     ]
@@ -120,6 +120,13 @@ export function initAuth(allowedOrigins: string[]) {
       enabled: true,
     },
     user: {
+      additionalFields: {
+        monthlyEventCount: {
+          type: "number",
+          defaultValue: 0,
+          required: false,
+        },
+      },
       deleteUser: {
         enabled: true,
         // Add a hook to run before deleting a user

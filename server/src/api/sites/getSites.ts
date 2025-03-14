@@ -3,7 +3,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { member, user, subscription } from "../../db/postgres/schema.js";
 import { getSitesUserHasAccessTo } from "../../lib/auth-utils.js";
-import { STRIPE_PLANS } from "../../lib/const.js";
+import { STRIPE_PRICES } from "../../lib/const.js";
 
 // Default event limit for users without an active subscription
 const DEFAULT_EVENT_LIMIT = 20_000;
@@ -11,7 +11,7 @@ const DEFAULT_EVENT_LIMIT = 20_000;
 /**
  * Get subscription event limit for a user
  */
-async function getUserEventLimit(userId: string): Promise<number> {
+export async function getUserEventLimit(userId: string): Promise<number> {
   try {
     // Find active subscription
     const userSubscription = await db
@@ -30,7 +30,7 @@ async function getUserEventLimit(userId: string): Promise<number> {
     }
 
     // Find the plan in STRIPE_PLANS
-    const plan = STRIPE_PLANS.find((p) => p.name === userSubscription[0].plan);
+    const plan = STRIPE_PRICES.find((p) => p.name === userSubscription[0].plan);
     return plan ? plan.limits.events : DEFAULT_EVENT_LIMIT;
   } catch (error) {
     console.error(`Error getting event limit for user ${userId}:`, error);

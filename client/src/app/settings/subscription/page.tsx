@@ -15,14 +15,14 @@ import { STRIPE_PRICES } from "@/lib/stripe";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSubscription } from "../../../api/admin/subscription";
+import { useSubscriptionWithUsage } from "../../../api/admin/subscription";
 import { authClient } from "../../../lib/auth";
 import { ChangePlanDialog } from "./components/ChangePlanDialog";
 import { CurrentPlanCard } from "./components/CurrentPlanCard";
 import { ErrorDialog } from "./components/ErrorDialog";
 import { HelpSection } from "./components/HelpSection";
 import { PlanFeaturesCard } from "./components/PlanFeaturesCard";
-import { DEFAULT_EVENT_LIMIT, DEFAULT_USAGE } from "./utils/constants";
+import { DEFAULT_EVENT_LIMIT } from "./utils/constants";
 import { getPlanDetails } from "./utils/planUtils";
 
 export default function SubscriptionPage() {
@@ -33,7 +33,7 @@ export default function SubscriptionPage() {
     isLoading,
     error: subscriptionError,
     refetch,
-  } = useSubscription();
+  } = useSubscriptionWithUsage();
 
   // State variables
   const [errorType, setErrorType] = useState<"cancel" | "resume">("cancel");
@@ -43,7 +43,7 @@ export default function SubscriptionPage() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Current usage - in a real app, you would fetch this from your API
-  const currentUsage = DEFAULT_USAGE;
+  const currentUsage = activeSubscription?.monthlyEventCount || 0;
 
   const handleCancelSubscription = async () => {
     try {
@@ -190,7 +190,7 @@ export default function SubscriptionPage() {
   };
 
   const eventLimit = getEventLimit();
-  const usagePercentage = (currentUsage.events / eventLimit) * 100;
+  const usagePercentage = (currentUsage / eventLimit) * 100;
 
   return (
     <div className="container py-10 max-w-5xl mx-auto">

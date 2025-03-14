@@ -1,6 +1,6 @@
 import { user, member, sites, subscription } from "../db/postgres/schema.js";
 import { clickhouse } from "../db/clickhouse/clickhouse.js";
-import { STRIPE_PLANS } from "../lib/const.js";
+import { STRIPE_PRICES } from "../lib/const.js";
 import { eq, inArray, and } from "drizzle-orm";
 import { db } from "../db/postgres/postgres.js";
 import { processResults } from "../api/utils.js";
@@ -74,7 +74,7 @@ async function getUserSubscriptionInfo(
     }
 
     // Find the plan in STRIPE_PLANS
-    const plan = STRIPE_PLANS.find((p) => p.name === userSubscription[0].plan);
+    const plan = STRIPE_PRICES.find((p) => p.name === userSubscription[0].plan);
     const eventLimit = plan ? plan.limits.events : DEFAULT_EVENT_LIMIT;
 
     // Get period start date - if not available, use first day of month
