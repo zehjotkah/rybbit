@@ -2,8 +2,8 @@ import { nivoTheme } from "@/lib/nivo";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { useMemo } from "react";
-import { GetOverviewBucketedResponse } from "../api/api";
 import { formatter } from "../lib/utils";
+import { GetOverviewBucketedResponse } from "../api/analytics/useGetOverviewBucketed";
 
 interface SiteSessionChartProps {
   data: GetOverviewBucketedResponse;

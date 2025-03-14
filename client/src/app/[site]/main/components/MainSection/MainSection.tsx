@@ -1,11 +1,12 @@
 "use client";
 import { Card, CardContent, CardLoader } from "@/components/ui/card";
-import { useGetOverview, useGetOverviewBucketed } from "@/api/api";
 import { BucketSelection } from "./BucketSelection";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
 import { useStore } from "../../../../../lib/store";
+import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
+import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
 
 export function MainSection() {
   const { selectedStat, time, site } = useStore();

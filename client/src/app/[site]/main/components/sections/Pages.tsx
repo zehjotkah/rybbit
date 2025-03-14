@@ -1,6 +1,6 @@
 "use client";
 
-import { GetSitesResponse } from "@/api/api";
+import { GetSitesResponse } from "@/api/admin/sites";
 import { StandardCard } from "../../../components/shared/StandardCard";
 
 export function Pages({

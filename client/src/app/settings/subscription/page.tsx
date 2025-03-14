@@ -1,9 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,17 +11,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSubscription } from "@/api/api";
+import { STRIPE_PRICES } from "@/lib/stripe";
 import { AlertCircle, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSubscription } from "../../../api/admin/subscription";
 import { authClient } from "../../../lib/auth";
-import { CurrentPlanCard } from "./components/CurrentPlanCard";
-import { PlanFeaturesCard } from "./components/PlanFeaturesCard";
 import { ChangePlanDialog } from "./components/ChangePlanDialog";
+import { CurrentPlanCard } from "./components/CurrentPlanCard";
 import { ErrorDialog } from "./components/ErrorDialog";
 import { HelpSection } from "./components/HelpSection";
-import { getPlanDetails } from "./utils/planUtils";
+import { PlanFeaturesCard } from "./components/PlanFeaturesCard";
 import { DEFAULT_EVENT_LIMIT, DEFAULT_USAGE } from "./utils/constants";
-import { STRIPE_PRICES } from "@/lib/stripe";
+import { getPlanDetails } from "./utils/planUtils";
 
 export default function SubscriptionPage() {
   const router = useRouter();

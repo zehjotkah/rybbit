@@ -4,29 +4,12 @@ import { useMemo, useState } from "react";
 
 import { Button } from "../../../../../components/ui/button";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
-
 import { getCountryName } from "../../../../../lib/utils";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../../../../components/ui/command";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../../../components/ui/popover";
 
 import { FilterParameter, addFilter } from "../../../../../lib/store";
 
-import { useSingleCol } from "../../../../../api/api";
 import { MultiSelect } from "../../../../../components/MultiSelect";
+import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
 
 interface ValueFilterProps {
   parameter: FilterParameter;

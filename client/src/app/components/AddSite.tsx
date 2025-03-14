@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { addSite, useGetSites } from "../../api/api";
+import { addSite, useGetSites } from "../../api/admin/sites";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import {
   AlertCircle,

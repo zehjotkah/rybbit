@@ -1,5 +1,5 @@
 "use client";
-import { useSiteHasData } from "../../../api/api";
+import { useSiteHasData } from "../../../api/admin/sites";
 import { useGetSiteMetadata } from "../../../api/hooks";
 import { useStore } from "../../../lib/store";
 import { NoData } from "../components/NoData";

@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { useOrganizationMembers } from "../../../api/api";
 import { authClient } from "../../../lib/auth";
 
 // Import the separated dialog components
@@ -23,6 +22,7 @@ import { EditOrganizationDialog } from "./components/EditOrganizationDialog";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
 import { RemoveMemberDialog } from "./components/RemoveMemberDialog";
 import { useUserOrganizations } from "../../../api/hooks";
+import { useOrganizationMembers } from "../../../api/admin/auth";
 
 // Types for our component
 export type Organization = {

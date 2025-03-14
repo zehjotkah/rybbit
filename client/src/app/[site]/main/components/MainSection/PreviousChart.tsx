@@ -1,10 +1,11 @@
 "use client";
-import { APIResponse, GetOverviewBucketedResponse } from "@/api/api";
 import { nivoTheme } from "@/lib/nivo";
 import { Time, useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { useMemo } from "react";
+import { APIResponse } from "../../../../../api/types";
+import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGetOverviewBucketed";
 
 const getMin = (time: Time) => {
   if (time.mode === "day") {

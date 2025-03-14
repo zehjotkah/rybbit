@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useStore } from "../../lib/store";
 import { useSyncStateWithUrl } from "../../lib/urlParams";
 import { Header } from "./Header/Header";
-import { useSiteHasData } from "../../api/api";
+import { useSiteHasData } from "../../api/admin/sites";
 import { useGetSiteMetadata } from "../../api/hooks";
 import { NoData } from "./components/NoData";
 

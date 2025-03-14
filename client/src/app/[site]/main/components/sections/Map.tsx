@@ -11,10 +11,10 @@ import * as CountryFlags from "country-flag-icons/react/3x2";
 import { scaleLinear } from "d3-scale";
 import React, { useEffect, useMemo, useState } from "react";
 import { GeoJSON, MapContainer, useMapEvent } from "react-leaflet";
-import { useSingleCol } from "@/api/api";
 import { Layer } from "leaflet";
 import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
+import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
 
 const countriesGeoUrl = "/countries.json";
 const subdivisionsGeoUrl = "/subdivisions.json";

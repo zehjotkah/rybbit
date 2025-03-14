@@ -1,9 +1,9 @@
 "use client";
 
-import { useGetSessionsInfinite } from "@/api/api";
 import { useMemo } from "react";
 import SessionsTable from "./components/SessionsTable";
 import { SubHeader } from "../components/SubHeader/SubHeader";
+import { useGetSessionsInfinite } from "../../../api/analytics/userSessions";
 
 export default function SessionsPage() {
   const {

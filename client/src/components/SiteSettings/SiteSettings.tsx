@@ -35,7 +35,7 @@ import {
   deleteSite,
   GetSitesResponse,
   useGetSites,
-} from "@/api/api";
+} from "@/api/admin/sites";
 import { BACKEND_URL } from "@/lib/const";
 import { useGetSiteMetadata } from "../../api/hooks";
 

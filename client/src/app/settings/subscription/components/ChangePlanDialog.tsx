@@ -9,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Subscription } from "@/api/api";
 import { AlertCircle, Shield, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Subscription } from "@/api/admin/subscription";
 
 interface ChangePlanDialogProps {
   showUpgradeDialog: boolean;

@@ -20,7 +20,10 @@ import { ReactNode, useMemo } from "react";
 import { addFilter, FilterParameter } from "../../../../lib/store";
 import { formatter } from "../../../../lib/utils";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { SingleColResponse, useSingleCol } from "../../../../api/api";
+import {
+  SingleColResponse,
+  useSingleCol,
+} from "../../../../api/analytics/useSingleCol";
 
 export function StandardCard({
   title,

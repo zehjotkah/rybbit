@@ -1,5 +1,8 @@
 import { Time } from "@/lib/store";
 import { DateTime } from "luxon";
+import { APIResponse } from "./types";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { BACKEND_URL } from "../lib/const";
 
 export function getStartAndEndDate(time: Time) {
   if (time.mode === "range") {
@@ -33,5 +36,19 @@ export async function authedFetch(url: string, opts: RequestInit = {}) {
   return fetch(url, {
     credentials: "include",
     ...opts,
+  });
+}
+
+export function useGenericQuery<T>(
+  endpoint: string
+): UseQueryResult<APIResponse<T>> {
+  return useQuery({
+    queryKey: [endpoint],
+    queryFn: () => {
+      return authedFetch(`${BACKEND_URL}/${endpoint}`).then((res) =>
+        res.json()
+      );
+    },
+    staleTime: Infinity,
   });
 }

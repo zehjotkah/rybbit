@@ -1,12 +1,12 @@
 "use client";
 
-import { useSingleCol } from "@/api/api";
 import { scaleLinear } from "d3-scale";
 import { Feature, FeatureCollection } from "geojson";
 import { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),

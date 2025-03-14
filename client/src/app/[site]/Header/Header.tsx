@@ -5,7 +5,8 @@ import { ChartBarDecreasing, ChartLine, Radio, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiteSettings } from "../../../components/SiteSettings/SiteSettings";
-import { useGetLiveUsercount, useGetSites } from "../../../api/api";
+import { useGetSites } from "../../../api/admin/sites";
+import { useGetLiveUsercount } from "../../../api/analytics/useLiveUserCount";
 
 export function Header() {
   const { data } = useGetLiveUsercount();

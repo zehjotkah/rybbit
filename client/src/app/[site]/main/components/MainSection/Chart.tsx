@@ -1,10 +1,11 @@
 "use client";
-import { APIResponse, GetOverviewBucketedResponse } from "@/api/api";
 import { nivoTheme } from "@/lib/nivo";
 import { StatType, Time, TimeBucket, useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
+import { APIResponse } from "../../../../../api/types";
+import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGetOverviewBucketed";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 

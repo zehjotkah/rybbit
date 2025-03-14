@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../lib/const";
-import { useGetSites } from "./api";
+import { useGetSites } from "./admin/sites";
 import { authedFetch } from "./utils";
 
 export function useGetSiteMetadata(siteId: string | number) {

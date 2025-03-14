@@ -1,10 +1,11 @@
-import { useGetOverview, useGetOverviewBucketed } from "@/api/api";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SiteSessionChart } from "./SiteSessionChart";
 import { SiteSettings } from "./SiteSettings/SiteSettings";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { useGetOverviewBucketed } from "../api/analytics/useGetOverviewBucketed";
+import { useGetOverview } from "../api/analytics/useGetOverview";
 
 interface SiteCardProps {
   siteId: number;

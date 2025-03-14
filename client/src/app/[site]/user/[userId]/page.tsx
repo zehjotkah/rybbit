@@ -1,6 +1,5 @@
 "use client";
 
-import { UserSessionsResponse, useGetUserSessions } from "@/api/api";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Browser } from "../../components/shared/icons/Browser";
@@ -10,6 +9,10 @@ import { getCountryName } from "@/lib/utils";
 import { useGetSiteMetadata } from "../../../../api/hooks";
 import { useStore } from "../../../../lib/store";
 import { DateTime } from "luxon";
+import {
+  useGetUserSessions,
+  UserSessionsResponse,
+} from "../../../../api/analytics/userSessions";
 
 // Helper function to format duration in seconds to a readable format
 const formatDuration = (seconds: number): string => {
@@ -60,7 +63,6 @@ export default function UserPage() {
   const { site } = useStore();
   const { siteMetadata, isLoading: isLoadingSiteMetadata } =
     useGetSiteMetadata(site);
-  console.info(data);
 
   // Sessions are now pre-grouped by the server
   const groupedSessions = data?.data || [];

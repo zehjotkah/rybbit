@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
 
 import { usePathname } from "next/navigation";
-import { useGetSites } from "../../../../api/api";
+import { useGetSites } from "../../../../api/admin/sites";
 import { DateSelector } from "./DateSelector";
 
 const canGoForward = (time: Time) => {
