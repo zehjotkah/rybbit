@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { db } from "../db/postgres/postgres.js";
-import { member, users } from "../db/postgres/schema.js";
+import { member, user } from "../db/postgres/schema.js";
 import { eq, and } from "drizzle-orm";
 import { auth } from "../lib/auth.js";
 
@@ -61,13 +61,13 @@ export async function listOrganizationMembers(
         organizationId: member.organizationId,
         createdAt: member.createdAt,
         // User fields
-        userName: users.name,
-        userEmail: users.email,
-        userImage: users.image,
-        userActualId: users.id,
+        userName: user.name,
+        userEmail: user.email,
+        userImage: user.image,
+        userActualId: user.id,
       })
       .from(member)
-      .leftJoin(users, eq(member.userId, users.id))
+      .leftJoin(user, eq(member.userId, user.id))
       .where(eq(member.organizationId, organizationId));
 
     // Transform the results to the expected format

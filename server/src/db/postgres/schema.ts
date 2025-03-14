@@ -6,11 +6,12 @@ import {
   serial,
   text,
   timestamp,
+  foreignKey,
   unique,
 } from "drizzle-orm/pg-core";
 
 // User table
-export const users = pgTable(
+export const user = pgTable(
   "user",
   {
     id: text().primaryKey().notNull(),
@@ -34,28 +35,42 @@ export const users = pgTable(
   ]
 );
 
-// Verification table
 export const verification = pgTable("verification", {
-  id: text("id").primaryKey().notNull(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  createdAt: timestamp("createdAt"),
-  updatedAt: timestamp("updatedAt"),
+  id: text().primaryKey().notNull(),
+  identifier: text().notNull(),
+  value: text().notNull(),
+  expiresAt: timestamp({ mode: "string" }).notNull(),
+  createdAt: timestamp({ mode: "string" }),
+  updatedAt: timestamp({ mode: "string" }),
 });
 
 // Sites table
-export const sites = pgTable("sites", {
-  siteId: serial("site_id").primaryKey().notNull(),
-  name: text("name").notNull(),
-  domain: text("domain").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-  createdBy: text("created_by")
-    .notNull()
-    .references(() => users.id),
-  organizationId: text("organization_id").references(() => organization.id),
-});
+export const sites = pgTable(
+  "sites",
+  {
+    siteId: serial("site_id").primaryKey().notNull(),
+    name: text("name").notNull(),
+    domain: text("domain").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    organizationId: text("organization_id").references(() => organization.id),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [user.id],
+      name: "sites_created_by_user_id_fk",
+    }),
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organization.id],
+      name: "sites_organization_id_organization_id_fk",
+    }),
+  ]
+);
 
 // Active sessions table
 export const activeSessions = pgTable("active_sessions", {
@@ -77,104 +92,156 @@ export const activeSessions = pgTable("active_sessions", {
   referrer: text("referrer"),
 });
 
-export const reports = pgTable("reports", {
-  reportId: serial("report_id").primaryKey().notNull(),
-  siteId: integer("site_id").references(() => sites.siteId),
-  userId: text("user_id").references(() => users.id),
-  reportType: text("report_type"),
-  data: jsonb("data"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const reports = pgTable(
+  "reports",
+  {
+    reportId: serial("report_id").primaryKey().notNull(),
+    siteId: integer("site_id"),
+    userId: text("user_id"),
+    reportType: text("report_type"),
+    data: jsonb(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.siteId],
+      foreignColumns: [sites.siteId],
+      name: "reports_site_id_sites_site_id_fk",
+    }),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "reports_user_id_user_id_fk",
+    }),
+  ]
+);
 
-// Account table
-export const account = pgTable("account", {
-  id: text("id").primaryKey().notNull(),
-  accountId: text("accountId").notNull(),
-  providerId: text("providerId").notNull(),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id),
-  accessToken: text("accessToken"),
-  refreshToken: text("refreshToken"),
-  idToken: text("idToken"),
-  accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
-  refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
-  scope: text("scope"),
-  password: text("password"),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-});
+export const account = pgTable(
+  "account",
+  {
+    id: text().primaryKey().notNull(),
+    accountId: text().notNull(),
+    providerId: text().notNull(),
+    userId: text().notNull(),
+    accessToken: text(),
+    refreshToken: text(),
+    idToken: text(),
+    accessTokenExpiresAt: timestamp({ mode: "string" }),
+    refreshTokenExpiresAt: timestamp({ mode: "string" }),
+    scope: text(),
+    password: text(),
+    createdAt: timestamp({ mode: "string" }).notNull(),
+    updatedAt: timestamp({ mode: "string" }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "account_userId_user_id_fk",
+    }),
+  ]
+);
 
-// Organization table
-export const organization = pgTable("organization", {
-  id: text("id").primaryKey().notNull(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
-  createdAt: timestamp("createdAt").notNull(),
-  metadata: text("metadata"),
-});
+export const organization = pgTable(
+  "organization",
+  {
+    id: text().primaryKey().notNull(),
+    name: text().notNull(),
+    slug: text().notNull(),
+    logo: text(),
+    createdAt: timestamp({ mode: "string" }).notNull(),
+    metadata: text(),
+  },
+  (table) => [unique("organization_slug_unique").on(table.slug)]
+);
 
-// Member table
-export const member = pgTable("member", {
-  id: text("id").primaryKey().notNull(),
-  organizationId: text("organizationId")
-    .notNull()
-    .references(() => organization.id),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id),
-  role: text("role").notNull(),
-  createdAt: timestamp("createdAt").notNull(),
-});
+export const member = pgTable(
+  "member",
+  {
+    id: text().primaryKey().notNull(),
+    organizationId: text().notNull(),
+    userId: text().notNull(),
+    role: text().notNull(),
+    createdAt: timestamp({ mode: "string" }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organization.id],
+      name: "member_organizationId_organization_id_fk",
+    }),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "member_userId_user_id_fk",
+    }),
+  ]
+);
 
-// Invitation table
-export const invitation = pgTable("invitation", {
-  id: text("id").primaryKey().notNull(),
-  email: text("email").notNull(),
-  inviterId: text("inviterId")
-    .notNull()
-    .references(() => users.id),
-  organizationId: text("organizationId")
-    .notNull()
-    .references(() => organization.id),
-  role: text("role").notNull(),
-  status: text("status").notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  createdAt: timestamp("createdAt").notNull(),
-});
+export const invitation = pgTable(
+  "invitation",
+  {
+    id: text().primaryKey().notNull(),
+    email: text().notNull(),
+    inviterId: text().notNull(),
+    organizationId: text().notNull(),
+    role: text().notNull(),
+    status: text().notNull(),
+    expiresAt: timestamp({ mode: "string" }).notNull(),
+    createdAt: timestamp({ mode: "string" }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.inviterId],
+      foreignColumns: [user.id],
+      name: "invitation_inviterId_user_id_fk",
+    }),
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organization.id],
+      name: "invitation_organizationId_organization_id_fk",
+    }),
+  ]
+);
 
-// Session table
-export const session = pgTable("session", {
-  id: text("id").primaryKey().notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  token: text("token").notNull().unique(),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-  ipAddress: text("ipAddress"),
-  userAgent: text("userAgent"),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id),
-  impersonatedBy: text("impersonatedBy"),
-  activeOrganizationId: text("activeOrganizationId"),
-});
+export const session = pgTable(
+  "session",
+  {
+    id: text().primaryKey().notNull(),
+    expiresAt: timestamp({ mode: "string" }).notNull(),
+    token: text().notNull(),
+    createdAt: timestamp({ mode: "string" }).notNull(),
+    updatedAt: timestamp({ mode: "string" }).notNull(),
+    ipAddress: text(),
+    userAgent: text(),
+    userId: text().notNull(),
+    impersonatedBy: text(),
+    activeOrganizationId: text(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "session_userId_user_id_fk",
+    }),
+    unique("session_token_unique").on(table.token),
+  ]
+);
 
-// Subscription table
 export const subscription = pgTable("subscription", {
-  id: text("id").primaryKey().notNull(),
-  plan: text("plan").notNull(),
-  referenceId: text("referenceId").notNull(),
-  stripeCustomerId: text("stripeCustomerId"),
-  stripeSubscriptionId: text("stripeSubscriptionId"),
-  status: text("status").notNull(),
-  periodStart: timestamp("periodStart", { mode: "string" }),
-  periodEnd: timestamp("periodEnd", { mode: "string" }),
-  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd"),
-  seats: integer("seats"),
-  trialStart: timestamp("trialStart", { mode: "string" }),
-  trialEnd: timestamp("trialEnd", { mode: "string" }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  id: text().primaryKey().notNull(),
+  plan: text().notNull(),
+  referenceId: text().notNull(),
+  stripeCustomerId: text(),
+  stripeSubscriptionId: text(),
+  status: text().notNull(),
+  periodStart: timestamp({ mode: "string" }),
+  periodEnd: timestamp({ mode: "string" }),
+  cancelAtPeriodEnd: boolean(),
+  seats: integer(),
+  trialStart: timestamp({ mode: "string" }),
+  trialEnd: timestamp({ mode: "string" }),
+  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp({ mode: "string" }).defaultNow().notNull(),
 });

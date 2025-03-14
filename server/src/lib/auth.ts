@@ -166,7 +166,7 @@ export function initAuth(allowedOrigins: string[]) {
       provider: "pg",
       schema: {
         // Map our schema tables to what better-auth expects
-        user: schema.users,
+        user: schema.user,
         account: schema.account,
         session: schema.session,
         verification: schema.verification,
