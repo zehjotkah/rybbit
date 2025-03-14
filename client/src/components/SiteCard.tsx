@@ -1,4 +1,4 @@
-import { useGetOverview, useGetOverviewBucketed } from "@/hooks/api";
+import { useGetOverview, useGetOverviewBucketed } from "@/api/api";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SiteSessionChart } from "./SiteSessionChart";

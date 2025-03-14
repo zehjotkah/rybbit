@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetSessionsInfinite } from "@/hooks/api";
+import { useGetSessionsInfinite } from "@/api/api";
 import { useMemo } from "react";
 import SessionsTable from "./components/SessionsTable";
 import { SubHeader } from "../components/SubHeader/SubHeader";

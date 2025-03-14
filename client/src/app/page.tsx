@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SiteCard } from "../components/SiteCard";
-import { useGetSites } from "../hooks/api";
+import { useGetSites } from "../api/api";
 import { authClient } from "../lib/auth";
 import { AddSite } from "./components/AddSite";
 import { CreateOrganizationDialog } from "./components/CreateOrganizationDialog";

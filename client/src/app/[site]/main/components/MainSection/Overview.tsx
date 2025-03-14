@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetOverview } from "@/hooks/api";
+import { useGetOverview } from "@/api/api";
 import { cn, formatSecondsAsMinutesAndSeconds, formatter } from "@/lib/utils";
 import { StatType, useStore } from "../../../../../lib/store";
 

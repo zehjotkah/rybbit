@@ -15,6 +15,12 @@ export function mapHeaders(headers: any) {
   return map;
 }
 
+export async function getSession(req: FastifyRequest) {
+  const headers = new Headers(req.headers as any);
+  const session = await auth!.api.getSession({ headers });
+  return session;
+}
+
 export async function getSitesUserHasAccessTo(req: FastifyRequest) {
   const headers = new Headers(req.headers as any);
   const session = await auth!.api.getSession({ headers });

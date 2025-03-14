@@ -58,11 +58,9 @@ export function TopBar() {
             {session.data?.user.name}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Link href="/settings" legacyBehavior passHref>
-                Settings
-              </Link>
-            </DropdownMenuItem>
+            <Link href="/settings/account" legacyBehavior passHref>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem
               onClick={async () => {
                 await authClient.signOut();

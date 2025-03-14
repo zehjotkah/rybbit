@@ -1,11 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardLoader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardLoader,
+  CardTitle,
+} from "@/components/ui/card";
 import * as CountryFlags from "country-flag-icons/react/3x2";
 import { scaleLinear } from "d3-scale";
 import React, { useEffect, useMemo, useState } from "react";
 import { GeoJSON, MapContainer, useMapEvent } from "react-leaflet";
-import { useSingleCol } from "@/hooks/api";
+import { useSingleCol } from "@/api/api";
 import { Layer } from "leaflet";
 import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
@@ -27,11 +33,12 @@ interface TooltipPosition {
 
 export function Map() {
   const { data: countryData, isLoading: isCountryLoading } = useSingleCol({
-    parameter: "country"
+    parameter: "country",
   });
-  const { data: subdivisionData, isLoading: isSubdivisionLoading } = useSingleCol({
-    parameter: "iso_3166_2"
-  });
+  const { data: subdivisionData, isLoading: isSubdivisionLoading } =
+    useSingleCol({
+      parameter: "iso_3166_2",
+    });
 
   const [dataVersion, setDataVersion] = useState<number>(0);
 
@@ -41,15 +48,24 @@ export function Map() {
     }
   }, [countryData, subdivisionData]);
 
-  const [tooltipContent, setTooltipContent] = useState<TooltipContent | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ x: 0, y: 0 });
-  const [mapView, setMapView] = useState<"countries" | "subdivisions">("countries");
+  const [tooltipContent, setTooltipContent] = useState<TooltipContent | null>(
+    null
+  );
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
+    x: 0,
+    y: 0,
+  });
+  const [mapView, setMapView] = useState<"countries" | "subdivisions">(
+    "countries"
+  );
 
   const colorScale = useMemo(() => {
     if (mapView === "countries" && !countryData?.data) return () => "#eee";
-    if (mapView === "subdivisions" && !subdivisionData?.data) return () => "#eee";
+    if (mapView === "subdivisions" && !subdivisionData?.data)
+      return () => "#eee";
 
-    const dataToUse = mapView === "countries" ? countryData?.data : subdivisionData?.data;
+    const dataToUse =
+      mapView === "countries" ? countryData?.data : subdivisionData?.data;
 
     const maxValue = Math.max(...(dataToUse?.map((d) => d.count) || [0]));
     return scaleLinear<string>()
@@ -57,8 +73,10 @@ export function Map() {
       .range(["rgba(232, 121, 249, 0.3)", "rgb(232, 121, 249)"]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
-  const [countriesGeoData, setCountriesGeoData] = useState<GeoJsonObject | null>(null);
-  const [subdivisionsGeoData, setSubdivisionsGeoData] = useState<GeoJsonObject | null>(null);
+  const [countriesGeoData, setCountriesGeoData] =
+    useState<GeoJsonObject | null>(null);
+  const [subdivisionsGeoData, setSubdivisionsGeoData] =
+    useState<GeoJsonObject | null>(null);
 
   useEffect(() => {
     fetch(countriesGeoUrl)
@@ -192,12 +210,14 @@ export function Map() {
               tooltipContent.code &&
               CountryFlags[tooltipContent.code as keyof typeof CountryFlags]
                 ? React.createElement(
-                  CountryFlags[tooltipContent.code as keyof typeof CountryFlags],
-                  {
-                    title: tooltipContent.name,
-                    className: "w-4",
-                  }
-                )
+                    CountryFlags[
+                      tooltipContent.code as keyof typeof CountryFlags
+                    ],
+                    {
+                      title: tooltipContent.name,
+                      className: "w-4",
+                    }
+                  )
                 : null}
               {tooltipContent.name}
             </div>

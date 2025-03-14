@@ -150,8 +150,8 @@ export default function Subscribe() {
     authClient.subscription
       .upgrade({
         plan: selectedPrice.name,
-        successUrl: "/",
-        cancelUrl: "/subscribe",
+        successUrl: globalThis.location.origin + "/",
+        cancelUrl: globalThis.location.origin + "/subscribe",
       })
       .catch((error) => {
         console.error("Subscription error:", error);

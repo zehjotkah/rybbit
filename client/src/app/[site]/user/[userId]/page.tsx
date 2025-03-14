@@ -1,13 +1,13 @@
 "use client";
 
-import { UserSessionsResponse, useGetUserSessions } from "@/hooks/api";
+import { UserSessionsResponse, useGetUserSessions } from "@/api/api";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Browser } from "../../components/shared/icons/Browser";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { getCountryName } from "@/lib/utils";
-import { useGetSiteMetadata } from "../../../../hooks/hooks";
+import { useGetSiteMetadata } from "../../../../api/hooks";
 import { useStore } from "../../../../lib/store";
 import { DateTime } from "luxon";
 

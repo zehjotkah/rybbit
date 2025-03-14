@@ -25,7 +25,7 @@ import {
 
 import { FilterParameter, addFilter } from "../../../../../lib/store";
 
-import { useSingleCol } from "../../../../../hooks/api";
+import { useSingleCol } from "../../../../../api/api";
 import { MultiSelect } from "../../../../../components/MultiSelect";
 
 interface ValueFilterProps {

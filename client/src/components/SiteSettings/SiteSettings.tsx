@@ -35,9 +35,9 @@ import {
   deleteSite,
   GetSitesResponse,
   useGetSites,
-} from "@/hooks/api";
+} from "@/api/api";
 import { BACKEND_URL } from "@/lib/const";
-import { useGetSiteMetadata } from "../../hooks/hooks";
+import { useGetSiteMetadata } from "../../api/hooks";
 
 interface SiteSettingsProps {
   siteId: number;

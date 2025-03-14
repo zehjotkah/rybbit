@@ -1,5 +1,5 @@
 "use client";
-import { APIResponse, GetOverviewBucketedResponse } from "@/hooks/api";
+import { APIResponse, GetOverviewBucketedResponse } from "@/api/api";
 import { nivoTheme } from "@/lib/nivo";
 import { Time, useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";

@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSubscription } from "@/hooks/api";
+import { useSubscription } from "@/api/api";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import { authClient } from "../../../lib/auth";
 import { CurrentPlanCard } from "./components/CurrentPlanCard";
@@ -55,7 +55,7 @@ export default function SubscriptionPage() {
       // Don't pass referenceId if it's the same as the user ID
       // This is because Better Auth defaults to the user ID when no referenceId is provided
       const { error } = await authClient.subscription.cancel({
-        returnUrl: window.location.href,
+        returnUrl: globalThis.location.href,
       });
 
       if (error) {
@@ -96,8 +96,8 @@ export default function SubscriptionPage() {
       // Better Auth defaults to the user ID when no referenceId is provided
       const { error } = await authClient.subscription.upgrade({
         plan: planId,
-        successUrl: "/settings",
-        cancelUrl: "/settings",
+        cancelUrl: globalThis.location.origin + "/settings/subscription",
+        successUrl: globalThis.location.origin + "/settings/subscription",
       });
 
       if (error) {
@@ -133,8 +133,8 @@ export default function SubscriptionPage() {
       // with the same plan they currently have
       const { error } = await authClient.subscription.upgrade({
         plan: activeSubscription.plan,
-        successUrl: window.location.origin + "/settings",
-        cancelUrl: window.location.origin + "/settings",
+        successUrl: globalThis.location.origin + "/settings/subscription",
+        cancelUrl: globalThis.location.origin + "/settings/subscription",
       });
 
       if (error) {

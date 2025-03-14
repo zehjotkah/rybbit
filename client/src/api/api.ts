@@ -1,14 +1,12 @@
+import { authClient } from "@/lib/auth";
 import {
+  useInfiniteQuery,
   useQuery,
   UseQueryResult,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
 } from "@tanstack/react-query";
 import { BACKEND_URL } from "../lib/const";
 import { FilterParameter, useStore } from "../lib/store";
 import { authedFetch, getStartAndEndDate } from "./utils";
-import { authClient } from "@/lib/auth";
 
 export type APIResponse<T> = {
   data: T;
@@ -88,40 +86,6 @@ export function useGenericQuery<T>(
       );
     },
     staleTime: Infinity,
-  });
-}
-
-export function useGenericSiteDataQuery<T>(
-  endpoint: string,
-  periodTime?: PeriodTime
-): UseQueryResult<APIResponse<T>> {
-  const { time, previousTime, site, filters } = useStore();
-  const timeToUse = periodTime === "previous" ? previousTime : time;
-  const { startDate, endDate } = getStartAndEndDate(timeToUse);
-
-  return useQuery({
-    queryKey: [endpoint, timeToUse, site, filters],
-    queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(
-        `${BACKEND_URL}/${endpoint}?${
-          startDate ? `startDate=${startDate}&` : ""
-        }${
-          endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&site=${site}&filters=${JSON.stringify(filters)}`
-      ).then((res) => res.json());
-    },
-    staleTime: Infinity,
-    placeholderData: (_, query: any) => {
-      if (!query?.queryKey) return undefined;
-      const prevQueryKey = query.queryKey as [string, string, string];
-      const [, , prevSite] = prevQueryKey;
-
-      if (prevSite === site) {
-        return query.state.data;
-      }
-      return undefined;
-    },
   });
 }
 

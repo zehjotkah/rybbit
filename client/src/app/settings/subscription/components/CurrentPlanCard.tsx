@@ -11,7 +11,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Subscription } from "@/hooks/api";
+import { Subscription } from "@/api/api";
 import { PlanTemplate, formatDate } from "../utils/planUtils";
 import { AlertCircle, ArrowRight, X } from "lucide-react";
 

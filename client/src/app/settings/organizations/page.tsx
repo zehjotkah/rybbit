@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { useOrganizationMembers } from "../../../hooks/api";
+import { useOrganizationMembers } from "../../../api/api";
 import { authClient } from "../../../lib/auth";
 
 // Import the separated dialog components
@@ -22,6 +22,7 @@ import { DeleteOrganizationDialog } from "./components/DeleteOrganizationDialog"
 import { EditOrganizationDialog } from "./components/EditOrganizationDialog";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
 import { RemoveMemberDialog } from "./components/RemoveMemberDialog";
+import { useUserOrganizations } from "../../../api/hooks";
 
 // Types for our component
 export type Organization = {
@@ -153,11 +154,6 @@ function OrganizationsInner({
       {organizations?.map((organization) => (
         <Organization key={organization.id} org={organization} />
       ))}
-      {organizations.length === 0 && (
-        <Card className="p-6 text-center text-muted-foreground">
-          You don't have any organizations yet.
-        </Card>
-      )}
     </div>
   );
 }
@@ -165,6 +161,10 @@ function OrganizationsInner({
 // Main Organizations component
 export default function Organizations() {
   const userOrganizations = authClient.useListOrganizations();
+
+  const { organizations, isLoading } = useUserOrganizations();
+
+  console.log(organizations);
 
   if (userOrganizations.isPending) {
     return (

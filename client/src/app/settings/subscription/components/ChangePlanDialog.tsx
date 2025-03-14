@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Subscription } from "@/hooks/api";
+import { Subscription } from "@/api/api";
 import { AlertCircle, Shield, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 

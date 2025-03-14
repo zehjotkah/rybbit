@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useStore } from "../../lib/store";
 import { useSyncStateWithUrl } from "../../lib/urlParams";
 import { Header } from "./Header/Header";
-import { useSiteHasData } from "../../hooks/api";
-import { useGetSiteMetadata } from "../../hooks/hooks";
+import { useSiteHasData } from "../../api/api";
+import { useGetSiteMetadata } from "../../api/hooks";
 import { NoData } from "./components/NoData";
 
 export default function SiteLayout({

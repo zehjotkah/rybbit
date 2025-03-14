@@ -1,6 +1,6 @@
 "use client";
-import { useSiteHasData } from "../../../hooks/api";
-import { useGetSiteMetadata } from "../../../hooks/hooks";
+import { useSiteHasData } from "../../../api/api";
+import { useGetSiteMetadata } from "../../../api/hooks";
 import { useStore } from "../../../lib/store";
 import { NoData } from "../components/NoData";
 import { SubHeader } from "../components/SubHeader/SubHeader";

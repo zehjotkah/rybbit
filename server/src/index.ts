@@ -27,6 +27,7 @@ import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/auth-utils.js";
 import { trackPageView } from "./tracker/trackPageView.js";
 import { listOrganizationMembers } from "./api/listOrganizationMembers.js";
+import { getUserOrganizations } from "./api/getUserOrganizations.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -136,6 +137,7 @@ server.get(
   "/list-organization-members/:organizationId",
   listOrganizationMembers
 );
+server.get("/user/organizations", getUserOrganizations);
 
 // Track pageview endpoint
 server.post("/track/pageview", trackPageView);

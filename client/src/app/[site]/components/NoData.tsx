@@ -1,6 +1,6 @@
 import { CodeSnippet } from "../../../components/CodeSnippet";
 import { Card, CardContent, CardHeader } from "../../../components/ui/card";
-import { GetSitesResponse } from "../../../hooks/api";
+import { GetSitesResponse } from "../../../api/api";
 import { BACKEND_URL } from "../../../lib/const";
 
 export function NoData({

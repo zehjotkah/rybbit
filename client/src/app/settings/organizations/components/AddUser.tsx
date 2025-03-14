@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { authedFetch } from "@/hooks/utils";
+import { authedFetch } from "@/api/utils";
 import { BACKEND_URL } from "@/lib/const";
 
 export function AddUser({ refetch }: { refetch: () => void }) {

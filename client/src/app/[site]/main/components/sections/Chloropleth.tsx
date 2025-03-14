@@ -1,6 +1,6 @@
 "use client";
 
-import { useSingleCol } from "@/hooks/api";
+import { useSingleCol } from "@/api/api";
 import { scaleLinear } from "d3-scale";
 import { Feature, FeatureCollection } from "geojson";
 import { LatLngExpression } from "leaflet";
