@@ -1,13 +1,13 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { TrackingPayload } from "../types.js";
-import { getUserId, getDeviceType, getIpAddress } from "../utils.js";
 import crypto from "crypto";
+import { eq } from "drizzle-orm";
+import { FastifyReply, FastifyRequest } from "fastify";
+import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
 import { db, sql } from "../db/postgres/postgres.js";
 import { activeSessions } from "../db/postgres/schema.js";
-import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
-import { eq } from "drizzle-orm";
+import { TrackingPayload } from "../types.js";
+import { getDeviceType, getIpAddress, getUserId } from "../utils.js";
 
-import { Pageview } from "../db/clickhouse/types.js";
+import { sitesOverLimit } from "../cron/monthly-usage-checker.js";
 import { pageviewQueue } from "./pageviewQueue.js";
 
 type TotalPayload = TrackingPayload & {
@@ -99,6 +99,16 @@ export async function trackPageView(
   reply: FastifyReply
 ) {
   try {
+    // Check if the site has exceeded its monthly limit
+    if (sitesOverLimit.has(Number(request.body.site_id))) {
+      console.log(
+        `[Tracking] Skipping pageview for site ${request.body.site_id} - over monthly limit`
+      );
+      return reply
+        .status(200)
+        .send("Site over monthly limit, pageview not tracked");
+    }
+
     const userAgent = request.headers["user-agent"] || "";
     const ipAddress = getIpAddress(request);
     const userId = getUserId(ipAddress, userAgent);
@@ -114,7 +124,6 @@ export async function trackPageView(
     };
 
     pageviewQueue.add(payload);
-    // insertPageview(payload);
     await updateSession(payload, existingSession);
 
     return reply.status(200).send();

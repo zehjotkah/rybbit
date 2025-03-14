@@ -8,6 +8,9 @@ import { processResults } from "../api/utils.js";
 // Default event limit for users without an active subscription
 const DEFAULT_EVENT_LIMIT = 20_000;
 
+// Global set to track site IDs that have exceeded their monthly limits
+export const sitesOverLimit = new Set<number>();
+
 /**
  * Gets the first day of the current month in YYYY-MM-DD format
  */
@@ -133,6 +136,9 @@ export async function updateUsersMonthlyUsage() {
   );
 
   try {
+    // Clear the previous list of sites over their limit
+    sitesOverLimit.clear();
+
     // Get all users
     const users = await db.select().from(user);
 
@@ -154,14 +160,27 @@ export async function updateUsersMonthlyUsage() {
         // Get monthly pageview count from ClickHouse using the subscription period
         const pageviewCount = await getMonthlyPageviews(siteIds, periodStart);
 
+        // Check if over limit and update global set
+        const isOverLimit = pageviewCount > eventLimit;
+
         // Update user's monthlyEventCount and overMonthlyLimit fields
         await db
           .update(user)
           .set({
             monthlyEventCount: pageviewCount,
-            overMonthlyLimit: pageviewCount > eventLimit,
+            overMonthlyLimit: isOverLimit,
           })
           .where(eq(user.id, userData.id));
+
+        // If over the limit, add all this user's sites to the global set
+        if (isOverLimit) {
+          for (const siteId of siteIds) {
+            sitesOverLimit.add(siteId);
+          }
+          console.log(
+            `[Monthly Usage Checker] User ${userData.email} is over limit. Added ${siteIds.length} sites to blocked list.`
+          );
+        }
 
         console.log(
           `[Monthly Usage Checker] Updated user ${
@@ -178,7 +197,9 @@ export async function updateUsersMonthlyUsage() {
       }
     }
 
-    console.log("[Monthly Usage Checker] Completed monthly event usage check");
+    console.log(
+      `[Monthly Usage Checker] Completed monthly event usage check. ${sitesOverLimit.size} sites are over their limit.`
+    );
   } catch (error) {
     console.error(
       "[Monthly Usage Checker] Error updating monthly usage:",
