@@ -28,6 +28,8 @@ export const user = pgTable(
     banReason: text(),
     banExpires: timestamp({ mode: "string" }),
     stripeCustomerId: text(),
+    overMonthlyLimit: boolean().default(false),
+    monthlyEventCount: integer().default(0),
   },
   (table) => [
     unique("user_username_unique").on(table.username),

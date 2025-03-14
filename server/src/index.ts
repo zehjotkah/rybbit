@@ -28,6 +28,7 @@ import { mapHeaders } from "./lib/auth-utils.js";
 import { trackPageView } from "./tracker/trackPageView.js";
 import { listOrganizationMembers } from "./api/listOrganizationMembers.js";
 import { getUserOrganizations } from "./api/getUserOrganizations.js";
+import { initializeCronJobs } from "./cron/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -150,10 +151,14 @@ const start = async () => {
     await loadAllowedDomains();
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
+
+    // Start session cleanup cron job
     cron.schedule("*/60 * * * * *", () => {
-      console.log("Cleaning up old sessions");
       cleanupOldSessions();
     });
+
+    // Initialize all cron jobs including monthly usage checker
+    initializeCronJobs();
   } catch (err) {
     server.log.error(err);
     process.exit(1);

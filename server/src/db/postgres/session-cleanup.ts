@@ -43,7 +43,7 @@ export async function cleanupOldSessions() {
     RETURNING *
   `;
 
-  console.log(`Cleaned up ${deletedSessions.length} sessions`);
+  // console.log(`Cleaned up ${deletedSessions.length} sessions`);
 
   if (deletedSessions.length > 0) {
     await insertSessions(

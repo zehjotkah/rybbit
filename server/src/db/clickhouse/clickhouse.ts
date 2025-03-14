@@ -26,7 +26,7 @@ export const initializeClickhouse = async () => {
         operating_system LowCardinality(String),
         operating_system_version LowCardinality(String),
         language LowCardinality(String),
-        country LowCardinality(String),
+        country LowCardinality(FixedString(2)),
         iso_3166_2 LowCardinality(String),
         screen_width UInt16,
         screen_height UInt16,
@@ -34,7 +34,7 @@ export const initializeClickhouse = async () => {
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(timestamp)
-      ORDER BY (timestamp, session_id)
+      ORDER BY (site_id, timestamp)
       `,
   });
 
@@ -60,7 +60,7 @@ export const initializeClickhouse = async () => {
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(start_time)
-      ORDER BY (session_id, start_time)
+      ORDER BY (site_id, start_time)
     `,
   });
 };
