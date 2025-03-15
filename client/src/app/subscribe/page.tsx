@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Check, Zap, Shield, Clock, Users } from "lucide-react";
+import { Check, Users } from "lucide-react";
 import { authClient } from "@/lib/auth";
 import {
   Card,
@@ -21,14 +21,13 @@ const EVENT_TIERS = [20_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000];
 
 // Define types for plans
 interface PlanTemplate {
-  id: "free" | "basic" | "pro";
+  id: "free" | "basic" | "pro" | "enterprise";
   name: string;
   price?: string;
   interval?: string;
   description: string;
   baseFeatures: string[];
   color: string;
-  icon: React.ReactNode;
 }
 
 interface Plan extends PlanTemplate {
@@ -61,8 +60,7 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
       "Community support",
     ],
     color:
-      "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900",
-    icon: <Clock className="h-5 w-5" />,
+      "bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900",
   },
   {
     id: "basic",
@@ -75,7 +73,6 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
     ],
     color:
       "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
-    icon: <Shield className="h-5 w-5" />,
   },
   {
     id: "pro",
@@ -90,7 +87,21 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
     ],
     color:
       "bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-800 dark:to-teal-800",
-    icon: <Zap className="h-5 w-5" />,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "Custom solutions for large organizations",
+    baseFeatures: [
+      "Unlimited events",
+      "90-day data retention",
+      "Dedicated support",
+      "Custom integrations",
+      "Advanced security features",
+      "SLA guarantees",
+    ],
+    color:
+      "bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-blue-900",
   },
 ];
 
@@ -101,7 +112,7 @@ function getFormattedPrice(plan: StripePrice): string {
 
 // Find the appropriate price for a tier at current event limit
 function findPriceForTier(
-  tier: "basic" | "pro",
+  tier: "basic" | "pro" | "enterprise",
   eventLimit: number
 ): StripePrice | null {
   const plans = STRIPE_PRICES.filter((plan) => plan.name.startsWith(tier));
@@ -113,14 +124,17 @@ function findPriceForTier(
 }
 
 export default function Subscribe() {
-  const [selectedTier, setSelectedTier] = useState<"free" | "basic" | "pro">(
-    "free"
-  );
-  const [eventLimitIndex, setEventLimitIndex] = useState<number>(1); // Default to 100k (index 1)
+  const [selectedTier, setSelectedTier] = useState<
+    "free" | "basic" | "pro" | "enterprise"
+  >("free");
+  const [eventLimitIndex, setEventLimitIndex] = useState<number>(0); // Default to 20k (index 0)
   const [selectedPrice, setSelectedPrice] = useState<StripePrice | null>(null);
 
   // Get the actual event limit value from the index
   const eventLimit = EVENT_TIERS[eventLimitIndex];
+
+  // Check if free plan is available based on event limit
+  const isFreeAvailable = eventLimit <= 20_000;
 
   // Group plans by type
   const basicPlans = STRIPE_PRICES.filter((plan) =>
@@ -135,6 +149,11 @@ export default function Subscribe() {
       return;
     }
 
+    if (selectedTier === "enterprise") {
+      setSelectedPrice(null);
+      return;
+    }
+
     const plans = selectedTier === "basic" ? basicPlans : proPlans;
     const matchingPlan =
       plans.find((plan) => plan.limits.events >= eventLimit) ||
@@ -144,12 +163,19 @@ export default function Subscribe() {
   }, [selectedTier, eventLimit, basicPlans, proPlans]);
 
   // Handle subscription
-  function handleSubscribe(): void {
-    if (!selectedPrice) return;
+  function handleSubscribe(
+    planId: "free" | "basic" | "pro" | "enterprise"
+  ): void {
+    setSelectedTier(planId);
+
+    if (planId === "free" || planId === "enterprise") return;
+
+    const price = planId === "basic" ? basicTierPrice : proTierPrice;
+    if (!price) return;
 
     authClient.subscription
       .upgrade({
-        plan: selectedPrice.name,
+        plan: price.name,
         successUrl: globalThis.location.origin + "/",
         cancelUrl: globalThis.location.origin + "/subscribe",
       })
@@ -158,14 +184,19 @@ export default function Subscribe() {
       });
   }
 
+  // Handle contact for enterprise
+  function handleContactEnterprise(): void {
+    window.location.href = "/contact";
+  }
+
   // Handle slider changes
   function handleSliderChange(value: number[]): void {
     setEventLimitIndex(value[0]);
-  }
 
-  // Handle tier selection
-  function handleTierSelection(tier: "free" | "basic" | "pro"): void {
-    setSelectedTier(tier);
+    // If event limit is over 20k, ensure free plan is not selected
+    if (EVENT_TIERS[value[0]] > 20_000 && selectedTier === "free") {
+      setSelectedTier("basic");
+    }
   }
 
   // Find the current prices for each tier based on the event limit
@@ -182,18 +213,23 @@ export default function Subscribe() {
     } else if (plan.id === "pro") {
       plan.price = proTierPrice ? getFormattedPrice(proTierPrice) : "$39+";
       plan.interval = "month";
+    } else if (plan.id === "enterprise") {
+      plan.price = "Custom";
+      plan.interval = "";
     } else {
       plan.price = "$0";
       plan.interval = "month";
     }
 
     // Add event limit feature at the beginning
-    plan.features = [
+    const eventFeature =
       plan.id === "free"
         ? "20,000 events per month"
-        : `${eventLimit.toLocaleString()} events per month`,
-      ...plan.baseFeatures,
-    ];
+        : plan.id === "enterprise"
+        ? "Unlimited events"
+        : `${Math.max(eventLimit, 100_000).toLocaleString()} events per month`;
+
+    plan.features = [eventFeature, ...plan.baseFeatures];
 
     return plan;
   });
@@ -209,7 +245,7 @@ export default function Subscribe() {
         </p>
       </div>
 
-      <div className="mb-12 max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+      <div className="mb-12 max-w-3xl mx-auto p-6 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800">
         <div className="mb-6">
           <h2 className="text-xl font-medium mb-4">
             How many events do you need?
@@ -225,7 +261,7 @@ export default function Subscribe() {
         </div>
 
         <Slider
-          defaultValue={[1]} // Default to index 1 (100k)
+          defaultValue={[0]} // Default to index 0 (20k)
           max={EVENT_TIERS.length - 1}
           min={0}
           step={1}
@@ -241,59 +277,43 @@ export default function Subscribe() {
                 eventLimitIndex === index ? "font-bold text-emerald-400" : ""
               }
             >
-              {tier === 20_000 ? "Free" : tier.toLocaleString()}
+              {tier.toLocaleString()}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
+      <div className="grid gap-8 md:grid-cols-4 max-w-6xl mx-auto">
         {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className="group transition-all duration-300 h-full"
-            onClick={() => handleTierSelection(plan.id)}
-          >
+          <div key={plan.id} className="transition-all duration-300 h-full">
             <Card
-              className={`flex flex-col h-full transition-transform duration-300 transform ${
-                selectedTier === plan.id
-                  ? "ring-2 ring-emerald-400 shadow-lg scale-[1.02]"
-                  : "hover:scale-[1.01] hover:shadow-md"
-              } cursor-pointer overflow-hidden`}
+              className={`flex flex-col h-full transition-transform duration-300 transform hover:scale-[1.01] hover:shadow-md cursor-pointer overflow-hidden ${
+                plan.id === "free" && !isFreeAvailable
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
             >
               <div className={`${plan.color} h-3 w-full`}></div>
 
               <CardHeader className="pb-4">
-                <div className="flex items-center mb-2">
-                  <div
-                    className={`p-1.5 rounded-full mr-2 ${
-                      plan.id === "free"
-                        ? "bg-gray-100 dark:bg-gray-800"
-                        : plan.id === "basic"
-                        ? "bg-green-50 dark:bg-green-800"
-                        : "bg-emerald-50 dark:bg-emerald-800"
-                    }`}
-                  >
-                    {plan.icon}
-                  </div>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                </div>
-
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <CardDescription className="space-y-3">
                   <div className="flex items-baseline">
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-3xl font-bold text-neutral-900 dark:text-white">
                       {plan.price}
                     </span>
-                    <span className="ml-1 text-neutral-500">
-                      /{plan.interval}
-                    </span>
+                    {plan.interval && (
+                      <span className="ml-1 text-neutral-500">
+                        /{plan.interval}
+                      </span>
+                    )}
                   </div>
                   <p>{plan.description}</p>
                 </CardDescription>
               </CardHeader>
 
               <CardContent className="pt-0 flex-grow">
-                <div className="w-full h-px bg-gray-200 dark:bg-gray-800 mb-4"></div>
+                <div className="w-full h-px bg-neutral-200 dark:bg-neutral-800 mb-4"></div>
                 <ul className="space-y-3 text-sm">
                   {plan.features.map((feature, i) => (
                     <li key={feature} className="flex items-start">
@@ -309,13 +329,9 @@ export default function Subscribe() {
               </CardContent>
 
               <CardFooter>
-                {plan.id !== "free" && (
+                {plan.id === "basic" || plan.id === "pro" ? (
                   <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSubscribe();
-                    }}
-                    disabled={!selectedPrice}
+                    onClick={() => handleSubscribe(plan.id)}
                     className={`w-full ${
                       plan.id === "pro"
                         ? "bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500"
@@ -325,14 +341,20 @@ export default function Subscribe() {
                   >
                     Subscribe to {plan.name}
                   </Button>
-                )}
-                {plan.id === "free" && (
+                ) : plan.id === "enterprise" ? (
                   <Button
-                    className="w-full border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                    variant="outline"
-                    disabled
+                    onClick={handleContactEnterprise}
+                    className="w-full bg-gradient-to-r from-slate-500 to-blue-400 hover:from-slate-600 hover:to-blue-500"
                   >
-                    Current Plan
+                    Contact Sales
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full border-neutral-300 text-gray-700 dark:border-neutral-700 dark:text-neutral-300"
+                    variant="outline"
+                    disabled={!isFreeAvailable}
+                  >
+                    {isFreeAvailable ? "Current Plan" : "Not Available"}
                   </Button>
                 )}
               </CardFooter>
@@ -341,7 +363,7 @@ export default function Subscribe() {
         ))}
       </div>
 
-      <div className="mt-16 text-center text-sm max-w-2xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+      <div className="mt-16 text-center text-sm max-w-2xl mx-auto p-6 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800">
         <div className="flex items-center justify-center mb-4">
           <Users className="h-5 w-5 text-emerald-400 mr-2" />
           <span className="font-medium">Important Information</span>
