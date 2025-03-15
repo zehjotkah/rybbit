@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 
 export default function StripeSuccessPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Log the redirect for debugging purposes
