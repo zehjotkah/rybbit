@@ -19,12 +19,15 @@ import { toast } from "sonner";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+
 export function DeleteAccount() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [password, setPassword] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleAccountDeletion = async () => {
     if (!password) {
@@ -53,7 +56,7 @@ export function DeleteAccount() {
         }
         return;
       }
-
+      queryClient.clear();
       toast.success("Account successfully deleted");
       setIsOpen(false);
 

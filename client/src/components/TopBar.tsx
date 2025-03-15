@@ -16,10 +16,13 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "./ui/navigation-menu";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function TopBar() {
   const session = authClient.useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   return (
     <div className="flex pt-2 items-center w-full pb-4 bg-neutral-900 justify-center">
       <div className="flex items-center justify-between max-w-6xl flex-1">
@@ -63,6 +66,8 @@ export function TopBar() {
             </Link>
             <DropdownMenuItem
               onClick={async () => {
+                // Clear the query cache before signing out
+                queryClient.clear();
                 await authClient.signOut();
                 router.push("/login");
               }}
