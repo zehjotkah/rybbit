@@ -23,8 +23,9 @@ import { ErrorDialog } from "./components/ErrorDialog";
 import { HelpSection } from "./components/HelpSection";
 import { PlanFeaturesCard } from "./components/PlanFeaturesCard";
 import { DEFAULT_EVENT_LIMIT } from "./utils/constants";
-import { getPlanDetails } from "./utils/planUtils";
+import { getPlanDetails, formatDate } from "./utils/planUtils";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 export default function SubscriptionPage() {
   const router = useRouter();
@@ -35,6 +36,8 @@ export default function SubscriptionPage() {
     error: subscriptionError,
     refetch,
   } = useSubscriptionWithUsage();
+
+  console.info("activeSubscription", activeSubscription);
 
   // State variables
   const [errorType, setErrorType] = useState<"cancel" | "resume">("cancel");
@@ -97,7 +100,7 @@ export default function SubscriptionPage() {
       const { error } = await authClient.subscription.upgrade({
         plan: planId,
         cancelUrl: globalThis.location.origin + "/settings/subscription",
-        successUrl: globalThis.location.origin + "/settings/subscription",
+        successUrl: globalThis.location.origin + "/auth/subscription/success",
       });
 
       if (error) {
@@ -133,7 +136,7 @@ export default function SubscriptionPage() {
       // with the same plan they currently have
       const { error } = await authClient.subscription.upgrade({
         plan: activeSubscription.plan,
-        successUrl: globalThis.location.origin + "/settings/subscription",
+        successUrl: globalThis.location.origin + "/auth/subscription/success",
         cancelUrl: globalThis.location.origin + "/settings/subscription",
       });
 
@@ -163,19 +166,27 @@ export default function SubscriptionPage() {
     ? getPlanDetails(activeSubscription.plan)
     : null;
 
+  // Determine if the current plan is annual
+  const isAnnualPlan = activeSubscription?.plan?.includes("-annual") || false;
+
   // Find the next tier plans for upgrade options
   const getCurrentTierPrices = () => {
     if (!activeSubscription?.plan) return [];
 
-    // Return all available plans for switching
-    return STRIPE_PRICES.sort((a, b) => {
-      // First sort by plan type (basic first, then pro)
-      if (a.name.startsWith("basic") && b.name.startsWith("pro")) return -1;
-      if (a.name.startsWith("pro") && b.name.startsWith("basic")) return 1;
+    // Get the current interval
+    const currentInterval = isAnnualPlan ? "year" : "month";
 
-      // Then sort by event limit
-      return a.limits.events - b.limits.events;
-    });
+    // Return all available plans for switching, matching the current interval
+    return STRIPE_PRICES.filter((p) => p.interval === currentInterval).sort(
+      (a, b) => {
+        // First sort by plan type (basic first, then pro)
+        if (a.name.startsWith("basic") && b.name.startsWith("pro")) return -1;
+        if (a.name.startsWith("pro") && b.name.startsWith("basic")) return 1;
+
+        // Then sort by event limit
+        return a.limits.events - b.limits.events;
+      }
+    );
   };
 
   const upgradePlans = getCurrentTierPrices();
@@ -192,6 +203,36 @@ export default function SubscriptionPage() {
 
   const eventLimit = getEventLimit();
   const usagePercentage = (currentUsage / eventLimit) * 100;
+
+  // Format the price with the correct interval
+  const formatPriceWithInterval = (price: number, interval: string) => {
+    return `$${price}/${interval === "year" ? "year" : "month"}`;
+  };
+
+  // Get formatted price for display
+  const getFormattedPrice = () => {
+    if (!activeSubscription?.plan) return "$0/month";
+
+    const plan = STRIPE_PRICES.find((p) => p.name === activeSubscription.plan);
+    if (!plan) return "$0/month";
+
+    return formatPriceWithInterval(plan.price, plan.interval);
+  };
+
+  // Format the renewal date with appropriate text
+  const formatRenewalDate = () => {
+    if (!activeSubscription?.periodEnd) return "N/A";
+
+    const formattedDate = formatDate(activeSubscription.periodEnd);
+
+    if (activeSubscription.status === "canceled") {
+      return `Expires on ${formattedDate}`;
+    }
+
+    return isAnnualPlan
+      ? `Renews annually on ${formattedDate}`
+      : `Renews monthly on ${formattedDate}`;
+  };
 
   return (
     <div className="container py-10 max-w-5xl mx-auto">
@@ -282,18 +323,114 @@ export default function SubscriptionPage() {
       ) : (
         <div className="space-y-6">
           {/* Current Plan */}
-          <CurrentPlanCard
-            activeSubscription={activeSubscription}
-            currentPlan={currentPlan}
-            currentUsage={currentUsage}
-            eventLimit={eventLimit}
-            usagePercentage={usagePercentage}
-            isProcessing={isProcessing}
-            handleCancelSubscription={handleCancelSubscription}
-            handleResumeSubscription={handleResumeSubscription}
-            handleShowUpgradeOptions={handleShowUpgradeOptions}
-            upgradePlans={upgradePlans}
-          />
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>
+                    {currentPlan?.name || "Current Plan"}
+                    {isAnnualPlan && (
+                      <Badge className="ml-2 bg-emerald-500 text-white">
+                        Annual
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    {activeSubscription.status === "active"
+                      ? "Your subscription is active."
+                      : activeSubscription.status === "canceled"
+                      ? "Your subscription has been canceled but is still active until the end of the billing period."
+                      : "Your subscription is inactive."}
+                  </CardDescription>
+                </div>
+                <div>
+                  {activeSubscription.status === "active" && (
+                    <Button
+                      variant="outline"
+                      onClick={handleShowUpgradeOptions}
+                      disabled={isProcessing}
+                    >
+                      Change Plan
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <h3 className="font-medium">Plan</h3>
+                    <p className="text-lg font-bold">{currentPlan?.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {getFormattedPrice()}
+                    </p>
+                    {isAnnualPlan && (
+                      <div className="mt-2 text-sm text-emerald-600 dark:text-emerald-400">
+                        <p>You save by paying annually (2 months free)</p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Renewal Date</h3>
+                    <p className="text-lg font-bold">{formatRenewalDate()}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {isAnnualPlan
+                        ? "Your plan renews once per year"
+                        : "Your plan renews monthly"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-medium mb-2">Usage</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm">Events</span>
+                        <span className="text-sm">
+                          {currentUsage.toLocaleString()} /{" "}
+                          {eventLimit.toLocaleString()}
+                        </span>
+                      </div>
+                      <Progress value={usagePercentage} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Billing Cycle Explanation */}
+                {isAnnualPlan && (
+                  <div className="pt-2 pb-0 px-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-md border border-emerald-100 dark:border-emerald-800">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300 py-2">
+                      <strong>Annual Billing:</strong> You're on annual billing
+                      which saves you money compared to monthly billing. Your
+                      subscription will renew once per year on{" "}
+                      {formatDate(activeSubscription.periodEnd)}.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter>
+              {activeSubscription.status === "active" ? (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelSubscription}
+                  disabled={isProcessing}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  {isProcessing ? "Processing..." : "Cancel Subscription"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleResumeSubscription}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Processing..." : "Resume Subscription"}
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
 
           {/* Plan Features */}
           <PlanFeaturesCard currentPlan={currentPlan} />

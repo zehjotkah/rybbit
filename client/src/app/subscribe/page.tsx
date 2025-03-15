@@ -15,6 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { STRIPE_PRICES } from "@/lib/stripe";
 import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [20_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000];
@@ -34,6 +36,9 @@ interface Plan extends PlanTemplate {
   price: string;
   interval: string;
   features: string[];
+  monthlyPrice?: number;
+  annualPrice?: number;
+  savings?: string;
 }
 
 interface StripePrice {
@@ -106,21 +111,102 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
 ];
 
 // Format price with dollar sign
-function getFormattedPrice(plan: StripePrice): string {
-  return `$${plan.price}`;
+function getFormattedPrice(price: number): string {
+  return `$${price}`;
 }
 
 // Find the appropriate price for a tier at current event limit
 function findPriceForTier(
   tier: "basic" | "pro" | "enterprise",
-  eventLimit: number
+  eventLimit: number,
+  interval: "month" | "year"
 ): StripePrice | null {
-  const plans = STRIPE_PRICES.filter((plan) => plan.name.startsWith(tier));
-  return (
-    plans.find((plan) => plan.limits.events >= eventLimit) ||
-    plans[plans.length - 1] ||
-    null
+  console.log(
+    `Finding price for tier: ${tier}, event limit: ${eventLimit}, interval: ${interval}`
   );
+
+  // Determine if we need to look for annual plans
+  const isAnnual = interval === "year";
+  const namePattern = isAnnual ? `${tier}-annual` : tier;
+
+  // Filter plans by name pattern (with or without -annual suffix) and interval
+  const plans = STRIPE_PRICES.filter(
+    (plan) =>
+      (isAnnual
+        ? plan.name.startsWith(tier) && plan.name.includes("-annual")
+        : plan.name.startsWith(tier) && !plan.name.includes("-annual")) &&
+      plan.interval === interval
+  );
+
+  console.log(
+    `Filtered plans for ${namePattern} with interval ${interval}:`,
+    plans.map((p) => ({
+      name: p.name,
+      interval: p.interval,
+      events: p.limits.events,
+      price: p.price,
+    }))
+  );
+
+  if (plans.length === 0) {
+    console.warn(`No plans found for ${namePattern} with interval ${interval}`);
+    return null;
+  }
+
+  // Find a plan that matches or exceeds the event limit
+  const matchingPlan = plans.find((plan) => plan.limits.events >= eventLimit);
+  const selectedPlan = matchingPlan || plans[plans.length - 1] || null;
+
+  if (selectedPlan) {
+    console.log(
+      `Selected plan: ${selectedPlan.name} (${selectedPlan.interval}) - $${selectedPlan.price} - ${selectedPlan.limits.events} events`
+    );
+  } else {
+    console.log(
+      `No plan selected for ${namePattern} with interval ${interval}`
+    );
+  }
+
+  // Return the matching plan or the highest tier available
+  return selectedPlan;
+}
+
+// Calculate savings percentage between monthly and annual plans
+function calculateSavings(monthlyPrice: number, annualPrice: number): string {
+  const monthlyCost = monthlyPrice * 12;
+  const savings = monthlyCost - annualPrice;
+  const savingsPercent = Math.round((savings / monthlyCost) * 100);
+  return `Save ${savingsPercent}%`;
+}
+
+// Function to get the direct plan ID based on criteria
+function getDirectPlanID(
+  tier: "basic" | "pro",
+  eventLimit: number,
+  isAnnual: boolean
+): string {
+  // Base pattern for plan names is like "basic100k" or "pro250k"
+  let planPrefix = tier;
+  let eventSuffix = "";
+
+  // Determine event tier suffix
+  if (eventLimit <= 100_000) {
+    eventSuffix = "100k";
+  } else if (eventLimit <= 250_000) {
+    eventSuffix = "250k";
+  } else if (eventLimit <= 500_000) {
+    eventSuffix = "500k";
+  } else if (eventLimit <= 1_000_000) {
+    eventSuffix = "1m";
+  } else {
+    eventSuffix = "2m";
+  }
+
+  // Construct the plan name with annual suffix if needed
+  const planName = `${planPrefix}${eventSuffix}${isAnnual ? "-annual" : ""}`;
+  console.log(`Constructed plan name: ${planName} for isAnnual=${isAnnual}`);
+
+  return planName;
 }
 
 export default function Subscribe() {
@@ -129,6 +215,7 @@ export default function Subscribe() {
   >("free");
   const [eventLimitIndex, setEventLimitIndex] = useState<number>(0); // Default to 20k (index 0)
   const [selectedPrice, setSelectedPrice] = useState<StripePrice | null>(null);
+  const [isAnnual, setIsAnnual] = useState<boolean>(false);
 
   // Get the actual event limit value from the index
   const eventLimit = EVENT_TIERS[eventLimitIndex];
@@ -136,31 +223,43 @@ export default function Subscribe() {
   // Check if free plan is available based on event limit
   const isFreeAvailable = eventLimit <= 20_000;
 
-  // Group plans by type
-  const basicPlans = STRIPE_PRICES.filter((plan) =>
-    plan.name.startsWith("basic")
+  // Group plans by type and interval
+  const basicMonthlyPlans = STRIPE_PRICES.filter(
+    (plan) => plan.name.startsWith("basic") && !plan.name.includes("-annual")
   );
-  const proPlans = STRIPE_PRICES.filter((plan) => plan.name.startsWith("pro"));
+  const basicAnnualPlans = STRIPE_PRICES.filter(
+    (plan) => plan.name.includes("basic") && plan.name.includes("-annual")
+  );
+  const proMonthlyPlans = STRIPE_PRICES.filter(
+    (plan) => plan.name.startsWith("pro") && !plan.name.includes("-annual")
+  );
+  const proAnnualPlans = STRIPE_PRICES.filter(
+    (plan) => plan.name.includes("pro") && plan.name.includes("-annual")
+  );
 
   // Update the selected price when tier or event limit changes
   useEffect(() => {
-    if (selectedTier === "free") {
+    if (selectedTier === "free" || selectedTier === "enterprise") {
       setSelectedPrice(null);
       return;
     }
 
-    if (selectedTier === "enterprise") {
-      setSelectedPrice(null);
-      return;
+    const interval = isAnnual ? "year" : "month";
+
+    // Get the correct set of plans based on the tier and interval
+    let filteredPlans;
+    if (selectedTier === "basic") {
+      filteredPlans = isAnnual ? basicAnnualPlans : basicMonthlyPlans;
+    } else {
+      filteredPlans = isAnnual ? proAnnualPlans : proMonthlyPlans;
     }
 
-    const plans = selectedTier === "basic" ? basicPlans : proPlans;
     const matchingPlan =
-      plans.find((plan) => plan.limits.events >= eventLimit) ||
-      plans[plans.length - 1];
+      filteredPlans.find((plan) => plan.limits.events >= eventLimit) ||
+      filteredPlans[filteredPlans.length - 1];
 
     setSelectedPrice(matchingPlan);
-  }, [selectedTier, eventLimit, basicPlans, proPlans]);
+  }, [selectedTier, eventLimit, isAnnual]);
 
   // Handle subscription
   function handleSubscribe(
@@ -170,13 +269,52 @@ export default function Subscribe() {
 
     if (planId === "free" || planId === "enterprise") return;
 
-    const price = planId === "basic" ? basicTierPrice : proTierPrice;
-    if (!price) return;
+    // Use the direct plan mapping approach with the new naming scheme
+    const planName = getDirectPlanID(
+      planId as "basic" | "pro",
+      eventLimit,
+      isAnnual
+    );
+
+    console.log(
+      `Direct plan mapping selected: ${planName}, interval=${
+        isAnnual ? "year" : "month"
+      }`
+    );
+
+    // Find the specific plan object in STRIPE_PRICES
+    const interval = isAnnual ? "year" : "month";
+
+    // The filter should match the new naming convention for annual plans
+    const matchingPlans = STRIPE_PRICES.filter((p) => {
+      const nameMatches = p.name === planName;
+      const intervalMatches = p.interval === interval;
+      return nameMatches && intervalMatches;
+    });
+
+    console.log(
+      `Found ${matchingPlans.length} matching plans for ${planName} (${interval})`
+    );
+
+    if (matchingPlans.length === 0) {
+      console.error(
+        `No matching plan found for name=${planName}, interval=${interval}`
+      );
+      return;
+    }
+
+    const selectedPlan = matchingPlans[0];
+    console.log(`Selected plan: `, selectedPlan);
+
+    // Log the selected plan to verify
+    console.log(
+      `Subscribing to ${selectedPlan.name} (${selectedPlan.interval}) - $${selectedPlan.price} - ${selectedPlan.limits.events} events`
+    );
 
     authClient.subscription
       .upgrade({
-        plan: price.name,
-        successUrl: globalThis.location.origin + "/",
+        plan: selectedPlan.name,
+        successUrl: globalThis.location.origin + "/auth/subscription/success",
         cancelUrl: globalThis.location.origin + "/subscribe",
       })
       .catch((error) => {
@@ -200,19 +338,40 @@ export default function Subscribe() {
   }
 
   // Find the current prices for each tier based on the event limit
-  const basicTierPrice = findPriceForTier("basic", eventLimit);
-  const proTierPrice = findPriceForTier("pro", eventLimit);
+  const interval = isAnnual ? "year" : "month";
+  const basicTierPrice = findPriceForTier("basic", eventLimit, interval);
+  const proTierPrice = findPriceForTier("pro", eventLimit, interval);
+
+  // Also get monthly prices for savings calculation
+  const basicMonthly = findPriceForTier("basic", eventLimit, "month");
+  const proMonthly = findPriceForTier("pro", eventLimit, "month");
+  const basicAnnual = findPriceForTier("basic", eventLimit, "year");
+  const proAnnual = findPriceForTier("pro", eventLimit, "year");
 
   // Generate plan objects with current state
   const plans: Plan[] = PLAN_TEMPLATES.map((template) => {
     const plan = { ...template } as Plan;
 
     if (plan.id === "basic") {
-      plan.price = basicTierPrice ? getFormattedPrice(basicTierPrice) : "$19+";
-      plan.interval = "month";
+      const tierPrice = basicTierPrice;
+      plan.price = tierPrice ? getFormattedPrice(tierPrice.price) : "$19+";
+      plan.interval = isAnnual ? "year" : "month";
+
+      if (basicMonthly && basicAnnual) {
+        plan.monthlyPrice = basicMonthly.price;
+        plan.annualPrice = basicAnnual.price;
+        plan.savings = calculateSavings(basicMonthly.price, basicAnnual.price);
+      }
     } else if (plan.id === "pro") {
-      plan.price = proTierPrice ? getFormattedPrice(proTierPrice) : "$39+";
-      plan.interval = "month";
+      const tierPrice = proTierPrice;
+      plan.price = tierPrice ? getFormattedPrice(tierPrice.price) : "$39+";
+      plan.interval = isAnnual ? "year" : "month";
+
+      if (proMonthly && proAnnual) {
+        plan.monthlyPrice = proMonthly.price;
+        plan.annualPrice = proAnnual.price;
+        plan.savings = calculateSavings(proMonthly.price, proAnnual.price);
+      }
     } else if (plan.id === "enterprise") {
       plan.price = "Custom";
       plan.interval = "";
@@ -236,13 +395,46 @@ export default function Subscribe() {
 
   return (
     <div className="container mx-auto py-12">
-      <div className="mb-16 text-center max-w-3xl mx-auto">
+      <div className="mb-12 text-center max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold tracking-tight mb-4 ">
           Choose Your Analytics Plan
         </h1>
         <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6">
           Find the perfect plan to track your site's performance
         </p>
+
+        {/* Billing toggle buttons */}
+        <div className="flex justify-center mb-8 mt-10">
+          <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-full inline-flex relative">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={cn(
+                "px-6 py-2 rounded-full text-sm font-medium transition-all",
+                !isAnnual
+                  ? "bg-white dark:bg-neutral-700 shadow-sm text-black dark:text-white"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+              )}
+            >
+              Monthly
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={cn(
+                  "px-6 py-2 rounded-full text-sm font-medium transition-all",
+                  isAnnual
+                    ? "bg-white dark:bg-neutral-700 shadow-sm text-black dark:text-white"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                )}
+              >
+                Annual
+              </button>
+              <Badge className="absolute -top-2 -right-2 bg-emerald-500 text-white border-0 pointer-events-none">
+                2 months free
+              </Badge>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mb-12 max-w-3xl mx-auto p-6 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800">
@@ -308,6 +500,13 @@ export default function Subscribe() {
                       </span>
                     )}
                   </div>
+                  {isAnnual &&
+                    plan.id !== "free" &&
+                    plan.id !== "enterprise" && (
+                      <Badge className="bg-emerald-500 text-white border-0">
+                        2 months free
+                      </Badge>
+                    )}
                   <p>{plan.description}</p>
                 </CardDescription>
               </CardHeader>

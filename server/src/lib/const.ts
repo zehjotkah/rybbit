@@ -15,7 +15,7 @@ export const STRIPE_PRICES = [
   },
   {
     priceId: "price_1R2l2KDFVprnAny2iZr5gFLe",
-    name: "basic100k",
+    name: "basic100k-annual",
     interval: "year",
     limits: {
       events: 100_000,
@@ -31,7 +31,7 @@ export const STRIPE_PRICES = [
   },
   {
     priceId: "price_1R2lJIDFVprnAny22zUvjg5o",
-    name: "basic250k",
+    name: "basic250k-annual",
     interval: "year",
     limits: {
       events: 250_000,
@@ -46,7 +46,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "basic500k",
+    name: "basic500k-annual",
     priceId: "price_1R2lKIDFVprnAny27wXUAy2D",
     interval: "year",
     limits: {
@@ -62,7 +62,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "basic1m",
+    name: "basic1m-annual",
     priceId: "price_1R2lKtDFVprnAny2Xl98rgu4",
     interval: "year",
     limits: {
@@ -78,7 +78,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "basic2m",
+    name: "basic2m-annual",
     priceId: "price_1R1fRMDFVprnAny24AMo0Vuu",
     interval: "year",
     limits: {
@@ -95,7 +95,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "pro100k",
+    name: "pro100k-annual",
     priceId: "price_1R2niKDFVprnAny2MXTSHxEe",
     interval: "year",
     limits: {
@@ -111,7 +111,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "pro250k",
+    name: "pro250k-annual",
     priceId: "price_1R2nixDFVprnAny2GYxz6N2Q",
     interval: "year",
     limits: {
@@ -127,7 +127,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "pro500k",
+    name: "pro500k-annual",
     priceId: "price_1R2njbDFVprnAny28XqaBEmG",
     interval: "year",
     limits: {
@@ -143,7 +143,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "pro1m",
+    name: "pro1m-annual",
     priceId: "price_1R2nk3DFVprnAny2I6CyyF9f",
     interval: "year",
     limits: {
@@ -159,7 +159,7 @@ export const STRIPE_PRICES = [
     },
   },
   {
-    name: "pro2m",
+    name: "pro2m-annual",
     priceId: "price_1R2nkfDFVprnAny2EkLPYdAg",
     interval: "year",
     limits: {

@@ -24,6 +24,7 @@ export function middleware(request: NextRequest) {
       "signup",
       "settings",
       "subscribe",
+      "auth",
       "_next",
       "api",
     ];

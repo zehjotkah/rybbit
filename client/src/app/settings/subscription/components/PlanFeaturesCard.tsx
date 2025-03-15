@@ -7,19 +7,33 @@ import {
 } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { PlanTemplate } from "../utils/planUtils";
+import { Badge } from "@/components/ui/badge";
 
 interface PlanFeaturesCardProps {
   currentPlan: PlanTemplate | null;
 }
 
 export function PlanFeaturesCard({ currentPlan }: PlanFeaturesCardProps) {
+  // Check if this is an annual plan
+  const isAnnualPlan = currentPlan?.interval === "year";
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Plan Features</CardTitle>
-        <CardDescription>
-          What's included in your {currentPlan?.name} plan
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Plan Features</CardTitle>
+            <CardDescription>
+              What's included in your {currentPlan?.name} plan
+              {isAnnualPlan && <span className="ml-1">(Annual)</span>}
+            </CardDescription>
+          </div>
+          {isAnnualPlan && (
+            <Badge className="bg-emerald-500 text-white font-semibold">
+              Annual Plan
+            </Badge>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <ul className="space-y-2">
