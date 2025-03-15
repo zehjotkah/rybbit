@@ -324,7 +324,7 @@ export default function Subscribe() {
 
   // Handle contact for enterprise
   function handleContactEnterprise(): void {
-    window.location.href = "/contact";
+    globalThis.location.href = "/contact";
   }
 
   // Handle slider changes

@@ -106,7 +106,7 @@ export const useStore = create<Store>((set) => ({
     // Get current URL search params to check for stored state
     let urlParams: URLSearchParams | null = null;
     if (typeof window !== "undefined") {
-      urlParams = new URLSearchParams(window.location.search);
+      urlParams = new URLSearchParams(globalThis.location.search);
     }
 
     // Check if we have state stored in the URL

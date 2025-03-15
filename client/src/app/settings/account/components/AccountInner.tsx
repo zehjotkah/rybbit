@@ -44,7 +44,7 @@ export function AccountInner({
       }
 
       toast.success("Name updated successfully");
-      window.location.reload();
+      globalThis.location.reload();
     } catch (error) {
       console.error("Error updating name:", error);
       toast.error(
@@ -74,7 +74,7 @@ export function AccountInner({
       toast.success("Username updated successfully");
 
       // Reload the page to refresh the session
-      window.location.reload();
+      globalThis.location.reload();
     } catch (error) {
       console.error("Error updating username:", error);
       toast.error(
@@ -109,7 +109,7 @@ export function AccountInner({
       toast.success("Email updated successfully");
 
       // Reload the page to refresh the session
-      window.location.reload();
+      globalThis.location.reload();
     } catch (error) {
       console.error("Error updating email:", error);
       toast.error(
