@@ -24,6 +24,7 @@ import { HelpSection } from "./components/HelpSection";
 import { PlanFeaturesCard } from "./components/PlanFeaturesCard";
 import { DEFAULT_EVENT_LIMIT } from "./utils/constants";
 import { getPlanDetails } from "./utils/planUtils";
+import { Progress } from "@/components/ui/progress";
 
 export default function SubscriptionPage() {
   const router = useRouter();
@@ -222,22 +223,61 @@ export default function SubscriptionPage() {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
-      ) : !activeSubscription ? (
+      ) : !activeSubscription?.plan ? (
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>No Active Subscription</CardTitle>
+              <CardTitle>Free Plan</CardTitle>
               <CardDescription>
-                You don't have an active subscription. Choose a plan to get
-                started.
+                You are currently on the Free Plan. Upgrade to unlock premium
+                features.
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <h3 className="font-medium">Plan</h3>
+                    <p className="text-lg font-bold">Free</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      $0/month
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Renewal Date</h3>
+                    <p className="text-lg font-bold">Never expires</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-medium mb-2">Usage</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm">Events</span>
+                        <span className="text-sm">
+                          {currentUsage.toLocaleString()} /{" "}
+                          {DEFAULT_EVENT_LIMIT.toLocaleString()}
+                        </span>
+                      </div>
+                      <Progress
+                        value={(currentUsage / DEFAULT_EVENT_LIMIT) * 100}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
             <CardFooter>
               <Button onClick={() => router.push("/subscribe")}>
-                View Plans <ArrowRight className="ml-2 h-4 w-4" />
+                Upgrade Plan <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
+
+          <PlanFeaturesCard currentPlan={getPlanDetails("free")} />
+
+          <HelpSection router={router} />
         </div>
       ) : (
         <div className="space-y-6">

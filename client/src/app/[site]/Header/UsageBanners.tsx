@@ -29,8 +29,11 @@ export function UsageBanners({ site }: UsageBannersProps) {
   const usagePercentage = getUsagePercentage();
   const isNearLimit = usagePercentage >= 90 && !site.overMonthlyLimit;
 
-  //   If over limit, show the red banner
-  if (site.overMonthlyLimit) {
+  if (
+    site.monthlyEventCount &&
+    site.eventLimit &&
+    site.monthlyEventCount > site.eventLimit
+  ) {
     return (
       <Alert variant="destructive" className="mb-3 p-4">
         <div className="flex items-start space-x-3">
