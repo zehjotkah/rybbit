@@ -22,14 +22,14 @@ export async function trackEvent(
 ) {
   try {
     // Check if the site has exceeded its monthly limit
-    if (isSiteOverLimit(request.body.site_id)) {
-      console.log(
-        `[Tracking] Skipping event for site ${request.body.site_id} - over monthly limit`
-      );
-      return reply
-        .status(200)
-        .send("Site over monthly limit, event not tracked");
-    }
+    // if (isSiteOverLimit(request.body.site_id)) {
+    //   console.log(
+    //     `[Tracking] Skipping event for site ${request.body.site_id} - over monthly limit`
+    //   );
+    //   return reply
+    //     .status(200)
+    //     .send("Site over monthly limit, event not tracked");
+    // }
 
     // Validate event data based on type
     const eventType = request.body.type || "pageview";
