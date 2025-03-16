@@ -93,7 +93,7 @@ server.addHook("onRequest", async (request, reply) => {
   // Bypass auth for health check and tracking
   if (
     url?.startsWith("/health") ||
-    url?.startsWith("/track/pageview") ||
+    url?.startsWith("/track") ||
     url?.startsWith("/script") ||
     url?.startsWith("/auth") ||
     url?.startsWith("/api/auth")
@@ -142,10 +142,6 @@ server.get(
 server.get("/user/organizations", getUserOrganizations);
 server.get("/user/subscription", getUserSubscription);
 
-// Track endpoints
-server.post("/track/pageview", trackEvent);
-server.post("/track/event", trackEvent);
-// New unified endpoint
 server.post("/track", trackEvent);
 
 const start = async () => {
