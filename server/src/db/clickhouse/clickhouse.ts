@@ -30,7 +30,10 @@ export const initializeClickhouse = async () => {
         iso_3166_2 LowCardinality(String),
         screen_width UInt16,
         screen_height UInt16,
-        device_type LowCardinality(String)
+        device_type LowCardinality(String),
+        event_type LowCardinality(String) DEFAULT 'pageview',
+        event_name String,
+        properties String
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(timestamp)

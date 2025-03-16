@@ -10,6 +10,9 @@ type TotalPayload = TrackingPayload & {
   ua: UAParser.IResult;
   referrer: string;
   ipAddress: string;
+  event_type?: string;
+  event_name?: string;
+  properties?: string;
 };
 
 class PageviewQueue {
@@ -82,6 +85,9 @@ class PageviewQueue {
         country: countryCode,
         iso_3166_2:
           countryCode && regionCode ? countryCode + "-" + regionCode : "",
+        event_type: pv.event_type || "pageview",
+        event_name: pv.event_name || "",
+        properties: pv.properties,
       };
     });
 

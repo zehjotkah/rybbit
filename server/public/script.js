@@ -9,10 +9,13 @@
     return;
   }
 
-  const SITE_ID = scriptTag.getAttribute("site-id");
+  const SITE_ID =
+    scriptTag.getAttribute("data-site-id") || scriptTag.getAttribute("site-id");
 
   if (!SITE_ID || isNaN(Number(SITE_ID))) {
-    console.error("Please provide a valid site ID");
+    console.error(
+      "Please provide a valid site ID using the data-site-id attribute"
+    );
     return;
   }
 
@@ -20,6 +23,9 @@
   const debounceDuration = scriptTag.getAttribute("data-debounce")
     ? Math.max(0, parseInt(scriptTag.getAttribute("data-debounce")))
     : 500;
+
+  // Check if automatic URL tracking should be disabled
+  const autoTrackURLs = scriptTag.getAttribute("data-auto-track") !== "false";
 
   // Debounce function
   function debounce(func, wait) {
@@ -30,8 +36,19 @@
     };
   }
 
-  // Track pageview (core functionality)
-  const trackPageview = () => {
+  // Unified tracking function for all event types
+  const track = (eventType = "pageview", eventName = "", properties = {}) => {
+    // Validate event data
+    if (
+      eventType === "custom_event" &&
+      (!eventName || typeof eventName !== "string")
+    ) {
+      console.error(
+        "Event name is required and must be a string for custom events"
+      );
+      return;
+    }
+
     const url = new URL(window.location.href);
     const payload = {
       site_id: SITE_ID,
@@ -43,11 +60,16 @@
       language: navigator.language,
       page_title: document.title,
       referrer: document.referrer,
+      event_type: eventType,
+      event_name: eventName,
+      properties:
+        eventType === "custom_event" ? JSON.stringify(properties) : undefined,
     };
 
-    console.log(payload);
+    console.log(`${eventType} event:`, payload);
 
-    fetch(`${ANALYTICS_HOST}/track/pageview`, {
+    // Use the new unified endpoint
+    fetch(`${ANALYTICS_HOST}/track`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,34 +80,42 @@
     }).catch(console.error);
   };
 
+  // Helper function for pageviews
+  const trackPageview = () => track("pageview");
+
   // Create debounced version with configured duration
   const debouncedTrackPageview =
     debounceDuration > 0
       ? debounce(trackPageview, debounceDuration)
       : trackPageview;
 
-  // History API override
-  const originalPushState = history.pushState;
-  const originalReplaceState = history.replaceState;
+  // Only set up automatic URL change tracking if not disabled
+  if (autoTrackURLs) {
+    // History API override
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
 
-  history.pushState = function (...args) {
-    originalPushState.apply(this, args);
-    debouncedTrackPageview();
-  };
+    history.pushState = function (...args) {
+      originalPushState.apply(this, args);
+      debouncedTrackPageview();
+    };
 
-  history.replaceState = function (...args) {
-    originalReplaceState.apply(this, args);
-    debouncedTrackPageview();
-  };
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args);
+      debouncedTrackPageview();
+    };
 
-  // Handle navigation events
-  window.addEventListener("popstate", debouncedTrackPageview);
+    // Handle navigation events
+    window.addEventListener("popstate", debouncedTrackPageview);
+  }
 
   // Expose API
   window.frogstats = {
-    trackPageview: debouncedTrackPageview,
-    // Add direct access to non-debounced version if needed
-    _trackImmediately: trackPageview,
+    // Core tracking function
+    track,
+    // Helper functions for backward compatibility and convenience
+    pageview: trackPageview,
+    event: (name, properties = {}) => track("custom_event", name, properties),
   };
 
   // Initial pageview

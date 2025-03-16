@@ -25,7 +25,7 @@ import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/auth-utils.js";
-import { trackPageView } from "./tracker/trackPageView.js";
+import { trackEvent } from "./tracker/trackEvent.js";
 import { listOrganizationMembers } from "./api/listOrganizationMembers.js";
 import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { initializeCronJobs } from "./cron/index.js";
@@ -142,8 +142,11 @@ server.get(
 server.get("/user/organizations", getUserOrganizations);
 server.get("/user/subscription", getUserSubscription);
 
-// Track pageview endpoint
-server.post("/track/pageview", trackPageView);
+// Track endpoints
+server.post("/track/pageview", trackEvent);
+server.post("/track/event", trackEvent);
+// New unified endpoint
+server.post("/track", trackEvent);
 
 const start = async () => {
   try {
