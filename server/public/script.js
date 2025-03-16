@@ -19,7 +19,7 @@
     return;
   }
 
-  // Get debounce duration from data attribute or default to 300ms
+  // Get debounce duration from data attribute or default to 500ms
   const debounceDuration = scriptTag.getAttribute("data-debounce")
     ? Math.max(0, parseInt(scriptTag.getAttribute("data-debounce")))
     : 500;
