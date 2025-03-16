@@ -10,7 +10,7 @@ import {
 
 // Extended type for tracking payloads with event data
 export interface EventTrackingPayload extends BaseTrackingPayload {
-  event_type: "pageview" | "custom_event";
+  type: "pageview" | "custom_event";
   event_name?: string; // Required for custom_event, optional for pageview
   properties?: string;
 }
@@ -32,7 +32,7 @@ export async function trackEvent(
     }
 
     // Validate event data based on type
-    const eventType = request.body.event_type || "pageview";
+    const eventType = request.body.type || "pageview";
 
     // Ensure custom events have an event name
     if (eventType === "custom_event" && !request.body.event_name) {

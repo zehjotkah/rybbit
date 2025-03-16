@@ -11,7 +11,7 @@ import { sitesOverLimit } from "../cron/monthly-usage-checker.js";
 
 // Define extended payload types
 export type BaseTrackingPayload = TrackingPayload & {
-  event_type?: string;
+  type?: string;
   event_name?: string;
   properties?: string;
 };
@@ -71,7 +71,7 @@ export function createBasePayload(
 
   return {
     ...(request.body as BaseTrackingPayload),
-    event_type: eventType,
+    type: eventType,
     ipAddress: ipAddress,
     timestamp: new Date().toISOString(),
     ua: userAgentParser(userAgent),

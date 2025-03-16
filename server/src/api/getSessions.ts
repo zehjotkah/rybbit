@@ -62,6 +62,7 @@ WHERE
     site_id = ${site}
     ${filterStatement}
     ${getTimeStatement(startDate, endDate, timezone)}
+    AND type = 'pageview'
 GROUP BY
     session_id,
     user_id,

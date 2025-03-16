@@ -39,6 +39,7 @@ export async function getSingleCol(
         site_id = ${site}
         ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND type = 'pageview'
     GROUP BY value ORDER BY count desc
      ${limit ? `LIMIT ${limit}` : ""};
   `;

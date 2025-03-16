@@ -60,7 +60,7 @@
       language: navigator.language,
       page_title: document.title,
       referrer: document.referrer,
-      event_type: eventType,
+      type: eventType,
       event_name: eventName,
       properties:
         eventType === "custom_event" ? JSON.stringify(properties) : undefined,
