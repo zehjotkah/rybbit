@@ -57,7 +57,7 @@ const getQuery = ({
                     session_id,
                     MIN(timestamp) AS start_time,
                     MAX(timestamp) AS end_time,
-                    COUNT(*)      AS pages_in_session 
+                    COUNT(CASE WHEN type = 'pageview' THEN 1 END) AS pages_in_session 
                 FROM pageviews
                 WHERE
                     site_id = ${site}
@@ -79,6 +79,7 @@ const getQuery = ({
                 ${filterStatement}  
                 AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
                 AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
+                AND type = 'pageview'
         ) AS page_stats`;
   }
 
@@ -104,7 +105,7 @@ const getQuery = ({
                     session_id,
                     MIN(timestamp) AS start_time,
                     MAX(timestamp) AS end_time,
-                    COUNT(*)      AS pages_in_session
+                    COUNT(CASE WHEN type = 'pageview' THEN 1 END) AS pages_in_session
                 FROM pageviews
                 WHERE
                     site_id = ${site}
@@ -124,6 +125,7 @@ const getQuery = ({
                 site_id = ${site}
                 ${filterStatement}
                 ${getTimeStatement(startDate, endDate, timezone)}
+                AND type = 'pageview'
         ) AS page_stats`;
 };
 

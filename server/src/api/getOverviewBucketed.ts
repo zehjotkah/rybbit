@@ -102,6 +102,7 @@ FROM
             ${filterStatement}
             AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
             AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
+            AND type = 'pageview'
         GROUP BY session_id
     )
     GROUP BY time
@@ -122,9 +123,9 @@ FULL JOIN
     WHERE
         site_id = ${site}
         ${filterStatement}
-        -- Past 24 hours in LA time
         AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
         AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
+        AND type = 'pageview'
     GROUP BY time
     ORDER BY time WITH FILL
       FROM toTimeZone(${TimeBucketToFn[bucket]}(now('${timezone}') - INTERVAL 1 DAY), 'UTC')
@@ -168,6 +169,7 @@ FROM
             site_id = ${site}
             ${filterStatement}
             ${getTimeStatement(startDate, endDate, timezone)}
+            AND type = 'pageview'
         GROUP BY session_id
     )
     GROUP BY time ORDER BY time ${
@@ -189,6 +191,7 @@ FULL JOIN
         site_id = ${site}
         ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
+        AND type = 'pageview'
     GROUP BY time ORDER BY time ${
       isAllTime
         ? ""
