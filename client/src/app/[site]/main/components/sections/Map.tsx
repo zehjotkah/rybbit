@@ -88,18 +88,23 @@ export function Map() {
   }, []);
 
   const handleStyle = (feature: Feature | undefined) => {
+    const borderColors = ["#377eb8", "#ff7f00", "#4daf4a", "#1abc9c", "#984ea3"];
     const isCountryView = mapView === "countries";
     const dataKey = isCountryView
       ? feature?.properties?.["ISO_A2"]
       : feature?.properties?.["iso_3166_2"];
+    const borderKey = isCountryView
+      ? feature?.properties?.["BORDER"]
+      : feature?.properties?.["border"];
     const foundData = isCountryView
       ? countryData?.data?.find(({ value }: any) => value === dataKey)
       : subdivisionData?.data.find(({ value }: any) => value === dataKey);
     const count = foundData?.count || 0;
     return {
-      color: count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)",
+      color: borderColors[borderKey],
       weight: 0.5,
       fill: true,
+      fillColor: count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)",
     };
   };
 
