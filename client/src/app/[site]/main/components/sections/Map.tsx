@@ -14,7 +14,7 @@ import { GeoJSON, MapContainer, useMapEvent } from "react-leaflet";
 import { Layer } from "leaflet";
 import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
-import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { useSingleCol } from "@/api/analytics/useSingleCol";
 
 const countriesGeoUrl = "/countries.json";
 const subdivisionsGeoUrl = "/subdivisions.json";
@@ -100,11 +100,12 @@ export function Map() {
       ? countryData?.data?.find(({ value }: any) => value === dataKey)
       : subdivisionData?.data.find(({ value }: any) => value === dataKey);
     const count = foundData?.count || 0;
+    const color = count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)";
     return {
-      color: borderColors[borderKey],
+      color: isCountryView ? color : borderColors[borderKey],
       weight: 0.5,
       fill: true,
-      fillColor: count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)",
+      fillColor: color,
     };
   };
 
