@@ -181,6 +181,7 @@ export function Map() {
               background: "none",
               cursor: "default",
               outline: "none",
+              zIndex: "1",
             }}
           >
             <MapEventHandler />
