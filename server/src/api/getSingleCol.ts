@@ -15,21 +15,55 @@ type GetSingleColResponse = {
   percentage: number;
 }[];
 
-export async function getSingleCol(
-  req: FastifyRequest<GenericRequest>,
-  res: FastifyReply
-) {
+const getQuery = (request: GenericRequest["Querystring"]) => {
   const { startDate, endDate, timezone, site, filters, parameter, limit } =
-    req.query;
-
-  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
-  if (!userHasAccessToSite) {
-    return res.status(403).send({ error: "Forbidden" });
-  }
+    request;
 
   const filterStatement = getFilterStatement(filters);
 
-  const query = `
+  if (parameter === "exit_page") {
+    return `
+    SELECT 
+        pathname as value,
+        COUNT(*) as count,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+    FROM (
+        SELECT
+            session_id,
+            argMax(hostname, timestamp) AS hostname,
+            argMax(pathname, timestamp) AS pathname
+        FROM pageviews 
+        WHERE
+          site_id = ${site} 
+          ${getTimeStatement(startDate, endDate, timezone)}
+        GROUP BY session_id
+    ) AS exit_pages
+    GROUP BY value ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};`;
+  }
+
+  if (parameter === "entry_page") {
+    return `
+    SELECT 
+        pathname as value,
+        COUNT(*) as count,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+    FROM (
+        SELECT
+            session_id,
+            argMin(hostname, timestamp) AS hostname,
+            argMin(pathname, timestamp) AS pathname
+        FROM pageviews 
+        WHERE
+          site_id = ${site} 
+          ${getTimeStatement(startDate, endDate, timezone)}
+        GROUP BY session_id
+    ) AS entry_pages
+    GROUP BY value ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};`;
+  }
+
+  return `
     SELECT
       ${geSqlParam(parameter)} as value,
       COUNT(*) as count,
@@ -41,8 +75,22 @@ export async function getSingleCol(
         ${getTimeStatement(startDate, endDate, timezone)}
         AND type = 'pageview'
     GROUP BY value ORDER BY count desc
-     ${limit ? `LIMIT ${limit}` : ""};
+    ${limit ? `LIMIT ${limit}` : ""};
   `;
+};
+
+export async function getSingleCol(
+  req: FastifyRequest<GenericRequest>,
+  res: FastifyReply
+) {
+  const { site, parameter } = req.query;
+
+  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
+  if (!userHasAccessToSite) {
+    return res.status(403).send({ error: "Forbidden" });
+  }
+
+  const query = getQuery(req.query);
 
   try {
     const result = await clickhouse.query({

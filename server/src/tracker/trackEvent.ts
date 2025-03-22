@@ -1,10 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { TrackingPayload } from "../types.js";
 import {
   BaseTrackingPayload,
   createBasePayload,
   getExistingSession,
-  isSiteOverLimit,
   processTrackingEvent,
 } from "./trackingUtils.js";
 
