@@ -39,6 +39,7 @@ export function Referrers() {
               title="Referrers"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
+              getLink={(e) => `https://${e.value}`}
               getLabel={(e) => (
                 <div className="flex items-center">
                   <img

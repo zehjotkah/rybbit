@@ -13,8 +13,10 @@ export type FilterParameter =
   | "page_title"
   | "querystring"
   | "iso_3166_2"
+  // derivative parameters
   | "entry_page"
-  | "exit_page";
+  | "exit_page"
+  | "dimensions";
 
 export type Filter = {
   parameter: FilterParameter;

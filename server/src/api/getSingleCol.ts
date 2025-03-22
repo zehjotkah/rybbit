@@ -84,6 +84,32 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
     ${limit ? `LIMIT ${limit}` : ""};`;
   }
 
+  if (parameter === "dimensions") {
+    return `
+    SELECT
+      concat(toString(screen_width), 'x', toString(screen_height)) AS value,
+      ${
+        type === "sessions"
+          ? "COUNT(distinct(session_id)) as count"
+          : "COUNT(*) as count"
+      },
+      ${
+        type === "sessions"
+          ? `ROUND(
+          COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
+          2
+      ) as percentage`
+          : "ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage"
+      }
+    FROM pageviews
+    WHERE
+      site_id = ${site}
+      ${filterStatement}
+      ${getTimeStatement(startDate, endDate, timezone)}
+    GROUP BY value ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};`;
+  }
+
   return `
     SELECT
       ${geSqlParam(parameter)} as value,

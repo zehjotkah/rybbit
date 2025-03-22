@@ -16,8 +16,9 @@ import {
   CardTitle,
 } from "../../../../../components/ui/card";
 import { Browser } from "../../../components/shared/icons/Browser";
+import { Monitor, Smartphone, Tablet } from "lucide-react";
 
-type Tab = "devices" | "browsers" | "os";
+type Tab = "devices" | "browsers" | "os" | "dimensions";
 
 export function Devices() {
   const [tab, setTab] = useState<Tab>("devices");
@@ -36,6 +37,7 @@ export function Devices() {
             <TabsTrigger value="devices">Devices</TabsTrigger>
             <TabsTrigger value="browsers">Browsers</TabsTrigger>
             <TabsTrigger value="os">Operating Systems</TabsTrigger>
+            <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
           </TabsList>
           <TabsContent value="devices">
             <StandardSection
@@ -44,7 +46,14 @@ export function Devices() {
               title="Devices"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => e.value || "Other"}
+              getLabel={(e) => (
+                <div className="flex gap-2 items-center">
+                  {e.value === "Desktop" && <Monitor className="w-4 h-4" />}
+                  {e.value === "Mobile" && <Smartphone className="w-4 h-4" />}
+                  {e.value === "Tablet" && <Tablet className="w-4 h-4" />}
+                  {e.value || "Other"}
+                </div>
+              )}
             />
           </TabsContent>
           <TabsContent value="browsers">
@@ -75,6 +84,20 @@ export function Devices() {
                 </div>
               )}
               filterParameter="operating_system"
+            />
+          </TabsContent>
+          <TabsContent value="dimensions">
+            <StandardSection
+              type="sessions"
+              title="Screen Dimensions"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) => (
+                <div className="flex gap-2 items-center">
+                  {e.value || "Other"}
+                </div>
+              )}
+              filterParameter="dimensions"
             />
           </TabsContent>
         </Tabs>
