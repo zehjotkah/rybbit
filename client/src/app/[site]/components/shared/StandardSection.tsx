@@ -76,6 +76,7 @@ export function StandardSection({
   getValue,
   getLink,
   filterParameter,
+  type,
 }: {
   title: string;
   isFetching?: boolean;
@@ -84,9 +85,11 @@ export function StandardSection({
   getValue: (item: SingleColResponse) => string;
   getLink?: (item: SingleColResponse) => string;
   filterParameter: FilterParameter;
+  type: "events" | "sessions";
 }) {
   const { data, isFetching } = useSingleCol({
     parameter: filterParameter,
+    type,
   });
 
   const { data: previousData, isFetching: previousIsFetching } = useSingleCol({

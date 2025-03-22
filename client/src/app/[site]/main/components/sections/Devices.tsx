@@ -39,6 +39,7 @@ export function Devices() {
           </TabsList>
           <TabsContent value="devices">
             <StandardSection
+              type="sessions"
               filterParameter="device_type"
               title="Devices"
               getValue={(e) => e.value}
@@ -48,6 +49,7 @@ export function Devices() {
           </TabsContent>
           <TabsContent value="browsers">
             <StandardSection
+              type="sessions"
               filterParameter="browser"
               title="Browsers"
               getValue={(e) => e.value}
@@ -62,6 +64,7 @@ export function Devices() {
           </TabsContent>
           <TabsContent value="os">
             <StandardSection
+              type="sessions"
               title="Operating Systems"
               getValue={(e) => e.value}
               getKey={(e) => e.value}

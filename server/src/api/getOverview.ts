@@ -1,12 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
-import { GenericRequest } from "./types.js";
 import {
   getFilterStatement,
   getTimeStatement,
   processResults,
 } from "./utils.js";
 import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import { FilterParameter } from "./types.js";
 
 type GetOverviewResponse = {
   sessions: number;
@@ -129,10 +129,21 @@ const getQuery = ({
         ) AS page_stats`;
 };
 
+export interface GenericRequest {
+  Querystring: {
+    startDate: string;
+    endDate: string;
+    timezone: string;
+    site: string;
+    filters: string;
+    parameter: FilterParameter;
+    past24Hours: boolean;
+    limit?: number;
+  };
+}
+
 export async function getOverview(
-  req: FastifyRequest<
-    GenericRequest & { Querystring: { past24Hours: boolean } }
-  >,
+  req: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
   const { startDate, endDate, timezone, site, filters, past24Hours } =

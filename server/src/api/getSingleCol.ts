@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../db/clickhouse/clickhouse.js";
-import { GenericRequest } from "./types.js";
 import {
   geSqlParam,
   getFilterStatement,
@@ -8,6 +7,20 @@ import {
   processResults,
 } from "./utils.js";
 import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import { FilterParameter } from "./types.js";
+
+interface GenericRequest {
+  Querystring: {
+    startDate: string;
+    endDate: string;
+    timezone: string;
+    site: string;
+    filters: string;
+    parameter: FilterParameter;
+    type: "events" | "sessions";
+    limit?: number;
+  };
+}
 
 type GetSingleColResponse = {
   value: string;
@@ -16,8 +29,16 @@ type GetSingleColResponse = {
 }[];
 
 const getQuery = (request: GenericRequest["Querystring"]) => {
-  const { startDate, endDate, timezone, site, filters, parameter, limit } =
-    request;
+  const {
+    startDate,
+    endDate,
+    timezone,
+    site,
+    filters,
+    parameter,
+    limit,
+    type,
+  } = request;
 
   const filterStatement = getFilterStatement(filters);
 
@@ -66,8 +87,19 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
   return `
     SELECT
       ${geSqlParam(parameter)} as value,
-      COUNT(*) as count,
-      ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+      ${
+        type === "sessions"
+          ? "COUNT(distinct(session_id)) as count"
+          : "COUNT(*) as count"
+      },
+      ${
+        type === "sessions"
+          ? `ROUND(
+          COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
+          2
+      ) as percentage`
+          : "ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage"
+      }
     FROM pageviews
     WHERE
         site_id = ${site}

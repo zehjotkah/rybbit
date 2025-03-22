@@ -46,20 +46,34 @@ export const initializeClickhouse = async () => {
     query: `
       CREATE TABLE IF NOT EXISTS sessions (
         site_id UInt16,
-        hostname String,
-        session_id String,
         start_time DateTime,
         end_time DateTime,
+        session_id String,
+        user_id String,
+        hostname String,
+        pathname String,
+        querystring String,
+        page_title String,
+        referrer String,
+        browser LowCardinality(String),
+        browser_version LowCardinality(String),
+        operating_system LowCardinality(String),
+        operating_system_version LowCardinality(String),
+        language LowCardinality(String),
+        country LowCardinality(FixedString(2)),
+        iso_3166_2 LowCardinality(String),
+        screen_width UInt16,
+        screen_height UInt16,
+        device_type LowCardinality(String),
         entry_page String,
         exit_page String,
         pageviews UInt32,
         events UInt32,
-        duration UInt32,
-        referrer String,
-        ip_address String,
-        browser String,
-        language String,
-        country LowCardinality(String)
+        utm_source String,
+        utm_medium String,
+        utm_campaign String,
+        utm_term String,
+        utm_content String
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(start_time)

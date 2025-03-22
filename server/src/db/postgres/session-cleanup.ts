@@ -49,7 +49,7 @@ export async function cleanupOldSessions() {
   //     deletedSessions.map((e) => ({
   //       ...e,
   //       start_time: convertPostgresToClickhouse(e.start_time),
-  //       last_activity: convertPostgresToClickhouse(e.last_activity),
+  //       end_time: convertPostgresToClickhouse(e.end_time),
   //     }))
   //   );
   // }

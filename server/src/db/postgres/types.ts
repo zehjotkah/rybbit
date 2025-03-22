@@ -3,7 +3,7 @@ export type Session = {
   user_id: string;
   hostname: string;
   start_time: string;
-  last_activity: string;
+  end_time: string;
   pageviews: number;
   entry_page: string;
   exit_page: string;

@@ -42,6 +42,7 @@ export function Pages({
           </TabsList>
           <TabsContent value="pages">
             <StandardSection
+              type="events"
               filterParameter="pathname"
               title="Pages"
               getValue={(e) => e.value}
@@ -52,6 +53,7 @@ export function Pages({
           </TabsContent>
           <TabsContent value="entry_pages">
             <StandardSection
+              type="events"
               filterParameter="entry_page"
               title="Entry Pages"
               getValue={(e) => e.value}
@@ -62,6 +64,7 @@ export function Pages({
           </TabsContent>
           <TabsContent value="exit_pages">
             <StandardSection
+              type="events"
               filterParameter="exit_page"
               title="Exit Pages"
               getValue={(e) => e.value}

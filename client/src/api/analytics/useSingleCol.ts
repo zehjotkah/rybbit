@@ -17,18 +17,20 @@ export function useSingleCol({
   limit = 10000,
   periodTime,
   useFilters = true,
+  type = "events",
 }: {
   parameter: FilterParameter;
   limit?: number;
   periodTime?: PeriodTime;
   useFilters?: boolean;
+  type?: "events" | "sessions";
 }): UseQueryResult<APIResponse<SingleColResponse[]>> {
   const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [parameter, timeToUse, site, filters, limit],
+    queryKey: [parameter, timeToUse, site, filters, limit, type],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
@@ -38,7 +40,9 @@ export function useSingleCol({
           endDate ? `endDate=${endDate}&` : ""
         }timezone=${timezone}&site=${site}&parameter=${parameter}${
           limit ? `&limit=${limit}` : ""
-        }${useFilters ? `&filters=${JSON.stringify(filters)}` : ""}`
+        }${
+          useFilters ? `&filters=${JSON.stringify(filters)}` : ""
+        }&type=${type}`
       ).then((res) => res.json());
     },
     staleTime: Infinity,

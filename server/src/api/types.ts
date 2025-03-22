@@ -21,15 +21,3 @@ export type Filter = {
   value: string[];
   type: FilterType;
 };
-
-export interface GenericRequest {
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    timezone: string;
-    site: string;
-    filters: string;
-    parameter: FilterParameter;
-    limit?: number;
-  };
-}
