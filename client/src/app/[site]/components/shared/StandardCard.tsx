@@ -81,7 +81,7 @@ export function StandardCard({
             }
           >
             <div
-              className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
+              className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
               style={{ width: `${e.percentage * ratio}%` }}
             ></div>
             <div className="z-10 mx-2 flex justify-between items-center text-sm w-full">
@@ -146,7 +146,7 @@ export function StandardCard({
                     }
                   >
                     <div
-                      className="absolute inset-0 bg-fuchsia-400 py-2 opacity-30 rounded-md"
+                      className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
                       style={{ width: `${e.percentage * ratio}%` }}
                     ></div>
                     <div className="z-10 ml-2 mr-4 flex justify-between items-center text-sm w-full h-7">

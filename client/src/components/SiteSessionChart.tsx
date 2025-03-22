@@ -74,15 +74,15 @@ export function SiteSessionChart({
         enablePoints={false}
         enableArea={true}
         areaOpacity={0.3}
-        colors={["hsl(var(--fuchsia-400))"]}
+        colors={["hsl(var(--accent-400))"]}
         theme={nivoTheme}
         defs={[
           {
             id: "gradientA",
             type: "linearGradient",
             colors: [
-              { offset: 0, color: "hsl(var(--fuchsia-400))", opacity: 1 },
-              { offset: 100, color: "hsl(var(--fuchsia-400))", opacity: 0 },
+              { offset: 0, color: "hsl(var(--accent-400))", opacity: 1 },
+              { offset: 100, color: "hsl(var(--accent-400))", opacity: 0 },
             ],
           },
         ]}

@@ -33,7 +33,7 @@ const CardLoader = React.forwardRef<
         stroke="3"
         bg-opacity="0.1"
         speed="1.4"
-        color="hsl(var(--fuchsia-400))"
+        color="hsl(var(--accent-400))"
       />
     </div>
   );

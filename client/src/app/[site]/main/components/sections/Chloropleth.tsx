@@ -50,7 +50,7 @@ export function Chloropleth() {
     const maxValue = Math.max(...data.data.map((d) => d.count));
     return scaleLinear<string>()
       .domain([0, maxValue])
-      .range(["hsl(var(--fuchsia-100))", "hsl(var(--fuchsia-600))"]);
+      .range(["hsl(var(--accent-100))", "hsl(var(--accent-600))"]);
   }, [data?.data]);
 
   const style = (feature: Feature<any, any> | undefined) => {

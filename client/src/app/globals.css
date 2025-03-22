@@ -10,8 +10,6 @@ body {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
     --primary: 240 5.9% 10%;
@@ -28,6 +26,20 @@ body {
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.3rem;
+    
+    
+    --accent-50: var(--indigo-50);
+    --accent-100: var(--indigo-100);
+    --accent-200: var(--indigo-200);
+    --accent-300: var(--indigo-300);
+    --accent-400: var(--indigo-400);
+    --accent-500: var(--indigo-500);
+    --accent-600: var(--indigo-600);
+    --accent-700: var(--indigo-700);
+    --accent-800: var(--indigo-800);
+    --accent-900: var(--indigo-900);
+    --accent-950: var(--indigo-950);
+
 
     /* Slate */
     --slate-50: 210 40% 98%;
@@ -329,8 +341,7 @@ body {
   .dark {
     --background: 0 0% 7%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
@@ -345,6 +356,5 @@ body {
     --destructive-foreground: 0 0% 98%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-
   }
 }

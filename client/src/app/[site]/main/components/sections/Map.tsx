@@ -67,10 +67,22 @@ export function Map() {
     const dataToUse =
       mapView === "countries" ? countryData?.data : subdivisionData?.data;
 
+    // Get computed values from CSS variables
+    const getComputedColor = (cssVar: string) => {
+      // Get the HSL values from CSS
+      const hslValues = getComputedStyle(document.documentElement)
+        .getPropertyValue(cssVar)
+        .trim();
+      return `hsl(${hslValues})`;
+    };
+
+    const startColor = getComputedColor("--accent-200");
+    const endColor = getComputedColor("--accent-500");
+
     const maxValue = Math.max(...(dataToUse?.map((d) => d.count) || [0]));
     return scaleLinear<string>()
       .domain([0, maxValue])
-      .range(["rgba(232, 121, 249, 0.3)", "rgb(232, 121, 249)"]);
+      .range([startColor, endColor]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
   const [countriesGeoData, setCountriesGeoData] =
@@ -88,7 +100,13 @@ export function Map() {
   }, []);
 
   const handleStyle = (feature: Feature | undefined) => {
-    const borderColors = ["#377eb8", "#ff7f00", "#4daf4a", "#1abc9c", "#984ea3"];
+    const borderColors = [
+      "#377eb8",
+      "#ff7f00",
+      "#4daf4a",
+      "#1abc9c",
+      "#984ea3",
+    ];
     const isCountryView = mapView === "countries";
     const dataKey = isCountryView
       ? feature?.properties?.["ISO_A2"]
@@ -229,7 +247,7 @@ export function Map() {
               {tooltipContent.name}
             </div>
             <div>
-              <span className="font-bold text-fuchsia-400">
+              <span className="font-bold text-accent-400">
                 {tooltipContent.count.toLocaleString()}
               </span>{" "}
               <span className="text-neutral-300">
