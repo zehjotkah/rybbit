@@ -42,15 +42,15 @@ export function useGetOverviewBucketed({
     ],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(
-        `${BACKEND_URL}/overview-bucketed?${
-          startDate ? `startDate=${startDate}&` : ""
-        }${
-          endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&bucket=${bucket}&site=${site}&filters=${JSON.stringify(
-          filters
-        )}${past24Hours ? `&past24Hours=${past24Hours}` : ""}`
-      ).then((res) => res.json());
+      return authedFetch(`${BACKEND_URL}/overview-bucketed`, {
+        startDate,
+        endDate,
+        timezone,
+        bucket,
+        site,
+        filters,
+        past24Hours,
+      }).then((res) => res.json());
     },
     placeholderData: (_, query: any) => {
       if (!query?.queryKey) return undefined;

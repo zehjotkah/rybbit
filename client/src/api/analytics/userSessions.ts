@@ -30,13 +30,13 @@ export function useGetUserSessions(userId: string) {
     queryKey: ["user-sessions", userId, time, site, filters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(
-        `${BACKEND_URL}/user/${userId}/sessions?${
-          startDate ? `startDate=${startDate}&` : ""
-        }${
-          endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&site=${site}&filters=${JSON.stringify(filters)}`
-      ).then((res) => res.json());
+      return authedFetch(`${BACKEND_URL}/user/${userId}/sessions`, {
+        startDate,
+        endDate,
+        timezone,
+        site,
+        filters,
+      }).then((res) => res.json());
     },
     staleTime: Infinity,
   });
@@ -64,15 +64,14 @@ export function useGetSessionsInfinite() {
     queryKey: ["sessions-infinite", time, site, filters],
     queryFn: ({ pageParam = 1 }) => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      let url = `${BACKEND_URL}/sessions?${
-        startDate ? `startDate=${startDate}&` : ""
-      }${
-        endDate ? `endDate=${endDate}&` : ""
-      }timezone=${timezone}&site=${site}&filters=${JSON.stringify(
-        filters
-      )}&page=${pageParam}`;
-
-      return authedFetch(url).then((res) => res.json());
+      return authedFetch(`${BACKEND_URL}/sessions`, {
+        startDate,
+        endDate,
+        timezone,
+        site,
+        filters,
+        page: pageParam,
+      }).then((res) => res.json());
     },
     initialPageParam: 1,
     getNextPageParam: (

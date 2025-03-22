@@ -33,17 +33,16 @@ export function useSingleCol({
     queryKey: [parameter, timeToUse, site, filters, limit, type],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(
-        `${BACKEND_URL}/single-col?${
-          startDate ? `startDate=${startDate}&` : ""
-        }${
-          endDate ? `endDate=${endDate}&` : ""
-        }timezone=${timezone}&site=${site}&parameter=${parameter}${
-          limit ? `&limit=${limit}` : ""
-        }${
-          useFilters ? `&filters=${JSON.stringify(filters)}` : ""
-        }&type=${type}`
-      ).then((res) => res.json());
+      return authedFetch(`${BACKEND_URL}/single-col`, {
+        startDate,
+        endDate,
+        timezone,
+        site,
+        parameter,
+        limit,
+        filters: useFilters ? filters : undefined,
+        type,
+      }).then((res) => res.json());
     },
     staleTime: Infinity,
     placeholderData: (_, query: any) => {
