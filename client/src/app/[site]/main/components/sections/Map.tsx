@@ -15,6 +15,7 @@ import { Layer } from "leaflet";
 import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
 import { useSingleCol } from "@/api/analytics/useSingleCol";
+import { addFilter, FilterParameter } from "../../../../../lib/store";
 
 const countriesGeoUrl = "/countries.json";
 const subdivisionsGeoUrl = "/subdivisions.json";
@@ -154,6 +155,23 @@ export function Map() {
           fillOpacity: 0.2,
         });
         setTooltipContent(null);
+      },
+      click: () => {
+        const isCountryView = mapView === "countries";
+        const code = isCountryView
+          ? feature.properties?.["ISO_A2"]
+          : feature.properties?.["iso_3166_2"];
+
+        // Set filter based on the current map view
+        const filterParameter: FilterParameter = isCountryView
+          ? "country"
+          : "iso_3166_2";
+
+        addFilter({
+          parameter: filterParameter,
+          value: [code],
+          type: "equals",
+        });
       },
     });
   };
