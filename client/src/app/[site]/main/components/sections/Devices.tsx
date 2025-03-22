@@ -1,15 +1,81 @@
 "use client";
 
-import { StandardCard } from "../../../components/shared/StandardCard";
+import { useState } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../../../components/ui/basic-tabs";
+import { StandardSection } from "../../../components/shared/StandardSection";
+import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../../../components/ui/card";
+import { Browser } from "../../../components/shared/icons/Browser";
+
+type Tab = "devices" | "browsers" | "os";
 
 export function Devices() {
+  const [tab, setTab] = useState<Tab>("devices");
   return (
-    <StandardCard
-      filterParameter="device_type"
-      title="Devices"
-      getValue={(e) => e.value}
-      getKey={(e) => e.value}
-      getLabel={(e) => e.value || "Other"}
-    />
+    <Card className="h-[493px]">
+      <CardHeader>
+        <CardTitle>Devices</CardTitle>
+      </CardHeader>
+      <CardContent className="mt-[-8px]">
+        <Tabs
+          defaultValue="devices"
+          value={tab}
+          onValueChange={(value) => setTab(value as Tab)}
+        >
+          <TabsList>
+            <TabsTrigger value="devices">Devices</TabsTrigger>
+            <TabsTrigger value="browsers">Browsers</TabsTrigger>
+            <TabsTrigger value="os">Operating Systems</TabsTrigger>
+          </TabsList>
+          <TabsContent value="devices">
+            <StandardSection
+              filterParameter="device_type"
+              title="Devices"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value || "Other"}
+            />
+          </TabsContent>
+          <TabsContent value="browsers">
+            <StandardSection
+              filterParameter="browser"
+              title="Browsers"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) => (
+                <div className="flex gap-2 items-center">
+                  <Browser browser={e.value} />
+                  {e.value || "Other"}
+                </div>
+              )}
+            />
+          </TabsContent>
+          <TabsContent value="os">
+            <StandardSection
+              title="Operating Systems"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) => (
+                <div className="flex gap-2 items-center">
+                  <OperatingSystem os={e.value || "Other"} />
+                  {e.value || "Other"}
+                </div>
+              )}
+              filterParameter="operating_system"
+            />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }
