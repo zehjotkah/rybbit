@@ -50,3 +50,15 @@ export const useCountries = () => {
     queryFn: () => fetch(countriesGeoUrl).then((res) => res.json()),
   });
 };
+
+export const useGetRegionName = () => {
+  const { data: subdivisions } = useSubdivisions();
+
+  return {
+    getRegionName: (iso_3166_2: string) => {
+      return subdivisions?.features.find(
+        (feature) => feature.properties.iso_3166_2 === iso_3166_2
+      )?.properties.name;
+    },
+  };
+};

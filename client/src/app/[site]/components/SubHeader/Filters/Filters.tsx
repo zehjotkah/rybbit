@@ -9,6 +9,7 @@ import {
 } from "../../../../../lib/store";
 import { getCountryName } from "../../../../../lib/utils";
 import { NewFilterButton } from "./NewFilterButton";
+import { useGetRegionName } from "../../../../../lib/geo";
 
 function getParameterNameLabel(parameter: FilterParameter) {
   switch (parameter) {
@@ -34,6 +35,8 @@ function getParameterNameLabel(parameter: FilterParameter) {
       return "City";
     case "region":
       return "Region";
+    case "iso_3166_2":
+      return "Region";
     default:
       return parameter;
   }
@@ -52,10 +55,16 @@ const filterTypeToLabel = (type: FilterType) => {
   }
 };
 
-function getParameterValueLabel(filter: Filter) {
+function getParameterValueLabel(
+  filter: Filter,
+  getRegionName: (iso_3166_2: string) => string | undefined
+) {
   const formatValue = (value: string) => {
     if (filter.parameter === "country") {
       return getCountryName(value);
+    }
+    if (filter.parameter === "iso_3166_2") {
+      return getRegionName(value);
     }
     return value;
   };
@@ -70,6 +79,7 @@ function getParameterValueLabel(filter: Filter) {
 
 export function Filters() {
   const { filters } = useStore();
+  const { getRegionName } = useGetRegionName();
 
   return (
     <div className="flex gap-2">
@@ -106,7 +116,7 @@ export function Filters() {
             {filterTypeToLabel(filter.type)}
           </div>
           <div className="text-neutral-100 font-medium">
-            {getParameterValueLabel(filter)}
+            {getParameterValueLabel(filter, getRegionName)}
           </div>
           <div
             className="text-neutral-400 cursor-pointer hover:text-neutral-200"

@@ -10,6 +10,7 @@ import { FilterParameter, addFilter } from "../../../../../lib/store";
 
 import { MultiSelect } from "../../../../../components/MultiSelect";
 import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { useGetRegionName } from "../../../../../lib/geo";
 
 interface ValueFilterProps {
   parameter: FilterParameter;
@@ -26,6 +27,7 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
     useFilters: false,
   });
 
+  const { getRegionName } = useGetRegionName();
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   const suggestions = useMemo(() => {
@@ -38,6 +40,12 @@ export function ValueFilter({ parameter, type, onComplete }: ValueFilterProps) {
             return {
               value: val,
               label: getCountryName(val),
+            };
+          }
+          if (parameter === "iso_3166_2") {
+            return {
+              value: val,
+              label: getRegionName(val),
             };
           }
           return {

@@ -40,21 +40,6 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
           2
       ) as percentage`;
 
-  if (parameter === "dimensions") {
-    return `
-    SELECT
-      concat(toString(screen_width), 'x', toString(screen_height)) AS value,
-      COUNT(distinct(session_id)) as count,
-      ${percentageStatement}
-    FROM pageviews
-    WHERE
-      site_id = ${site}
-      ${filterStatement}
-      ${getTimeStatement(startDate, endDate, timezone)}
-    GROUP BY value ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};`;
-  }
-
   // if (["querystring", "page_title", "pathname"].includes(parameter)) {
   // }
 
@@ -72,7 +57,9 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
         FROM pageviews 
         WHERE
           site_id = ${site} 
+          ${filterStatement}
           ${getTimeStatement(startDate, endDate, timezone)}
+          AND type = 'pageview'
         GROUP BY session_id
     ) AS exit_pages
     GROUP BY value ORDER BY count desc
@@ -93,7 +80,9 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
         FROM pageviews 
         WHERE
           site_id = ${site} 
+          ${filterStatement}
           ${getTimeStatement(startDate, endDate, timezone)}
+          AND type = 'pageview'
         GROUP BY session_id
     ) AS entry_pages
     GROUP BY value ORDER BY count desc

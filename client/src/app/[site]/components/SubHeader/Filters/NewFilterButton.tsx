@@ -36,7 +36,7 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
   },
   {
     label: "Region",
-    value: "region",
+    value: "iso_3166_2",
   },
   {
     label: "City",

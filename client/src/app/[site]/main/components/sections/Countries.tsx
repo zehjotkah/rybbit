@@ -71,7 +71,6 @@ export function Countries() {
               getValue={(e) => e.value}
               getKey={(e) => e.value}
               getLabel={(e) => {
-                console.info(e.value);
                 return (
                   <div className="flex gap-2 items-center">
                     <CountryFlag country={e.value} />
