@@ -116,7 +116,7 @@ export const initializeClickhouse = async () => {
   });
   await clickhouse.exec({
     query: `
-    CREATE MATERIALIZED VIEW sessions_mv
+    CREATE MATERIALIZED VIEW IF NOT EXISTS sessions_mv
     TO sessions
     AS
     SELECT 

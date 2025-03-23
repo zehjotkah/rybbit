@@ -42,46 +42,24 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
 
   const filterStatement = getFilterStatement(filters);
 
-  if (parameter === "exit_page") {
+  if (parameter === "exit_page" || parameter === "entry_page") {
     return `
-    SELECT 
-        pathname as value,
-        COUNT(*) as count,
+    SELECT
+        ${parameter} as value,
+        count() as count,
         ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-    FROM (
-        SELECT
-            session_id,
-            argMax(hostname, timestamp) AS hostname,
-            argMax(pathname, timestamp) AS pathname
-        FROM pageviews 
-        WHERE
-          site_id = ${site} 
-          ${getTimeStatement(startDate, endDate, timezone)}
-        GROUP BY session_id
-    ) AS exit_pages
-    GROUP BY value ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};`;
-  }
-
-  if (parameter === "entry_page") {
-    return `
-    SELECT 
-        pathname as value,
-        COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-    FROM (
-        SELECT
-            session_id,
-            argMin(hostname, timestamp) AS hostname,
-            argMin(pathname, timestamp) AS pathname
-        FROM pageviews 
-        WHERE
-          site_id = ${site} 
-          ${getTimeStatement(startDate, endDate, timezone)}
-        GROUP BY session_id
-    ) AS entry_pages
-    GROUP BY value ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};`;
+    FROM
+        sessions_mv
+    WHERE 
+        site_id = ${site} 
+        AND notEmpty(entry_page)
+        ${getTimeStatement(startDate, endDate, timezone, "sessions")}
+    GROUP BY
+      ${parameter}
+    ORDER BY
+        COUNT() DESC
+    ${limit ? `LIMIT ${limit}` : ""};
+    `;
   }
 
   if (parameter === "dimensions") {

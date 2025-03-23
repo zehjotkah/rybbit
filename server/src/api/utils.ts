@@ -4,16 +4,20 @@ import { Filter, FilterParameter, FilterType } from "./types.js";
 export function getTimeStatement(
   startDate: string,
   endDate: string,
-  timezone: string
+  timezone: string,
+  table: "events" | "sessions" = "events"
 ) {
   if (!startDate && !endDate) {
     return "";
   }
-  return `AND timestamp >= toTimeZone(
+
+  const col = table === "events" ? "timestamp" : "session_end";
+
+  return `AND ${col} >= toTimeZone(
       toStartOfDay(toDateTime('${startDate}', '${timezone}')),
       'UTC'
     )
-    AND timestamp < if(
+    AND ${col} < if(
       toDate('${endDate}') = toDate(now(), '${timezone}'),
       now(),
       toTimeZone(
