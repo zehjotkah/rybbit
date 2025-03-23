@@ -16,7 +16,7 @@ export type SingleColResponse = {
 
 export function useSingleCol({
   parameter,
-  limit = 10000,
+  limit = 1000,
   periodTime,
   useFilters = true,
 }: {

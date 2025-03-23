@@ -1,20 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { GetSitesResponse } from "../../../../../api/admin/sites";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "../../../../../components/ui/basic-tabs";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../../../components/ui/card";
-import { StandardSection } from "../../../components/shared/StandardSection";
-import { GetSitesResponse } from "../../../../../api/admin/sites";
+import { Card, CardContent } from "../../../../../components/ui/card";
+import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 
 type Tab = "pages" | "entry_pages" | "exit_pages";
 
@@ -26,10 +21,7 @@ export function Pages({
   const [tab, setTab] = useState<Tab>("pages");
   return (
     <Card className="h-[493px]">
-      <CardHeader>
-        <CardTitle>Pages</CardTitle>
-      </CardHeader>
-      <CardContent className="mt-[-8px]">
+      <CardContent className="mt-2">
         <Tabs
           defaultValue="pages"
           value={tab}

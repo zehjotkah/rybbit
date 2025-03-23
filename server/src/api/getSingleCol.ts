@@ -35,57 +35,105 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
 
   const filterStatement = getFilterStatement(filters);
 
+  const percentageStatement = `ROUND(
+          COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
+          2
+      ) as percentage`;
+
   if (parameter === "dimensions") {
     return `
     SELECT
       concat(toString(screen_width), 'x', toString(screen_height)) AS value,
-      COUNT(*) as count,
-      ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-    FROM sessions_mv
+      COUNT(distinct(session_id)) as count,
+      ${percentageStatement}
+    FROM pageviews
     WHERE
       site_id = ${site}
       ${filterStatement}
-      ${getTimeStatement(startDate, endDate, timezone, "sessions")}
+      ${getTimeStatement(startDate, endDate, timezone)}
     GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};`;
   }
 
-  if (["querystring", "page_title", "pathname"].includes(parameter)) {
+  // if (["querystring", "page_title", "pathname"].includes(parameter)) {
+  // }
+
+  if (parameter === "exit_page") {
     return `
-      SELECT
-        ${geSqlParam(parameter)} as value,
-        COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-      FROM pageviews
-      WHERE
-          site_id = ${site}
-          ${filterStatement}
+    SELECT 
+        pathname as value,
+        COUNT(distinct(session_id)) as count,
+        ${percentageStatement}
+    FROM (
+        SELECT
+            session_id,
+            argMax(hostname, timestamp) AS hostname,
+            argMax(pathname, timestamp) AS pathname
+        FROM pageviews 
+        WHERE
+          site_id = ${site} 
           ${getTimeStatement(startDate, endDate, timezone)}
-          AND type = 'pageview'
-      GROUP BY value ORDER BY count desc
-      ${limit ? `LIMIT ${limit}` : ""};
-    `;
+        GROUP BY session_id
+    ) AS exit_pages
+    GROUP BY value ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};`;
+  }
+
+  if (parameter === "entry_page") {
+    return `
+    SELECT 
+        pathname as value,
+        COUNT(distinct(session_id)) as count,
+        ${percentageStatement}
+    FROM (
+        SELECT
+            session_id,
+            argMin(hostname, timestamp) AS hostname,
+            argMin(pathname, timestamp) AS pathname
+        FROM pageviews 
+        WHERE
+          site_id = ${site} 
+          ${getTimeStatement(startDate, endDate, timezone)}
+        GROUP BY session_id
+    ) AS entry_pages
+    GROUP BY value ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};`;
   }
 
   return `
     SELECT
-        ${parameter} as value,
-        count() as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage,
-        ROUND(AVG(dateDiff('second', session_start, session_end))) as avg_session_duration,
-        ROUND(SUM(if(pageviews = 1, 1, 0)) * 100.0 / COUNT(), 2) as bounce_rate
-    FROM
-        sessions_mv
+      ${geSqlParam(parameter)} as value,
+      COUNT(distinct(session_id)) as count,
+      ${percentageStatement}
+    FROM pageviews
     WHERE
         site_id = ${site}
-        AND notEmpty(${parameter})
-        ${getTimeStatement(startDate, endDate, timezone, "sessions")}
-    GROUP BY
-      ${parameter}
-    ORDER BY
-        COUNT() DESC
+        ${filterStatement}
+        ${getTimeStatement(startDate, endDate, timezone)}
+        AND type = 'pageview'
+    GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};
   `;
+  // return `
+  //   SELECT
+  //       ${parameter} as value,
+  //       count() as count,
+  //       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage,
+  //       ROUND(AVG(dateDiff('second', session_start, session_end))) as avg_session_duration,
+  //       ROUND(SUM(if(pageviews = 1, 1, 0)) * 100.0 / COUNT(), 2) as bounce_rate
+  //   FROM
+  //       sessions_mv
+  //   WHERE
+  //       site_id = ${site}
+  //       AND notEmpty(${parameter})
+  //       ${filterStatement}
+  //       ${getTimeStatement(startDate, endDate, timezone, "sessions")}
+  //   GROUP BY
+  //     ${parameter}
+  //   ORDER BY
+  //       COUNT() DESC
+  //   ${limit ? `LIMIT ${limit}` : ""};
+  // `;
 };
 
 export async function getSingleCol(
@@ -110,6 +158,7 @@ export async function getSingleCol(
     const data = await processResults<GetSingleColResponse[number]>(result);
     return res.send({ data });
   } catch (error) {
+    console.log(query);
     console.error(`Error fetching ${parameter}:`, error);
     return res.status(500).send({ error: `Failed to fetch ${parameter}` });
   }

@@ -1,6 +1,6 @@
 "use client";
 import { getCountryName } from "../../../../../lib/utils";
-import { StandardSection } from "../../../components/shared/StandardSection";
+import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
 import { useState } from "react";
 import {
@@ -21,11 +21,11 @@ type Tab = "countries" | "regions";
 export function Countries() {
   const [tab, setTab] = useState<Tab>("countries");
   return (
-    <Card className="h-[493px]">
-      <CardHeader>
+    <Card className="">
+      {/* <CardHeader>
         <CardTitle>Countries</CardTitle>
-      </CardHeader>
-      <CardContent className="mt-[-8px]">
+      </CardHeader> */}
+      <CardContent className="mt-2">
         <Tabs
           defaultValue="countries"
           value={tab}

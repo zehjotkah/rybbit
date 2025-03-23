@@ -6,13 +6,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../../components/ui/basic-tabs";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../../../components/ui/card";
-import { StandardSection } from "../../../components/shared/StandardSection";
+import { Card, CardContent } from "../../../../../components/ui/card";
+import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 
 type Tab = "referrers";
 
@@ -20,10 +15,7 @@ export function Referrers() {
   const [tab, setTab] = useState<Tab>("referrers");
   return (
     <Card className="h-[493px]">
-      <CardHeader>
-        <CardTitle>Referrers</CardTitle>
-      </CardHeader>
-      <CardContent className="mt-[-8px]">
+      <CardContent className="mt-2">
         <Tabs
           defaultValue="referrers"
           value={tab}

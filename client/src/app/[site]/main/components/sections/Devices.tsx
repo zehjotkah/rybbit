@@ -1,5 +1,6 @@
 "use client";
 
+import { Monitor, Smartphone, Tablet } from "lucide-react";
 import { useState } from "react";
 import {
   Tabs,
@@ -7,16 +8,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../../components/ui/basic-tabs";
-import { StandardSection } from "../../../components/shared/StandardSection";
-import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../../../components/ui/card";
+import { Card, CardContent } from "../../../../../components/ui/card";
+import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { Browser } from "../../../components/shared/icons/Browser";
-import { Monitor, Smartphone, Tablet } from "lucide-react";
+import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
 
 type Tab = "devices" | "browsers" | "os" | "dimensions";
 
@@ -24,10 +19,7 @@ export function Devices() {
   const [tab, setTab] = useState<Tab>("devices");
   return (
     <Card className="h-[493px]">
-      <CardHeader>
-        <CardTitle>Devices</CardTitle>
-      </CardHeader>
-      <CardContent className="mt-[-8px]">
+      <CardContent className="mt-2">
         <Tabs
           defaultValue="devices"
           value={tab}
