@@ -1,5 +1,5 @@
 "use client";
-import { Globe } from "lucide-react";
+import { ChevronRight, Globe } from "lucide-react";
 import { useState } from "react";
 import {
   Tabs,
@@ -11,6 +11,7 @@ import { Card, CardContent } from "../../../../../components/ui/card";
 import { getCountryName } from "../../../../../lib/utils";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
+import { useSubdivisions } from "../../../../../lib/geo";
 
 type Tab = "countries" | "regions" | "languages";
 
@@ -47,6 +48,9 @@ const getCountryFromLanguage = (languageCode: string): string | null => {
 
 export function Countries() {
   const [tab, setTab] = useState<Tab>("countries");
+
+  const { data: subdivisions } = useSubdivisions();
+
   return (
     <Card className="">
       <CardContent className="mt-2">
@@ -66,15 +70,45 @@ export function Countries() {
               title="Countries"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => (
-                <div className="flex gap-2 items-center">
-                  <CountryFlag country={e.value} />
-                  {getCountryName(e.value)}
-                </div>
-              )}
+              getLabel={(e) => {
+                console.info(e.value);
+                return (
+                  <div className="flex gap-2 items-center">
+                    <CountryFlag country={e.value} />
+                    {getCountryName(e.value)}
+                  </div>
+                );
+              }}
             />
           </TabsContent>
-          <TabsContent value="regions"></TabsContent>
+          <TabsContent value="regions">
+            <StandardSection
+              filterParameter="iso_3166_2"
+              title="Regions"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) => {
+                if (!e.value) {
+                  return "Unknown";
+                }
+
+                const region = subdivisions?.features.find(
+                  (feature) => feature.properties.iso_3166_2 === e.value
+                )?.properties;
+
+                return (
+                  <div className="flex gap-2 items-center">
+                    <CountryFlag
+                      country={region?.iso_3166_2.slice(0, 2) ?? ""}
+                    />
+                    {region?.iso_3166_2.slice(0, 2)}
+                    <ChevronRight className="w-4 h-4 mx-[-4px]" />
+                    {region?.name}
+                  </div>
+                );
+              }}
+            />
+          </TabsContent>
           <TabsContent value="languages">
             <StandardSection
               filterParameter="language"

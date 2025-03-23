@@ -16,9 +16,7 @@ import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
 import { useSingleCol } from "@/api/analytics/useSingleCol";
 import { addFilter, FilterParameter } from "../../../../../lib/store";
-
-const countriesGeoUrl = "/countries.json";
-const subdivisionsGeoUrl = "/subdivisions.json";
+import { useCountries, useSubdivisions } from "../../../../../lib/geo";
 
 interface TooltipContent {
   name: string;
@@ -86,19 +84,8 @@ export function Map() {
       .range([startColor, endColor]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
-  const [countriesGeoData, setCountriesGeoData] =
-    useState<GeoJsonObject | null>(null);
-  const [subdivisionsGeoData, setSubdivisionsGeoData] =
-    useState<GeoJsonObject | null>(null);
-
-  useEffect(() => {
-    fetch(countriesGeoUrl)
-      .then((res) => res.json())
-      .then(setCountriesGeoData);
-    fetch(subdivisionsGeoUrl)
-      .then((res) => res.json())
-      .then(setSubdivisionsGeoData);
-  }, []);
+  const { data: subdivisionsGeoData } = useSubdivisions();
+  const { data: countriesGeoData } = useCountries();
 
   const handleStyle = (feature: Feature | undefined) => {
     const borderColors = [
@@ -224,7 +211,7 @@ export function Map() {
             {mapView === "countries" && countriesGeoData && (
               <GeoJSON
                 key={`countries-${dataVersion}`}
-                data={countriesGeoData}
+                data={countriesGeoData as GeoJsonObject}
                 style={handleStyle}
                 onEachFeature={handleEachFeature}
               />
@@ -232,7 +219,7 @@ export function Map() {
             {mapView === "subdivisions" && subdivisionsGeoData && (
               <GeoJSON
                 key={`subdivisions-${dataVersion}`}
-                data={subdivisionsGeoData}
+                data={subdivisionsGeoData as GeoJsonObject}
                 style={handleStyle}
                 onEachFeature={handleEachFeature}
               />
