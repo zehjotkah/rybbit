@@ -91,6 +91,8 @@ export const initializeClickhouse = async () => {
         session_end DateTime,
         user_id String,
         pageviews UInt32,
+        entry_page String,
+        exit_page String,
 
         hostname String,
         referrer String,
@@ -124,6 +126,8 @@ export const initializeClickhouse = async () => {
         max(timestamp) AS session_end,
         any(user_id) AS user_id,
         countIf(type = 'pageview') AS pageviews,
+        argMinIf(pathname, timestamp, type = 'pageview') AS entry_page,
+        argMaxIf(pathname, timestamp, type = 'pageview') AS exit_page,
 
         any(hostname) AS hostname,
         any(referrer) AS referrer,
