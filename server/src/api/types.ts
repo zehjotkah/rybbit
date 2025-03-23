@@ -13,6 +13,7 @@ export type FilterParameter =
   | "page_title"
   | "querystring"
   | "iso_3166_2"
+  | "event_name"
   // derivative parameters
   | "entry_page"
   | "exit_page"

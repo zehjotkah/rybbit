@@ -43,6 +43,8 @@ function getParameterNameLabel(parameter: FilterParameter) {
       return "Exit Page";
     case "dimensions":
       return "Dimension";
+    case "event_name":
+      return "Event Name";
     default:
       return parameter;
   }

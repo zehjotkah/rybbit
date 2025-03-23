@@ -99,6 +99,7 @@ export function StandardSection({
   getLabel,
   getValue,
   getLink,
+  countLabel,
   filterParameter,
 }: {
   title: string;
@@ -107,6 +108,7 @@ export function StandardSection({
   getLabel: (item: SingleColResponse) => ReactNode;
   getValue: (item: SingleColResponse) => string;
   getLink?: (item: SingleColResponse) => string;
+  countLabel?: string;
   filterParameter: FilterParameter;
 }) {
   const { data, isFetching, error, refetch } = useSingleCol({
@@ -165,7 +167,7 @@ export function StandardSection({
         <>
           <div className="flex flex-row gap-2 justify-between pr-1 text-xs text-neutral-400">
             <div>{title}</div>
-            <div>Sessions</div>
+            <div>{countLabel || "Sessions"}</div>
           </div>
           {data?.data?.slice(0, 10).map((e) => (
             <Row
@@ -198,7 +200,7 @@ export function StandardSection({
             <div className="flex flex-col gap-2">
               <div className="flex flex-row gap-2 justify-between pr-20 text-sm text-neutral-400">
                 <div>{title}</div>
-                <div>Sessions</div>
+                <div>{countLabel || "Sessions"}</div>
               </div>
               <div className="flex flex-col gap-2 max-h-[85vh] overflow-x-hidden">
                 {data?.data?.map((e) => (

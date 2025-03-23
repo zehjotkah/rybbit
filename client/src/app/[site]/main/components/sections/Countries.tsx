@@ -32,7 +32,6 @@ const getLanguageName = (languageCode: string) => {
     // Just a language code
     return languageNamesInEnglish.of(languageCode);
   } catch (error) {
-    console.error(error);
     return languageCode;
   }
 };

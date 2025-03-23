@@ -40,33 +40,26 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
           2
       ) as percentage`;
 
-  // if (["querystring", "page_title", "pathname"].includes(parameter)) {
-  // }
-
-  if (parameter === "exit_page") {
+  if (parameter === "event_name") {
     return `
-    SELECT 
-        pathname as value,
-        COUNT(distinct(session_id)) as count,
-        ${percentageStatement}
-    FROM (
-        SELECT
-            session_id,
-            argMax(hostname, timestamp) AS hostname,
-            argMax(pathname, timestamp) AS pathname
-        FROM pageviews 
-        WHERE
-          site_id = ${site} 
-          ${filterStatement}
-          ${getTimeStatement(startDate, endDate, timezone)}
-          AND type = 'pageview'
-        GROUP BY session_id
-    ) AS exit_pages
-    GROUP BY value ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};`;
+    SELECT
+      event_name as value,
+      COUNT(*) as count,
+      ${percentageStatement}
+    FROM pageviews
+    WHERE
+      site_id = ${site}
+      ${filterStatement}
+      ${getTimeStatement(startDate, endDate, timezone)}
+      AND type = 'custom_event'
+    GROUP BY event_name ORDER BY count desc
+    ${limit ? `LIMIT ${limit}` : ""};
+  `;
   }
 
-  if (parameter === "entry_page") {
+  if (parameter === "exit_page" || parameter === "entry_page") {
+    const arg = parameter === "exit_page" ? "argMax" : "argMin";
+
     return `
     SELECT 
         pathname as value,
@@ -75,16 +68,16 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
     FROM (
         SELECT
             session_id,
-            argMin(hostname, timestamp) AS hostname,
-            argMin(pathname, timestamp) AS pathname
+            ${arg}(hostname, timestamp) AS hostname,
+            ${arg}(pathname, timestamp) AS pathname
         FROM pageviews 
         WHERE
           site_id = ${site} 
           ${filterStatement}
           ${getTimeStatement(startDate, endDate, timezone)}
-          AND type = 'pageview'
+          // AND type = 'pageview'
         GROUP BY session_id
-    ) AS entry_pages
+    ) AS query
     GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};`;
   }
@@ -99,7 +92,7 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
         site_id = ${site}
         ${filterStatement}
         ${getTimeStatement(startDate, endDate, timezone)}
-        AND type = 'pageview'
+        // AND type = 'pageview'
     GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};
   `;
@@ -147,7 +140,6 @@ export async function getSingleCol(
     const data = await processResults<GetSingleColResponse[number]>(result);
     return res.send({ data });
   } catch (error) {
-    console.log(query);
     console.error(`Error fetching ${parameter}:`, error);
     return res.status(500).send({ error: `Failed to fetch ${parameter}` });
   }

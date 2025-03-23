@@ -70,6 +70,10 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
     label: "Screen Dimensions",
     value: "dimensions",
   },
+  {
+    label: "Event Name",
+    value: "event_name",
+  },
 ];
 
 export function NewFilterButton() {
