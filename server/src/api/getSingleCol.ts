@@ -17,7 +17,6 @@ interface GenericRequest {
     site: string;
     filters: string;
     parameter: FilterParameter;
-    type: "events" | "sessions";
     limit?: number;
   };
 }
@@ -26,91 +25,65 @@ type GetSingleColResponse = {
   value: string;
   count: number;
   percentage: number;
+  avg_session_duration?: number;
+  bounce_rate?: number;
 }[];
 
 const getQuery = (request: GenericRequest["Querystring"]) => {
-  const {
-    startDate,
-    endDate,
-    timezone,
-    site,
-    filters,
-    parameter,
-    limit,
-    type,
-  } = request;
+  const { startDate, endDate, timezone, site, filters, parameter, limit } =
+    request;
 
   const filterStatement = getFilterStatement(filters);
-
-  if (parameter === "exit_page" || parameter === "entry_page") {
-    return `
-    SELECT
-        ${parameter} as value,
-        count() as count,
-        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-    FROM
-        sessions_mv
-    WHERE 
-        site_id = ${site} 
-        AND notEmpty(entry_page)
-        ${getTimeStatement(startDate, endDate, timezone, "sessions")}
-    GROUP BY
-      ${parameter}
-    ORDER BY
-        COUNT() DESC
-    ${limit ? `LIMIT ${limit}` : ""};
-    `;
-  }
 
   if (parameter === "dimensions") {
     return `
     SELECT
       concat(toString(screen_width), 'x', toString(screen_height)) AS value,
-      ${
-        type === "sessions"
-          ? "COUNT(distinct(session_id)) as count"
-          : "COUNT(*) as count"
-      },
-      ${
-        type === "sessions"
-          ? `ROUND(
-          COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
-          2
-      ) as percentage`
-          : "ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage"
-      }
-    FROM pageviews
+      COUNT(*) as count,
+      ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+    FROM sessions_mv
     WHERE
       site_id = ${site}
       ${filterStatement}
-      ${getTimeStatement(startDate, endDate, timezone)}
+      ${getTimeStatement(startDate, endDate, timezone, "sessions")}
     GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};`;
   }
 
+  if (["querystring", "page_title", "pathname"].includes(parameter)) {
+    return `
+      SELECT
+        ${geSqlParam(parameter)} as value,
+        COUNT(*) as count,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+      FROM pageviews
+      WHERE
+          site_id = ${site}
+          ${filterStatement}
+          ${getTimeStatement(startDate, endDate, timezone)}
+          AND type = 'pageview'
+      GROUP BY value ORDER BY count desc
+      ${limit ? `LIMIT ${limit}` : ""};
+    `;
+  }
+
   return `
     SELECT
-      ${geSqlParam(parameter)} as value,
-      ${
-        type === "sessions"
-          ? "COUNT(distinct(session_id)) as count"
-          : "COUNT(*) as count"
-      },
-      ${
-        type === "sessions"
-          ? `ROUND(
-          COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
-          2
-      ) as percentage`
-          : "ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage"
-      }
-    FROM pageviews
+        ${parameter} as value,
+        count() as count,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage,
+        ROUND(AVG(dateDiff('second', session_start, session_end))) as avg_session_duration,
+        ROUND(SUM(if(pageviews = 1, 1, 0)) * 100.0 / COUNT(), 2) as bounce_rate
+    FROM
+        sessions_mv
     WHERE
         site_id = ${site}
-        ${filterStatement}
-        ${getTimeStatement(startDate, endDate, timezone)}
-        AND type = 'pageview'
-    GROUP BY value ORDER BY count desc
+        AND notEmpty(${parameter})
+        ${getTimeStatement(startDate, endDate, timezone, "sessions")}
+    GROUP BY
+      ${parameter}
+    ORDER BY
+        COUNT() DESC
     ${limit ? `LIMIT ${limit}` : ""};
   `;
 };

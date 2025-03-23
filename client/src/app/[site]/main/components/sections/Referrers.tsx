@@ -34,7 +34,6 @@ export function Referrers() {
           </TabsList>
           <TabsContent value="referrers">
             <StandardSection
-              type="sessions"
               filterParameter="referrer"
               title="Referrers"
               getValue={(e) => e.value}

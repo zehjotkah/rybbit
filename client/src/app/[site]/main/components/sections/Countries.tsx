@@ -37,7 +37,6 @@ export function Countries() {
           </TabsList>
           <TabsContent value="countries">
             <StandardSection
-              type="sessions"
               filterParameter="country"
               title="Countries"
               getValue={(e) => e.value}

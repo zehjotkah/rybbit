@@ -10,6 +10,8 @@ export type SingleColResponse = {
   value: string;
   count: number;
   percentage: number;
+  avg_session_duration?: number;
+  bounce_rate?: number;
 };
 
 export function useSingleCol({
@@ -17,20 +19,18 @@ export function useSingleCol({
   limit = 10000,
   periodTime,
   useFilters = true,
-  type = "events",
 }: {
   parameter: FilterParameter;
   limit?: number;
   periodTime?: PeriodTime;
   useFilters?: boolean;
-  type?: "events" | "sessions";
 }): UseQueryResult<APIResponse<SingleColResponse[]>> {
   const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [parameter, timeToUse, site, filters, limit, type],
+    queryKey: [parameter, timeToUse, site, filters, limit],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/single-col`, {
@@ -41,7 +41,6 @@ export function useSingleCol({
         parameter,
         limit,
         filters: useFilters ? filters : undefined,
-        type,
       }).then((res) => res.json());
     },
     staleTime: Infinity,

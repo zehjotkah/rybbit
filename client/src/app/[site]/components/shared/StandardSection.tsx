@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { round } from "lodash";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { AlertCircle, SquareArrowOutUpRight, RefreshCcw } from "lucide-react";
 import { memo, ReactNode, useMemo } from "react";
 import {
   SingleColResponse,
@@ -76,7 +76,6 @@ export function StandardSection({
   getValue,
   getLink,
   filterParameter,
-  type,
 }: {
   title: string;
   isFetching?: boolean;
@@ -85,11 +84,9 @@ export function StandardSection({
   getValue: (item: SingleColResponse) => string;
   getLink?: (item: SingleColResponse) => string;
   filterParameter: FilterParameter;
-  type: "events" | "sessions";
 }) {
-  const { data, isFetching } = useSingleCol({
+  const { data, isFetching, error, refetch } = useSingleCol({
     parameter: filterParameter,
-    type,
   });
 
   const { data: previousData, isFetching: previousIsFetching } = useSingleCol({
@@ -111,10 +108,35 @@ export function StandardSection({
     ? 100 / data?.data?.[0]?.percentage
     : 1;
 
+  // Check for errors from either query
+  const hasError = error || previousData?.error;
+  const errorMessage =
+    error?.message || "An error occurred while fetching data";
+
   return (
     <div className="flex flex-col gap-2">
       {isLoading ? (
         <Skeleton />
+      ) : hasError ? (
+        <div className="py-6 flex-1 flex flex-col items-center justify-center gap-3 transition-all">
+          <AlertCircle className="text-amber-400 w-8 h-8" />
+          <div className="text-center">
+            <div className="text-neutral-100 font-medium mb-1">
+              Failed to load data
+            </div>
+            <div className="text-sm text-neutral-400 max-w-md mx-auto mb-3">
+              {errorMessage}
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-transparent hover:bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-neutral-100"
+            onClick={() => refetch()}
+          >
+            <RefreshCcw className="w-3 h-3" /> Try Again
+          </Button>
+        </div>
       ) : (
         data?.data?.slice(0, 10).map((e) => (
           <div
@@ -177,7 +199,7 @@ export function StandardSection({
         <Button variant="outline" disabled className="opacity-50">
           View All
         </Button>
-      ) : data?.data?.length && data?.data?.length > 10 ? (
+      ) : !hasError && data?.data?.length && data?.data?.length > 10 ? (
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">View All</Button>
