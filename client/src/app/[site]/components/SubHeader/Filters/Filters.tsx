@@ -18,7 +18,7 @@ function getParameterNameLabel(parameter: FilterParameter) {
     case "device_type":
       return "Device Type";
     case "operating_system":
-      return "Operating System";
+      return "OS";
     case "browser":
       return "Browser";
     case "referrer":
@@ -26,9 +26,9 @@ function getParameterNameLabel(parameter: FilterParameter) {
     case "pathname":
       return "Path";
     case "page_title":
-      return "Page Title";
+      return "Title";
     case "querystring":
-      return "Query String";
+      return "Query";
     case "language":
       return "Language";
     case "city":
@@ -37,6 +37,12 @@ function getParameterNameLabel(parameter: FilterParameter) {
       return "Region";
     case "iso_3166_2":
       return "Region";
+    case "entry_page":
+      return "Entry Page";
+    case "exit_page":
+      return "Exit Page";
+    case "dimensions":
+      return "Dimension";
     default:
       return parameter;
   }

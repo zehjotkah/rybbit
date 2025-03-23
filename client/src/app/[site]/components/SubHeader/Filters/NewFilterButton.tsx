@@ -38,10 +38,10 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
     label: "Region",
     value: "iso_3166_2",
   },
-  {
-    label: "City",
-    value: "city",
-  },
+  // {
+  //   label: "City",
+  //   value: "city",
+  // },
   {
     label: "Device Type",
     value: "device_type",
@@ -57,6 +57,18 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
   {
     label: "Language",
     value: "language",
+  },
+  {
+    label: "Entry Page",
+    value: "entry_page",
+  },
+  {
+    label: "Exit Page",
+    value: "exit_page",
+  },
+  {
+    label: "Screen Dimensions",
+    value: "dimensions",
   },
 ];
 
@@ -87,6 +99,9 @@ export function NewFilterButton() {
         selectedFilter?.value === "country" ||
         selectedFilter?.value === "region" ||
         selectedFilter?.value === "city" ||
+        selectedFilter?.value === "iso_3166_2" ||
+        selectedFilter?.value === "entry_page" ||
+        selectedFilter?.value === "exit_page" ||
         selectedFilter?.value === "querystring"
       ) {
         return [
