@@ -169,6 +169,7 @@ export function StandardSection({
           </div>
           {data?.data?.slice(0, 10).map((e) => (
             <Row
+              key={getKey(e)}
               e={e}
               ratio={ratio}
               getKey={getKey}
