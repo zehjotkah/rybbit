@@ -52,10 +52,11 @@ export function isSiteOverLimit(siteId: number | string): boolean {
 
 // Get existing user session
 export async function getExistingSession(
-  userId: string
+  userId: string,
+  siteId: string
 ): Promise<ActiveSession | null> {
   const [existingSession] = await sql<ActiveSession[]>`
-    SELECT * FROM active_sessions WHERE user_id = ${userId}
+    SELECT * FROM active_sessions WHERE user_id = ${userId} AND site_id = ${siteId}
   `;
   return existingSession;
 }

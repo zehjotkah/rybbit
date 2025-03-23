@@ -47,7 +47,10 @@ export async function trackEvent(
     );
 
     // Get existing session
-    const existingSession = await getExistingSession(payload.userId);
+    const existingSession = await getExistingSession(
+      payload.userId,
+      payload.site_id
+    );
 
     // Process the event (isPageview = true for pageview events)
     await processTrackingEvent(
