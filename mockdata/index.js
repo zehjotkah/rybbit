@@ -501,6 +501,371 @@ function formatTime(seconds) {
   }
 }
 
+// Optimized version of generateSessionEvents for speed
+function generateSessionEventsOptimized(
+  userId,
+  sessionId,
+  startTime,
+  sessionData
+) {
+  // Pre-allocate array for events - this is much faster than dynamic growth
+  // Most sessions will have between 1-30 events, so this is a reasonable size
+  const MAX_EVENTS = 36;
+  const events = new Array(MAX_EVENTS);
+  let eventCount = 0;
+
+  // Session duration calculation
+  const sessionDuration = Math.floor(Math.random() * 1800) + 60; // 1-30 minutes in seconds
+  const numberOfPageviews = Math.floor(Math.random() * 8) + 1; // 1-8 pageviews per session (reduced for speed)
+
+  // Cache commonly used values to avoid repeated property lookups
+  const siteId = SITE_ID;
+  const hostname = SITE_DOMAIN;
+  const browser = sessionData.browser;
+  const browserVersion = sessionData.browserVersion;
+  const os = sessionData.os;
+  const osVersion = sessionData.osVersion;
+  const language = sessionData.language;
+  const screenWidth = sessionData.screenWidth;
+  const screenHeight = sessionData.screenHeight;
+  const deviceType = sessionData.deviceType;
+  const country = sessionData.country;
+  const iso3166 = sessionData.iso3166;
+  const initialReferrer = sessionData.referrer;
+  const dateFormat = "yyyy-MM-dd HH:mm:ss";
+
+  // Track session state
+  let currentPath = null;
+  let currentProduct = null;
+  let cartItems = [];
+  let hasPurchased = false;
+  let currentTime = startTime;
+
+  // Create a fast template event creator function - much faster than creating and copying objects
+  function createEvent(
+    pathname,
+    querystring,
+    title,
+    referrer,
+    type,
+    eventName,
+    props
+  ) {
+    if (eventCount >= MAX_EVENTS) return; // Safety check
+
+    events[eventCount++] = {
+      site_id: siteId,
+      session_id: sessionId,
+      user_id: userId,
+      hostname: hostname,
+      browser: browser,
+      browser_version: browserVersion,
+      operating_system: os,
+      operating_system_version: osVersion,
+      language: language,
+      screen_width: screenWidth,
+      screen_height: screenHeight,
+      device_type: deviceType,
+      country: country,
+      iso_3166_2: iso3166,
+      timestamp: currentTime.toFormat(dateFormat),
+      pathname: pathname,
+      querystring: querystring || "",
+      page_title: title,
+      referrer: referrer || "",
+      type: type,
+      event_name: eventName || "",
+      properties: props || "",
+    };
+  }
+
+  // Fast entry page selection - avoid complex weighted random for most common case
+  // First page - entry point - optimize for most common case
+  const entryPageIndex = Math.floor(Math.random() * 10);
+  if (entryPageIndex < 3) {
+    // 30% homepage
+    currentPath = pagePaths[0]; // homepage
+  } else if (entryPageIndex < 6) {
+    // 30% products
+    currentPath = pagePaths[1]; // products
+  } else if (entryPageIndex < 8) {
+    // 20% sale
+    currentPath = pagePaths[3]; // sale
+  } else {
+    // 20% random
+    currentPath = pagePaths[Math.floor(Math.random() * 15)];
+  }
+
+  // Run through the pageviews for this session
+  for (let i = 0; i < numberOfPageviews; i++) {
+    // Advance time - simplify time calculation
+    const timeAdvance = 30 + Math.floor(Math.random() * 30);
+    currentTime = currentTime.plus({ seconds: timeAdvance });
+
+    // Check if we've exceeded session duration
+    if (i > 0 && currentTime > startTime.plus({ seconds: sessionDuration })) {
+      break;
+    }
+
+    // Get querystring - simplified
+    let querystring = "";
+    if (Math.random() < 0.2) {
+      // Reduced probability for speed
+      if (currentPath.path.startsWith("/product/")) {
+        // Use most common product variant
+        querystring = "?variant=medium";
+      } else if (currentPath.path === "/products") {
+        // Use most common sort
+        querystring = "?sort=newest";
+      }
+    }
+
+    // Add pageview event - always happens
+    createEvent(
+      currentPath.path,
+      querystring,
+      currentPath.title,
+      i === 0 ? initialReferrer : "",
+      "pageview",
+      "",
+      ""
+    );
+
+    // Update product for product pages
+    if (currentPath.path.startsWith("/product/")) {
+      currentProduct = currentPath.product;
+
+      // Add product view event - always on product pages
+      currentTime = currentTime.plus({ seconds: 2 });
+
+      // Simplified properties creation - avoid building complex objects
+      const productProps = JSON.stringify({
+        product_id: currentProduct.id,
+        product_name: currentProduct.name,
+        category: currentProduct.category,
+        price: currentProduct.price,
+        currency: "USD",
+      });
+
+      createEvent(
+        currentPath.path,
+        querystring,
+        currentPath.title,
+        "",
+        "custom_event",
+        "product-view",
+        productProps
+      );
+
+      // Add to cart (30% chance)
+      if (Math.random() < 0.3 && !cartItems.includes(currentProduct)) {
+        currentTime = currentTime.plus({ seconds: 5 });
+        cartItems.push(currentProduct);
+
+        createEvent(
+          currentPath.path,
+          querystring,
+          currentPath.title,
+          "",
+          "custom_event",
+          "add-to-cart",
+          JSON.stringify({
+            product_id: currentProduct.id,
+            product_name: currentProduct.name,
+            category: currentProduct.category,
+            price: currentProduct.price,
+            quantity: 1,
+            currency: "USD",
+          })
+        );
+      }
+    }
+    // Cart view/checkout - simplified for speed
+    else if (currentPath.path === "/cart" && cartItems.length > 0) {
+      // Calculate cart total once
+      const cartTotal = cartItems
+        .reduce((sum, item) => sum + parseFloat(item.price), 0)
+        .toFixed(2);
+
+      createEvent(
+        currentPath.path,
+        querystring,
+        currentPath.title,
+        "",
+        "custom_event",
+        "view-cart",
+        JSON.stringify({
+          items_count: cartItems.length,
+          value: cartTotal,
+          currency: "USD",
+        })
+      );
+    }
+    // Purchase flow - simplified for speed
+    else if (
+      currentPath.path === "/checkout" &&
+      cartItems.length > 0 &&
+      !hasPurchased
+    ) {
+      // Calculate cart total once
+      const cartTotal = cartItems
+        .reduce((sum, item) => sum + parseFloat(item.price), 0)
+        .toFixed(2);
+
+      createEvent(
+        currentPath.path,
+        querystring,
+        currentPath.title,
+        "",
+        "custom_event",
+        "begin-checkout",
+        JSON.stringify({
+          items_count: cartItems.length,
+          value: cartTotal,
+          currency: "USD",
+        })
+      );
+
+      // Purchase - simplify condition
+      if (
+        (i === numberOfPageviews - 1 || Math.random() < 0.6) &&
+        !hasPurchased
+      ) {
+        currentTime = currentTime.plus({ seconds: 15 });
+        const transactionId = Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase();
+
+        // Simplified purchase event - avoid creating complex JSON structures
+        createEvent(
+          currentPath.path,
+          querystring,
+          currentPath.title,
+          "",
+          "custom_event",
+          "purchase",
+          JSON.stringify({
+            transaction_id: transactionId,
+            value: cartTotal,
+            tax: (parseFloat(cartTotal) * 0.08).toFixed(2),
+            shipping: "9.99",
+            currency: "USD",
+            items_count: cartItems.length,
+          })
+        );
+
+        hasPurchased = true;
+      }
+    }
+
+    // Simplified navigation logic for speed - use faster random selection
+    if (i < numberOfPageviews - 1) {
+      const navRand = Math.random();
+
+      // Faster navigation logic - avoid complex condition checking
+      if (cartItems.length > 0 && navRand < 0.3) {
+        // 30% go to cart if items exist
+        currentPath = pagePaths.find((p) => p.path === "/cart") || pagePaths[0];
+      } else if (
+        currentPath.path === "/cart" &&
+        cartItems.length > 0 &&
+        navRand < 0.6
+      ) {
+        // 30% go to checkout from cart
+        currentPath =
+          pagePaths.find((p) => p.path === "/checkout") || pagePaths[0];
+      } else if (navRand < 0.4) {
+        // 40% go to product - products are after index 15
+        const productIndex =
+          15 + Math.floor(Math.random() * (pagePaths.length - 15));
+        currentPath = pagePaths[productIndex];
+      } else if (navRand < 0.7) {
+        // 30% go to one of the main pages (indexes 0-5)
+        currentPath = pagePaths[Math.floor(Math.random() * 6)];
+      } else {
+        // 30% random navigation
+        currentPath = pagePaths[Math.floor(Math.random() * pagePaths.length)];
+      }
+    }
+  }
+
+  // Return only the populated part of the array
+  return events.slice(0, eventCount);
+}
+
+// Function to generate session data (browser, OS, screen resolution, etc.)
+function generateSessionData() {
+  // Select browser and version
+  const browser = weightedRandom(browsers);
+  const browserVersion =
+    browser.versions[Math.floor(Math.random() * browser.versions.length)];
+
+  // Select OS and version
+  const os = weightedRandom(operatingSystems);
+  const osVersion = os.versions[Math.floor(Math.random() * os.versions.length)];
+
+  // Select screen resolution
+  const resolution = weightedRandom(screenResolutions);
+
+  // Generate language code (instead of using faker.locale)
+  const languageCodes = [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "ru",
+    "zh",
+    "ja",
+    "pt",
+    "nl",
+  ];
+  const language =
+    languageCodes[Math.floor(Math.random() * languageCodes.length)] +
+    (Math.random() < 0.5 ? "" : "-" + faker.location.countryCode());
+
+  // Select referrer
+  const referrer = weightedRandom(referrers).url;
+
+  // Use Faker for location data
+  const country = faker.location.countryCode();
+  let region = "";
+
+  // Get region code based on country
+  if (country === "US") {
+    region = faker.location.state({ abbreviated: true });
+  } else {
+    // For non-US, we'll use a simple region code
+    region = faker.location.county().slice(0, 3).toUpperCase();
+  }
+
+  // Determine device type based on screen resolution and OS
+  let deviceType = "Desktop";
+  if (os.name === "Android" || os.name === "iOS") {
+    deviceType = "Mobile";
+    if (resolution.width > 768) {
+      deviceType = "Tablet";
+    }
+  } else if (resolution.width <= 1024) {
+    deviceType = "Mobile";
+  }
+
+  return {
+    browser: browser.name,
+    browserVersion: browserVersion,
+    os: os.name,
+    osVersion: osVersion,
+    screenWidth: resolution.width,
+    screenHeight: resolution.height,
+    language: language,
+    referrer: referrer,
+    country: country,
+    iso3166: country && region ? `${country}-${region}` : country,
+    deviceType: deviceType,
+  };
+}
+
 // Function to generate events for a specific day
 async function generateEventsForDay(date, targetEventsCount) {
   // Instead of one large array, use a collection of batch arrays
@@ -531,6 +896,63 @@ async function generateEventsForDay(date, targetEventsCount) {
     `Preparing ${sessionsToGenerate.toLocaleString()} sessions with timestamps...`
   );
 
+  // For session data creation - cache common data to avoid recreating for every session
+  // Pre-generate some session data arrays for faster random selection
+  const pregenSessionData = {
+    browsers: Array.from({ length: 1000 }, () => {
+      const browser = weightedRandom(browsers);
+      return {
+        name: browser.name,
+        version:
+          browser.versions[Math.floor(Math.random() * browser.versions.length)],
+      };
+    }),
+
+    operatingSystems: Array.from({ length: 1000 }, () => {
+      const os = weightedRandom(operatingSystems);
+      return {
+        name: os.name,
+        version: os.versions[Math.floor(Math.random() * os.versions.length)],
+      };
+    }),
+
+    resolutions: Array.from({ length: 100 }, () =>
+      weightedRandom(screenResolutions)
+    ),
+
+    referrers: Array.from({ length: 100 }, () => weightedRandom(referrers).url),
+
+    countries: Array.from({ length: 100 }, () => {
+      const country = faker.location.countryCode();
+      let region = "";
+      if (country === "US") {
+        region = faker.location.state({ abbreviated: true });
+      } else {
+        region = faker.location.county().slice(0, 3).toUpperCase();
+      }
+      return { country, region };
+    }),
+
+    languages: Array.from({ length: 100 }, () => {
+      const languageCodes = [
+        "en",
+        "es",
+        "fr",
+        "de",
+        "it",
+        "ru",
+        "zh",
+        "ja",
+        "pt",
+        "nl",
+      ];
+      return (
+        languageCodes[Math.floor(Math.random() * languageCodes.length)] +
+        (Math.random() < 0.5 ? "" : "-" + faker.location.countryCode())
+      );
+    }),
+  };
+
   // Pre-generate timestamps for the day with realistic distribution in batches
   // This reduces memory pressure while maintaining chronological order
   const TIMESTAMP_BATCH_SIZE = 100000;
@@ -548,6 +970,14 @@ async function generateEventsForDay(date, targetEventsCount) {
 
   console.log(`Beginning event generation in optimized batches...`);
 
+  // Faster UUID generation
+  const fastUUID = () => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  };
+
   // Process in batches to optimize memory usage and performance
   while (totalTimestampsGenerated < sessionsToGenerate) {
     // Generate next batch of timestamps
@@ -557,10 +987,16 @@ async function generateEventsForDay(date, targetEventsCount) {
     );
     timestampBatch = [];
 
-    // Generate timestamps
+    // Generate timestamps - using a more optimized approach
+    const dateJSDate = date.toJSDate();
     for (let i = 0; i < batchSize; i++) {
+      // Simplified time generation - avoid full weightedRandom for every timestamp
+      const hour = 9 + Math.floor(Math.random() * 12); // Focus on 9am-9pm where most traffic happens
+      const minute = Math.floor(Math.random() * 60);
+      const second = Math.floor(Math.random() * 60);
+
       timestampBatch.push(
-        generateTimeForDay(DateTime.fromJSDate(date.toJSDate()))
+        DateTime.fromJSDate(dateJSDate).set({ hour, minute, second })
       );
     }
 
@@ -672,9 +1108,43 @@ async function generateEventsForDay(date, targetEventsCount) {
         sessionInfo.lastActivity = now;
       } else {
         // Create a new session
-        sessionId = generateUUID();
+        sessionId = fastUUID(); // Using faster UUID generation
         userId = userIds[Math.floor(Math.random() * userIds.length)];
-        sessionData = generateSessionData();
+
+        // Faster session data creation using pre-generated arrays
+        const browserIdx = Math.floor(Math.random() * 1000);
+        const osIdx = Math.floor(Math.random() * 1000);
+        const resIdx = Math.floor(Math.random() * 100);
+        const countryIdx = Math.floor(Math.random() * 100);
+        const langIdx = Math.floor(Math.random() * 100);
+        const refIdx = Math.floor(Math.random() * 100);
+
+        const browserInfo = pregenSessionData.browsers[browserIdx];
+        const osInfo = pregenSessionData.operatingSystems[osIdx];
+        const resolution = pregenSessionData.resolutions[resIdx];
+        const { country, region } = pregenSessionData.countries[countryIdx];
+
+        // Determine device type based on screen resolution and OS - simplified
+        let deviceType = "Desktop";
+        if (osInfo.name === "Android" || osInfo.name === "iOS") {
+          deviceType = resolution.width > 768 ? "Tablet" : "Mobile";
+        } else if (resolution.width <= 1024) {
+          deviceType = "Mobile";
+        }
+
+        sessionData = {
+          browser: browserInfo.name,
+          browserVersion: browserInfo.version,
+          os: osInfo.name,
+          osVersion: osInfo.version,
+          screenWidth: resolution.width,
+          screenHeight: resolution.height,
+          language: pregenSessionData.languages[langIdx],
+          referrer: pregenSessionData.referrers[refIdx],
+          country: country,
+          iso3166: country && region ? `${country}-${region}` : country,
+          deviceType: deviceType,
+        };
 
         // Add to active sessions
         activeSessions.set(sessionId, {
@@ -684,7 +1154,7 @@ async function generateEventsForDay(date, targetEventsCount) {
         });
       }
 
-      // Generate events for this session using fast, optimized event generation
+      // Generate events for this session using optimized event generation
       const sessionEvents = generateSessionEventsOptimized(
         userId,
         sessionId,
@@ -844,366 +1314,6 @@ async function generateEventsForDay(date, targetEventsCount) {
   );
 
   return finalEvents.length;
-}
-
-// Optimized version of generateSessionEvents for speed
-function generateSessionEventsOptimized(
-  userId,
-  sessionId,
-  startTime,
-  sessionData
-) {
-  const events = [];
-  let currentTime = startTime;
-
-  // Use simpler random number generation for speed
-  const sessionDuration = Math.floor(Math.random() * 1800) + 60; // 1-30 minutes in seconds
-  const numberOfPageviews = Math.floor(Math.random() * 12) + 1; // 1-12 pageviews per session
-
-  let currentPath = null;
-  let currentProduct = null;
-  let cartItems = [];
-  let hasPurchased = false;
-
-  // Pre-allocate array for better performance
-  events.length = Math.min(numberOfPageviews * 3, 30); // Approximate - allow space for multiple events per page
-  let eventCount = 0;
-
-  // Avoid repeated code by creating a template event object
-  const baseEvent = {
-    site_id: SITE_ID,
-    session_id: sessionId,
-    user_id: userId,
-    hostname: SITE_DOMAIN,
-    browser: sessionData.browser,
-    browser_version: sessionData.browserVersion,
-    operating_system: sessionData.os,
-    operating_system_version: sessionData.osVersion,
-    language: sessionData.language,
-    screen_width: sessionData.screenWidth,
-    screen_height: sessionData.screenHeight,
-    device_type: sessionData.deviceType,
-    country: sessionData.country,
-    iso_3166_2: sessionData.iso3166,
-  };
-
-  // Simplified page selection logic for speed
-  for (let i = 0; i < numberOfPageviews; i++) {
-    // Select page
-    if (i === 0) {
-      // First page - entry point
-      const entryPages = [
-        pagePaths[0], // homepage
-        pagePaths[1], // products
-        // A few random category pages
-        pagePaths[Math.floor(Math.random() * 5) + 15],
-        pagePaths[Math.floor(Math.random() * 5) + 15],
-      ];
-      currentPath = entryPages[Math.floor(Math.random() * entryPages.length)];
-    } else {
-      // Follow simplified, faster pathing logic
-      if (currentPath.path.startsWith("/product/") && Math.random() < 0.4) {
-        // From product, might add to cart and go to cart
-        if (Math.random() < 0.4 && currentPath.product) {
-          cartItems.push(currentPath.product);
-        }
-
-        if (cartItems.length > 0 && Math.random() < 0.5) {
-          // Go to cart
-          currentPath =
-            pagePaths.find((p) => p.path === "/cart") || pagePaths[0];
-        } else {
-          // Go to another product or category
-          const idx = Math.floor(Math.random() * pagePaths.length);
-          currentPath = pagePaths[idx];
-        }
-      } else if (currentPath.path === "/cart" && cartItems.length > 0) {
-        // From cart, might go to checkout
-        if (Math.random() < 0.6) {
-          currentPath =
-            pagePaths.find((p) => p.path === "/checkout") || pagePaths[0];
-        } else {
-          // Continue shopping
-          const idx = Math.floor(Math.random() * pagePaths.length);
-          currentPath = pagePaths[idx];
-        }
-      } else if (
-        currentPath.path === "/checkout" &&
-        cartItems.length > 0 &&
-        !hasPurchased
-      ) {
-        if (Math.random() < 0.7) {
-          // Purchase completed
-          hasPurchased = true;
-          currentPath =
-            pagePaths.find((p) => p.path === "/order-history") || pagePaths[0];
-        } else {
-          // Abandoned
-          currentPath =
-            pagePaths.find((p) => p.path === "/cart") || pagePaths[0];
-        }
-      } else {
-        // Random navigation
-        const idx = Math.floor(Math.random() * pagePaths.length);
-        currentPath = pagePaths[idx];
-      }
-    }
-
-    // Update product if on product page
-    if (currentPath.path.startsWith("/product/")) {
-      currentProduct = currentPath.product;
-    }
-
-    // Determine querystring (simplified)
-    let querystring = "";
-    if (Math.random() < 0.3) {
-      for (const prefix in tabParams) {
-        if (currentPath.path.includes(prefix)) {
-          const params = tabParams[prefix];
-          querystring = params[Math.floor(Math.random() * params.length)].param;
-          break;
-        }
-      }
-    }
-
-    // Add pageview event
-    currentTime = startTime.plus({
-      seconds: i * 30 + Math.floor(Math.random() * 30),
-    });
-    events[eventCount++] = {
-      ...baseEvent,
-      timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-      pathname: currentPath.path,
-      querystring: querystring,
-      page_title: currentPath.title,
-      referrer: i === 0 ? sessionData.referrer : "",
-      type: "pageview",
-      event_name: "",
-      properties: "",
-    };
-
-    // Add custom event based on page type (simplified for speed)
-    if (currentPath.path.startsWith("/product/") && currentProduct) {
-      // Product view
-      currentTime = currentTime.plus({
-        seconds: Math.floor(Math.random() * 5) + 2,
-      });
-      events[eventCount++] = {
-        ...baseEvent,
-        timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-        pathname: currentPath.path,
-        querystring: querystring,
-        page_title: currentPath.title,
-        referrer: "",
-        type: "custom_event",
-        event_name: "product-view",
-        properties: JSON.stringify({
-          product_id: currentProduct.id,
-          product_name: currentProduct.name,
-          category: currentProduct.category,
-          price: currentProduct.price,
-          currency: "USD",
-        }),
-      };
-
-      // Possible add to cart (30% chance)
-      if (Math.random() < 0.3 && !cartItems.includes(currentProduct)) {
-        currentTime = currentTime.plus({
-          seconds: Math.floor(Math.random() * 10) + 5,
-        });
-        cartItems.push(currentProduct);
-
-        events[eventCount++] = {
-          ...baseEvent,
-          timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-          pathname: currentPath.path,
-          querystring: querystring,
-          page_title: currentPath.title,
-          referrer: "",
-          type: "custom_event",
-          event_name: "add-to-cart",
-          properties: JSON.stringify({
-            product_id: currentProduct.id,
-            product_name: currentProduct.name,
-            category: currentProduct.category,
-            price: currentProduct.price,
-            quantity: 1,
-            currency: "USD",
-          }),
-        };
-      }
-    } else if (currentPath.path === "/cart" && cartItems.length > 0) {
-      // View cart
-      const cartTotal = cartItems.reduce(
-        (sum, item) => sum + parseFloat(item.price),
-        0
-      );
-
-      events[eventCount++] = {
-        ...baseEvent,
-        timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-        pathname: currentPath.path,
-        querystring: querystring,
-        page_title: currentPath.title,
-        referrer: "",
-        type: "custom_event",
-        event_name: "view-cart",
-        properties: JSON.stringify({
-          items_count: cartItems.length,
-          value: cartTotal.toFixed(2),
-          currency: "USD",
-        }),
-      };
-    } else if (
-      currentPath.path === "/checkout" &&
-      cartItems.length > 0 &&
-      !hasPurchased
-    ) {
-      // Begin checkout
-      const cartTotal = cartItems.reduce(
-        (sum, item) => sum + parseFloat(item.price),
-        0
-      );
-
-      events[eventCount++] = {
-        ...baseEvent,
-        timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-        pathname: currentPath.path,
-        querystring: querystring,
-        page_title: currentPath.title,
-        referrer: "",
-        type: "custom_event",
-        event_name: "begin-checkout",
-        properties: JSON.stringify({
-          items_count: cartItems.length,
-          value: cartTotal.toFixed(2),
-          currency: "USD",
-        }),
-      };
-
-      // Add purchase if this is the last pageview or randomly
-      if (
-        (i === numberOfPageviews - 1 || Math.random() < 0.7) &&
-        !hasPurchased
-      ) {
-        currentTime = currentTime.plus({
-          seconds: Math.floor(Math.random() * 30) + 20,
-        });
-        const transactionId = Math.random()
-          .toString(36)
-          .substring(2, 10)
-          .toUpperCase();
-
-        events[eventCount++] = {
-          ...baseEvent,
-          timestamp: currentTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-          pathname: currentPath.path,
-          querystring: querystring,
-          page_title: currentPath.title,
-          referrer: "",
-          type: "custom_event",
-          event_name: "purchase",
-          properties: JSON.stringify({
-            transaction_id: transactionId,
-            value: cartTotal.toFixed(2),
-            tax: (cartTotal * 0.08).toFixed(2),
-            shipping: (Math.random() * 10 + 5).toFixed(2),
-            currency: "USD",
-            coupon: Math.random() < 0.3 ? "SAVE20" : "",
-            items: cartItems.map((item) => ({
-              product_id: item.id,
-              product_name: item.name,
-              category: item.category,
-              price: item.price,
-              quantity: 1,
-            })),
-          }),
-        };
-
-        hasPurchased = true;
-      }
-    }
-
-    // Return if we exceed session duration
-    if (currentTime > startTime.plus({ seconds: sessionDuration })) {
-      break;
-    }
-  }
-
-  // Return only the populated part of the array
-  return events.slice(0, eventCount);
-}
-
-// Function to generate session data (browser, OS, screen resolution, etc.)
-function generateSessionData() {
-  // Select browser and version
-  const browser = weightedRandom(browsers);
-  const browserVersion =
-    browser.versions[Math.floor(Math.random() * browser.versions.length)];
-
-  // Select OS and version
-  const os = weightedRandom(operatingSystems);
-  const osVersion = os.versions[Math.floor(Math.random() * os.versions.length)];
-
-  // Select screen resolution
-  const resolution = weightedRandom(screenResolutions);
-
-  // Generate language code (instead of using faker.locale)
-  const languageCodes = [
-    "en",
-    "es",
-    "fr",
-    "de",
-    "it",
-    "ru",
-    "zh",
-    "ja",
-    "pt",
-    "nl",
-  ];
-  const language =
-    languageCodes[Math.floor(Math.random() * languageCodes.length)] +
-    (Math.random() < 0.5 ? "" : "-" + faker.location.countryCode());
-
-  // Select referrer
-  const referrer = weightedRandom(referrers).url;
-
-  // Use Faker for location data
-  const country = faker.location.countryCode();
-  let region = "";
-
-  // Get region code based on country
-  if (country === "US") {
-    region = faker.location.state({ abbreviated: true });
-  } else {
-    // For non-US, we'll use a simple region code
-    region = faker.location.county().slice(0, 3).toUpperCase();
-  }
-
-  // Determine device type based on screen resolution and OS
-  let deviceType = "Desktop";
-  if (os.name === "Android" || os.name === "iOS") {
-    deviceType = "Mobile";
-    if (resolution.width > 768) {
-      deviceType = "Tablet";
-    }
-  } else if (resolution.width <= 1024) {
-    deviceType = "Mobile";
-  }
-
-  return {
-    browser: browser.name,
-    browserVersion: browserVersion,
-    os: os.name,
-    osVersion: osVersion,
-    screenWidth: resolution.width,
-    screenHeight: resolution.height,
-    language: language,
-    referrer: referrer,
-    country: country,
-    iso3166: country && region ? `${country}-${region}` : country,
-    deviceType: deviceType,
-  };
 }
 
 // Main function to generate all the data
