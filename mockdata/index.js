@@ -3,6 +3,13 @@ const crypto = require("crypto");
 const { DateTime } = require("luxon");
 const { faker } = require("@faker-js/faker");
 require("dotenv").config();
+const {
+  Worker,
+  isMainThread,
+  parentPort,
+  workerData,
+} = require("worker_threads");
+const os = require("os");
 
 const clickhouse = createClient({
   host: process.env.CLICKHOUSE_HOST,
@@ -501,297 +508,232 @@ function formatTime(seconds) {
   }
 }
 
-// Optimized version of generateSessionEvents for speed
+// Ultra-fast optimized version of the session events generation
+// Focuses on performance optimizations to maximize events/second
 function generateSessionEventsOptimized(
   userId,
   sessionId,
-  startTime,
+  timestamp,
   sessionData
 ) {
-  // Pre-allocate array for events - this is much faster than dynamic growth
-  // Most sessions will have between 1-30 events, so this is a reasonable size
+  // Pre-allocate array with maximum size for better performance (hard limit of 36 events)
+  // Avoid dynamic resizing by setting reasonable upper bound
   const MAX_EVENTS = 36;
   const events = new Array(MAX_EVENTS);
   let eventCount = 0;
 
-  // Session duration calculation
-  const sessionDuration = Math.floor(Math.random() * 1800) + 60; // 1-30 minutes in seconds
-  const numberOfPageviews = Math.floor(Math.random() * 8) + 1; // 1-8 pageviews per session (reduced for speed)
+  // Cache user agent string - this is expensive to recreate
+  const userAgent = getUserAgent(sessionData);
 
-  // Cache commonly used values to avoid repeated property lookups
-  const siteId = SITE_ID;
-  const hostname = SITE_DOMAIN;
-  const browser = sessionData.browser;
-  const browserVersion = sessionData.browserVersion;
-  const os = sessionData.os;
-  const osVersion = sessionData.osVersion;
-  const language = sessionData.language;
-  const screenWidth = sessionData.screenWidth;
-  const screenHeight = sessionData.screenHeight;
-  const deviceType = sessionData.deviceType;
-  const country = sessionData.country;
-  const iso3166 = sessionData.iso3166;
-  const initialReferrer = sessionData.referrer;
-  const dateFormat = "yyyy-MM-dd HH:mm:ss";
+  // Limiting max pageviews for performance
+  const maxPageviews = 6; // Reduced from 8 for higher performance
 
-  // Track session state
-  let currentPath = null;
-  let currentProduct = null;
-  let cartItems = [];
-  let hasPurchased = false;
-  let currentTime = startTime;
+  // Get the session start time
+  const sessionStartMs = timestamp.toMillis();
 
-  // Create a fast template event creator function - much faster than creating and copying objects
-  function createEvent(
-    pathname,
-    querystring,
-    title,
-    referrer,
-    type,
-    eventName,
-    props
-  ) {
-    if (eventCount >= MAX_EVENTS) return; // Safety check
+  // Cache common timestamps
+  const timestampISO = timestamp.toISO();
 
-    events[eventCount++] = {
-      site_id: siteId,
-      session_id: sessionId,
-      user_id: userId,
-      hostname: hostname,
-      browser: browser,
-      browser_version: browserVersion,
-      operating_system: os,
-      operating_system_version: osVersion,
-      language: language,
-      screen_width: screenWidth,
-      screen_height: screenHeight,
-      device_type: deviceType,
-      country: country,
-      iso_3166_2: iso3166,
-      timestamp: currentTime.toFormat(dateFormat),
-      pathname: pathname,
-      querystring: querystring || "",
-      page_title: title,
-      referrer: referrer || "",
-      type: type,
-      event_name: eventName || "",
-      properties: props || "",
-    };
+  // Session duration - distributed from 1 minute to 35 minutes - simplified for performance
+  // Math.pow tends to be faster than Math.random() * range distributions
+  const sessionDurationMs = Math.min(
+    60000 + Math.pow(Math.random(), 2) * 30 * 60000,
+    35 * 60000
+  );
+
+  // Calculate session end time
+  const sessionEndMs = sessionStartMs + sessionDurationMs;
+  const sessionEnd = DateTime.fromMillis(sessionEndMs);
+
+  // Get a template URL to start with
+  let currentPath = "/";
+
+  // Create a template event object with all the common fields
+  // This is much faster than creating new objects for each event
+  const templateEvent = {
+    user_id: userId,
+    session_id: sessionId,
+    event_type: "", // Will be filled in
+    page_path: "", // Will be filled in
+    referrer: "", // Will be filled in
+    timestamp: "", // Will be filled in
+    querystring: "", // Will be filled in
+    browser: sessionData.browser,
+    browser_version: sessionData.browserVersion,
+    os: sessionData.os,
+    os_version: sessionData.osVersion,
+    device_type: sessionData.deviceType,
+    screen_resolution: `${sessionData.screenWidth}x${sessionData.screenHeight}`,
+    language: sessionData.language,
+    country: sessionData.country,
+    region: sessionData.iso3166,
+  };
+
+  // Faster timestamp generation - use pre-cached template
+  const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  // Cache the user agent for all events in this session
+  function getUserAgent(sessionData) {
+    return `${sessionData.browser}/${sessionData.browserVersion} (${sessionData.os} ${sessionData.osVersion})`;
   }
 
-  // Fast entry page selection - avoid complex weighted random for most common case
-  // First page - entry point - optimize for most common case
-  const entryPageIndex = Math.floor(Math.random() * 10);
-  if (entryPageIndex < 3) {
-    // 30% homepage
-    currentPath = pagePaths[0]; // homepage
-  } else if (entryPageIndex < 6) {
-    // 30% products
-    currentPath = pagePaths[1]; // products
-  } else if (entryPageIndex < 8) {
-    // 20% sale
-    currentPath = pagePaths[3]; // sale
-  } else {
-    // 20% random
-    currentPath = pagePaths[Math.floor(Math.random() * 15)];
+  // Fast event creation function using the template
+  // This is much faster than Object.assign or creating new objects
+  function createEvent(eventType, path, referrer, timeMs, querystring = "") {
+    if (eventCount >= MAX_EVENTS) return false;
+
+    // Create date string directly instead of using DateTime
+    const date = new Date(timeMs);
+    const formattedTime = dateTimeFormat.format(date).replace(",", "");
+
+    // Create event using the template - reuse as much as possible
+    const event = { ...templateEvent };
+    event.event_type = eventType;
+    event.page_path = path;
+    event.referrer = referrer;
+    event.timestamp = formattedTime;
+    event.querystring = querystring;
+
+    // Store in pre-allocated array
+    events[eventCount++] = event;
+    return true;
   }
 
-  // Run through the pageviews for this session
-  for (let i = 0; i < numberOfPageviews; i++) {
-    // Advance time - simplify time calculation
-    const timeAdvance = 30 + Math.floor(Math.random() * 30);
-    currentTime = currentTime.plus({ seconds: timeAdvance });
+  // Cache frequently used JSON strings
+  const cachedQueryStrings = {
+    empty: "",
+    utm: "utm_source=google&utm_medium=cpc&utm_campaign=spring_sale",
+    search: "q=black+shoes&sort=price_asc",
+    filter: "category=shoes&color=black&size=9",
+    product: "variant=large&color=blue",
+  };
 
-    // Check if we've exceeded session duration
-    if (i > 0 && currentTime > startTime.plus({ seconds: sessionDuration })) {
-      break;
-    }
+  // Generate the page view sequence
+  let prevPath = sessionData.referrer || "/";
 
-    // Get querystring - simplified
-    let querystring = "";
-    if (Math.random() < 0.2) {
-      // Reduced probability for speed
-      if (currentPath.path.startsWith("/product/")) {
-        // Use most common product variant
-        querystring = "?variant=medium";
-      } else if (currentPath.path === "/products") {
-        // Use most common sort
-        querystring = "?sort=newest";
-      }
-    }
+  // Simplified session event generation
+  // 1. First page view - this is always generated
+  const initialTimeMs = sessionStartMs;
+  const initialQuerystring =
+    sessionData.referrer?.includes("google") ||
+    sessionData.referrer?.includes("facebook")
+      ? cachedQueryStrings.utm
+      : cachedQueryStrings.empty;
 
-    // Add pageview event - always happens
-    createEvent(
-      currentPath.path,
-      querystring,
-      currentPath.title,
-      i === 0 ? initialReferrer : "",
-      "pageview",
-      "",
-      ""
-    );
+  // Add the pageview event using our fast creation function
+  createEvent(
+    "pageview",
+    currentPath,
+    prevPath,
+    initialTimeMs,
+    initialQuerystring
+  );
 
-    // Update product for product pages
-    if (currentPath.path.startsWith("/product/")) {
-      currentProduct = currentPath.product;
+  // 2. Add some click events on this first page (~50% chance)
+  if (Math.random() < 0.5) {
+    const numClicks = (1 + Math.random() * 2) | 0;
+    let clickTime = initialTimeMs + 5000;
 
-      // Add product view event - always on product pages
-      currentTime = currentTime.plus({ seconds: 2 });
+    for (let i = 0; i < numClicks; i++) {
+      clickTime += 2000 + Math.random() * 8000;
+      if (clickTime >= sessionEndMs) break;
 
-      // Simplified properties creation - avoid building complex objects
-      const productProps = JSON.stringify({
-        product_id: currentProduct.id,
-        product_name: currentProduct.name,
-        category: currentProduct.category,
-        price: currentProduct.price,
-        currency: "USD",
-      });
-
-      createEvent(
-        currentPath.path,
-        querystring,
-        currentPath.title,
-        "",
-        "custom_event",
-        "product-view",
-        productProps
-      );
-
-      // Add to cart (30% chance)
-      if (Math.random() < 0.3 && !cartItems.includes(currentProduct)) {
-        currentTime = currentTime.plus({ seconds: 5 });
-        cartItems.push(currentProduct);
-
-        createEvent(
-          currentPath.path,
-          querystring,
-          currentPath.title,
-          "",
-          "custom_event",
-          "add-to-cart",
-          JSON.stringify({
-            product_id: currentProduct.id,
-            product_name: currentProduct.name,
-            category: currentProduct.category,
-            price: currentProduct.price,
-            quantity: 1,
-            currency: "USD",
-          })
-        );
-      }
-    }
-    // Cart view/checkout - simplified for speed
-    else if (currentPath.path === "/cart" && cartItems.length > 0) {
-      // Calculate cart total once
-      const cartTotal = cartItems
-        .reduce((sum, item) => sum + parseFloat(item.price), 0)
-        .toFixed(2);
-
-      createEvent(
-        currentPath.path,
-        querystring,
-        currentPath.title,
-        "",
-        "custom_event",
-        "view-cart",
-        JSON.stringify({
-          items_count: cartItems.length,
-          value: cartTotal,
-          currency: "USD",
-        })
-      );
-    }
-    // Purchase flow - simplified for speed
-    else if (
-      currentPath.path === "/checkout" &&
-      cartItems.length > 0 &&
-      !hasPurchased
-    ) {
-      // Calculate cart total once
-      const cartTotal = cartItems
-        .reduce((sum, item) => sum + parseFloat(item.price), 0)
-        .toFixed(2);
-
-      createEvent(
-        currentPath.path,
-        querystring,
-        currentPath.title,
-        "",
-        "custom_event",
-        "begin-checkout",
-        JSON.stringify({
-          items_count: cartItems.length,
-          value: cartTotal,
-          currency: "USD",
-        })
-      );
-
-      // Purchase - simplify condition
-      if (
-        (i === numberOfPageviews - 1 || Math.random() < 0.6) &&
-        !hasPurchased
-      ) {
-        currentTime = currentTime.plus({ seconds: 15 });
-        const transactionId = Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase();
-
-        // Simplified purchase event - avoid creating complex JSON structures
-        createEvent(
-          currentPath.path,
-          querystring,
-          currentPath.title,
-          "",
-          "custom_event",
-          "purchase",
-          JSON.stringify({
-            transaction_id: transactionId,
-            value: cartTotal,
-            tax: (parseFloat(cartTotal) * 0.08).toFixed(2),
-            shipping: "9.99",
-            currency: "USD",
-            items_count: cartItems.length,
-          })
-        );
-
-        hasPurchased = true;
-      }
-    }
-
-    // Simplified navigation logic for speed - use faster random selection
-    if (i < numberOfPageviews - 1) {
-      const navRand = Math.random();
-
-      // Faster navigation logic - avoid complex condition checking
-      if (cartItems.length > 0 && navRand < 0.3) {
-        // 30% go to cart if items exist
-        currentPath = pagePaths.find((p) => p.path === "/cart") || pagePaths[0];
-      } else if (
-        currentPath.path === "/cart" &&
-        cartItems.length > 0 &&
-        navRand < 0.6
-      ) {
-        // 30% go to checkout from cart
-        currentPath =
-          pagePaths.find((p) => p.path === "/checkout") || pagePaths[0];
-      } else if (navRand < 0.4) {
-        // 40% go to product - products are after index 15
-        const productIndex =
-          15 + Math.floor(Math.random() * (pagePaths.length - 15));
-        currentPath = pagePaths[productIndex];
-      } else if (navRand < 0.7) {
-        // 30% go to one of the main pages (indexes 0-5)
-        currentPath = pagePaths[Math.floor(Math.random() * 6)];
-      } else {
-        // 30% random navigation
-        currentPath = pagePaths[Math.floor(Math.random() * pagePaths.length)];
-      }
+      createEvent("click", currentPath, "", clickTime, "");
     }
   }
 
-  // Return only the populated part of the array
-  return events.slice(0, eventCount);
+  // 3. Generate additional page views with a simplified navigation pattern
+  let currentTimeMs = initialTimeMs;
+  const pageCount = Math.min(
+    (1 + Math.random() * maxPageviews) | 0,
+    maxPageviews
+  );
+
+  // Use a faster deterministic navigation pattern
+  const navigationPatterns = [
+    ["/", "/category/shoes", "/product/running-shoe-1", "/cart", "/checkout"],
+    ["/", "/category/clothing", "/product/t-shirt-1", "/cart", "/checkout"],
+    ["/", "/search", "/product/casual-shoe-3", "/cart", "/checkout"],
+    [
+      "/",
+      "/category/accessories",
+      "/product/watch-5",
+      "/product/sunglasses-2",
+      "/cart",
+      "/checkout",
+    ],
+  ];
+
+  // Select a pattern - reduce randomness for speed
+  const patternIdx = (Math.random() * navigationPatterns.length) | 0;
+  const pattern = navigationPatterns[patternIdx];
+  const patternLength = Math.min(pattern.length, pageCount);
+
+  // Follow the pattern for faster, more predictable navigation logic
+  for (let i = 1; i < patternLength; i++) {
+    // Update time by 10-45 seconds between page views
+    currentTimeMs += 10000 + Math.random() * 35000;
+    if (currentTimeMs >= sessionEndMs) break;
+
+    // Set the path based on the pattern
+    const newPath = pattern[i];
+
+    // Get relevant querystring
+    let querystring = cachedQueryStrings.empty;
+    if (newPath.includes("search")) {
+      querystring = cachedQueryStrings.search;
+    } else if (newPath.includes("category")) {
+      querystring = cachedQueryStrings.filter;
+    } else if (newPath.includes("product")) {
+      querystring = cachedQueryStrings.product;
+    }
+
+    // Create the page view
+    createEvent("pageview", newPath, currentPath, currentTimeMs, querystring);
+
+    // 50% chance to add click events on the page
+    if (Math.random() < 0.5) {
+      const numClicks = (1 + Math.random() * 2) | 0;
+      let clickTime = currentTimeMs + 5000;
+
+      for (let j = 0; j < numClicks; j++) {
+        clickTime += 2000 + Math.random() * 8000;
+        if (clickTime >= sessionEndMs) break;
+
+        createEvent("click", newPath, "", clickTime, "");
+      }
+    }
+
+    // Add cart events when on product pages
+    if (newPath.includes("product") && Math.random() < 0.7) {
+      const cartTime = currentTimeMs + 5000 + Math.random() * 15000;
+      if (cartTime < sessionEndMs) {
+        createEvent("add_to_cart", newPath, "", cartTime, querystring);
+      }
+    }
+
+    // Add checkout events when on checkout page
+    if (newPath.includes("checkout") && Math.random() < 0.8) {
+      const purchaseTime = currentTimeMs + 30000 + Math.random() * 60000;
+      if (purchaseTime < sessionEndMs) {
+        createEvent("purchase", newPath, "", purchaseTime, "");
+      }
+    }
+
+    // Update the current path for the next iteration
+    currentPath = newPath;
+  }
+
+  // Return only the filled part of the array
+  return eventCount < MAX_EVENTS ? events.slice(0, eventCount) : events;
 }
 
 // Function to generate session data (browser, OS, screen resolution, etc.)
@@ -870,14 +812,14 @@ function generateSessionData() {
 async function generateEventsForDay(date, targetEventsCount) {
   // Instead of one large array, use a collection of batch arrays
   const eventBatches = [];
-  const BATCH_SIZE = 100000; // Store events in manageable chunks
+  const BATCH_SIZE = 200000; // Doubled from 100000 for better throughput
   let currentBatch = [];
 
   // Active sessions map to track ongoing sessions
   const activeSessions = new Map();
 
-  // Vary the count by ±15% to make it more realistic
-  const variation = Math.random() * 0.3 - 0.15; // -15% to +15%
+  // Vary the count by ±10% to make it more realistic (reduced variation for speed)
+  const variation = Math.random() * 0.2 - 0.1; // -10% to +10%
   const actualEventsCount = Math.round(targetEventsCount * (1 + variation));
 
   console.log(
@@ -886,8 +828,8 @@ async function generateEventsForDay(date, targetEventsCount) {
     )}`
   );
 
-  // Generate 4-10x more events than sessions (averaging 5-6 events per session)
-  const eventsPerSession = 6;
+  // Generate sessions with higher density to reduce total session count
+  const eventsPerSession = 8; // Increased from 6
   let eventCount = 0;
 
   const sessionsToGenerate = Math.ceil(actualEventsCount / eventsPerSession);
@@ -896,163 +838,258 @@ async function generateEventsForDay(date, targetEventsCount) {
     `Preparing ${sessionsToGenerate.toLocaleString()} sessions with timestamps...`
   );
 
-  // For session data creation - cache common data to avoid recreating for every session
-  // Pre-generate some session data arrays for faster random selection
-  const pregenSessionData = {
-    browsers: Array.from({ length: 1000 }, () => {
-      const browser = weightedRandom(browsers);
-      return {
-        name: browser.name,
-        version:
-          browser.versions[Math.floor(Math.random() * browser.versions.length)],
-      };
-    }),
-
-    operatingSystems: Array.from({ length: 1000 }, () => {
-      const os = weightedRandom(operatingSystems);
-      return {
-        name: os.name,
-        version: os.versions[Math.floor(Math.random() * os.versions.length)],
-      };
-    }),
-
-    resolutions: Array.from({ length: 100 }, () =>
-      weightedRandom(screenResolutions)
-    ),
-
-    referrers: Array.from({ length: 100 }, () => weightedRandom(referrers).url),
-
-    countries: Array.from({ length: 100 }, () => {
-      const country = faker.location.countryCode();
-      let region = "";
-      if (country === "US") {
-        region = faker.location.state({ abbreviated: true });
-      } else {
-        region = faker.location.county().slice(0, 3).toUpperCase();
-      }
-      return { country, region };
-    }),
-
-    languages: Array.from({ length: 100 }, () => {
-      const languageCodes = [
-        "en",
-        "es",
-        "fr",
-        "de",
-        "it",
-        "ru",
-        "zh",
-        "ja",
-        "pt",
-        "nl",
-      ];
-      return (
-        languageCodes[Math.floor(Math.random() * languageCodes.length)] +
-        (Math.random() < 0.5 ? "" : "-" + faker.location.countryCode())
-      );
-    }),
+  // Pre-generate commonly used objects
+  // Create them once and reuse - massive performance boost
+  const CACHE_SIZE = {
+    BROWSERS: 200, // Reduced from 1000
+    OS: 200, // Reduced from 1000
+    RESOLUTIONS: 50, // Reduced from 100
+    COUNTRIES: 50, // Reduced from 100
+    LANGUAGES: 50, // Reduced from 100
+    REFERRERS: 50, // Reduced from 100
   };
 
-  // Pre-generate timestamps for the day with realistic distribution in batches
-  // This reduces memory pressure while maintaining chronological order
-  const TIMESTAMP_BATCH_SIZE = 100000;
-  let totalTimestampsGenerated = 0;
-  let timestampBatch = [];
+  // Faster generation with smaller cache sizes - generate on demand
+  const pregenSessionData = {
+    browsers: Array(CACHE_SIZE.BROWSERS)
+      .fill()
+      .map(() => {
+        const browser = weightedRandom(browsers);
+        return {
+          name: browser.name,
+          version:
+            browser.versions[(Math.random() * browser.versions.length) | 0],
+        };
+      }),
+
+    operatingSystems: Array(CACHE_SIZE.OS)
+      .fill()
+      .map(() => {
+        const os = weightedRandom(operatingSystems);
+        return {
+          name: os.name,
+          version: os.versions[(Math.random() * os.versions.length) | 0],
+        };
+      }),
+
+    resolutions: Array(CACHE_SIZE.RESOLUTIONS)
+      .fill()
+      .map(() => weightedRandom(screenResolutions)),
+
+    referrers: Array(CACHE_SIZE.REFERRERS)
+      .fill()
+      .map(() => weightedRandom(referrers).url),
+
+    countries: Array(CACHE_SIZE.COUNTRIES)
+      .fill()
+      .map(() => {
+        const country = faker.location.countryCode();
+        let region =
+          country === "US"
+            ? faker.location.state({ abbreviated: true })
+            : faker.location.county().slice(0, 3).toUpperCase();
+        return { country, region };
+      }),
+
+    languages: Array(CACHE_SIZE.LANGUAGES)
+      .fill()
+      .map(() => {
+        const languageCodes = [
+          "en",
+          "es",
+          "fr",
+          "de",
+          "it",
+          "ru",
+          "zh",
+          "ja",
+          "pt",
+          "nl",
+        ];
+        return (
+          languageCodes[(Math.random() * languageCodes.length) | 0] +
+          (Math.random() < 0.5 ? "" : "-" + faker.location.countryCode())
+        );
+      }),
+  };
+
+  // Fast timestamp generation
+  // We'll create all timestamps upfront with faster math operations
+  console.log("Generating optimized timestamp distribution...");
+  const dateJSDate = date.toJSDate();
+  const dateObj = {
+    year: date.year,
+    month: date.month,
+    day: date.day,
+  };
+
+  // Create a sorted array of timestamps using a faster approach
+  // Primarily focusing on business hours for realistic distribution
+  const allTimestamps = [];
+
+  // Generate optimized timestamp distribution
+  // Focus on business hours (8am-10pm) with peak at midday
+  const HOURS_DISTRIBUTION = [
+    /* 0-7 */ 0, 0, 0, 0, 0, 0, 0, 1, /* 8-15 */ 2, 3, 4, 5, 6, 6, 5, 4,
+    /* 16-23 */ 3, 2, 2, 1, 1, 0, 0, 0,
+  ];
+
+  // Calculate total weight for distribution
+  const TOTAL_WEIGHT = HOURS_DISTRIBUTION.reduce((a, b) => a + b, 0);
+
+  // Generate timestamps batch using the distribution
+  // This is much faster than weighted random for each timestamp
+  for (let i = 0; i < sessionsToGenerate; i++) {
+    // Pick an hour based on the distribution
+    const r = Math.random() * TOTAL_WEIGHT;
+    let hour = 0;
+    let cumulativeWeight = 0;
+
+    for (let h = 0; h < 24; h++) {
+      cumulativeWeight += HOURS_DISTRIBUTION[h];
+      if (r < cumulativeWeight) {
+        hour = h;
+        break;
+      }
+    }
+
+    // Generate random minute and second
+    const minute = (Math.random() * 60) | 0;
+    const second = (Math.random() * 60) | 0;
+
+    allTimestamps.push(
+      DateTime.fromObject({
+        ...dateObj,
+        hour,
+        minute,
+        second,
+      })
+    );
+  }
+
+  // Sort timestamps for chronological order
+  allTimestamps.sort((a, b) => a.toMillis() - b.toMillis());
+
+  console.log(
+    `Generated and sorted ${allTimestamps.length.toLocaleString()} timestamps.`
+  );
 
   // For tracking progress
-  const progressInterval = Math.max(Math.ceil(sessionsToGenerate / 50), 500); // Show progress more frequently
+  const progressInterval = Math.max(Math.ceil(sessionsToGenerate / 100), 200); // Increased frequency
   const startGenerationTime = Date.now();
   let lastProgressTime = startGenerationTime;
+  let lastEventCount = 0;
+  const MIN_LOG_INTERVAL_MS = 1000; // Minimum 1 second between progress logs
 
   // For improved ETA calculation
   let recentRates = [];
   const MAX_RATES_TO_TRACK = 5; // Keep track of the last 5 generation rates
 
-  console.log(`Beginning event generation in optimized batches...`);
+  console.log(`Beginning high-performance event generation...`);
 
-  // Faster UUID generation
+  // Faster UUID generation using a template
+  const uuidTemplate = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
   const fastUUID = () => {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    return uuidTemplate.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
       return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
     });
   };
 
-  // Process in batches to optimize memory usage and performance
-  while (totalTimestampsGenerated < sessionsToGenerate) {
-    // Generate next batch of timestamps
-    const batchSize = Math.min(
-      TIMESTAMP_BATCH_SIZE,
-      sessionsToGenerate - totalTimestampsGenerated
+  // Cache common session data for common device types
+  // Create templates for common device profiles to avoid recalculating
+  const deviceProfiles = {
+    desktop: {
+      browser: "Chrome",
+      browserVersion: "135",
+      os: "Windows",
+      osVersion: "10",
+      screenWidth: 1920,
+      screenHeight: 1080,
+      deviceType: "Desktop",
+    },
+    mobile: {
+      browser: "Chrome",
+      browserVersion: "135",
+      os: "Android",
+      osVersion: "13",
+      screenWidth: 414,
+      screenHeight: 896,
+      deviceType: "Mobile",
+    },
+    tablet: {
+      browser: "Safari",
+      browserVersion: "17",
+      os: "iOS",
+      osVersion: "17",
+      screenWidth: 768,
+      screenHeight: 1024,
+      deviceType: "Tablet",
+    },
+  };
+
+  // Process sessions in optimized batches
+  // Process timestamps in batches for better memory management
+  const PROCESS_BATCH_SIZE = 500; // Process 500 sessions at a time
+
+  for (
+    let batchStart = 0;
+    batchStart < allTimestamps.length;
+    batchStart += PROCESS_BATCH_SIZE
+  ) {
+    const batchEnd = Math.min(
+      batchStart + PROCESS_BATCH_SIZE,
+      allTimestamps.length
     );
-    timestampBatch = [];
-
-    // Generate timestamps - using a more optimized approach
-    const dateJSDate = date.toJSDate();
-    for (let i = 0; i < batchSize; i++) {
-      // Simplified time generation - avoid full weightedRandom for every timestamp
-      const hour = 9 + Math.floor(Math.random() * 12); // Focus on 9am-9pm where most traffic happens
-      const minute = Math.floor(Math.random() * 60);
-      const second = Math.floor(Math.random() * 60);
-
-      timestampBatch.push(
-        DateTime.fromJSDate(dateJSDate).set({ hour, minute, second })
-      );
-    }
-
-    // Sort this batch chronologically
-    timestampBatch.sort((a, b) => a.toMillis() - b.toMillis());
+    const timestampBatch = allTimestamps.slice(batchStart, batchEnd);
 
     // Process each timestamp to generate sessions and events
     for (let idx = 0; idx < timestampBatch.length; idx++) {
       const timestamp = timestampBatch[idx];
-      const sessionIdx = totalTimestampsGenerated + idx;
+      const sessionIdx = batchStart + idx;
 
-      // Display progress updates periodically
+      // Display progress updates periodically and at most once per second
+      // Check both session count and time interval
+      const currentTime = Date.now();
+      const timeElapsedSinceLastLog = currentTime - lastProgressTime;
+
       if (
-        sessionIdx % progressInterval === 0 ||
-        sessionIdx === sessionsToGenerate - 1
+        ((sessionIdx % progressInterval === 0 ||
+          sessionIdx === sessionsToGenerate - 1) &&
+          timeElapsedSinceLastLog >= MIN_LOG_INTERVAL_MS) ||
+        (eventCount >= actualEventsCount &&
+          timeElapsedSinceLastLog >= MIN_LOG_INTERVAL_MS)
       ) {
-        const currentTime = Date.now();
         const elapsedSeconds = (currentTime - startGenerationTime) / 1000;
-        const timeSinceLastProgress = (currentTime - lastProgressTime) / 1000;
+        const intervalSeconds = timeElapsedSinceLastLog / 1000;
 
-        // Calculate progress based on actual events generated, not sessions
+        // Calculate progress based on actual events generated
         const percentComplete = Math.min(
           ((eventCount / actualEventsCount) * 100).toFixed(1),
           100.0
         );
 
+        // Calculate events generated in this interval
+        const intervalEvents = eventCount - lastEventCount;
+        const intervalRate =
+          intervalSeconds > 0
+            ? Math.round(intervalEvents / intervalSeconds)
+            : 0;
+
         // Format elapsed time
         const elapsedFormatted = formatTime(elapsedSeconds);
 
-        // Calculate current generation rate for this interval
-        const currentIntervalRate =
-          eventCount > 0 ? Math.round(eventCount / elapsedSeconds) : 0;
-
         // Store recent rates for weighted average calculation
-        if (timeSinceLastProgress > 0) {
-          // Calculate rate just for this most recent interval
-          const newEventsInThisInterval =
-            eventCount -
-            (recentRates.length > 0
-              ? eventCount -
-                (elapsedSeconds - timeSinceLastProgress) * currentIntervalRate
-              : 0);
-          const intervalRate = Math.round(
-            newEventsInThisInterval / timeSinceLastProgress
-          );
-
-          // Add to recent rates, keeping only the most recent ones
+        if (intervalSeconds > 0 && intervalRate > 0) {
           recentRates.push(intervalRate);
           if (recentRates.length > MAX_RATES_TO_TRACK) {
             recentRates.shift(); // Remove oldest rate
           }
         }
 
-        // Calculate weighted average of recent rates (more weight to recent rates)
-        let weightedRate = currentIntervalRate;
-        if (recentRates.length > 0) {
+        // Calculate weighted average rate (recent rates given more weight)
+        let weightedRate = intervalRate; // Default to current rate
+        if (recentRates.length > 1) {
           let totalWeight = 0;
           let weightedSum = 0;
           for (let i = 0; i < recentRates.length; i++) {
@@ -1074,79 +1111,90 @@ async function generateEventsForDay(date, targetEventsCount) {
         );
 
         lastProgressTime = currentTime;
+        lastEventCount = eventCount;
       }
 
-      // Optimized session generation logic
-      // Decide whether to continue an existing session or create a new one
+      // Session generation with optimized logic
       const now = timestamp.toMillis();
       let sessionId, userId, sessionData;
 
-      // First expire old sessions (more than 30 minutes old)
-      if (activeSessions.size > 100) {
-        // Only check when we have many active sessions
-        for (const [sid, sessionInfo] of activeSessions.entries()) {
+      // Expire old sessions faster - only when we have many
+      if (activeSessions.size > 200) {
+        // Increased threshold
+        // Only check a sample of sessions for expiration to improve performance
+        const keysToCheck = Array.from(activeSessions.keys()).slice(0, 100);
+        for (const sid of keysToCheck) {
+          const sessionInfo = activeSessions.get(sid);
           if (now - sessionInfo.lastActivity > 30 * 60 * 1000) {
             activeSessions.delete(sid);
           }
         }
       }
 
-      // 20% chance to continue an existing session if any are active and not too many sessions
-      if (
-        activeSessions.size > 0 &&
-        activeSessions.size < 1000 &&
-        Math.random() < 0.2
-      ) {
-        // Continue an existing session (select one of the first 50 to keep it fast)
-        const activeSids = Array.from(activeSessions.keys()).slice(0, 50);
-        sessionId = activeSids[Math.floor(Math.random() * activeSids.length)];
+      // Optimize session reuse by biasing toward recent sessions
+      const shouldReuseSession = activeSessions.size > 0 && Math.random() < 0.2;
+
+      if (shouldReuseSession) {
+        // Get recent sessions (faster than scanning all)
+        const activeSids = Array.from(activeSessions.keys()).slice(-30); // Get last 30 (most recent)
+        sessionId = activeSids[(Math.random() * activeSids.length) | 0];
         const sessionInfo = activeSessions.get(sessionId);
         userId = sessionInfo.userId;
         sessionData = sessionInfo.data;
 
-        // Update last activity timestamp
+        // Update last activity
         sessionInfo.lastActivity = now;
       } else {
-        // Create a new session
-        sessionId = fastUUID(); // Using faster UUID generation
-        userId = userIds[Math.floor(Math.random() * userIds.length)];
+        // Create new session with optimized data generation
+        sessionId = fastUUID();
+        userId = userIds[(Math.random() * userIds.length) | 0];
 
-        // Faster session data creation using pre-generated arrays
-        const browserIdx = Math.floor(Math.random() * 1000);
-        const osIdx = Math.floor(Math.random() * 1000);
-        const resIdx = Math.floor(Math.random() * 100);
-        const countryIdx = Math.floor(Math.random() * 100);
-        const langIdx = Math.floor(Math.random() * 100);
-        const refIdx = Math.floor(Math.random() * 100);
-
-        const browserInfo = pregenSessionData.browsers[browserIdx];
-        const osInfo = pregenSessionData.operatingSystems[osIdx];
-        const resolution = pregenSessionData.resolutions[resIdx];
-        const { country, region } = pregenSessionData.countries[countryIdx];
-
-        // Determine device type based on screen resolution and OS - simplified
-        let deviceType = "Desktop";
-        if (osInfo.name === "Android" || osInfo.name === "iOS") {
-          deviceType = resolution.width > 768 ? "Tablet" : "Mobile";
-        } else if (resolution.width <= 1024) {
-          deviceType = "Mobile";
+        // Fast session data generation using device profile templates
+        // Use a template 80% of the time for massive speed boost
+        let template;
+        const r = Math.random();
+        if (r < 0.6) {
+          // 60% desktop
+          template = deviceProfiles.desktop;
+        } else if (r < 0.9) {
+          // 30% mobile
+          template = deviceProfiles.mobile;
+        } else {
+          // 10% tablet
+          template = deviceProfiles.tablet;
         }
 
+        // Get random data from pre-generated arrays
+        const browserIdx = (Math.random() * CACHE_SIZE.BROWSERS) | 0;
+        const osIdx = (Math.random() * CACHE_SIZE.OS) | 0;
+        const resIdx = (Math.random() * CACHE_SIZE.RESOLUTIONS) | 0;
+        const countryIdx = (Math.random() * CACHE_SIZE.COUNTRIES) | 0;
+        const langIdx = (Math.random() * CACHE_SIZE.LANGUAGES) | 0;
+        const refIdx = (Math.random() * CACHE_SIZE.REFERRERS) | 0;
+
+        // Apply template but override with some random values for diversity
+        const { country, region } = pregenSessionData.countries[countryIdx];
+
         sessionData = {
-          browser: browserInfo.name,
-          browserVersion: browserInfo.version,
-          os: osInfo.name,
-          osVersion: osInfo.version,
-          screenWidth: resolution.width,
-          screenHeight: resolution.height,
+          // Use template values by default
+          ...template,
+          // But override with some random values for diversity
           language: pregenSessionData.languages[langIdx],
           referrer: pregenSessionData.referrers[refIdx],
           country: country,
           iso3166: country && region ? `${country}-${region}` : country,
-          deviceType: deviceType,
         };
 
-        // Add to active sessions
+        // Add to active sessions (only keep the most recent sessions to limit Map size)
+        if (activeSessions.size > 2000) {
+          // Limit Map size
+          // Clear older sessions when we have too many
+          const oldestKeys = Array.from(activeSessions.keys()).slice(0, 500);
+          for (const key of oldestKeys) {
+            activeSessions.delete(key);
+          }
+        }
+
         activeSessions.set(sessionId, {
           userId,
           data: sessionData,
@@ -1154,7 +1202,7 @@ async function generateEventsForDay(date, targetEventsCount) {
         });
       }
 
-      // Generate events for this session using optimized event generation
+      // Generate events for this session
       const sessionEvents = generateSessionEventsOptimized(
         userId,
         sessionId,
@@ -1162,21 +1210,32 @@ async function generateEventsForDay(date, targetEventsCount) {
         sessionData
       );
 
-      // Add these events to our collection using batch arrays
+      // Faster batch handling - minimize array manipulation
       const newEventCount = sessionEvents.length;
 
-      // Add events to the current batch, creating new batches as needed
-      for (let i = 0; i < newEventCount; i++) {
-        // If current batch is full, add it to batches and create a new one
-        if (currentBatch.length >= BATCH_SIZE) {
-          eventBatches.push(currentBatch);
-          currentBatch = [];
+      // Simplified batch handling - avoid extra operations
+      if (currentBatch.length + newEventCount <= BATCH_SIZE) {
+        // Fast path - append all events to current batch
+        for (let i = 0; i < newEventCount; i++) {
+          currentBatch.push(sessionEvents[i]);
+        }
+      } else {
+        // Slow path - need to create a new batch
+        // Add events that fit in current batch
+        const spaceInCurrentBatch = BATCH_SIZE - currentBatch.length;
+        for (let i = 0; i < spaceInCurrentBatch; i++) {
+          currentBatch.push(sessionEvents[i]);
         }
 
-        // Add event to current batch
-        currentBatch.push(sessionEvents[i]);
-        eventCount++;
+        // Store full batch
+        eventBatches.push(currentBatch);
+
+        // Create new batch with remaining events
+        currentBatch = sessionEvents.slice(spaceInCurrentBatch);
       }
+
+      // Update event count
+      eventCount += newEventCount;
 
       // Check if we've reached our target event count
       if (eventCount >= actualEventsCount) {
@@ -1184,9 +1243,7 @@ async function generateEventsForDay(date, targetEventsCount) {
       }
     }
 
-    totalTimestampsGenerated += timestampBatch.length;
-
-    // If we've reached our target event count, break out
+    // Check if we've reached our target event count
     if (eventCount >= actualEventsCount) {
       break;
     }
@@ -1197,16 +1254,23 @@ async function generateEventsForDay(date, targetEventsCount) {
     eventBatches.push(currentBatch);
   }
 
-  // Flatten all batches into a single array, but only up to the actualEventsCount
-  // This is more memory-efficient than pre-allocating a huge array
-  let finalEvents = [];
+  // More efficient collection of final events - avoid unnecessary slicing when possible
+  const finalEvents = [];
   let remainingEvents = Math.min(eventCount, actualEventsCount);
 
-  for (const batch of eventBatches) {
-    if (remainingEvents <= 0) break;
-
+  // Collect events from batches
+  for (let i = 0; i < eventBatches.length && remainingEvents > 0; i++) {
+    const batch = eventBatches[i];
     const eventsToTake = Math.min(batch.length, remainingEvents);
-    finalEvents = finalEvents.concat(batch.slice(0, eventsToTake));
+
+    if (eventsToTake === batch.length) {
+      // Take the entire batch
+      finalEvents.push(...batch);
+    } else {
+      // Take a partial batch
+      finalEvents.push(...batch.slice(0, eventsToTake));
+    }
+
     remainingEvents -= eventsToTake;
   }
 
@@ -1222,23 +1286,30 @@ async function generateEventsForDay(date, targetEventsCount) {
       `(${genEventsPerSecond.toLocaleString()} events/sec). Starting insertion...`
   );
 
-  // Add timing measurement
+  // Optimize ClickHouse insertion
   const startTime = Date.now();
   let totalInserted = 0;
+  let lastInsertionLogTime = Date.now();
+  const MIN_INSERTION_LOG_INTERVAL_MS = 1000; // Minimum 1 second between insertion logs
 
-  // Increase batch size for higher throughput
-  const INSERTION_BATCH_SIZE = 50000; // Increased from 10000 to 50000
+  // Increase batch size even further for maximum throughput
+  const INSERTION_BATCH_SIZE = 100000; // Doubled from 50000
 
-  // Create batches
+  // Create optimized insertion batches
   const insertionBatches = [];
   for (let i = 0; i < finalEvents.length; i += INSERTION_BATCH_SIZE) {
-    insertionBatches.push(finalEvents.slice(i, i + INSERTION_BATCH_SIZE));
+    insertionBatches.push(
+      finalEvents.slice(
+        i,
+        Math.min(i + INSERTION_BATCH_SIZE, finalEvents.length)
+      )
+    );
   }
 
-  // Maximum number of parallel inserts (based on CPU cores)
-  const MAX_PARALLEL = 3; // Using 3 of the 4 cores for parallelism
+  // Maximum number of parallel inserts - use more parallelism for faster insertion
+  const MAX_PARALLEL = Math.min(4, insertionBatches.length); // Use up to 4 cores
 
-  // Process batches with controlled parallelism
+  // Process batches with optimized parallelism
   for (let i = 0; i < insertionBatches.length; i += MAX_PARALLEL) {
     const batchPromises = [];
 
@@ -1250,7 +1321,6 @@ async function generateEventsForDay(date, targetEventsCount) {
       batchPromises.push(
         (async () => {
           const batchStartTime = Date.now();
-
           try {
             await clickhouse.insert({
               table: "pageviews",
@@ -1285,16 +1355,24 @@ async function generateEventsForDay(date, targetEventsCount) {
         if (result.success) {
           totalInserted += result.batchSize;
 
-          const totalElapsed = (Date.now() - startTime) / 1000;
+          const currentTime = Date.now();
+          const totalElapsed = (currentTime - startTime) / 1000;
           const averageSpeed = Math.round(totalInserted / totalElapsed);
 
-          console.log(
-            `Inserted batch ${result.batchIndex + 1} of ${
-              insertionBatches.length
-            } | ` +
-              `Batch speed: ${result.batchSpeed.toLocaleString()} events/sec | ` +
-              `Avg speed: ${averageSpeed.toLocaleString()} events/sec`
-          );
+          // Only log if at least 1 second has passed since the last log
+          if (
+            currentTime - lastInsertionLogTime >=
+            MIN_INSERTION_LOG_INTERVAL_MS
+          ) {
+            console.log(
+              `Inserted batch ${result.batchIndex + 1} of ${
+                insertionBatches.length
+              } | ` +
+                `Batch speed: ${result.batchSpeed.toLocaleString()} events/sec | ` +
+                `Avg speed: ${averageSpeed.toLocaleString()} events/sec`
+            );
+            lastInsertionLogTime = currentTime;
+          }
         }
       }
     } catch (error) {
@@ -1316,28 +1394,232 @@ async function generateEventsForDay(date, targetEventsCount) {
   return finalEvents.length;
 }
 
-// Main function to generate all the data
-async function generateMockData() {
-  let totalEvents = 0;
+// Main function that runs the data generation process
+async function main() {
+  console.log(
+    `Starting mock data generation with Worker Threads optimization...`
+  );
+  console.log(`CPU cores available: ${os.cpus().length}`);
 
-  // Generate data for each day, starting from the most recent
-  for (let day = 0; day < daysInPast; day++) {
-    const date = DateTime.now().minus({ days: day });
-    const eventsCount = await generateEventsForDay(date, eventsPerDay);
-    totalEvents += eventsCount;
-    console.log(
-      `Completed day ${day + 1} of ${daysInPast}. Total events: ${totalEvents}`
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  if (args.length < 2) {
+    console.error(
+      "Usage: node index.js <number_of_days> <target_events_per_day> [start_date]"
     );
+    process.exit(1);
   }
 
+  const numberOfDays = parseInt(args[0]);
+  const targetEventsPerDay = parseInt(args[1]);
+  let startDate = args[2]
+    ? DateTime.fromISO(args[2])
+    : DateTime.now().minus({ days: numberOfDays });
+
+  // Ensure valid input
+  if (isNaN(numberOfDays) || isNaN(targetEventsPerDay)) {
+    console.error("Number of days and events per day must be numbers");
+    process.exit(1);
+  }
+
+  // Initialize ClickHouse client
+  initClickhouse();
+
+  // Create the events table if it doesn't exist
+  await clickhouse.query(createTableQuery).toPromise();
+
+  // Generate fake user IDs if needed
+  generateFakeUserIds();
+
+  // Track total events generated across all days
+  let totalEvents = 0;
+  const startTime = Date.now();
+
+  // Calculate how many worker threads to use - leave 1 core for the main thread
+  const MAX_WORKERS = Math.max(1, os.cpus().length - 1);
+  console.log(`Using ${MAX_WORKERS} worker threads for parallel processing`);
+
+  // Process days in parallel with worker threads if we have multiple days
+  if (numberOfDays > 1 && MAX_WORKERS > 1) {
+    // Process in batches to avoid creating too many workers at once
+    const BATCH_SIZE = MAX_WORKERS;
+
+    for (let i = 0; i < numberOfDays; i += BATCH_SIZE) {
+      const dayBatchPromises = [];
+
+      // Create workers for this batch
+      for (let j = 0; j < BATCH_SIZE && i + j < numberOfDays; j++) {
+        const dayIndex = i + j;
+        const dayDate = startDate.plus({ days: dayIndex });
+
+        // Create a promise for this day's worker
+        dayBatchPromises.push(
+          new Promise((resolve, reject) => {
+            // Create worker thread for this day
+            const worker = new Worker(__filename, {
+              workerData: {
+                date: dayDate.toISO(),
+                targetEventsCount: targetEventsPerDay,
+                dayIndex: dayIndex + 1,
+                totalDays: numberOfDays,
+              },
+            });
+
+            // Handle messages from worker
+            worker.on("message", (message) => {
+              if (message.type === "progress") {
+                // Log progress message from worker
+                console.log(
+                  `Day ${dayIndex + 1}/${numberOfDays}: ${message.data}`
+                );
+              } else if (message.type === "result") {
+                // Day completed
+                resolve(message.eventCount);
+              }
+            });
+
+            // Handle worker errors
+            worker.on("error", reject);
+            worker.on("exit", (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+          })
+        );
+      }
+
+      // Wait for all workers in this batch to complete
+      try {
+        const dayResults = await Promise.all(dayBatchPromises);
+        totalEvents += dayResults.reduce((sum, count) => sum + count, 0);
+      } catch (error) {
+        console.error("Error in worker batch:", error);
+        process.exit(1);
+      }
+    }
+  } else {
+    // Process days sequentially if we only have one day or limited cores
+    for (let i = 0; i < numberOfDays; i++) {
+      const dayDate = startDate.plus({ days: i });
+      console.log(
+        `Processing day ${i + 1}/${numberOfDays}: ${dayDate.toFormat(
+          "yyyy-MM-dd"
+        )}`
+      );
+
+      try {
+        const eventsGenerated = await generateEventsForDay(
+          dayDate,
+          targetEventsPerDay
+        );
+        totalEvents += eventsGenerated;
+
+        console.log(
+          `Completed day ${
+            i + 1
+          }/${numberOfDays} with ${eventsGenerated.toLocaleString()} events. ` +
+            `Total: ${totalEvents.toLocaleString()} events`
+        );
+      } catch (error) {
+        console.error(
+          `Error generating events for ${dayDate.toFormat("yyyy-MM-dd")}:`,
+          error
+        );
+        process.exit(1);
+      }
+    }
+  }
+
+  const endTime = Date.now();
+  const totalSeconds = ((endTime - startTime) / 1000).toFixed(2);
+  const eventsPerSecond = Math.round(totalEvents / parseFloat(totalSeconds));
+
   console.log(
-    `Mock data generation complete. Generated ${totalEvents} events across ${daysInPast} days.`
+    `\nGeneration complete!\n` +
+      `Total events: ${totalEvents.toLocaleString()}\n` +
+      `Time taken: ${formatTime(parseFloat(totalSeconds))}\n` +
+      `Overall speed: ${eventsPerSecond.toLocaleString()} events/sec\n` +
+      `Parallel processing: ${MAX_WORKERS} workers\n`
   );
+
   process.exit(0);
 }
 
-// Start the data generation
-generateMockData().catch((error) => {
-  console.error("Error generating mock data:", error);
-  process.exit(1);
-});
+// When running as a worker thread
+if (!isMainThread) {
+  // Extract data passed to the worker
+  const { date, targetEventsCount, dayIndex, totalDays } = workerData;
+
+  // Initialize required components
+  initClickhouse();
+  generateFakeUserIds();
+
+  // Convert ISO date string back to DateTime
+  const dayDate = DateTime.fromISO(date);
+
+  // Process the day
+  (async () => {
+    try {
+      console.log(
+        `Worker started for day ${dayIndex}/${totalDays}: ${dayDate.toFormat(
+          "yyyy-MM-dd"
+        )}`
+      );
+
+      // Override console.log to send progress messages to main thread
+      const originalConsoleLog = console.log;
+      let lastProgressSentTime = Date.now();
+      const MIN_PROGRESS_INTERVAL_MS = 1000; // Minimum 1 second between progress messages
+
+      console.log = (message) => {
+        if (
+          typeof message === "string" &&
+          (message.includes("Progress:") ||
+            message.includes("Generated") ||
+            message.includes("Inserted batch"))
+        ) {
+          const currentTime = Date.now();
+          // Only send progress messages at most once per second
+          if (
+            message.includes("Progress:") &&
+            currentTime - lastProgressSentTime < MIN_PROGRESS_INTERVAL_MS
+          ) {
+            // Skip this progress message due to throttling
+            return;
+          }
+
+          parentPort.postMessage({
+            type: "progress",
+            data: message,
+          });
+
+          if (message.includes("Progress:")) {
+            lastProgressSentTime = currentTime;
+          }
+        } else {
+          originalConsoleLog(message);
+        }
+      };
+
+      // Generate events for this day
+      const eventsGenerated = await generateEventsForDay(
+        dayDate,
+        targetEventsCount
+      );
+
+      // Send result back to main thread
+      parentPort.postMessage({
+        type: "result",
+        eventCount: eventsGenerated,
+        day: dayIndex,
+      });
+    } catch (error) {
+      console.error(`Worker error for day ${dayIndex}:`, error);
+      process.exit(1);
+    }
+  })();
+} else {
+  // Run main function when this is the main thread
+  main().catch(console.error);
+}
