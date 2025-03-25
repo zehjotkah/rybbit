@@ -61,31 +61,56 @@ function truncatePath(path: string, maxLength: number = 32) {
 }
 
 // Component to display a single pageview or event
-function PageviewItem({ item, index }: { item: PageviewEvent; index: number }) {
+function PageviewItem({
+  item,
+  index,
+  isLast = false,
+}: {
+  item: PageviewEvent;
+  index: number;
+  isLast?: boolean;
+}) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp);
   const formattedTime = timestamp.toFormat("h:mm:ss a");
 
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-neutral-700 last:border-0">
-      <div className="text-sm text-gray-500 min-w-8 text-right">
-        {index + 1}.
-      </div>
-      <div className="flex-shrink-0">
-        {isEvent ? (
-          <MousePointerClick className="w-4 h-4 text-amber-500" />
-        ) : (
-          <FileText className="w-4 h-4 text-blue-500" />
+    <div className="flex items-center mb-3 last:mb-0">
+      {/* Timeline circle with number */}
+      <div className="relative flex-shrink-0">
+        {!isLast && (
+          <div className="absolute top-8 left-4 w-[1px] h-[12px] bg-neutral-700" />
         )}
+        {/* Connecting line */}
+        <div
+          className={`flex items-center justify-center w-8 h-8 rounded-full ${
+            isEvent ? "bg-amber-900/30" : "bg-blue-900/30"
+          } border ${isEvent ? "border-amber-500/50" : "border-blue-500/50"}`}
+        >
+          <span className="text-sm font-medium">{index + 1}</span>
+        </div>
       </div>
-      <div className="flex flex-1 items-center justify-between">
-        <span className="text-sm truncate max-w-[500px]" title={item.pathname}>
-          {item.pathname}
-          {item.querystring && `?${item.querystring}`}
-        </span>
-        <span className="text-xs text-gray-500 flex-shrink-0">
+
+      {/* Content in a single row */}
+      <div className="flex items-center ml-3 flex-1">
+        <div className="flex-shrink-0 mr-3">
+          {isEvent ? (
+            <MousePointerClick className="w-4 h-4 text-amber-500" />
+          ) : (
+            <FileText className="w-4 h-4 text-blue-500" />
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0 mr-4">
+          <div className="text-sm truncate" title={item.pathname}>
+            {item.pathname}
+            {item.querystring ? item.querystring : ""}
+          </div>
+        </div>
+
+        <div className="text-xs text-gray-400 flex-shrink-0">
           {formattedTime}
-        </span>
+        </div>
       </div>
     </div>
   );
@@ -120,136 +145,134 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
 
   return (
     <div className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
-      <TooltipProvider>
-        <div className="p-3 cursor-pointer" onClick={handleCardClick}>
+      <div className="p-3 cursor-pointer" onClick={handleCardClick}>
+        <div className="flex items-center gap-2">
+          {/* Avatar and User ID */}
           <div className="flex items-center gap-2">
-            {/* Avatar and User ID */}
-            <div className="flex items-center gap-2">
-              <Avatar
-                name={session.user_id}
-                colors={["#2c2b4b", "#a75293", "#9c7a9d", "#9ddacb", "#f8dcb4"]}
-                variant="beam"
-                size={24}
-              />
-              <span className="text-xs font-mono text-gray-400">
-                {truncatedUserId}
-              </span>
-            </div>
+            <Avatar
+              name={session.user_id}
+              colors={["#2c2b4b", "#a75293", "#9c7a9d", "#9ddacb", "#f8dcb4"]}
+              variant="beam"
+              size={24}
+            />
+            <span className="text-xs font-mono text-gray-400">
+              {truncatedUserId}
+            </span>
+          </div>
 
-            {/* Icons section */}
-            <div className="flex space-x-2 items-center ml-3">
-              {/* Country */}
-              {session.country && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center">
-                      <CountryFlag country={session.country} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{getCountryName(session.country)}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-
-              {/* Browser */}
+          {/* Icons section */}
+          <div className="flex space-x-2 items-center ml-3">
+            {/* Country */}
+            {session.country && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div>
-                    <Browser browser={session.browser || "Unknown"} />
+                  <div className="flex items-center">
+                    <CountryFlag country={session.country} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{session.browser || "Unknown browser"}</p>
+                  <p>{getCountryName(session.country)}</p>
                 </TooltipContent>
               </Tooltip>
+            )}
 
-              {/* OS */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <OperatingSystem os={session.operating_system || ""} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{session.operating_system || "Unknown OS"}</p>
-                </TooltipContent>
-              </Tooltip>
+            {/* Browser */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Browser browser={session.browser || "Unknown"} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{session.browser || "Unknown browser"}</p>
+              </TooltipContent>
+            </Tooltip>
 
-              {/* Device Type */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <DeviceIcon deviceType={session.device_type || ""} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{session.device_type || "Unknown device"}</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+            {/* OS */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <OperatingSystem os={session.operating_system || ""} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{session.operating_system || "Unknown OS"}</p>
+              </TooltipContent>
+            </Tooltip>
 
-            {/* Pages section with tooltips for long paths */}
-            <div className="flex items-center ml-3 flex-1 min-w-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
-                    {truncatePath(session.entry_page)}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{session.entry_page || "-"}</p>
-                </TooltipContent>
-              </Tooltip>
+            {/* Device Type */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <DeviceIcon deviceType={session.device_type || ""} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{session.device_type || "Unknown device"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
 
-              <ArrowRight className="mx-2 w-3 h-3 flex-shrink-0 text-gray-400" />
+          {/* Pages section with tooltips for long paths */}
+          <div className="flex items-center ml-3 flex-1 min-w-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
+                  {truncatePath(session.entry_page)}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{session.entry_page || "-"}</p>
+              </TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
-                    {truncatePath(session.exit_page)}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{session.exit_page || "-"}</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+            <ArrowRight className="mx-2 w-3 h-3 flex-shrink-0 text-gray-400" />
 
-            {/* Time information */}
-            <div className="flex items-center gap-2 ml-3">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1 text-xs text-gray-400">
-                    <Clock className="w-3 h-3" />
-                    <span>{durationFormatted}</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    {DateTime.fromSQL(session.session_start).toFormat(
-                      "MMM d, h:mm a"
-                    )}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
+                  {truncatePath(session.exit_page)}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{session.exit_page || "-"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
 
-            {/* Expand/Collapse icon */}
-            <div className="ml-3 flex-shrink-0">
-              {expanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              )}
-            </div>
+          {/* Time information */}
+          <div className="flex items-center gap-2 ml-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 text-xs text-gray-400">
+                  <Clock className="w-3 h-3" />
+                  <span>{durationFormatted}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {DateTime.fromSQL(session.session_start).toFormat(
+                    "MMM d, h:mm a"
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {/* Expand/Collapse icon */}
+          <div className="ml-3 flex-shrink-0">
+            {expanded ? (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            )}
           </div>
         </div>
-      </TooltipProvider>
+      </div>
 
       {/* Expanded content - detailed session data */}
       {expanded && (
-        <div className="px-4 pb-4 bg-neutral-900 border-t border-neutral-700">
+        <div className="px-4 pb-4 bg-neutral-900 border-t border-neutral-800">
           {isLoading ? (
             <div className="py-4">
               <Skeleton className="h-4 w-full mb-2" />
@@ -274,7 +297,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
                   <div className="text-sm font-medium mb-2">
                     Session Timeline
                   </div>
-                  <div className="flex gap-2 mb-3">
+                  <div className="flex gap-2 mb-4">
                     <Badge
                       variant="outline"
                       className="flex items-center gap-1 bg-neutral-800 text-gray-300"
@@ -299,12 +322,15 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
                       </span>
                     </Badge>
                   </div>
-                  <div className="bg-neutral-950 rounded-md border border-neutral-700 p-2">
+                  <div className="p-4">
                     {sessionDetails.data.pageviews.map((pageview, index) => (
                       <PageviewItem
                         key={`${pageview.timestamp}-${index}`}
                         item={pageview}
                         index={index}
+                        isLast={
+                          index === sessionDetails.data.pageviews.length - 1
+                        }
                       />
                     ))}
                   </div>
@@ -312,154 +338,152 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
               </TabsContent>
 
               <TabsContent value="info" className="mt-4">
-                <TooltipProvider>
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        User Information
-                      </h4>
-                      <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
-                        <div className="flex items-center gap-2">
-                          <Avatar
-                            name={sessionDetails.data.session.user_id}
-                            colors={[
-                              "#2c2b4b",
-                              "#a75293",
-                              "#9c7a9d",
-                              "#9ddacb",
-                              "#f8dcb4",
-                            ]}
-                            variant="beam"
-                            size={24}
-                          />
-                          <div className="text-sm font-mono">
-                            {sessionDetails.data.session.user_id}
-                          </div>
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">
+                      User Information
+                    </h4>
+                    <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                      <div className="flex items-center gap-2">
+                        <Avatar
+                          name={sessionDetails.data.session.user_id}
+                          colors={[
+                            "#2c2b4b",
+                            "#a75293",
+                            "#9c7a9d",
+                            "#9ddacb",
+                            "#f8dcb4",
+                          ]}
+                          variant="beam"
+                          size={24}
+                        />
+                        <div className="text-sm font-mono">
+                          {sessionDetails.data.session.user_id}
                         </div>
-                        {sessionDetails.data.session.language && (
-                          <div className="text-sm text-gray-400">
-                            <span className="font-medium">Language:</span>{" "}
-                            {sessionDetails.data.session.language}
-                          </div>
-                        )}
-                        {sessionDetails.data.session.country && (
-                          <div className="flex items-center gap-2 text-sm text-gray-400">
-                            <span className="font-medium">Location:</span>
-                            <div className="flex items-center gap-1">
-                              <CountryFlag
-                                country={sessionDetails.data.session.country}
-                              />
-                              <span>
-                                {getCountryName(
-                                  sessionDetails.data.session.country
-                                )}
-                              </span>
-                              {sessionDetails.data.session.iso_3166_2 && (
-                                <span>
-                                  ({sessionDetails.data.session.iso_3166_2})
-                                </span>
+                      </div>
+                      {sessionDetails.data.session.language && (
+                        <div className="text-sm text-gray-400">
+                          <span className="font-medium">Language:</span>{" "}
+                          {sessionDetails.data.session.language}
+                        </div>
+                      )}
+                      {sessionDetails.data.session.country && (
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span className="font-medium">Location:</span>
+                          <div className="flex items-center gap-1">
+                            <CountryFlag
+                              country={sessionDetails.data.session.country}
+                            />
+                            <span>
+                              {getCountryName(
+                                sessionDetails.data.session.country
                               )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        Device Information
-                      </h4>
-                      <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
-                        <div className="flex items-center gap-2 text-sm">
-                          <MonitorSmartphone className="w-4 h-4" />
-                          <span className="font-medium">Device Type:</span>{" "}
-                          {sessionDetails.data.session.device_type || "Unknown"}
-                        </div>
-
-                        <div className="flex items-center gap-2 text-sm">
-                          <Browser
-                            browser={
-                              sessionDetails.data.session.browser || "Unknown"
-                            }
-                          />
-                          <span className="font-medium">Browser:</span>{" "}
-                          {sessionDetails.data.session.browser || "Unknown"}
-                          {sessionDetails.data.session.browser_version && (
-                            <span className="text-gray-400">
-                              ({sessionDetails.data.session.browser_version})
                             </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 text-sm">
-                          <OperatingSystem
-                            os={
-                              sessionDetails.data.session.operating_system || ""
-                            }
-                          />
-                          <span className="font-medium">OS:</span>{" "}
-                          {sessionDetails.data.session.operating_system ||
-                            "Unknown"}
-                          {sessionDetails.data.session
-                            .operating_system_version && (
-                            <span className="text-gray-400">
-                              (
-                              {
-                                sessionDetails.data.session
-                                  .operating_system_version
-                              }
-                              )
-                            </span>
-                          )}
-                        </div>
-
-                        {sessionDetails.data.session.screen_width &&
-                        sessionDetails.data.session.screen_height ? (
-                          <div className="text-sm text-gray-400">
-                            <span className="font-medium">Screen:</span>{" "}
-                            {sessionDetails.data.session.screen_width} x{" "}
-                            {sessionDetails.data.session.screen_height}
+                            {sessionDetails.data.session.iso_3166_2 && (
+                              <span>
+                                ({sessionDetails.data.session.iso_3166_2})
+                              </span>
+                            )}
                           </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="col-span-2">
-                      <h4 className="text-sm font-medium mb-2">
-                        Session Information
-                      </h4>
-                      <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
-                        <div className="text-sm">
-                          <span className="font-medium">Duration:</span>{" "}
-                          {durationFormatted}
                         </div>
-
-                        <div className="text-sm">
-                          <span className="font-medium">Start Time:</span>{" "}
-                          {DateTime.fromSQL(
-                            sessionDetails.data.session.session_start
-                          ).toFormat("MMMM d, yyyy h:mm:ss a")}
-                        </div>
-
-                        <div className="text-sm">
-                          <span className="font-medium">End Time:</span>{" "}
-                          {DateTime.fromSQL(
-                            sessionDetails.data.session.session_end
-                          ).toFormat("MMMM d, yyyy h:mm:ss a")}
-                        </div>
-
-                        {sessionDetails.data.session.referrer && (
-                          <div className="text-sm">
-                            <span className="font-medium">Referrer:</span>
-                            <span className="text-gray-400 ml-1 break-all">
-                              {sessionDetails.data.session.referrer}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                </TooltipProvider>
+
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">
+                      Device Information
+                    </h4>
+                    <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                      <div className="flex items-center gap-2 text-sm">
+                        <MonitorSmartphone className="w-4 h-4" />
+                        <span className="font-medium">Device Type:</span>{" "}
+                        {sessionDetails.data.session.device_type || "Unknown"}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm">
+                        <Browser
+                          browser={
+                            sessionDetails.data.session.browser || "Unknown"
+                          }
+                        />
+                        <span className="font-medium">Browser:</span>{" "}
+                        {sessionDetails.data.session.browser || "Unknown"}
+                        {sessionDetails.data.session.browser_version && (
+                          <span className="text-gray-400">
+                            ({sessionDetails.data.session.browser_version})
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm">
+                        <OperatingSystem
+                          os={
+                            sessionDetails.data.session.operating_system || ""
+                          }
+                        />
+                        <span className="font-medium">OS:</span>{" "}
+                        {sessionDetails.data.session.operating_system ||
+                          "Unknown"}
+                        {sessionDetails.data.session
+                          .operating_system_version && (
+                          <span className="text-gray-400">
+                            (
+                            {
+                              sessionDetails.data.session
+                                .operating_system_version
+                            }
+                            )
+                          </span>
+                        )}
+                      </div>
+
+                      {sessionDetails.data.session.screen_width &&
+                      sessionDetails.data.session.screen_height ? (
+                        <div className="text-sm text-gray-400">
+                          <span className="font-medium">Screen:</span>{" "}
+                          {sessionDetails.data.session.screen_width} x{" "}
+                          {sessionDetails.data.session.screen_height}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <h4 className="text-sm font-medium mb-2">
+                      Session Information
+                    </h4>
+                    <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                      <div className="text-sm">
+                        <span className="font-medium">Duration:</span>{" "}
+                        {durationFormatted}
+                      </div>
+
+                      <div className="text-sm">
+                        <span className="font-medium">Start Time:</span>{" "}
+                        {DateTime.fromSQL(
+                          sessionDetails.data.session.session_start
+                        ).toFormat("MMMM d, yyyy h:mm:ss a")}
+                      </div>
+
+                      <div className="text-sm">
+                        <span className="font-medium">End Time:</span>{" "}
+                        {DateTime.fromSQL(
+                          sessionDetails.data.session.session_end
+                        ).toFormat("MMMM d, yyyy h:mm:ss a")}
+                      </div>
+
+                      {sessionDetails.data.session.referrer && (
+                        <div className="text-sm">
+                          <span className="font-medium">Referrer:</span>
+                          <span className="text-gray-400 ml-1 break-all">
+                            {sessionDetails.data.session.referrer}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           ) : (
