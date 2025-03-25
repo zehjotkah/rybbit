@@ -7,7 +7,7 @@ import {
 } from "./utils.js";
 import { getUserHasAccessToSite } from "../lib/auth-utils.js";
 
-type GetSessionsResponse = {
+export type GetSessionsResponse = {
   session_id: string;
   user_id: string;
   country: string;
@@ -17,7 +17,10 @@ type GetSessionsResponse = {
   browser: string;
   operating_system: string;
   referrer: string;
-  last_pageview_timestamp: string;
+  session_end: string;
+  session_start: string;
+  entry_page: string;
+  exit_page: string;
   pageviews: number;
 }[];
 
@@ -29,6 +32,7 @@ export interface GetSessionsRequest {
     site: string;
     filters: string;
     page: number;
+    userId?: string;
   };
 }
 
@@ -36,7 +40,8 @@ export async function getSessions(
   req: FastifyRequest<GetSessionsRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, site, filters, page } = req.query;
+  const { startDate, endDate, timezone, site, filters, page, userId } =
+    req.query;
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
@@ -55,14 +60,17 @@ SELECT
     browser,
     operating_system,
     referrer,
-    MAX(timestamp) AS last_pageview_timestamp,
-    COUNT(*) AS pageviews
+    MAX(timestamp) AS session_end,
+    MIN(timestamp) AS session_start,
+    argMinIf(pathname, timestamp, type = 'pageview') AS entry_page,
+    argMaxIf(pathname, timestamp, type = 'pageview') AS exit_page,
+    countIf(type = 'pageview') AS pageviews
 FROM pageviews
 WHERE
     site_id = ${site}
+    ${userId ? ` AND user_id = '${userId}'` : ""}
     ${filterStatement}
     ${getTimeStatement(startDate, endDate, timezone)}
-    AND type = 'pageview'
 GROUP BY
     session_id,
     user_id,
@@ -73,7 +81,7 @@ GROUP BY
     device_type,
     operating_system,
     referrer
-ORDER BY last_pageview_timestamp DESC
+ORDER BY session_start DESC
 LIMIT 100 OFFSET ${(page - 1) * 100}
   `;
 

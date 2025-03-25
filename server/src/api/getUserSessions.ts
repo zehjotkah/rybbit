@@ -78,7 +78,8 @@ SELECT
     browser,
     operating_system,
     device_type,
-    country
+    country,
+    iso_3166_2
 FROM pageviews
 WHERE
     site_id = ${site}
