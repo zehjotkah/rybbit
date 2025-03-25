@@ -65,21 +65,41 @@ function PageviewItem({
   item,
   index,
   isLast = false,
+  nextTimestamp,
 }: {
   item: PageviewEvent;
   index: number;
   isLast?: boolean;
+  nextTimestamp?: string; // Timestamp of the next event for duration calculation
 }) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp);
   const formattedTime = timestamp.toFormat("h:mm:ss a");
 
+  // Calculate duration if this is a pageview and we have the next timestamp
+  let duration = null;
+  if (!isEvent && nextTimestamp) {
+    const nextTime = DateTime.fromSQL(nextTimestamp);
+    const diff = nextTime.diff(timestamp, ["minutes", "seconds"]);
+    const minutes = Math.floor(diff.minutes);
+    const seconds = Math.floor(diff.seconds);
+
+    if (minutes > 0 || seconds > 0) {
+      duration = `${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+    }
+  }
+
   return (
-    <div className="flex items-center mb-3 last:mb-0">
+    <div className="flex mb-3">
       {/* Timeline circle with number */}
       <div className="relative flex-shrink-0">
         {!isLast && (
-          <div className="absolute top-8 left-4 w-[1px] h-[12px] bg-neutral-700" />
+          <div
+            className="absolute top-8 left-4 w-[1px] bg-neutral-700"
+            style={{
+              height: "calc(100% - 20px)",
+            }}
+          />
         )}
         {/* Connecting line */}
         <div
@@ -91,26 +111,35 @@ function PageviewItem({
         </div>
       </div>
 
-      {/* Content in a single row */}
-      <div className="flex items-center ml-3 flex-1">
-        <div className="flex-shrink-0 mr-3">
-          {isEvent ? (
-            <MousePointerClick className="w-4 h-4 text-amber-500" />
-          ) : (
-            <FileText className="w-4 h-4 text-blue-500" />
-          )}
-        </div>
+      <div className="flex flex-col ml-3 flex-1">
+        <div className="flex items-center flex-1 py-1">
+          <div className="flex-shrink-0 mr-3">
+            {isEvent ? (
+              <MousePointerClick className="w-4 h-4 text-amber-500" />
+            ) : (
+              <FileText className="w-4 h-4 text-blue-500" />
+            )}
+          </div>
 
-        <div className="flex-1 min-w-0 mr-4">
-          <div className="text-sm truncate" title={item.pathname}>
-            {item.pathname}
-            {item.querystring ? item.querystring : ""}
+          <div className="flex-1 min-w-0 mr-4">
+            <div className="text-sm truncate" title={item.pathname}>
+              {item.pathname}
+              {item.querystring ? item.querystring : ""}
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-400 flex-shrink-0">
+            {formattedTime}
           </div>
         </div>
-
-        <div className="text-xs text-gray-400 flex-shrink-0">
-          {formattedTime}
-        </div>
+        {!isEvent && duration && (
+          <div className="flex items-center pl-7 mt-1">
+            <div className="text-xs text-gray-500">
+              <Clock className="w-3 h-3 inline mr-1 text-gray-500" />
+              Time on page: {duration}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -272,7 +301,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
 
       {/* Expanded content - detailed session data */}
       {expanded && (
-        <div className="px-4 pb-4 bg-neutral-900 border-t border-neutral-800">
+        <div className="px-4 bg-neutral-900 border-t border-neutral-800">
           {isLoading ? (
             <div className="py-4">
               <Skeleton className="h-4 w-full mb-2" />
@@ -323,16 +352,29 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
                     </Badge>
                   </div>
                   <div className="p-4">
-                    {sessionDetails.data.pageviews.map((pageview, index) => (
-                      <PageviewItem
-                        key={`${pageview.timestamp}-${index}`}
-                        item={pageview}
-                        index={index}
-                        isLast={
-                          index === sessionDetails.data.pageviews.length - 1
-                        }
-                      />
-                    ))}
+                    {sessionDetails.data.pageviews.map((pageview, index) => {
+                      // Determine the next timestamp for duration calculation
+                      // For the last item, use the session end time
+                      let nextTimestamp;
+                      if (index < sessionDetails.data.pageviews.length - 1) {
+                        nextTimestamp =
+                          sessionDetails.data.pageviews[index + 1].timestamp;
+                      } else {
+                        nextTimestamp = sessionDetails.data.session.session_end;
+                      }
+
+                      return (
+                        <PageviewItem
+                          key={`${pageview.timestamp}-${index}`}
+                          item={pageview}
+                          index={index}
+                          isLast={
+                            index === sessionDetails.data.pageviews.length - 1
+                          }
+                          nextTimestamp={nextTimestamp}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </TabsContent>
