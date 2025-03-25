@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { GetSessionsResponse } from "../../../../api/analytics/userSessions";
 import { SessionCard, SessionCardSkeleton } from "./SessionCard";
 
@@ -19,15 +19,9 @@ export default function SessionsList({
   isFetchingNextPage,
 }: SessionsListProps) {
   const { site } = useParams();
-  const router = useRouter();
 
   // Reference for the scroll container
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Handle navigation to user details page
-  const handleSessionClick = (userId: string) => {
-    router.push(`/${site}/user/${userId}`);
-  };
 
   // Infinite scroll implementation
   useEffect(() => {
@@ -73,11 +67,7 @@ export default function SessionsList({
       ) : (
         // Render session cards with more robust key generation
         data.map((session, index) => (
-          <SessionCard
-            key={`${index}`}
-            session={session}
-            onClick={() => handleSessionClick(session.user_id)}
-          />
+          <SessionCard key={index} session={session} />
         ))
       )}
 

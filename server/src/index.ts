@@ -11,6 +11,7 @@ import { getLiveUsercount } from "./api/getLiveUsercount.js";
 import { getOverview } from "./api/getOverview.js";
 import { getOverviewBucketed } from "./api/getOverviewBucketed.js";
 import { getSessions } from "./api/getSessions.js";
+import { getSession } from "./api/getSession.js";
 import { getSingleCol } from "./api/getSingleCol.js";
 import { getUserSessions } from "./api/getUserSessions.js";
 import { listUsers } from "./api/listUsers.js";
@@ -126,6 +127,7 @@ server.get("/overview-bucketed", getOverviewBucketed);
 server.get("/single-col", getSingleCol);
 server.get("/site-has-data/:site", getSiteHasData);
 server.get("/sessions", getSessions);
+server.get("/session/:sessionId", getSession);
 server.get("/user/:userId/sessions", getUserSessions);
 
 // Administrative
