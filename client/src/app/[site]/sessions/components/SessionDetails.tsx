@@ -1,0 +1,353 @@
+import { DateTime } from "luxon";
+import { Browser } from "../../components/shared/icons/Browser";
+import { CountryFlag } from "../../components/shared/icons/CountryFlag";
+import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
+import { getCountryName } from "../../../../lib/utils";
+import {
+  MonitorSmartphone,
+  Clock,
+  FileText,
+  MousePointerClick,
+} from "lucide-react";
+import Avatar from "boring-avatars";
+import {
+  useGetSessionDetails,
+  PageviewEvent,
+} from "../../../../api/analytics/userSessions";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
+
+// Component to display a single pageview or event
+function PageviewItem({
+  item,
+  index,
+  isLast = false,
+  nextTimestamp,
+}: {
+  item: PageviewEvent;
+  index: number;
+  isLast?: boolean;
+  nextTimestamp?: string; // Timestamp of the next event for duration calculation
+}) {
+  const isEvent = item.type !== "pageview";
+  const timestamp = DateTime.fromSQL(item.timestamp);
+  const formattedTime = timestamp.toFormat("h:mm:ss a");
+
+  // Calculate duration if this is a pageview and we have the next timestamp
+  let duration = null;
+  if (!isEvent && nextTimestamp) {
+    const nextTime = DateTime.fromSQL(nextTimestamp);
+    const diff = nextTime.diff(timestamp, ["minutes", "seconds"]);
+    const minutes = Math.floor(diff.minutes);
+    const seconds = Math.floor(diff.seconds);
+
+    if (minutes > 0 || seconds > 0) {
+      duration = `${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+    }
+  }
+
+  return (
+    <div className="flex mb-3">
+      {/* Timeline circle with number */}
+      <div className="relative flex-shrink-0">
+        {!isLast && (
+          <div
+            className="absolute top-8 left-4 w-[1px] bg-neutral-700"
+            style={{
+              height: "calc(100% - 20px)",
+            }}
+          />
+        )}
+        {/* Connecting line */}
+        <div
+          className={`flex items-center justify-center w-8 h-8 rounded-full ${
+            isEvent ? "bg-amber-900/30" : "bg-blue-900/30"
+          } border ${isEvent ? "border-amber-500/50" : "border-blue-500/50"}`}
+        >
+          <span className="text-sm font-medium">{index + 1}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col ml-3 flex-1">
+        <div className="flex items-center flex-1 py-1">
+          <div className="flex-shrink-0 mr-3">
+            {isEvent ? (
+              <MousePointerClick className="w-4 h-4 text-amber-500" />
+            ) : (
+              <FileText className="w-4 h-4 text-blue-500" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0 mr-4">
+            <Link
+              href={`${item.hostname}${item.pathname}${
+                item.querystring ? `${item.querystring}` : ""
+              }`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div
+                className="text-sm truncate hover:underline"
+                title={item.pathname}
+              >
+                {item.pathname}
+                {item.querystring ? `${item.querystring}` : ""}
+              </div>
+            </Link>
+          </div>
+
+          <div className="text-xs text-gray-400 flex-shrink-0">
+            {formattedTime}
+          </div>
+        </div>
+        {!isEvent && duration && (
+          <div className="flex items-center pl-7 mt-1">
+            <div className="text-xs text-gray-500">
+              <Clock className="w-3 h-3 inline mr-1 text-gray-500" />
+              Time on page: {duration}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface SessionDetailsProps {
+  sessionId: string;
+}
+
+export function SessionDetails({ sessionId }: SessionDetailsProps) {
+  const {
+    data: sessionDetails,
+    isLoading,
+    error,
+  } = useGetSessionDetails(sessionId);
+
+  // Calculate session duration for the details section
+  const getDurationFormatted = () => {
+    if (!sessionDetails?.data) return "";
+    const start = DateTime.fromSQL(sessionDetails.data.session.session_start);
+    const end = DateTime.fromSQL(sessionDetails.data.session.session_end);
+    const duration = end.diff(start, ["minutes", "seconds"]);
+    return `${Math.floor(duration.minutes)}m ${Math.floor(duration.seconds)}s`;
+  };
+
+  return (
+    <div className="px-4 bg-neutral-900 border-t border-neutral-800">
+      {isLoading ? (
+        <div className="py-4">
+          <Skeleton className="h-4 w-full mb-2" />
+          <Skeleton className="h-4 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      ) : error ? (
+        <Alert variant="destructive" className="mt-4">
+          <AlertDescription>
+            Error loading session details. Please try again.
+          </AlertDescription>
+        </Alert>
+      ) : sessionDetails?.data ? (
+        <Tabs defaultValue="timeline" className="mt-4">
+          <TabsList className="bg-neutral-800">
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="info">Session Info</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="timeline" className="mt-4">
+            <div className="mb-3">
+              <div className="text-sm font-medium mb-2">Session Timeline</div>
+              <div className="flex gap-2 mb-4">
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                >
+                  <FileText className="w-3 h-3" />
+                  <span>
+                    Pageviews: {sessionDetails.data.session.pageviews}
+                  </span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                >
+                  <MousePointerClick className="w-3 h-3" />
+                  <span>
+                    Events:{" "}
+                    {
+                      sessionDetails.data.pageviews.filter(
+                        (p) => p.type !== "pageview"
+                      ).length
+                    }
+                  </span>
+                </Badge>
+              </div>
+              <div className="p-4">
+                {sessionDetails.data.pageviews.map((pageview, index) => {
+                  // Determine the next timestamp for duration calculation
+                  // For the last item, use the session end time
+                  let nextTimestamp;
+                  if (index < sessionDetails.data.pageviews.length - 1) {
+                    nextTimestamp =
+                      sessionDetails.data.pageviews[index + 1].timestamp;
+                  } else {
+                    nextTimestamp = sessionDetails.data.session.session_end;
+                  }
+
+                  return (
+                    <PageviewItem
+                      key={`${pageview.timestamp}-${index}`}
+                      item={pageview}
+                      index={index}
+                      isLast={
+                        index === sessionDetails.data.pageviews.length - 1
+                      }
+                      nextTimestamp={nextTimestamp}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="info" className="mt-4">
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <h4 className="text-sm font-medium mb-2">User Information</h4>
+                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      name={sessionDetails.data.session.user_id}
+                      colors={[
+                        "#2c2b4b",
+                        "#a75293",
+                        "#9c7a9d",
+                        "#9ddacb",
+                        "#f8dcb4",
+                      ]}
+                      variant="beam"
+                      size={24}
+                    />
+                    <div className="text-sm font-mono">
+                      {sessionDetails.data.session.user_id}
+                    </div>
+                  </div>
+                  {sessionDetails.data.session.language && (
+                    <div className="text-sm text-gray-400">
+                      <span className="font-medium">Language:</span>{" "}
+                      {sessionDetails.data.session.language}
+                    </div>
+                  )}
+                  {sessionDetails.data.session.country && (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span className="font-medium">Location:</span>
+                      <div className="flex items-center gap-1">
+                        <CountryFlag
+                          country={sessionDetails.data.session.country}
+                        />
+                        <span>
+                          {getCountryName(sessionDetails.data.session.country)}
+                        </span>
+                        {sessionDetails.data.session.iso_3166_2 && (
+                          <span>
+                            ({sessionDetails.data.session.iso_3166_2})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium mb-2">Device Information</h4>
+                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                  <div className="flex items-center gap-2 text-sm">
+                    <MonitorSmartphone className="w-4 h-4" />
+                    <span className="font-medium">Device Type:</span>{" "}
+                    {sessionDetails.data.session.device_type || "Unknown"}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <Browser
+                      browser={sessionDetails.data.session.browser || "Unknown"}
+                    />
+                    <span className="font-medium">Browser:</span>{" "}
+                    {sessionDetails.data.session.browser || "Unknown"}
+                    {sessionDetails.data.session.browser_version && (
+                      <span className="text-gray-400">
+                        ({sessionDetails.data.session.browser_version})
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <OperatingSystem
+                      os={sessionDetails.data.session.operating_system || ""}
+                    />
+                    <span className="font-medium">OS:</span>{" "}
+                    {sessionDetails.data.session.operating_system || "Unknown"}
+                    {sessionDetails.data.session.operating_system_version && (
+                      <span className="text-gray-400">
+                        ({sessionDetails.data.session.operating_system_version})
+                      </span>
+                    )}
+                  </div>
+
+                  {sessionDetails.data.session.screen_width &&
+                  sessionDetails.data.session.screen_height ? (
+                    <div className="text-sm text-gray-400">
+                      <span className="font-medium">Screen:</span>{" "}
+                      {sessionDetails.data.session.screen_width} x{" "}
+                      {sessionDetails.data.session.screen_height}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="col-span-2">
+                <h4 className="text-sm font-medium mb-2">
+                  Session Information
+                </h4>
+                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                  <div className="text-sm">
+                    <span className="font-medium">Duration:</span>{" "}
+                    {getDurationFormatted()}
+                  </div>
+
+                  <div className="text-sm">
+                    <span className="font-medium">Start Time:</span>{" "}
+                    {DateTime.fromSQL(
+                      sessionDetails.data.session.session_start
+                    ).toFormat("MMMM d, yyyy h:mm:ss a")}
+                  </div>
+
+                  <div className="text-sm">
+                    <span className="font-medium">End Time:</span>{" "}
+                    {DateTime.fromSQL(
+                      sessionDetails.data.session.session_end
+                    ).toFormat("MMMM d, yyyy h:mm:ss a")}
+                  </div>
+
+                  {sessionDetails.data.session.referrer && (
+                    <div className="text-sm">
+                      <span className="font-medium">Referrer:</span>
+                      <span className="text-gray-400 ml-1 break-all">
+                        {sessionDetails.data.session.referrer}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <div className="py-4 text-center text-gray-400">No data available</div>
+      )}
+    </div>
+  );
+}
