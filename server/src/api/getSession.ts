@@ -31,6 +31,7 @@ export interface SessionDetails {
 export interface PageviewEvent {
   timestamp: string;
   pathname: string;
+  hostname: string;
   querystring: string;
   page_title: string;
   referrer: string;
@@ -99,6 +100,7 @@ LIMIT 1
 SELECT
     timestamp,
     pathname,
+    hostname,
     querystring,
     page_title,
     referrer,
@@ -112,16 +114,29 @@ WHERE
 ORDER BY timestamp ASC
     `;
 
-    // Execute both queries
-    const sessionResult = await clickhouse.query({
-      query: sessionQuery,
-      format: "JSONEachRow",
-    });
+    // Execute both queries in parallel
+    const [sessionResultSettled, pageviewsResultSettled] =
+      await Promise.allSettled([
+        clickhouse.query({
+          query: sessionQuery,
+          format: "JSONEachRow",
+        }),
+        clickhouse.query({
+          query: pageviewsQuery,
+          format: "JSONEachRow",
+        }),
+      ]);
 
-    const pageviewsResult = await clickhouse.query({
-      query: pageviewsQuery,
-      format: "JSONEachRow",
-    });
+    // Check if queries were successful
+    if (sessionResultSettled.status === "rejected") {
+      throw sessionResultSettled.reason;
+    }
+    if (pageviewsResultSettled.status === "rejected") {
+      throw pageviewsResultSettled.reason;
+    }
+
+    const sessionResult = sessionResultSettled.value;
+    const pageviewsResult = pageviewsResultSettled.value;
 
     const sessionData = await processResults<SessionDetails>(sessionResult);
     const pageviewsData = await processResults<PageviewEvent>(pageviewsResult);

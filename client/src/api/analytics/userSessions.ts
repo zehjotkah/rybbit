@@ -115,6 +115,7 @@ export interface SessionDetails {
 export interface PageviewEvent {
   timestamp: string;
   pathname: string;
+  hostname: string;
   querystring: string;
   page_title: string;
   referrer: string;

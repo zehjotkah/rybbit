@@ -34,6 +34,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -122,10 +123,19 @@ function PageviewItem({
           </div>
 
           <div className="flex-1 min-w-0 mr-4">
-            <div className="text-sm truncate" title={item.pathname}>
-              {item.pathname}
-              {item.querystring ? item.querystring : ""}
-            </div>
+            <Link
+              href={`${item.hostname}${item.pathname}${
+                item.querystring ? `${item.querystring}` : ""
+              }`}
+            >
+              <div
+                className="text-sm truncate hover:underline"
+                title={item.pathname}
+              >
+                {item.pathname}
+                {item.querystring ? `${item.querystring}` : ""}
+              </div>
+            </Link>
           </div>
 
           <div className="text-xs text-gray-400 flex-shrink-0">
