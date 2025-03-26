@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { DateTime } from "luxon";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
@@ -225,48 +225,77 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       </div>
 
       {/* Expanded content using SessionDetails component */}
-      {expanded && <SessionDetails sessionId={session.session_id} />}
+      {expanded && <SessionDetails session={session} />}
     </div>
   );
 }
 
-export function SessionCardSkeleton() {
-  return (
-    <div className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 p-3">
-      <div className="flex items-center">
-        {/* Avatar and User ID */}
-        <div className="flex items-center gap-2 min-w-[110px]">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-3 w-16" />
-        </div>
+export const SessionCardSkeleton = memo(() => {
+  // Function to get a random width class for skeletons
+  const getRandomWidth = () => {
+    const widths = [
+      "w-16",
+      "w-20",
+      "w-24",
+      "w-28",
+      "w-32",
+      "w-36",
+      "w-40",
+      "w-44",
+      "w-48",
+    ];
+    return widths[Math.floor(Math.random() * widths.length)];
+  };
 
-        {/* Icons */}
-        <div className="flex space-x-2 items-center ml-3">
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-4 w-4" />
-        </div>
-
-        {/* Entry/Exit paths */}
-        <div className="flex items-center ml-3 flex-1 min-w-0">
-          <Skeleton className="h-3 w-20" />
-          <div className="mx-2">
-            <Skeleton className="h-3 w-3" />
+  // Create multiple skeletons for a realistic loading state
+  const skeletons = Array.from({ length: 5 }).map((_, index) => (
+    <div
+      className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden"
+      key={index}
+    >
+      <div className="p-3">
+        <div className="flex items-center gap-2">
+          {/* Avatar and User ID */}
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-6 rounded-full" />
+            <Skeleton className="h-3 w-14" />
           </div>
-          <Skeleton className="h-3 w-20" />
-        </div>
 
-        {/* Time */}
-        <div className="ml-3">
-          <Skeleton className="h-3 w-16" />
-        </div>
+          {/* Icons */}
+          <div className="flex space-x-2 items-center ml-3">
+            <Skeleton className="h-4 w-4 rounded-sm" />
+            <Skeleton className="h-4 w-4 rounded-sm" />
+            <Skeleton className="h-4 w-4 rounded-sm" />
+            <Skeleton className="h-4 w-4 rounded-sm" />
+            {/* Badge skeleton for pageviews */}
+            <Skeleton className="h-4 w-8 rounded-sm" />
+            {/* Badge skeleton for events */}
+            <Skeleton className="h-4 w-8 rounded-sm" />
+          </div>
 
-        {/* Expand icon */}
-        <div className="ml-3 flex-shrink-0">
-          <Skeleton className="h-4 w-4" />
+          {/* Entry/Exit paths with randomized widths */}
+          <div className="flex items-center ml-3 flex-1 min-w-0">
+            <Skeleton className={`h-3 max-w-[200px] ${getRandomWidth()}`} />
+            <div className="mx-2 flex-shrink-0">
+              <Skeleton className="h-3 w-3" />
+            </div>
+            <Skeleton className={`h-3 max-w-[200px] ${getRandomWidth()}`} />
+          </div>
+
+          {/* Time */}
+          <div className="flex items-center gap-1 ml-3">
+            <Skeleton className="h-3 w-3 rounded-full" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+
+          {/* Expand icon */}
+          <div className="ml-3 flex-shrink-0">
+            <Skeleton className="h-4 w-4" />
+          </div>
         </div>
       </div>
     </div>
-  );
-}
+  ));
+
+  return <>{skeletons}</>;
+});

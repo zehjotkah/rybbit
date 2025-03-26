@@ -13,6 +13,7 @@ import Avatar from "boring-avatars";
 import {
   useGetSessionDetails,
   PageviewEvent,
+  GetSessionsResponse,
 } from "../../../../api/analytics/userSessions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import CopyText from "@/components/CopyText";
+import { memo } from "react";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -149,16 +151,78 @@ function PageviewItem({
   );
 }
 
+// Memoized skeleton component for the session details timeline
+const SessionDetailsTimelineSkeleton = memo(
+  ({ itemCount }: { itemCount: number }) => {
+    // Function to get a random width class for skeletons
+    const getRandomWidth = () => {
+      const widths = [
+        "w-28",
+        "w-36",
+        "w-44",
+        "w-52",
+        "w-60",
+        "w-72",
+        "w-80",
+        "w-96",
+        "w-full",
+      ];
+      return widths[Math.floor(Math.random() * widths.length)];
+    };
+
+    return (
+      <div className="py-4">
+        {/* Tabs skeleton */}
+        <div className="flex gap-2 mb-6">
+          <Skeleton className="h-8 w-24 rounded-md" />
+          <Skeleton className="h-8 w-24 rounded-md" />
+        </div>
+
+        {/* Timeline tab skeleton */}
+        <div className="mb-4">
+          <div className="flex gap-2 mb-3">
+            <Skeleton className="h-6 w-32 rounded-full" />
+            <Skeleton className="h-6 w-32 rounded-full" />
+          </div>
+
+          {/* Timeline items skeleton */}
+          {Array.from({ length: itemCount }).map((_, i) => (
+            <div key={i} className="flex mb-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="ml-3 flex-1">
+                <div className="flex items-center">
+                  <Skeleton className="h-4 w-4 mr-3" />
+                  <Skeleton
+                    className={`h-4 ${getRandomWidth()} max-w-md mr-4`}
+                  />
+                  <Skeleton className="h-3 w-16 flex-shrink-0 ml-auto" />
+                </div>
+                <div className="mt-1 pl-7">
+                  {Math.random() > 0.5 && (
+                    <Skeleton
+                      className={`h-3 ${Math.random() > 0.7 ? "w-48" : "w-32"}`}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+);
+
 interface SessionDetailsProps {
-  sessionId: string;
+  session: GetSessionsResponse[number];
 }
 
-export function SessionDetails({ sessionId }: SessionDetailsProps) {
+export function SessionDetails({ session }: SessionDetailsProps) {
   const {
     data: sessionDetails,
     isLoading,
     error,
-  } = useGetSessionDetails(sessionId);
+  } = useGetSessionDetails(session.session_id);
 
   // Calculate session duration for the details section
   const getDurationFormatted = () => {
@@ -176,38 +240,9 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
   return (
     <div className="px-4 bg-neutral-900 border-t border-neutral-800">
       {isLoading ? (
-        <div className="py-4">
-          {/* Tabs skeleton */}
-          <div className="flex gap-2 mb-6">
-            <Skeleton className="h-8 w-24 rounded-md" />
-            <Skeleton className="h-8 w-24 rounded-md" />
-          </div>
-
-          {/* Timeline tab skeleton */}
-          <div className="mb-4">
-            <div className="flex gap-2 mb-3">
-              <Skeleton className="h-6 w-32 rounded-full" />
-              <Skeleton className="h-6 w-32 rounded-full" />
-            </div>
-
-            {/* Timeline items skeleton */}
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex mb-3">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center">
-                    <Skeleton className="h-4 w-4 mr-3" />
-                    <Skeleton className="h-4 w-full max-w-md mr-4" />
-                    <Skeleton className="h-3 w-16 flex-shrink-0 ml-auto" />
-                  </div>
-                  <div className="mt-1 pl-7">
-                    <Skeleton className="h-3 w-32" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SessionDetailsTimelineSkeleton
+          itemCount={session.pageviews + session.events}
+        />
       ) : error ? (
         <Alert variant="destructive" className="mt-4">
           <AlertDescription>
