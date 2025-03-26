@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import CopyText from "@/components/CopyText";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -33,13 +34,13 @@ function PageviewItem({
   nextTimestamp?: string; // Timestamp of the next event for duration calculation
 }) {
   const isEvent = item.type !== "pageview";
-  const timestamp = DateTime.fromSQL(item.timestamp);
+  const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
   const formattedTime = timestamp.toFormat("h:mm:ss a");
 
   // Calculate duration if this is a pageview and we have the next timestamp
   let duration = null;
   if (!isEvent && nextTimestamp) {
-    const nextTime = DateTime.fromSQL(nextTimestamp);
+    const nextTime = DateTime.fromSQL(nextTimestamp, { zone: "utc" }).toLocal();
     const diff = nextTime.diff(timestamp, ["minutes", "seconds"]);
     const minutes = Math.floor(diff.minutes);
     const seconds = Math.floor(diff.seconds);
@@ -91,8 +92,11 @@ function PageviewItem({
                 rel="noopener noreferrer"
               >
                 <div
-                  className="text-sm truncate hover:underline"
+                  className="text-sm truncate hover:underline "
                   title={item.pathname}
+                  style={{
+                    maxWidth: "calc(min(100vw, 1150px) - 250px)",
+                  }}
                 >
                   {item.pathname}
                   {item.querystring ? `${item.querystring}` : ""}
@@ -159,8 +163,12 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
   // Calculate session duration for the details section
   const getDurationFormatted = () => {
     if (!sessionDetails?.data) return "";
-    const start = DateTime.fromSQL(sessionDetails.data.session.session_start);
-    const end = DateTime.fromSQL(sessionDetails.data.session.session_end);
+    const start = DateTime.fromSQL(sessionDetails.data.session.session_start, {
+      zone: "utc",
+    }).toLocal();
+    const end = DateTime.fromSQL(sessionDetails.data.session.session_end, {
+      zone: "utc",
+    }).toLocal();
     const duration = end.diff(start, ["minutes", "seconds"]);
     return `${Math.floor(duration.minutes)}m ${Math.floor(duration.seconds)}s`;
   };
@@ -274,132 +282,234 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
           </TabsContent>
 
           <TabsContent value="info" className="mt-4">
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-8 mb-6">
+              {/* User Information */}
               <div>
-                <h4 className="text-sm font-medium mb-2">User Information</h4>
-                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
-                  <div className="flex items-center gap-2">
-                    <Avatar
-                      name={sessionDetails.data.session.user_id}
-                      colors={[
-                        "#2c2b4b",
-                        "#a75293",
-                        "#9c7a9d",
-                        "#9ddacb",
-                        "#f8dcb4",
-                      ]}
-                      variant="beam"
-                      size={24}
-                    />
-                    <div className="text-sm font-mono">
-                      {sessionDetails.data.session.session_id}
-                    </div>
-                  </div>
-                  {sessionDetails.data.session.language && (
-                    <div className="text-sm text-gray-400">
-                      <span className="font-medium">Language:</span>{" "}
-                      {sessionDetails.data.session.language}
-                    </div>
-                  )}
-                  {sessionDetails.data.session.country && (
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <span className="font-medium">Location:</span>
-                      <div className="flex items-center gap-1">
-                        <CountryFlag
-                          country={sessionDetails.data.session.country}
+                <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
+                  User Information
+                </h4>
+                <div className="space-y-3">
+                  {sessionDetails.data.session.user_id && (
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 bg-neutral-800 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Avatar
+                          size={24}
+                          name={sessionDetails.data.session.user_id}
+                          variant="marble"
+                          colors={[
+                            "#92A1C6",
+                            "#146A7C",
+                            "#F0AB3D",
+                            "#C271B4",
+                            "#C20D90",
+                          ]}
                         />
-                        <span>
-                          {getCountryName(sessionDetails.data.session.country)}
-                        </span>
-                        {sessionDetails.data.session.iso_3166_2 && (
-                          <span>
-                            ({sessionDetails.data.session.iso_3166_2})
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400 flex items-center">
+                          <span className="font-medium text-gray-300">
+                            User ID:
                           </span>
-                        )}
+                          <CopyText
+                            text={sessionDetails.data.session.user_id}
+                            maxLength={24}
+                            className="inline-flex ml-2"
+                          />
+                        </div>
+                        <div className="text-sm text-gray-400 flex items-center">
+                          <span className="font-medium text-gray-300">
+                            Session ID:
+                          </span>
+                          <CopyText
+                            text={sessionDetails.data.session.session_id}
+                            maxLength={20}
+                            className="inline-flex ml-2"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
+
+                  <div className="space-y-2">
+                    {sessionDetails.data.session.language && (
+                      <div className="text-sm flex items-center gap-2">
+                        <span className="font-medium text-gray-300 min-w-[80px]">
+                          Language:
+                        </span>
+                        <span className="text-gray-400">
+                          {sessionDetails.data.session.language}
+                        </span>
+                      </div>
+                    )}
+
+                    {sessionDetails.data.session.country && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium text-gray-300 min-w-[80px]">
+                          Location:
+                        </span>
+                        <div className="flex items-center gap-1 text-gray-400">
+                          <CountryFlag
+                            country={sessionDetails.data.session.country}
+                          />
+                          <span>
+                            {getCountryName(
+                              sessionDetails.data.session.country
+                            )}
+                          </span>
+                          {sessionDetails.data.session.iso_3166_2 && (
+                            <span>
+                              ({sessionDetails.data.session.iso_3166_2})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
+              {/* Device Information */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Device Information</h4>
-                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
+                <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
+                  Device Information
+                </h4>
+                <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
-                    <MonitorSmartphone className="w-4 h-4" />
-                    <span className="font-medium">Device Type:</span>{" "}
-                    {sessionDetails.data.session.device_type || "Unknown"}
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Device:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <MonitorSmartphone className="w-4 h-4 text-gray-500" />
+                      <span>
+                        {sessionDetails.data.session.device_type || "Unknown"}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <Browser
-                      browser={sessionDetails.data.session.browser || "Unknown"}
-                    />
-                    <span className="font-medium">Browser:</span>{" "}
-                    {sessionDetails.data.session.browser || "Unknown"}
-                    {sessionDetails.data.session.browser_version && (
-                      <span className="text-gray-400">
-                        ({sessionDetails.data.session.browser_version})
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Browser:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <Browser
+                        browser={
+                          sessionDetails.data.session.browser || "Unknown"
+                        }
+                      />
+                      <span>
+                        {sessionDetails.data.session.browser || "Unknown"}
+                        {sessionDetails.data.session.browser_version && (
+                          <span className="ml-1">
+                            v{sessionDetails.data.session.browser_version}
+                          </span>
+                        )}
                       </span>
-                    )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <OperatingSystem
-                      os={sessionDetails.data.session.operating_system || ""}
-                    />
-                    <span className="font-medium">OS:</span>{" "}
-                    {sessionDetails.data.session.operating_system || "Unknown"}
-                    {sessionDetails.data.session.operating_system_version && (
-                      <span className="text-gray-400">
-                        ({sessionDetails.data.session.operating_system_version})
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      OS:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <OperatingSystem
+                        os={sessionDetails.data.session.operating_system || ""}
+                      />
+                      <span>
+                        {sessionDetails.data.session.operating_system ||
+                          "Unknown"}
+                        {sessionDetails.data.session
+                          .operating_system_version && (
+                          <span className="ml-1">
+                            {
+                              sessionDetails.data.session
+                                .operating_system_version
+                            }
+                          </span>
+                        )}
                       </span>
-                    )}
+                    </div>
                   </div>
 
                   {sessionDetails.data.session.screen_width &&
                   sessionDetails.data.session.screen_height ? (
-                    <div className="text-sm text-gray-400">
-                      <span className="font-medium">Screen:</span>{" "}
-                      {sessionDetails.data.session.screen_width} x{" "}
-                      {sessionDetails.data.session.screen_height}
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-medium text-gray-300 min-w-[80px]">
+                        Screen:
+                      </span>
+                      <span className="text-gray-400">
+                        {sessionDetails.data.session.screen_width} ×{" "}
+                        {sessionDetails.data.session.screen_height}
+                      </span>
                     </div>
                   ) : null}
                 </div>
               </div>
 
-              <div className="col-span-2">
-                <h4 className="text-sm font-medium mb-2">
+              {/* Session Information */}
+              <div className="col-span-2 mt-2">
+                <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
                   Session Information
                 </h4>
-                <div className="space-y-2 bg-neutral-950 p-3 rounded-md border border-neutral-700">
-                  <div className="text-sm">
-                    <span className="font-medium">Duration:</span>{" "}
-                    {getDurationFormatted()}
-                  </div>
-
-                  <div className="text-sm">
-                    <span className="font-medium">Start Time:</span>{" "}
-                    {DateTime.fromSQL(
-                      sessionDetails.data.session.session_start
-                    ).toFormat("MMMM d, yyyy h:mm:ss a")}
-                  </div>
-
-                  <div className="text-sm">
-                    <span className="font-medium">End Time:</span>{" "}
-                    {DateTime.fromSQL(
-                      sessionDetails.data.session.session_end
-                    ).toFormat("MMMM d, yyyy h:mm:ss a")}
-                  </div>
-
-                  {sessionDetails.data.session.referrer && (
-                    <div className="text-sm">
-                      <span className="font-medium">Referrer:</span>
-                      <span className="text-gray-400 ml-1 break-all">
-                        {sessionDetails.data.session.referrer}
-                      </span>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Duration:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      <span>{getDurationFormatted()}</span>
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Start:
+                    </span>
+                    <span className="text-gray-400">
+                      {DateTime.fromSQL(
+                        sessionDetails.data.session.session_start,
+                        { zone: "utc" }
+                      )
+                        .toLocal()
+                        .toFormat("MMM d, yyyy h:mm:ss a")}
+                    </span>
+                  </div>
+
+                  {sessionDetails.data.session.referrer ? (
+                    <div className="flex items-start gap-2 text-sm col-span-2">
+                      <span className="font-medium text-gray-300 min-w-[80px] mt-0.5">
+                        Referrer:
+                      </span>
+                      <CopyText
+                        text={sessionDetails.data.session.referrer}
+                        maxLength={60}
+                        className="text-gray-400"
+                      >
+                        <span className="font-normal text-gray-400 break-all">
+                          {sessionDetails.data.session.referrer}
+                        </span>
+                      </CopyText>
+                    </div>
+                  ) : (
+                    <div />
                   )}
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      End:
+                    </span>
+                    <span className="text-gray-400">
+                      {DateTime.fromSQL(
+                        sessionDetails.data.session.session_end,
+                        {
+                          zone: "utc",
+                        }
+                      )
+                        .toLocal()
+                        .toFormat("MMM d, yyyy h:mm:ss a")}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
