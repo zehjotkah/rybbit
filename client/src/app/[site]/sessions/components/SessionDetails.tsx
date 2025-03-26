@@ -8,6 +8,7 @@ import {
   Clock,
   FileText,
   MousePointerClick,
+  ArrowRight,
 } from "lucide-react";
 import Avatar from "boring-avatars";
 import {
@@ -22,6 +23,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import CopyText from "@/components/CopyText";
 import { memo } from "react";
+import { Button } from "../../../../components/ui/button";
+import { useParams } from "next/navigation";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -223,6 +226,7 @@ export function SessionDetails({ session }: SessionDetailsProps) {
     isLoading,
     error,
   } = useGetSessionDetails(session.session_id);
+  const { site } = useParams();
 
   // Calculate session duration for the details section
   const getDurationFormatted = () => {
@@ -251,10 +255,17 @@ export function SessionDetails({ session }: SessionDetailsProps) {
         </Alert>
       ) : sessionDetails?.data ? (
         <Tabs defaultValue="timeline" className="mt-4">
-          <TabsList className="bg-neutral-800">
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            <TabsTrigger value="info">Session Info</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-between items-center mb-6">
+            <TabsList className="bg-neutral-800">
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              <TabsTrigger value="info">Session Info</TabsTrigger>
+            </TabsList>
+            <Link href={`/${site}/user/${sessionDetails.data.session.user_id}`}>
+              <Button variant={"accent"}>
+                View User <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
 
           <TabsContent value="timeline" className="mt-4">
             <div className="mb-3">
