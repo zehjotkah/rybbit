@@ -111,7 +111,7 @@ function PageviewItem({
           <div className="flex items-center pl-7 mt-1">
             <div className="text-xs text-gray-400">
               <Clock className="w-3 h-3 inline mr-1 text-gray-400" />
-              Time on page: {duration}
+              {duration}
             </div>
           </div>
         )}
@@ -169,9 +169,36 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
     <div className="px-4 bg-neutral-900 border-t border-neutral-800">
       {isLoading ? (
         <div className="py-4">
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2" />
+          {/* Tabs skeleton */}
+          <div className="flex gap-2 mb-6">
+            <Skeleton className="h-8 w-24 rounded-md" />
+            <Skeleton className="h-8 w-24 rounded-md" />
+          </div>
+
+          {/* Timeline tab skeleton */}
+          <div className="mb-4">
+            <div className="flex gap-2 mb-3">
+              <Skeleton className="h-6 w-32 rounded-full" />
+              <Skeleton className="h-6 w-32 rounded-full" />
+            </div>
+
+            {/* Timeline items skeleton */}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex mb-3">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="ml-3 flex-1">
+                  <div className="flex items-center">
+                    <Skeleton className="h-4 w-4 mr-3" />
+                    <Skeleton className="h-4 w-full max-w-md mr-4" />
+                    <Skeleton className="h-3 w-16 flex-shrink-0 ml-auto" />
+                  </div>
+                  <div className="mt-1 pl-7">
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : error ? (
         <Alert variant="destructive" className="mt-4">
@@ -191,7 +218,7 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
               <div className="flex gap-2 mb-2">
                 <Badge
                   variant="outline"
-                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                  className="flex items-center gap-1  text-gray-300 bg-blue-500/60"
                 >
                   <FileText className="w-3 h-3" />
                   <span>
@@ -205,7 +232,7 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                  className="flex items-center gap-1  text-gray-300 bg-amber-500/60"
                 >
                   <MousePointerClick className="w-3 h-3" />
                   <span>

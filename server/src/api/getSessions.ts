@@ -85,11 +85,9 @@ GROUP BY
     device_type,
     operating_system
 
-ORDER BY session_start DESC
+ORDER BY session_end DESC
 LIMIT 100 OFFSET ${(page - 1) * 100}
   `;
-
-  console.log(query);
 
   try {
     const result = await clickhouse.query({

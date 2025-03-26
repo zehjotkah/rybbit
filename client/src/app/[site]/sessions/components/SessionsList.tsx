@@ -57,7 +57,7 @@ export default function SessionsList({
     >
       {isLoading ? (
         // Show skeleton cards while loading
-        Array.from({ length: 10 }).map((_, index) => (
+        Array.from({ length: 30 }).map((_, index) => (
           <SessionCardSkeleton key={`skeleton-${index}`} />
         ))
       ) : data.length === 0 ? (
@@ -72,7 +72,7 @@ export default function SessionsList({
       )}
 
       {isFetchingNextPage && (
-        <div className="py-4">
+        <div className="">
           <SessionCardSkeleton key="loading-more" />
         </div>
       )}

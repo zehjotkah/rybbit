@@ -11,6 +11,8 @@ import {
   ChevronRight,
   ArrowRight,
   Clock,
+  FileText,
+  MousePointerClick,
 } from "lucide-react";
 import Avatar from "boring-avatars";
 import { GetSessionsResponse } from "../../../../api/analytics/userSessions";
@@ -21,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SessionDetails } from "./SessionDetails";
+import { Badge } from "../../../../components/ui/badge";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -136,6 +139,31 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
               <TooltipContent>
                 <p>{session.device_type || "Unknown device"}</p>
               </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                >
+                  <FileText className="w-4 h-4 text-blue-500" />
+                  <span>{session.pageviews}</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>Pageviews</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                >
+                  <MousePointerClick className="w-4 h-4 text-amber-500" />
+                  <span>{session.events}</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>Events</TooltipContent>
             </Tooltip>
           </div>
 
