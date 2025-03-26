@@ -27,6 +27,7 @@ import { Badge } from "../ui/badge";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
+  userId?: string;
   onClick?: () => void;
 }
 
@@ -50,7 +51,7 @@ function truncatePath(path: string, maxLength: number = 32) {
   return `${path.substring(0, maxLength)}...`;
 }
 
-export function SessionCard({ session, onClick }: SessionCardProps) {
+export function SessionCard({ session, onClick, userId }: SessionCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   // Calculate session duration in minutes
@@ -225,7 +226,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       </div>
 
       {/* Expanded content using SessionDetails component */}
-      {expanded && <SessionDetails session={session} />}
+      {expanded && <SessionDetails session={session} userId={userId} />}
     </div>
   );
 }

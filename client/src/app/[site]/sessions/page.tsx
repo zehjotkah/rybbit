@@ -1,7 +1,7 @@
 "use client";
 
 import { SubHeader } from "../components/SubHeader/SubHeader";
-import SessionsList from "../../../components/Sessions/SessionsList";
+import SessionsList from "@/components/Sessions/SessionsList";
 
 export default function SessionsPage() {
   return (

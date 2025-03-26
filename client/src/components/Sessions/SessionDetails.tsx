@@ -218,9 +218,10 @@ const SessionDetailsTimelineSkeleton = memo(
 
 interface SessionDetailsProps {
   session: GetSessionsResponse[number];
+  userId?: string;
 }
 
-export function SessionDetails({ session }: SessionDetailsProps) {
+export function SessionDetails({ session, userId }: SessionDetailsProps) {
   const {
     data: sessionDetails,
     isLoading,
@@ -241,6 +242,8 @@ export function SessionDetails({ session }: SessionDetailsProps) {
     return `${Math.floor(duration.minutes)}m ${Math.floor(duration.seconds)}s`;
   };
 
+  console.info(userId);
+
   return (
     <div className="px-4 bg-neutral-900 border-t border-neutral-800">
       {isLoading ? (
@@ -260,11 +263,13 @@ export function SessionDetails({ session }: SessionDetailsProps) {
               <TabsTrigger value="timeline">Timeline</TabsTrigger>
               <TabsTrigger value="info">Session Info</TabsTrigger>
             </TabsList>
-            <Link href={`/${site}/user/${sessionDetails.data.session.user_id}`}>
-              <Button variant={"accent"}>
-                View User <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+            {!userId && (
+              <Link href={`/${site}/user/${userId}`}>
+                <Button variant={"accent"}>
+                  View User <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            )}
           </div>
 
           <TabsContent value="timeline" className="mt-4">
