@@ -19,9 +19,11 @@ export type GetSessionsResponse = {
   referrer: string;
   session_end: string;
   session_start: string;
+  session_duration: number;
   entry_page: string;
   exit_page: string;
   pageviews: number;
+  events: number;
 }[];
 
 export interface GetSessionsRequest {
@@ -59,12 +61,14 @@ SELECT
     device_type,
     browser,
     operating_system,
-    referrer,
+    argMin(referrer, timestamp),
     MAX(timestamp) AS session_end,
     MIN(timestamp) AS session_start,
+    dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration,
     argMinIf(pathname, timestamp, type = 'pageview') AS entry_page,
     argMaxIf(pathname, timestamp, type = 'pageview') AS exit_page,
-    countIf(type = 'pageview') AS pageviews
+    countIf(type = 'pageview') AS pageviews,
+    countIf(type = 'custom_event') AS events
 FROM pageviews
 WHERE
     site_id = ${site}
@@ -79,11 +83,13 @@ GROUP BY
     iso_3166_2,
     language,
     device_type,
-    operating_system,
-    referrer
+    operating_system
+
 ORDER BY session_start DESC
 LIMIT 100 OFFSET ${(page - 1) * 100}
   `;
+
+  console.log(query);
 
   try {
     const result = await clickhouse.query({

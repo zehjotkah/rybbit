@@ -167,7 +167,12 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
                 >
                   <FileText className="w-3 h-3" />
                   <span>
-                    Pageviews: {sessionDetails.data.session.pageviews}
+                    Pageviews:{" "}
+                    {
+                      sessionDetails.data.pageviews.filter(
+                        (p) => p.type === "pageview"
+                      ).length
+                    }
                   </span>
                 </Badge>
                 <Badge
@@ -232,7 +237,7 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
                       size={24}
                     />
                     <div className="text-sm font-mono">
-                      {sessionDetails.data.session.user_id}
+                      {sessionDetails.data.session.session_id}
                     </div>
                   </div>
                   {sessionDetails.data.session.language && (
