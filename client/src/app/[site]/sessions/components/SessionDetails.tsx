@@ -82,21 +82,25 @@ function PageviewItem({
           </div>
 
           <div className="flex-1 min-w-0 mr-4">
-            <Link
-              href={`${item.hostname}${item.pathname}${
-                item.querystring ? `${item.querystring}` : ""
-              }`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div
-                className="text-sm truncate hover:underline"
-                title={item.pathname}
+            {item.type === "pageview" ? (
+              <Link
+                href={`${item.hostname}${item.pathname}${
+                  item.querystring ? `${item.querystring}` : ""
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {item.pathname}
-                {item.querystring ? `${item.querystring}` : ""}
-              </div>
-            </Link>
+                <div
+                  className="text-sm truncate hover:underline"
+                  title={item.pathname}
+                >
+                  {item.pathname}
+                  {item.querystring ? `${item.querystring}` : ""}
+                </div>
+              </Link>
+            ) : (
+              <div className="text-sm truncate">{item.event_name}</div>
+            )}
           </div>
 
           <div className="text-xs text-gray-400 flex-shrink-0">
@@ -105,9 +109,34 @@ function PageviewItem({
         </div>
         {!isEvent && duration && (
           <div className="flex items-center pl-7 mt-1">
-            <div className="text-xs text-gray-500">
-              <Clock className="w-3 h-3 inline mr-1 text-gray-500" />
+            <div className="text-xs text-gray-400">
+              <Clock className="w-3 h-3 inline mr-1 text-gray-400" />
               Time on page: {duration}
+            </div>
+          </div>
+        )}
+        {isEvent && (
+          <div className="flex items-center pl-7 mt-1">
+            <div className="text-xs text-gray-400">
+              {item.properties &&
+              Object.keys(JSON.parse(item.properties)).length > 0 ? (
+                <span className="flex flex-wrap gap-2 mt-1">
+                  {Object.entries(JSON.parse(item.properties)).map(
+                    ([key, value]) => (
+                      <Badge
+                        key={key}
+                        variant="outline"
+                        className="px-1.5 py-0 h-5 text-xs bg-neutral-800 text-gray-100 font-medium"
+                      >
+                        <span className="text-gray-300 font-light mr-1">
+                          {key}:
+                        </span>{" "}
+                        {String(value)}
+                      </Badge>
+                    )
+                  )}
+                </span>
+              ) : null}
             </div>
           </div>
         )}
@@ -159,8 +188,7 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
 
           <TabsContent value="timeline" className="mt-4">
             <div className="mb-3">
-              <div className="text-sm font-medium mb-2">Session Timeline</div>
-              <div className="flex gap-2 mb-4">
+              <div className="flex gap-2 mb-2">
                 <Badge
                   variant="outline"
                   className="flex items-center gap-1 bg-neutral-800 text-gray-300"
@@ -190,7 +218,7 @@ export function SessionDetails({ sessionId }: SessionDetailsProps) {
                   </span>
                 </Badge>
               </div>
-              <div className="p-4">
+              <div className="px-1 pt-2 pb-1">
                 {sessionDetails.data.pageviews.map((pageview, index) => {
                   // Determine the next timestamp for duration calculation
                   // For the last item, use the session end time
