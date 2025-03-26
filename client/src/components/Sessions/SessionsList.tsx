@@ -13,8 +13,6 @@ export default function SessionsList({ userId }: { userId?: string }) {
     isFetchingNextPage,
   } = useGetSessionsInfinite(userId);
 
-  console.info(userId);
-
   // Combine all pages of data
   const flattenedData = useMemo(() => {
     if (!data) return [];
