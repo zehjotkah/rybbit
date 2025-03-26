@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
-import { Browser } from "../../components/shared/icons/Browser";
-import { CountryFlag } from "../../components/shared/icons/CountryFlag";
-import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
-import { getCountryName } from "../../../../lib/utils";
+import { Browser } from "../../app/[site]/components/shared/icons/Browser";
+import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
+import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
+import { getCountryName } from "../../lib/utils";
 import {
   MonitorSmartphone,
   Clock,
@@ -15,7 +15,7 @@ import {
   useGetSessionDetails,
   PageviewEvent,
   GetSessionsResponse,
-} from "../../../../api/analytics/userSessions";
+} from "../../api/analytics/userSessions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import CopyText from "@/components/CopyText";
 import { memo } from "react";
-import { Button } from "../../../../components/ui/button";
+import { Button } from "../ui/button";
 import { useParams } from "next/navigation";
 
 // Component to display a single pageview or event

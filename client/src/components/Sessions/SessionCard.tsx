@@ -1,9 +1,9 @@
 import { memo, useState } from "react";
 import { DateTime } from "luxon";
-import { Browser } from "../../components/shared/icons/Browser";
-import { CountryFlag } from "../../components/shared/icons/CountryFlag";
-import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
-import { getCountryName } from "../../../../lib/utils";
+import { Browser } from "../../app/[site]/components/shared/icons/Browser";
+import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
+import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
+import { getCountryName } from "../../lib/utils";
 import {
   Laptop,
   Smartphone,
@@ -15,7 +15,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import Avatar from "boring-avatars";
-import { GetSessionsResponse } from "../../../../api/analytics/userSessions";
+import { GetSessionsResponse } from "../../api/analytics/userSessions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -23,7 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SessionDetails } from "./SessionDetails";
-import { Badge } from "../../../../components/ui/badge";
+import { Badge } from "../ui/badge";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -248,7 +248,7 @@ export const SessionCardSkeleton = memo(() => {
   };
 
   // Create multiple skeletons for a realistic loading state
-  const skeletons = Array.from({ length: 5 }).map((_, index) => (
+  const skeletons = Array.from({ length: 10 }).map((_, index) => (
     <div
       className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden"
       key={index}

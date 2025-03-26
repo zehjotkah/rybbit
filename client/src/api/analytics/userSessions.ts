@@ -61,12 +61,12 @@ export type GetSessionsResponse = {
   exit_page: string;
 }[];
 
-export function useGetSessionsInfinite() {
+export function useGetSessionsInfinite(userId?: string) {
   const { time, site, filters } = useStore();
   const { startDate, endDate } = getStartAndEndDate(time);
 
   return useInfiniteQuery<APIResponse<GetSessionsResponse>>({
-    queryKey: ["sessions-infinite", time, site, filters],
+    queryKey: ["sessions-infinite", time, site, filters, userId],
     queryFn: ({ pageParam = 1 }) => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/sessions`, {
@@ -76,6 +76,7 @@ export function useGetSessionsInfinite() {
         site,
         filters,
         page: pageParam,
+        userId,
       }).then((res) => res.json());
     },
     initialPageParam: 1,

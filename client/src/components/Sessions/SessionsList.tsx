@@ -1,24 +1,23 @@
-import { useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
-import { GetSessionsResponse } from "../../../../api/analytics/userSessions";
+import { useEffect, useMemo, useRef } from "react";
+import { useGetSessionsInfinite } from "../../api/analytics/userSessions";
 import { SessionCard, SessionCardSkeleton } from "./SessionCard";
 
-interface SessionsListProps {
-  data: GetSessionsResponse;
-  isLoading: boolean;
-  fetchNextPage: () => void;
-  hasNextPage: boolean | undefined;
-  isFetchingNextPage: boolean;
-}
+export default function SessionsList({ userId }: { userId?: string }) {
+  // Get sessions data with infinite loading
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetSessionsInfinite(userId);
 
-export default function SessionsList({
-  data,
-  isLoading,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-}: SessionsListProps) {
-  const { site } = useParams();
+  // Combine all pages of data
+  const flattenedData = useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.data || []);
+  }, [data]);
 
   // Reference for the scroll container
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,6 +48,11 @@ export default function SessionsList({
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  if (error)
+    return (
+      <div className="text-red-500 p-4">Error: {(error as Error).message}</div>
+    );
+
   return (
     <div
       ref={containerRef}
@@ -57,17 +61,18 @@ export default function SessionsList({
     >
       {isLoading ? (
         // Show skeleton cards while loading
-        Array.from({ length: 30 }).map((_, index) => (
-          <SessionCardSkeleton key={`skeleton-${index}`} />
-        ))
-      ) : data.length === 0 ? (
+        <SessionCardSkeleton />
+      ) : flattenedData.length === 0 ? (
         <div className="flex justify-center py-8 text-gray-400">
           No sessions found
         </div>
       ) : (
         // Render session cards with more robust key generation
-        data.map((session, index) => (
-          <SessionCard key={index} session={session} />
+        flattenedData.map((session, index) => (
+          <SessionCard
+            key={`${session.session_id}-${index}`}
+            session={session}
+          />
         ))
       )}
 
