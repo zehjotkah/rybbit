@@ -62,6 +62,7 @@ class PageviewQueue {
 
       const countryCode = dataForIp?.data?.countryIso || "";
       const regionCode = dataForIp?.data?.subdivisions?.[0]?.isoCode || "";
+      console.info(dataForIp);
       const latitude = dataForIp?.data?.latitude || 0;
       const longitude = dataForIp?.data?.longitude || 0;
 
