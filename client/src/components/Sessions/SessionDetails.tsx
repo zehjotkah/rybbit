@@ -242,8 +242,6 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
     return `${Math.floor(duration.minutes)}m ${Math.floor(duration.seconds)}s`;
   };
 
-  console.info(userId);
-
   return (
     <div className="px-4 bg-neutral-900 border-t border-neutral-800">
       {isLoading ? (
@@ -264,7 +262,7 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
               <TabsTrigger value="info">Session Info</TabsTrigger>
             </TabsList>
             {!userId && (
-              <Link href={`/${site}/user/${userId}`}>
+              <Link href={`/${site}/user/${session.user_id}`}>
                 <Button variant={"accent"}>
                   View User <ArrowRight className="w-4 h-4" />
                 </Button>

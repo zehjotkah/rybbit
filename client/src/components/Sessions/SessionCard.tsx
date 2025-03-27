@@ -79,12 +79,12 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
         <div className="flex items-center gap-2">
           {/* Avatar and User ID */}
           <div className="flex items-center gap-2">
-            <Avatar
+            {/* <Avatar
               name={session.user_id}
               colors={["#2c2b4b", "#a75293", "#9c7a9d", "#9ddacb", "#f8dcb4"]}
               variant="beam"
               size={24}
-            />
+            /> */}
             <span className="text-xs font-mono text-gray-400">
               {truncatedUserId}
             </span>
@@ -196,26 +196,18 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
           </div>
 
           {/* Time information */}
-          <div className="flex items-center gap-2 ml-3">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <Clock className="w-3 h-3" />
-                  <span>{durationFormatted}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {DateTime.fromSQL(session.session_start).toFormat(
-                    "MMM d, h:mm a"
-                  )}
-                </p>
-              </TooltipContent>
-            </Tooltip>
+
+          <div className="flex items-center gap-4 text-xs text-gray-300">
+            <span className="text-gray-400">
+              {DateTime.fromSQL(session.session_start).toFormat(
+                "MMM d, h:mm a"
+              )}
+            </span>
+            <span>{durationFormatted}</span>
           </div>
 
           {/* Expand/Collapse icon */}
-          <div className="ml-3 flex-shrink-0">
+          <div className="ml-2 flex-shrink-0">
             {expanded ? (
               <ChevronDown className="w-4 h-4 text-gray-400" />
             ) : (
@@ -245,6 +237,18 @@ export const SessionCardSkeleton = memo(() => {
       "w-44",
       "w-48",
     ];
+    return widths[Math.floor(Math.random() * widths.length)];
+  };
+
+  // Get random width for time displays
+  const getRandomTimeWidth = () => {
+    const widths = ["w-20", "w-24", "w-28", "w-32"];
+    return widths[Math.floor(Math.random() * widths.length)];
+  };
+
+  // Get random width for duration displays
+  const getRandomDurationWidth = () => {
+    const widths = ["w-10", "w-12", "w-14"];
     return widths[Math.floor(Math.random() * widths.length)];
   };
 
@@ -284,13 +288,16 @@ export const SessionCardSkeleton = memo(() => {
           </div>
 
           {/* Time */}
-          <div className="flex items-center gap-1 ml-3">
-            <Skeleton className="h-3 w-3 rounded-full" />
-            <Skeleton className="h-3 w-16" />
+          <div className="flex items-center gap-4 ml-3">
+            {/* Date/time skeleton */}
+            <Skeleton className={`h-3 ${getRandomTimeWidth()}`} />
+
+            {/* Duration skeleton */}
+            <Skeleton className={`h-3 ${getRandomDurationWidth()}`} />
           </div>
 
           {/* Expand icon */}
-          <div className="ml-3 flex-shrink-0">
+          <div className="ml-2 flex-shrink-0">
             <Skeleton className="h-4 w-4" />
           </div>
         </div>
