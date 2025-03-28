@@ -70,8 +70,8 @@ export function useGetSessionsInfinite(userId?: string) {
     queryFn: ({ pageParam = 1 }) => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/sessions`, {
-        startDate,
-        endDate,
+        startDate: userId ? undefined : startDate,
+        endDate: userId ? undefined : endDate,
         timezone,
         site,
         filters,
