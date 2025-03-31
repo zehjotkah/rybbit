@@ -7,6 +7,7 @@ export type LiveSessionLocation = {
   lat: number;
   lon: number;
   count: number;
+  city: string;
 };
 
 export function useGetLiveSessionLocations() {

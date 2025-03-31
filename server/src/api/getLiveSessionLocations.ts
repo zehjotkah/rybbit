@@ -18,7 +18,8 @@ WITH stuff AS (
     SELECT
         session_id,
         any(lat) AS lat,
-        any(lon) AS lon
+        any(lon) AS lon,
+        any(city) AS city
     FROM
         pageviews
     WHERE
@@ -30,12 +31,14 @@ WITH stuff AS (
 SELECT
     lat,
     lon,
+    city,
     count() as count
 from
     stuff
 GROUP BY
     lat,
-    lon`,
+    lon,
+    city`,
     query_params: {
       siteId: Number(siteId),
     },
@@ -46,6 +49,7 @@ GROUP BY
     lat: number;
     lon: number;
     count: number;
+    city: string;
   }>(result);
 
   return res.status(200).send({ data });
