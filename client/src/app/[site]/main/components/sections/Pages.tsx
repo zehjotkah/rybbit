@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { GetSitesResponse } from "../../../../../api/admin/sites";
+import {
+  GetSitesResponse,
+  useGetSiteMetadata,
+} from "../../../../../api/admin/sites";
 import {
   Tabs,
   TabsContent,
@@ -14,13 +17,8 @@ import { StandardSectionRealtime } from "../../../components/shared/StandardSect
 
 type Tab = "pages" | "entry_pages" | "exit_pages";
 
-export function Pages({
-  siteMetadata,
-  isRealtime = false,
-}: {
-  siteMetadata: GetSitesResponse[number];
-  isRealtime?: boolean;
-}) {
+export function Pages({ isRealtime = false }: { isRealtime?: boolean }) {
+  const { siteMetadata } = useGetSiteMetadata();
   const [tab, setTab] = useState<Tab>("pages");
 
   const ComponentToUse = isRealtime ? StandardSectionRealtime : StandardSection;
@@ -45,7 +43,7 @@ export function Pages({
               getValue={(e) => e.value}
               getKey={(e) => e.value}
               getLabel={(e) => e.value || "Other"}
-              getLink={(e) => `https://${siteMetadata.domain}${e.value}`}
+              getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
             />
           </TabsContent>
           <TabsContent value="entry_pages">
@@ -55,7 +53,7 @@ export function Pages({
               getValue={(e) => e.value}
               getKey={(e) => e.value}
               getLabel={(e) => e.value || "Other"}
-              getLink={(e) => `https://${siteMetadata.domain}${e.value}`}
+              getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
             />
           </TabsContent>
           <TabsContent value="exit_pages">
@@ -65,7 +63,7 @@ export function Pages({
               getValue={(e) => e.value}
               getKey={(e) => e.value}
               getLabel={(e) => e.value || "Other"}
-              getLink={(e) => `https://${siteMetadata.domain}${e.value}`}
+              getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
             />
           </TabsContent>
         </Tabs>
