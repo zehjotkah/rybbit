@@ -2,7 +2,7 @@ import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { APIResponse } from "../types";
 import { getStartAndEndDate, authedFetch } from "../utils";
-import { useStore } from "../../lib/store";
+import { TimeBucket, useStore } from "../../lib/store";
 
 type PeriodTime = "current" | "previous";
 
@@ -59,14 +59,16 @@ export function useGetOverviewBucketed({
 export function useGetOverviewBucketedPastMinutes({
   pastMinutes = 24 * 60,
   site,
+  bucket = "hour",
+  refetchInterval,
 }: {
   pastMinutes: number;
   site?: number | string;
+  bucket?: TimeBucket;
+  refetchInterval?: number;
 }): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
-  const { bucket, filters } = useStore();
-
   return useQuery({
-    queryKey: ["overview-bucketed-past-minutes", pastMinutes, site, filters],
+    queryKey: ["overview-bucketed-past-minutes", pastMinutes, site, bucket],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/overview-bucketed`, {
@@ -76,6 +78,7 @@ export function useGetOverviewBucketedPastMinutes({
         pastMinutes,
       }).then((res) => res.json());
     },
+    refetchInterval,
     placeholderData: (_, query: any) => {
       if (!query?.queryKey) return undefined;
       const prevQueryKey = query.queryKey as [string, string, string];

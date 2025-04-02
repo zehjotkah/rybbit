@@ -16,6 +16,7 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
   const { data, isLoading } = useGetOverviewBucketedPastMinutes({
     pastMinutes: 24 * 60,
     site: siteId,
+    bucket: "hour",
   });
 
   const { data: overviewData, isLoading: isOverviewLoading } =
