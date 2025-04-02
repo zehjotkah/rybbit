@@ -23,65 +23,16 @@ const getQuery = ({
   timezone,
   site,
   filters,
-  past24Hours,
+  pastMinutes,
 }: {
   startDate: string;
   endDate: string;
   timezone: string;
   site: string;
   filters: string;
-  past24Hours: boolean;
+  pastMinutes: number;
 }) => {
   const filterStatement = getFilterStatement(filters);
-
-  if (past24Hours) {
-    return `SELECT 
-      session_stats.sessions,
-      session_stats.pages_per_session,
-      session_stats.bounce_rate * 100 AS bounce_rate,
-      session_stats.session_duration,
-      page_stats.pageviews,
-      page_stats.users
-    FROM
-    (
-        -- Session-level metrics
-        SELECT
-            COUNT() AS sessions,
-            AVG(pages_in_session) AS pages_per_session,
-            sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
-            AVG(end_time - start_time) AS session_duration
-        FROM
-            (
-                -- One row per session
-                SELECT
-                    session_id,
-                    MIN(timestamp) AS start_time,
-                    MAX(timestamp) AS end_time,
-                    COUNT(CASE WHEN type = 'pageview' THEN 1 END) AS pages_in_session 
-                FROM pageviews
-                WHERE
-                    site_id = ${site}
-                    ${filterStatement}
-                    AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
-                    AND timestamp < toTimeZone(now('${timezone}'), 'UTC') 
-                GROUP BY session_id
-            )
-        ) AS session_stats
-        CROSS JOIN
-        (
-            -- Page-level and user-level metrics  
-            SELECT
-                COUNT(*)                   AS pageviews,
-                COUNT(DISTINCT user_id)    AS users
-            FROM pageviews
-            WHERE 
-                site_id = ${site}
-                ${filterStatement}  
-                AND timestamp >= toTimeZone(now('${timezone}'), 'UTC') - INTERVAL 1 DAY
-                AND timestamp < toTimeZone(now('${timezone}'), 'UTC')
-                AND type = 'pageview'
-        ) AS page_stats`;
-  }
 
   return `SELECT   
       session_stats.sessions,
@@ -110,9 +61,13 @@ const getQuery = ({
                 WHERE
                     site_id = ${site}
                     ${filterStatement}
-                    ${getTimeStatement({
-                      date: { startDate, endDate, timezone },
-                    })}
+                    ${getTimeStatement(
+                      pastMinutes
+                        ? { pastMinutes }
+                        : {
+                            date: { startDate, endDate, timezone },
+                          }
+                    )}
                 GROUP BY session_id
             )
         ) AS session_stats
@@ -126,9 +81,13 @@ const getQuery = ({
             WHERE 
                 site_id = ${site}
                 ${filterStatement}
-                ${getTimeStatement({
-                  date: { startDate, endDate, timezone },
-                })}
+                ${getTimeStatement(
+                  pastMinutes
+                    ? { pastMinutes }
+                    : {
+                        date: { startDate, endDate, timezone },
+                      }
+                )}
                 AND type = 'pageview'
         ) AS page_stats`;
 };
@@ -142,6 +101,7 @@ export interface GenericRequest {
     filters: string;
     parameter: FilterParameter;
     past24Hours: boolean;
+    pastMinutes: number;
     limit?: number;
   };
 }
@@ -150,7 +110,7 @@ export async function getOverview(
   req: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, site, filters, past24Hours } =
+  const { startDate, endDate, timezone, site, filters, pastMinutes } =
     req.query;
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {
@@ -163,7 +123,7 @@ export async function getOverview(
     timezone,
     site,
     filters,
-    past24Hours,
+    pastMinutes: Number(pastMinutes),
   });
 
   try {
