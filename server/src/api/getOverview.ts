@@ -100,8 +100,7 @@ export interface GenericRequest {
     site: string;
     filters: string;
     parameter: FilterParameter;
-    past24Hours: boolean;
-    pastMinutes: number;
+    pastMinutes?: number;
     limit?: number;
   };
 }
