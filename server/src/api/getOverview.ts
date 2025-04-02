@@ -110,7 +110,9 @@ const getQuery = ({
                 WHERE
                     site_id = ${site}
                     ${filterStatement}
-                    ${getTimeStatement(startDate, endDate, timezone)}
+                    ${getTimeStatement({
+                      date: { startDate, endDate, timezone },
+                    })}
                 GROUP BY session_id
             )
         ) AS session_stats
@@ -124,7 +126,9 @@ const getQuery = ({
             WHERE 
                 site_id = ${site}
                 ${filterStatement}
-                ${getTimeStatement(startDate, endDate, timezone)}
+                ${getTimeStatement({
+                  date: { startDate, endDate, timezone },
+                })}
                 AND type = 'pageview'
         ) AS page_stats`;
 };

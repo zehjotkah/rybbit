@@ -168,7 +168,9 @@ FROM
         WHERE 
             site_id = ${site}
             ${filterStatement}
-            ${getTimeStatement(startDate, endDate, timezone)}
+            ${getTimeStatement({
+              date: { startDate, endDate, timezone },
+            })}
             AND type = 'pageview'
         GROUP BY session_id
     )
@@ -190,7 +192,9 @@ FULL JOIN
     WHERE
         site_id = ${site}
         ${filterStatement}
-        ${getTimeStatement(startDate, endDate, timezone)}
+        ${getTimeStatement({
+          date: { startDate, endDate, timezone },
+        })}
         AND type = 'pageview'
     GROUP BY time ORDER BY time ${
       isAllTime
