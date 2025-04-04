@@ -53,9 +53,24 @@ function getDomainFromReferrer(referrer: string): string {
   }
 }
 
-export function getChannel(referrer: string, querystring: string): string {
+// Checks if the referrer is from the same site as the current hostname
+function isSelfReferral(referringDomain: string, hostname: string): boolean {
+  if (!referringDomain || !hostname) return false;
+  return referringDomain === hostname;
+}
+
+export function getChannel(
+  referrer: string,
+  querystring: string,
+  hostname?: string
+): string {
   const utmParams = getUTMParams(querystring);
   const referringDomain = getDomainFromReferrer(referrer);
+
+  // Check if this is a self-referral (internal navigation)
+  const selfReferral = hostname
+    ? isSelfReferral(referringDomain, hostname)
+    : false;
 
   // UTM parameters
   const utmSource = utmParams["utm_source"] || "";
@@ -63,6 +78,18 @@ export function getChannel(referrer: string, querystring: string): string {
   const utmCampaign = utmParams["utm_campaign"] || "";
   const gclid = utmParams["gclid"] || "";
   const gadSource = utmParams["gad_source"] || "";
+
+  // If it's a self-referral and has no UTM parameters, treat it as internal traffic
+  if (
+    (selfReferral || !referrer) &&
+    !utmSource &&
+    !utmMedium &&
+    !utmCampaign &&
+    !gclid &&
+    !gadSource
+  ) {
+    return "Internal";
+  }
 
   // Check if traffic is paid
   const isPaid =
@@ -116,7 +143,7 @@ export function getChannel(referrer: string, querystring: string): string {
 
   // Direct
   if (
-    referringDomain === "$direct" &&
+    (referringDomain === "$direct" || (!referrer && !selfReferral)) &&
     !utmMedium &&
     (!utmSource || utmSource === "direct" || utmSource === "(direct)")
   ) {
@@ -153,7 +180,9 @@ export function getChannel(referrer: string, querystring: string): string {
   if (/shop|shopping/.test(utmCampaign)) return "Organic Shopping";
 
   // If referring domain exists but we couldn't categorize it
-  if (referringDomain && referringDomain !== "$direct") return "Referral";
+  // Don't mark as referral if it's a self-referral
+  if (referringDomain && referringDomain !== "$direct" && !selfReferral)
+    return "Referral";
 
   // Default fallback
   return "Unknown";
