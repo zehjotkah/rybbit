@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import clickhouse from "../db/clickhouse/clickhouse.js";
 import { TrackingPayload } from "../types.js";
 import { getDeviceType } from "../utils.js";
+import { getChannel } from "./getChannel.js";
 
 type TotalPayload = TrackingPayload & {
   userId: string;
@@ -78,6 +79,7 @@ class PageviewQueue {
         querystring: pv.querystring || "",
         page_title: pv.page_title || "",
         referrer: pv.referrer || "",
+        channel: getChannel(pv.referrer, pv.querystring),
         browser: pv.ua.browser.name || "",
         browser_version: pv.ua.browser.major || "",
         operating_system: pv.ua.os.name || "",
