@@ -31,6 +31,10 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
     value: "referrer",
   },
   {
+    label: "Channel",
+    value: "channel",
+  },
+  {
     label: "Country",
     value: "country",
   },
@@ -38,10 +42,10 @@ const FilterOptions: { label: string; value: FilterParameter }[] = [
     label: "Region",
     value: "iso_3166_2",
   },
-  // {
-  //   label: "City",
-  //   value: "city",
-  // },
+  {
+    label: "City",
+    value: "city",
+  },
   {
     label: "Device Type",
     value: "device_type",
