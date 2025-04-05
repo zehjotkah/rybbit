@@ -24,8 +24,8 @@ export function TopBar() {
   const queryClient = useQueryClient();
 
   return (
-    <div className="flex pt-2 items-center w-full pb-4 bg-neutral-900 justify-center">
-      <div className="flex items-center justify-between max-w-6xl flex-1">
+    <div className="flex pt-2 pb-4 px-3 items-center w-full  bg-neutral-900 justify-center">
+      <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-4">
           <Link href="/" className="font-bold text-xl">
             🐸 Frogstats
