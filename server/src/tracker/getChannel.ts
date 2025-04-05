@@ -3,21 +3,57 @@ import {
   audioMediums,
   displayMediums,
   emailMediums,
+  emailAppIds,
   emailSources,
+  isMobileAppId,
   pushMediums,
   referralMediums,
+  searchAppIds,
   searchDomains,
   searchSources,
+  shoppingAppIds,
   shoppingDomains,
   shoppingSources,
   smsSources,
+  socialAppIds,
   socialDomains,
   socialMediums,
   socialSources,
+  videoAppIds,
   videoDomains,
   videoMediums,
   videoSources,
 } from "./const.js";
+
+// Categorize mobile app by its bundle ID/package name
+function getMobileAppCategory(
+  appId: string
+): { type: string; isPaid: boolean } | null {
+  const appIdLower = appId.toLowerCase();
+
+  // Check against our defined app ID lists
+  if (socialAppIds.some((id) => appIdLower.includes(id))) {
+    return { type: "Organic Social", isPaid: false };
+  }
+
+  if (videoAppIds.some((id) => appIdLower.includes(id))) {
+    return { type: "Organic Video", isPaid: false };
+  }
+
+  if (searchAppIds.some((id) => appIdLower.includes(id))) {
+    return { type: "Organic Search", isPaid: false };
+  }
+
+  if (emailAppIds.some((id) => appIdLower.includes(id))) {
+    return { type: "Email", isPaid: false };
+  }
+
+  if (shoppingAppIds.some((id) => appIdLower.includes(id))) {
+    return { type: "Organic Shopping", isPaid: false };
+  }
+
+  return null;
+}
 
 // UTM and URL parameter parsing utilities
 function getUTMParams(querystring: string): Record<string, string> {
@@ -56,7 +92,15 @@ function getDomainFromReferrer(referrer: string): string {
 // Checks if the referrer is from the same site as the current hostname
 function isSelfReferral(referringDomain: string, hostname: string): boolean {
   if (!referringDomain || !hostname) return false;
-  return referringDomain === hostname;
+
+  // Handle subdomain variations
+  // Strip 'www.' prefixes for both domains
+  const stripWww = (domain: string) => domain.replace(/^www\./, "");
+  const refDomain = stripWww(referringDomain);
+  const currentDomain = stripWww(hostname);
+
+  // Check if domains match or if referrer is a subdomain of current domain
+  return refDomain === currentDomain || refDomain.endsWith("." + currentDomain);
 }
 
 export function getChannel(
@@ -79,16 +123,26 @@ export function getChannel(
   const gclid = utmParams["gclid"] || "";
   const gadSource = utmParams["gad_source"] || "";
 
+  // Check for mobile app sources using reverse DNS format (bundle IDs/package names)
+  if (utmSource && isMobileAppId(utmSource)) {
+    const appCategory = getMobileAppCategory(utmSource);
+    if (appCategory) {
+      return appCategory.isPaid
+        ? "Paid " + appCategory.type.split(" ")[1]
+        : appCategory.type;
+    }
+  }
+
   // If it's a self-referral and has no UTM parameters, treat it as internal traffic
   if (
-    (selfReferral || !referrer) &&
+    !referrer &&
     !utmSource &&
     !utmMedium &&
     !utmCampaign &&
     !gclid &&
     !gadSource
   ) {
-    return "Internal";
+    return selfReferral ? "Internal" : "Direct";
   }
 
   // Check if traffic is paid
@@ -101,17 +155,27 @@ export function getChannel(
   // Check domain type - improved to handle subdomains better
   const isDomainSearch = searchDomains.some(
     (domain) =>
-      referringDomain.includes(domain) ||
-      /^(?:www\.)?google\.[a-z]{2,3}$/.test(referringDomain)
+      referringDomain === domain ||
+      referringDomain.endsWith("." + domain) ||
+      (domain.endsWith(".") && referringDomain.startsWith(domain))
   );
-  const isDomainSocial = socialDomains.some((domain) =>
-    referringDomain.includes(domain)
+  const isDomainSocial = socialDomains.some(
+    (domain) =>
+      referringDomain === domain ||
+      referringDomain.endsWith("." + domain) ||
+      (domain.endsWith(".") && referringDomain.startsWith(domain))
   );
-  const isDomainVideo = videoDomains.some((domain) =>
-    referringDomain.includes(domain)
+  const isDomainVideo = videoDomains.some(
+    (domain) =>
+      referringDomain === domain ||
+      referringDomain.endsWith("." + domain) ||
+      (domain.endsWith(".") && referringDomain.startsWith(domain))
   );
-  const isDomainShopping = shoppingDomains.some((domain) =>
-    referringDomain.includes(domain)
+  const isDomainShopping = shoppingDomains.some(
+    (domain) =>
+      referringDomain === domain ||
+      referringDomain.endsWith("." + domain) ||
+      (domain.endsWith(".") && referringDomain.startsWith(domain))
   );
 
   // Check source type

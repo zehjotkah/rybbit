@@ -142,7 +142,6 @@ export const videoDomains = [
   "rumble.com",
   "odysee.com",
   "lbry.tv",
-  "tiktok.com",
   "reels.instagram.com",
 
   // Educational
@@ -621,3 +620,201 @@ export const audioMediums = [
   "jingle",
   "commercial",
 ];
+
+// Mobile App IDs (reverse DNS format)
+export const socialAppIds = [
+  // Facebook family
+  "com.facebook",
+  "com.facebook.katana",
+  "com.facebook.facebook",
+  "com.facebook.messenger",
+  "com.facebook.orca",
+
+  // Instagram
+  "com.instagram",
+  "com.instagram.android",
+  "com.burbn.instagram",
+
+  // Twitter/X
+  "com.twitter",
+  "com.twitter.android",
+  "com.atebits.tweetie2",
+
+  // TikTok
+  "com.zhiliaoapp.musically",
+  "com.tiktok",
+
+  // Snapchat
+  "com.snapchat",
+  "com.snapchat.android",
+  "com.toyopagroup.picaboo",
+
+  // LinkedIn
+  "com.linkedin",
+  "com.linkedin.android",
+  "com.linkedin.LinkedIn",
+
+  // Pinterest
+  "com.pinterest",
+
+  // Reddit
+  "com.reddit",
+  "com.reddit.frontpage",
+  "com.reddit.reddit",
+
+  // Discord
+  "com.discord",
+  "com.hammerandchisel.discord",
+
+  // Telegram
+  "org.telegram",
+  "org.telegram.messenger",
+  "ph.telegra.Telegraph",
+
+  // WhatsApp
+  "com.whatsapp",
+
+  // Thread
+  "com.instagram.barcelona",
+  "com.threads",
+
+  // Bluesky
+  "xyz.blueskyweb.app",
+
+  // Mastodon
+  "org.joinmastodon.android",
+
+  // Other social
+  "com.slack",
+  "im.vector.app",
+];
+
+export const videoAppIds = [
+  // YouTube
+  "com.google.android.youtube",
+  "com.google.ios.youtube",
+  "com.google.ios.youtubekids",
+  "com.google.android.apps.youtube.kids",
+  "com.google.ios.youtubeunplugged",
+  "com.google.android.youtube.tv",
+
+  // Streaming services
+  "com.netflix",
+  "com.disney.disneyplus",
+  "com.hulu",
+  "com.hbo.hbonow",
+  "com.hbo.hbomax",
+  "com.peacocktv",
+  "com.amazon.avod",
+  "com.amazon.amazonvideo",
+  "com.cbs.app",
+  "com.paramountplus",
+
+  // Twitch
+  "tv.twitch",
+  "tv.twitch.android.app",
+
+  // Other video
+  "com.vimeo",
+  "com.dailymotion",
+];
+
+export const searchAppIds = [
+  // Google
+  "com.google.android.googlequicksearchbox",
+  "com.google.android.websearch",
+
+  // Bing
+  "com.microsoft.bing",
+
+  // Yahoo
+  "com.yahoo.mobile.client.android.search",
+  "com.yahoo.search",
+
+  // DuckDuckGo
+  "com.duckduckgo.mobile.android",
+  "com.duckduckgo.mobile.ios",
+
+  // Other search
+  "com.ecosia.android",
+  "com.brave.browser",
+  "org.mozilla.firefox",
+  "com.microsoft.emmx",
+];
+
+export const emailAppIds = [
+  // Gmail
+  "com.google.android.gm",
+  "com.google.android.gm.lite",
+  "com.google.Gmail",
+
+  // Outlook
+  "com.microsoft.office.outlook",
+  "com.microsoft.outlooklite",
+  "com.microsoft.Office.Outlook",
+
+  // Yahoo Mail
+  "com.yahoo.mobile.client.android.mail",
+  "com.yahoo.Aerogram",
+
+  // Apple Mail
+  "com.apple.mobilemail",
+
+  // ProtonMail
+  "ch.protonmail.android",
+  "ch.protonmail.protonmail",
+
+  // Other mail apps
+  "com.superhuman.mail",
+  "com.superhuman.Superhuman",
+  "com.samsung.android.email.provider",
+  "me.bluemail.mail",
+  "com.easilydo.mail",
+  "org.kman.AquaMail",
+  "com.aol.mobile.aolapp",
+  "ru.mail.mailapp",
+  "ru.mail.mail",
+  "ru.yandex.mail",
+  "com.pingapp.app",
+  "com.readdle.smartemail",
+];
+
+export const shoppingAppIds = [
+  // Amazon
+  "com.amazon.mShop",
+  "com.amazon.shopping",
+
+  // eBay
+  "com.ebay.mobile",
+
+  // Walmart
+  "com.walmart.android",
+
+  // Target
+  "com.target.ui",
+
+  // Etsy
+  "com.etsy.android",
+
+  // Shopify
+  "com.shopify.mobile",
+
+  // Wish
+  "com.contextlogic.wish",
+
+  // AliExpress
+  "com.alibaba.aliexpresshd",
+
+  // Other shopping
+  "com.wayfair.wayfair",
+  "com.newegg.app",
+  "com.bestbuy.android",
+  "com.ikea.app",
+  "com.homedepot",
+];
+
+// Categorize mobile apps by their bundle ID/package name - helper function
+export function isMobileAppId(source: string): boolean {
+  // Check for common app identifier patterns (com.company.app, etc.)
+  return /^[a-z0-9_]+(\.([a-z0-9_]+))+$/.test(source);
+}
