@@ -1,5 +1,5 @@
 "use client";
-import { Plus } from "lucide-react";
+import { ListFilterPlus, Plus } from "lucide-react";
 import { Button } from "../../../../../components/ui/button";
 import {
   DropdownMenu,
@@ -140,7 +140,7 @@ export function NewFilterButton() {
           className="px-3"
           onClick={() => setOpen(true)}
         >
-          <Plus />
+          <ListFilterPlus className="w-4 h-4" />
           Filter
         </Button>
       </DropdownMenuTrigger>
