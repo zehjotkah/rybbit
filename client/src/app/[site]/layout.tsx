@@ -48,9 +48,9 @@ export default function SiteLayout({
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <div className="flex-1 overflow-auto">
-          <div className="px-4 py-4 max-w-[1400px] mx-auto w-full">
+          <div className="px-4 py-2 max-w-[1400px] mx-auto w-full">
             <Header />
-            <div className="mt-6">{children}</div>
+            <div>{children}</div>
           </div>
         </div>
       </div>

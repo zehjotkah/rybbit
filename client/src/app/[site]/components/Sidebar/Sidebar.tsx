@@ -1,8 +1,18 @@
 "use client";
-import { ChartBarDecreasing, ChartLine, Radio, User } from "lucide-react";
+import {
+  ChartBarDecreasing,
+  ChartLine,
+  Radio,
+  Settings,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGetSites } from "../../../../api/admin/sites";
+import LiveUserCount from "./LiveUserCount";
+import { SiteSettings } from "../../../../components/SiteSettings/SiteSettings";
+import { Button } from "../../../../components/ui/button";
+import { SiteSelector } from "./SiteSelector";
 
 export function Sidebar() {
   const { data: sites } = useGetSites();
@@ -27,47 +37,54 @@ export function Sidebar() {
   return (
     <div className="w-56 bg-neutral-900 border-r border-neutral-850 h-full flex flex-col">
       {site && (
-        <div className="p-4 border-b border-t border-neutral-800">
-          <div className="flex items-center gap-2">
-            <img
-              className="w-6"
-              src={`https://www.google.com/s2/favicons?domain=${site.domain}&sz=64`}
-              alt={site.domain}
-            />
-            <div className="font-medium text-white truncate">{site.domain}</div>
-          </div>
+        <div className="p-3 border-b  border-neutral-800 flex flex-col gap-2">
+          <SiteSelector />
+          {/* <div className="flex items-center gap-2">
+            <LiveUserCount />
+          </div> */}
         </div>
       )}
-      <div className="flex flex-col space-y-1 p-3 mt-2">
+      <div className="flex flex-col space-y-1 p-3 mt-1">
         <SidebarLink
           label="Main"
           active={isActiveTab("main")}
           href={getTabPath("main")}
-          icon={<ChartLine size={18} />}
+          icon={<ChartLine className="w-4 h-4" />}
         />
         <SidebarLink
           label="Sessions"
           active={isActiveTab("sessions")}
           href={getTabPath("sessions")}
-          icon={<User size={18} />}
+          icon={<User className="w-4 h-4" />}
         />
         <SidebarLink
           label="Realtime"
           active={isActiveTab("realtime")}
           href={getTabPath("realtime")}
-          icon={<Radio size={18} />}
+          icon={<Radio className="w-4 h-4" />}
         />
         <SidebarLink
           label="Retention"
           active={isActiveTab("retention")}
           href={getTabPath("retention")}
-          icon={<ChartBarDecreasing size={18} />}
+          icon={<ChartBarDecreasing className="w-4 h-4" />}
         />
         <SidebarLink
           label="Reports"
           active={isActiveTab("reports")}
           href={getTabPath("reports")}
-          icon={<ChartBarDecreasing size={18} />}
+          icon={<ChartBarDecreasing className="w-4 h-4" />}
+        />
+        <SiteSettings
+          siteId={site?.siteId ?? 0}
+          trigger={
+            <div className="px-3 py-2.5 rounded-lg transition-colors w-full text-neutral-200 hover:text-white hover:bg-neutral-800/50">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span className="text-sm">Settings</span>
+              </div>
+            </div>
+          }
         />
       </div>
     </div>
