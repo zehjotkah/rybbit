@@ -136,7 +136,7 @@ server.get("/session/:sessionId", getSession);
 server.get("/user/:userId/sessions", getUserSessions);
 server.get("/user/info/:siteId/:userId", getUserInfo);
 server.get("/live-session-locations/:siteId", getLiveSessionLocations);
-server.get("/funnel/:site", getFunnel);
+server.post("/funnel/:site", getFunnel);
 
 // Administrative
 server.post("/add-site", addSite);

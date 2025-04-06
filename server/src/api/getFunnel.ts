@@ -66,7 +66,7 @@ export async function getFunnel(
       }
     });
 
-    // Build the funnel query
+    // Build the funnel query - first part to calculate visitors at each step
     const query = `
     WITH
     -- Get all user actions in the time period
@@ -113,34 +113,42 @@ export async function getFunnel(
       )
       .join("")}
     
-    -- Final results
-    SELECT
-      step_number,
-      step_name,
-      visitors,
-      round(visitors * 100.0 / first_step, 2) as conversion_rate,
-      round((1 - (visitors / prev_step)) * 100.0, 2) as dropoff_rate
-    FROM (
+    -- Calculate visitor count for each step
+    , StepCounts AS (
       ${steps
         .map(
           (step, index) => `
-        SELECT
-          ${index + 1} as step_number,
-          '${step.name || step.value}' as step_name,
-          count(DISTINCT user_id) as visitors,
-          FIRST_VALUE(count(DISTINCT user_id)) OVER (ORDER BY ${
-            index + 1
-          }) as first_step,
-          LAG(count(DISTINCT user_id), 1, count(DISTINCT user_id)) OVER (ORDER BY ${
-            index + 1
-          }) as prev_step
-        FROM Step${index + 1}
-      `
+          SELECT
+            ${index + 1} as step_number,
+            '${step.name || step.value}' as step_name,
+            count(DISTINCT user_id) as visitors
+          FROM Step${index + 1}
+        `
         )
         .join("\nUNION ALL\n")}
     )
-    ORDER BY step_number
+    
+    -- Final results with calculated conversion and dropoff rates
+    SELECT
+      s1.step_number,
+      s1.step_name,
+      s1.visitors as visitors,
+      round(s1.visitors * 100.0 / first_step.visitors, 2) as conversion_rate,
+      CASE 
+        WHEN s1.step_number = 1 THEN 0
+        ELSE round((1 - (s1.visitors / prev_step.visitors)) * 100.0, 2)
+      END as dropoff_rate
+    FROM StepCounts s1
+    CROSS JOIN (SELECT visitors FROM StepCounts WHERE step_number = 1) as first_step
+    LEFT JOIN (
+      SELECT step_number + 1 as next_step_number, visitors
+      FROM StepCounts
+      WHERE step_number < ${steps.length}
+    ) as prev_step ON s1.step_number = prev_step.next_step_number
+    ORDER BY s1.step_number
     `;
+
+    console.info(query);
 
     // Execute the query
     const result = await clickhouse.query({

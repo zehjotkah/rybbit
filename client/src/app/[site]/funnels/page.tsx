@@ -1,3 +1,9 @@
+import { CreateFunnel } from "./components/CreateFunnel";
+
 export default function FunnelsPage() {
-  return <div>Funnels</div>;
+  return (
+    <div>
+      <CreateFunnel />
+    </div>
+  );
 }

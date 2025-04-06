@@ -7,9 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Calendar } from "lucide-react";
 import { DateTime } from "luxon";
 import { CustomDateRangePicker } from "./CustomDateRangePicker";
-import { Calendar, Calendar1 } from "lucide-react";
 import { Time } from "./types";
 
 const getLabel = (time: Time) => {
