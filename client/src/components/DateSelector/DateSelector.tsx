@@ -7,10 +7,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Time, useStore } from "@/lib/store";
 import { DateTime } from "luxon";
 import { CustomDateRangePicker } from "./CustomDateRangePicker";
 import { Calendar, Calendar1 } from "lucide-react";
+import { Time } from "./types";
 
 const getLabel = (time: Time) => {
   if (time.mode === "range") {
@@ -66,9 +66,13 @@ const getLabel = (time: Time) => {
   }
 };
 
-export function DateSelector() {
-  const { time, setTime } = useStore();
-
+export function DateSelector({
+  time,
+  setTime,
+}: {
+  time: Time;
+  setTime: (time: Time) => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -187,7 +191,7 @@ export function DateSelector() {
           All Time
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <CustomDateRangePicker />
+        <CustomDateRangePicker setTime={setTime} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

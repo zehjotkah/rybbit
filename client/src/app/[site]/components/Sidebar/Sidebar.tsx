@@ -15,6 +15,7 @@ import LiveUserCount from "./LiveUserCount";
 import { SiteSettings } from "../../../../components/SiteSettings/SiteSettings";
 import { Button } from "../../../../components/ui/button";
 import { SiteSelector } from "./SiteSelector";
+import { Funnel } from "@phosphor-icons/react/dist/ssr";
 
 export function Sidebar() {
   const { data: sites } = useGetSites();
@@ -68,6 +69,12 @@ export function Sidebar() {
           active={isActiveTab("retention")}
           href={getTabPath("retention")}
           icon={<LayoutGrid className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Funnels"
+          active={isActiveTab("funnels")}
+          href={getTabPath("funnels")}
+          icon={<Funnel weight="bold" />}
         />
         <SidebarLink
           label="Reports"

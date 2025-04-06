@@ -1,49 +1,6 @@
 import { DateTime } from "luxon";
 import { create } from "zustand";
-
-type DateMode = {
-  mode: "day";
-  day: string;
-};
-
-type DateRangeMode = {
-  mode: "range";
-  startDate: string;
-  endDate: string;
-  wellKnown?:
-    | "Last 3 days"
-    | "Last 7 days"
-    | "Last 14 days"
-    | "Last 30 days"
-    | "Last 60 days";
-};
-
-type WeekMode = {
-  mode: "week";
-  week: string;
-};
-
-type MonthMode = {
-  mode: "month";
-  month: string;
-};
-
-type YearMode = {
-  mode: "year";
-  year: string;
-};
-
-type AllTimeMode = {
-  mode: "all-time";
-};
-
-export type Time =
-  | DateMode
-  | DateRangeMode
-  | WeekMode
-  | MonthMode
-  | YearMode
-  | AllTimeMode;
+import { Time } from "../components/DateSelector/types";
 
 export type TimeBucket =
   | "minute"
