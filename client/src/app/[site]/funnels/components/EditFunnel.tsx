@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,13 +19,13 @@ import {
   FunnelStep,
   useSaveFunnel,
 } from "@/api/analytics/useGetFunnel";
+import { SavedFunnel } from "@/api/analytics/useGetFunnels";
 import { Funnel } from "./Funnel";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useStore } from "@/lib/store";
@@ -33,10 +33,18 @@ import { toast } from "sonner";
 import { getStartAndEndDate } from "../../../../api/utils";
 import { useDebounce } from "@uidotdev/usehooks";
 
-export function CreateFunnelDialog() {
-  const [open, setOpen] = useState(false);
+interface EditFunnelDialogProps {
+  funnel: SavedFunnel;
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-  // Initial date state - last 7 days
+export function EditFunnelDialog({
+  funnel,
+  isOpen,
+  onClose,
+}: EditFunnelDialogProps) {
+  // Time state - initialized from funnel configuration
   const [time, setTime] = useState<Time>({
     mode: "range",
     startDate: DateTime.now().minus({ days: 7 }).toISODate(),
@@ -44,18 +52,15 @@ export function CreateFunnelDialog() {
     wellKnown: "Last 7 days",
   });
 
-  // Funnel steps state
-  const [steps, setSteps] = useState<FunnelStep[]>([
-    { type: "page", value: "/", name: "Homepage" },
-    { type: "page", value: "", name: "" },
-  ]);
+  // Funnel steps state - initialized from funnel
+  const [steps, setSteps] = useState<FunnelStep[]>(funnel.steps);
 
   // Debounce steps and time changes
   const debouncedSteps = useDebounce(steps, 300);
   const debouncedTime = useDebounce(time, 300);
 
-  // Funnel name
-  const [name, setName] = useState("New Funnel");
+  // Funnel name - initialized from funnel
+  const [name, setName] = useState(funnel.name);
 
   const { startDate, endDate } = getStartAndEndDate(debouncedTime);
 
@@ -65,15 +70,11 @@ export function CreateFunnelDialog() {
     isError,
     error,
     isLoading: isPending,
-  } = useGetFunnel(
-    debouncedSteps.some((step) => !step.value)
-      ? undefined
-      : {
-          steps: debouncedSteps,
-          startDate,
-          endDate,
-        }
-  );
+  } = useGetFunnel({
+    steps: debouncedSteps,
+    startDate,
+    endDate,
+  });
 
   // Funnel save mutation
   const {
@@ -123,8 +124,8 @@ export function CreateFunnelDialog() {
     }
   };
 
-  // Save funnel configuration
-  const handleSaveFunnel = () => {
+  // Update funnel
+  const handleUpdateFunnel = () => {
     // Validate name
     if (!name.trim()) {
       alert("Please enter a funnel name");
@@ -172,47 +173,41 @@ export function CreateFunnelDialog() {
       endDate = DateTime.now().toISODate();
     }
 
-    // Save funnel directly without analyzing
+    // Update funnel with the report ID
     saveFunnel(
       {
         steps,
         startDate,
         endDate,
         name,
+        reportId: funnel.id,
       },
       {
         onSuccess: () => {
           // Close dialog on successful save
-          setOpen(false);
-          // Optional: Show success message
-          toast?.success("Funnel saved successfully");
+          onClose();
+          // Show success message
+          toast?.success("Funnel updated successfully");
         },
         onError: (error) => {
           // Show error but don't close dialog
-          toast?.error(`Failed to save funnel: ${error.message}`);
+          toast?.error(`Failed to update funnel: ${error.message}`);
         },
       }
     );
   };
 
-  // Reset form when dialog closes
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      // Reset analysis
-    }
-  };
+  // Load existing funnel data on first render
+  useEffect(() => {
+    // Pre-load the funnel visualization
+    handleQueryFunnel();
+  }, []);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="flex gap-2">
-          <Plus className="w-4 h-4" /> Create Funnel
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[80vw]">
         <DialogHeader>
-          <DialogTitle>Create Funnel</DialogTitle>
+          <DialogTitle>Edit Funnel</DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-[600px_3fr] gap-6 my-4">
@@ -338,16 +333,16 @@ export function CreateFunnelDialog() {
                 : "An error occurred")}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              onClick={handleSaveFunnel}
+              onClick={handleUpdateFunnel}
               disabled={isSaving}
               variant="success"
             >
               <Save className="mr-2 h-4 w-4" />
-              {isSaving ? "Saving..." : "Save Funnel"}
+              {isSaving ? "Saving..." : "Update Funnel"}
             </Button>
           </div>
         </DialogFooter>
