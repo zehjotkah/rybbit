@@ -124,7 +124,7 @@ export function Funnel({
               return (
                 <div
                   key={step.stepNumber}
-                  className="bg-neutral-50 dark:bg-neutral-900 rounded-md p-1 relative pl-3 border-l border-l-neutral-800 first:border-l-0"
+                  className=" rounded-md p-1 relative pl-3 border-l border-l-neutral-800 first:border-l-0"
                 >
                   <div className="font-medium flex items-center gap-2">
                     {step.stepName}

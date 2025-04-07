@@ -15,6 +15,9 @@ import {
   Edit,
   FunnelIcon,
   Trash2,
+  Globe,
+  ZapIcon,
+  ArrowRight,
 } from "lucide-react";
 import { DateTime } from "luxon";
 import { useState } from "react";
@@ -23,6 +26,12 @@ import { getStartAndEndDate } from "../../../../api/utils";
 import { EditFunnelDialog } from "./EditFunnel";
 import { Funnel } from "./Funnel";
 import { useDebounce } from "@uidotdev/usehooks";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface FunnelRowProps {
   funnel: SavedFunnel;
@@ -107,12 +116,53 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
           </div>
           <div>
             <h3 className="font-medium">{funnel.name}</h3>
-            <div className="text-sm text-neutral-500 flex items-center gap-2">
+            {/* <div className="text-sm text-neutral-500 flex items-center gap-2">
               <span>{funnel.steps.length} steps</span>
               <span>•</span>
               <div className="flex items-center">
                 <Calendar className="h-3 w-3 mr-1" />
                 {formatDate(funnel.createdAt)}
+              </div>
+            </div> */}
+            <div className="mt-1 text-xs text-neutral-400 flex items-center">
+              <div className="flex flex-wrap gap-1 max-w-[500px]">
+                {funnel.steps.map((step, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && (
+                      <ArrowRight className="h-3 w-3 mx-1 text-neutral-400" />
+                    )}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
+                            {step.type === "page" ? (
+                              <Globe className="h-3 w-3 mr-1 text-blue-400" />
+                            ) : (
+                              <ZapIcon className="h-3 w-3 mr-1 text-amber-400" />
+                            )}
+                            <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
+                              {step.name || step.value}
+                            </span>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="text-xs">
+                          <div>
+                            <span className="font-semibold">
+                              {step.type === "page" ? "Page" : "Event"}:
+                            </span>{" "}
+                            {step.value}
+                          </div>
+                          {step.name && (
+                            <div>
+                              <span className="font-semibold">Label:</span>{" "}
+                              {step.name}
+                            </div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
