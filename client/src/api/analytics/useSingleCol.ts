@@ -30,7 +30,7 @@ export function useSingleCol({
   const { startDate, endDate } = getStartAndEndDate(timeToUse);
 
   return useQuery({
-    queryKey: [parameter, timeToUse, site, filters, limit],
+    queryKey: [parameter, timeToUse, site, filters, limit, useFilters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/single-col`, {
