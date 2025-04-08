@@ -36,6 +36,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
+import { SubHeader } from "../components/SubHeader/SubHeader";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -268,12 +269,13 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <SubHeader />
+      {/* <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Users className="w-6 h-6" />
           Users
         </h1>
-      </div>
+      </div> */}
 
       <div className="rounded-md border border-neutral-800 bg-neutral-900">
         <div className="relative overflow-x-auto">
@@ -364,27 +366,40 @@ export default function UsersPage() {
         {/* Pagination */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-neutral-800">
           <div className="text-sm text-neutral-400">
-            Showing{" "}
-            <span className="font-semibold">
-              {table.getState().pagination.pageIndex * pagination.pageSize + 1}
-            </span>{" "}
-            to{" "}
-            <span className="font-semibold">
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) *
-                  pagination.pageSize,
-                data?.totalCount || 0
-              )}
-            </span>{" "}
-            of <span className="font-semibold">{data?.totalCount || 0}</span>{" "}
-            users
+            {isLoading ? (
+              <span>Loading users...</span>
+            ) : (
+              <>
+                Showing{" "}
+                <span className="font-semibold">
+                  {data?.data?.length
+                    ? table.getState().pagination.pageIndex *
+                        pagination.pageSize +
+                      1
+                    : 0}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold">
+                  {data?.data?.length
+                    ? Math.min(
+                        (table.getState().pagination.pageIndex + 1) *
+                          pagination.pageSize,
+                        data?.totalCount || 0
+                      )
+                    : 0}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold">{data?.totalCount || 0}</span>{" "}
+                users
+              </>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
+              disabled={!table.getCanPreviousPage() || isLoading}
             >
               <ChevronsLeft className="h-4 w-4" />
             </Button>
@@ -392,23 +407,31 @@ export default function UsersPage() {
               variant="outline"
               size="sm"
               onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              disabled={!table.getCanPreviousPage() || isLoading}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="text-sm text-neutral-400">
-              Page{" "}
-              <span className="font-semibold">
-                {table.getState().pagination.pageIndex + 1}
-              </span>{" "}
-              of{" "}
-              <span className="font-semibold">{table.getPageCount() || 1}</span>
+              {isLoading ? (
+                <span>Loading...</span>
+              ) : (
+                <>
+                  Page{" "}
+                  <span className="font-semibold">
+                    {table.getState().pagination.pageIndex + 1}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold">
+                    {Math.max(table.getPageCount(), 1)}
+                  </span>
+                </>
+              )}
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              disabled={!table.getCanNextPage() || isLoading}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -416,7 +439,7 @@ export default function UsersPage() {
               variant="outline"
               size="sm"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
+              disabled={!table.getCanNextPage() || isLoading}
             >
               <ChevronsRight className="h-4 w-4" />
             </Button>
