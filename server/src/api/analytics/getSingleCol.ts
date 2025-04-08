@@ -1,12 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import clickhouse from "../db/clickhouse/clickhouse.js";
+import clickhouse from "../../db/clickhouse/clickhouse.js";
 import {
   geSqlParam,
   getFilterStatement,
   getTimeStatement,
   processResults,
 } from "./utils.js";
-import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { FilterParameter } from "./types.js";
 
 interface GenericRequest {

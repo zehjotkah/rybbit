@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { sql } from "../db/postgres/postgres.js";
+import { sql } from "../../db/postgres/postgres.js";
 
 type ListUsersResponse = {
   id: string;

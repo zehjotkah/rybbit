@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import clickhouse from "../db/clickhouse/clickhouse.js";
-import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import clickhouse from "../../db/clickhouse/clickhouse.js";
+import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { processResults } from "./utils.js";
 
 // Define the expected shape of a single data row from the query

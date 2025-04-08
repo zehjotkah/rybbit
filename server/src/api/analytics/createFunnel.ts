@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { db } from "../db/postgres/postgres.js";
-import { reports } from "../db/postgres/schema.js";
-import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import { db } from "../../db/postgres/postgres.js";
+import { reports } from "../../db/postgres/schema.js";
+import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { eq } from "drizzle-orm";
 
 type FunnelStep = {

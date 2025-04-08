@@ -1,12 +1,12 @@
 import { FastifyRequest } from "fastify";
 import { FastifyReply } from "fastify";
-import clickhouse from "../db/clickhouse/clickhouse.js";
+import clickhouse from "../../db/clickhouse/clickhouse.js";
 import {
   getTimeStatement,
   processResults,
   getFilterStatement,
 } from "./utils.js";
-import { getUserHasAccessToSite } from "../lib/auth-utils.js";
+import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 
 type FunnelStep = {
   value: string;
