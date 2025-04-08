@@ -60,7 +60,12 @@ export function NewFilterButton() {
         <Button
           variant="default"
           className="px-3"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            if (localFilters.length === 0) {
+              addLocalFilter();
+            }
+            setOpen(true);
+          }}
         >
           <ListFilterPlus className="w-4 h-4" />
           Filter
