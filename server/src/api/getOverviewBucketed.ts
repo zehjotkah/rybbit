@@ -44,14 +44,14 @@ function getTimeStatementFill(
   if (date) {
     const { startDate, endDate, timezone } = date;
     return `WITH FILL FROM toTimeZone(
-      toStartOfDay(toDateTime('${startDate}', '${timezone}')),
+      toDateTime(${TimeBucketToFn[bucket]}(toDateTime('${startDate}', '${timezone}'))),
       'UTC'
       )
       TO if(
         toDate('${endDate}') = toDate(now(), '${timezone}'),
         now(),
         toTimeZone(
-          toStartOfDay(toDateTime('${endDate}', '${timezone}')) + INTERVAL 1 DAY,
+          toDateTime(${TimeBucketToFn[bucket]}(toDateTime('${endDate}', '${timezone}'))) + INTERVAL 1 DAY,
           'UTC'
         )
       ) STEP INTERVAL ${bucketIntervalMap[bucket]}`;
@@ -95,9 +95,9 @@ SELECT
 FROM 
 (
     SELECT
-         ${
+         toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(start_time, '${timezone}')) AS time,
+         }(toTimeZone(start_time, '${timezone}'))) AS time,
         COUNT() AS sessions,
         AVG(pages_in_session) AS pages_per_session,
         sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
@@ -138,9 +138,9 @@ FROM
 FULL JOIN
 (
     SELECT
-         ${
+         toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(timestamp, '${timezone}')) AS time,
+         }(toTimeZone(timestamp, '${timezone}'))) AS time,
         COUNT(*) AS pageviews,
         COUNT(DISTINCT user_id) AS users
     FROM pageviews
@@ -207,6 +207,8 @@ export async function getOverviewBucketed(
     filters,
     pastMinutes,
   });
+
+  console.info(query);
 
   try {
     const result = await clickhouse.query({
