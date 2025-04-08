@@ -14,6 +14,8 @@ import {
 } from "@tanstack/react-table";
 import { DateTime } from "luxon";
 import {
+  ArrowDown,
+  ArrowUp,
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
@@ -28,9 +30,39 @@ import { Browser } from "../components/shared/icons/Browser";
 import { OperatingSystem } from "../components/shared/icons/OperatingSystem";
 import { getCountryName } from "../../../lib/utils";
 import { Smartphone, Tablet, Monitor } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
+
+// Create a reusable sort header component
+const SortHeader = ({ column, children }: any) => {
+  const isSorted = column.getIsSorted();
+
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(isSorted === "asc")}
+      className="p-0 hover:bg-transparent"
+    >
+      {children}
+      {isSorted ? (
+        isSorted === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        )
+      ) : (
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      )}
+    </Button>
+  );
+};
 
 export default function UsersPage() {
   const router = useRouter();
@@ -39,7 +71,7 @@ export default function UsersPage() {
   // State for server-side operations
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 20,
+    pageSize: 50,
   });
   const [sorting, setSorting] = useState<SortingState>([
     { id: "last_seen", desc: true },
@@ -60,7 +92,19 @@ export default function UsersPage() {
     sortOrder,
   });
 
-  // Define table columns
+  // Format relative time with special handling for times less than 1 minute
+  const formatRelativeTime = (dateStr: string) => {
+    const date = DateTime.fromSQL(dateStr, { zone: "utc" }).toLocal();
+    const diff = Math.abs(date.diffNow(["minutes"]).minutes);
+
+    if (diff < 1) {
+      return "<1 min ago";
+    }
+
+    return date.toRelative();
+  };
+
+  // Define table columns with consistent Title Case capitalization
   const columns = [
     columnHelper.accessor("user_id", {
       header: "User ID",
@@ -73,7 +117,7 @@ export default function UsersPage() {
     columnHelper.accessor("country", {
       header: "Country",
       cell: (info) => (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           <CountryFlag country={info.getValue() || ""} />
           {info.getValue() ? getCountryName(info.getValue()) : "Unknown"}
         </div>
@@ -82,27 +126,27 @@ export default function UsersPage() {
     columnHelper.accessor("browser", {
       header: "Browser",
       cell: (info) => (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           <Browser browser={info.getValue() || "Unknown"} />
           {info.getValue() || "Unknown"}
         </div>
       ),
     }),
     columnHelper.accessor("operating_system", {
-      header: "OS",
+      header: "Operating System",
       cell: (info) => (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           <OperatingSystem os={info.getValue() || ""} />
           {info.getValue() || "Unknown"}
         </div>
       ),
     }),
     columnHelper.accessor("device_type", {
-      header: "Device",
+      header: "Device Type",
       cell: (info) => {
         const deviceType = info.getValue();
         return (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 whitespace-nowrap">
             {deviceType === "Desktop" && <Monitor className="w-4 h-4" />}
             {deviceType === "Mobile" && <Smartphone className="w-4 h-4" />}
             {deviceType === "Tablet" && <Tablet className="w-4 h-4" />}
@@ -112,58 +156,84 @@ export default function UsersPage() {
       },
     }),
     columnHelper.accessor("pageviews", {
-      header: "Pageviews",
-      cell: (info) => info.getValue().toLocaleString(),
+      header: ({ column }) => (
+        <SortHeader column={column}>Pageviews</SortHeader>
+      ),
+      cell: (info) => (
+        <div className="whitespace-nowrap">
+          {info.getValue().toLocaleString()}
+        </div>
+      ),
     }),
     columnHelper.accessor("events", {
-      header: "Events",
-      cell: (info) => info.getValue().toLocaleString(),
+      header: ({ column }) => <SortHeader column={column}>Events</SortHeader>,
+      cell: (info) => (
+        <div className="whitespace-nowrap">
+          {info.getValue().toLocaleString()}
+        </div>
+      ),
     }),
     columnHelper.accessor("sessions", {
-      header: "Sessions",
-      cell: (info) => info.getValue().toLocaleString(),
+      header: ({ column }) => <SortHeader column={column}>Sessions</SortHeader>,
+      cell: (info) => (
+        <div className="whitespace-nowrap">
+          {info.getValue().toLocaleString()}
+        </div>
+      ),
     }),
     columnHelper.accessor("last_seen", {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Last Seen
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <SortHeader column={column}>Last Seen</SortHeader>
       ),
-      cell: (info) => (
-        <div>
-          {DateTime.fromSQL(info.getValue(), {
-            zone: "utc",
-          })
-            .toLocal()
-            .toLocaleString(DateTime.DATETIME_SHORT)}
-        </div>
-      ),
+      cell: (info) => {
+        const date = DateTime.fromSQL(info.getValue(), {
+          zone: "utc",
+        }).toLocal();
+        const formattedDate = date.toLocaleString(DateTime.DATETIME_SHORT);
+        const relativeTime = formatRelativeTime(info.getValue());
+
+        return (
+          <div className="whitespace-nowrap">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>{relativeTime}</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{formattedDate}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
     }),
     columnHelper.accessor("first_seen", {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          First Seen
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <SortHeader column={column}>First Seen</SortHeader>
       ),
-      cell: (info) => (
-        <div>
-          {DateTime.fromSQL(info.getValue(), {
-            zone: "utc",
-          })
-            .toLocal()
-            .toLocaleString(DateTime.DATETIME_SHORT)}
-        </div>
-      ),
+      cell: (info) => {
+        const date = DateTime.fromSQL(info.getValue(), {
+          zone: "utc",
+        }).toLocal();
+        const formattedDate = date.toLocaleString(DateTime.DATETIME_SHORT);
+        const relativeTime = formatRelativeTime(info.getValue());
+
+        return (
+          <div className="whitespace-nowrap">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>{relativeTime}</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{formattedDate}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
     }),
   ];
 
@@ -185,11 +255,8 @@ export default function UsersPage() {
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
     manualSorting: true,
+    sortDescFirst: true,
   });
-
-  const handleRowClick = (userId: string) => {
-    router.push(`/${site}/user/${userId}`);
-  };
 
   if (isError) {
     return (
@@ -208,17 +275,20 @@ export default function UsersPage() {
         </h1>
       </div>
 
-      <div className="rounded-md border border-neutral-700 bg-neutral-850">
+      <div className="rounded-md border border-neutral-800 bg-neutral-900">
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-neutral-900 text-neutral-400 text-xs uppercase">
+            <thead className="bg-neutral-850 text-neutral-400 ">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
                       scope="col"
-                      className="px-4 py-3 font-medium"
+                      className="px-4 py-1 font-medium whitespace-nowrap"
+                      style={{
+                        minWidth: header.id === "user_id" ? "100px" : "auto",
+                      }}
                     >
                       {header.isPlaceholder
                         ? null
@@ -233,7 +303,7 @@ export default function UsersPage() {
             </thead>
             <tbody>
               {isLoading ? (
-                Array.from({ length: 10 }).map((_, index) => (
+                Array.from({ length: 15 }).map((_, index) => (
                   <tr
                     key={index}
                     className="border-b border-neutral-800 animate-pulse"

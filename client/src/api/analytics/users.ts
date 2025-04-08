@@ -63,7 +63,11 @@ export function useGetUsers(options: GetUsersOptions) {
         sortOrder,
       }).then((res) => res.json());
     },
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
+    // Use default staleTime (0) for real-time data
+    staleTime: 0,
+    // Enable refetching when the window regains focus
+    refetchOnWindowFocus: true,
+    // Add a background refetch interval (every 30 seconds)
+    refetchInterval: 30000,
   });
 }
