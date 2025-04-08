@@ -58,6 +58,8 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
     FROM pageviews
     WHERE
       site_id = ${site}
+      AND event_name IS NOT NULL 
+      AND event_name <> ''
       ${filterStatement}
       ${getTimeStatement(
         minutes
@@ -99,6 +101,7 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
           // AND type = 'pageview'
         GROUP BY session_id
     ) AS query
+    WHERE pathname IS NOT NULL AND pathname <> ''
     GROUP BY value ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};`;
   }
@@ -111,6 +114,8 @@ const getQuery = (request: GenericRequest["Querystring"]) => {
     FROM pageviews
     WHERE
         site_id = ${site}
+        AND ${geSqlParam(parameter)} IS NOT NULL
+        AND ${geSqlParam(parameter)} <> ''
         ${filterStatement}
         ${getTimeStatement(
           minutes
