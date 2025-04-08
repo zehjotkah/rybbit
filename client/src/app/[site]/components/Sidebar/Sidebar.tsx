@@ -1,21 +1,20 @@
 "use client";
+import { Funnel } from "@phosphor-icons/react/dist/ssr";
 import {
   ChartBarDecreasing,
-  ChartLine,
   LayoutDashboard,
   LayoutGrid,
   Radio,
+  Rewind,
   Settings,
   User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGetSites } from "../../../../api/admin/sites";
-import LiveUserCount from "./LiveUserCount";
 import { SiteSettings } from "../../../../components/SiteSettings/SiteSettings";
-import { Button } from "../../../../components/ui/button";
+import LiveUserCount from "./LiveUserCount";
 import { SiteSelector } from "./SiteSelector";
-import { Funnel } from "@phosphor-icons/react/dist/ssr";
 
 export function Sidebar() {
   const { data: sites } = useGetSites();
@@ -56,6 +55,12 @@ export function Sidebar() {
           label="Sessions"
           active={isActiveTab("sessions")}
           href={getTabPath("sessions")}
+          icon={<Rewind className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Users"
+          active={isActiveTab("users")}
+          href={getTabPath("users")}
           icon={<User className="w-4 h-4" />}
         />
         <SidebarLink
