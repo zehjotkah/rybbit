@@ -63,5 +63,7 @@ export function useGetUsers(options: GetUsersOptions) {
         sortOrder,
       }).then((res) => res.json());
     },
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   createColumnHelper,
   flexRender,
@@ -256,22 +257,35 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ) : (
-                table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-b border-neutral-800 hover:bg-neutral-800 cursor-pointer"
-                    onClick={() => handleRowClick(row.original.user_id)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-4 py-3">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const userId = row.original.user_id;
+                  const href = `/${site}/user/${userId}`;
+
+                  return (
+                    <tr
+                      key={row.id}
+                      className="border-b border-neutral-800 hover:bg-neutral-800 cursor-pointer group"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="px-4 py-3 relative">
+                          <Link
+                            href={href}
+                            className="absolute inset-0 z-10"
+                            aria-label={`View user ${userId}`}
+                          >
+                            <span className="sr-only">View user details</span>
+                          </Link>
+                          <span className="relative z-0">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

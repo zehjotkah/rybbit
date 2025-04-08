@@ -80,7 +80,7 @@ SELECT
     argMax(browser, timestamp) AS browser,
     argMax(operating_system, timestamp) AS operating_system,
     argMax(device_type, timestamp) AS device_type,
-    count() AS pageviews,
+    countIf(type = 'pageview') AS pageviews,
     countIf(type = 'custom_event') AS events,
     count(distinct session_id) AS sessions,
     max(timestamp) AS last_seen,
