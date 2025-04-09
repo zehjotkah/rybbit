@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
 import { authedFetch, genericQuery, useGenericQuery } from "../utils";
@@ -57,7 +58,18 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
 }
 
 export function useSiteHasData(siteId: string) {
-  return useGenericQuery<boolean>(`site-has-data/${siteId}`);
+  return useQuery({
+    queryKey: ["site-has-data", siteId],
+    queryFn: () => {
+      if (!siteId) {
+        return Promise.resolve(false);
+      }
+      return authedFetch(`${BACKEND_URL}/site-has-data/${siteId}`).then((res) =>
+        res.json()
+      );
+    },
+    staleTime: Infinity,
+  });
 }
 
 export function useGetSiteMetadata(siteId?: string | number) {
