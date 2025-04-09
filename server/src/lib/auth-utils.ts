@@ -3,6 +3,7 @@ import { auth } from "./auth.js";
 import { sites, member } from "../db/postgres/schema.js";
 import { inArray, eq } from "drizzle-orm";
 import { db } from "../db/postgres/postgres.js";
+import { isSitePublic } from "../utils.js";
 
 export function mapHeaders(headers: any) {
   const entries = Object.entries(headers);
@@ -64,6 +65,9 @@ export async function getUserHasAccessToSite(
   req: FastifyRequest,
   siteId: string
 ) {
-  const sites = await getSitesUserHasAccessTo(req);
-  return sites.some((site) => site.siteId === Number(siteId));
+  const [sites, isPublic] = await Promise.all([
+    getSitesUserHasAccessTo(req),
+    isSitePublic(siteId),
+  ]);
+  return sites.some((site) => site.siteId === Number(siteId)) || isPublic;
 }

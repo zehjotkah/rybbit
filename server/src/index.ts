@@ -6,39 +6,42 @@ import cron from "node-cron";
 import { dirname, join } from "path";
 import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
-import { createAccount } from "./api/user/createAccount.js";
+import { createFunnel } from "./api/analytics/createFunnel.js";
+import { deleteReport } from "./api/analytics/deleteReport.js";
+import { getFunnel } from "./api/analytics/getFunnel.js";
+import { getFunnels } from "./api/analytics/getFunnels.js";
+import { getLiveSessionLocations } from "./api/analytics/getLiveSessionLocations.js";
 import { getLiveUsercount } from "./api/analytics/getLiveUsercount.js";
 import { getOverview } from "./api/analytics/getOverview.js";
 import { getOverviewBucketed } from "./api/analytics/getOverviewBucketed.js";
-import { getSessions } from "./api/analytics/getSessions.js";
+import { getRetention } from "./api/analytics/getRetention.js";
 import { getSession } from "./api/analytics/getSession.js";
+import { getSessions } from "./api/analytics/getSessions.js";
 import { getSingleCol } from "./api/analytics/getSingleCol.js";
+import { getUserInfo } from "./api/analytics/getUserInfo.js";
 import { getUserSessions } from "./api/analytics/getUserSessions.js";
 import { getUsers } from "./api/analytics/getUsers.js";
-import { listUsers } from "./api/user/listUsers.js";
 import { addSite } from "./api/sites/addSite.js";
 import { changeSiteDomain } from "./api/sites/changeSiteDomain.js";
+import { changeSitePublic } from "./api/sites/changeSitePublic.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSites } from "./api/sites/getSites.js";
+import { createAccount } from "./api/user/createAccount.js";
+import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
+import { getUserSubscription } from "./api/user/getUserSubscription.js";
+import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
+import { listUsers } from "./api/user/listUsers.js";
+import { initializeCronJobs } from "./cron/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initializePostgres } from "./db/postgres/postgres.js";
 import { cleanupOldSessions } from "./db/postgres/session-cleanup.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
-import { auth } from "./lib/auth.js";
 import { mapHeaders } from "./lib/auth-utils.js";
+import { auth } from "./lib/auth.js";
 import { trackEvent } from "./tracker/trackEvent.js";
-import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
-import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
-import { initializeCronJobs } from "./cron/index.js";
-import { getUserSubscription } from "./api/user/getUserSubscription.js";
-import { getUserInfo } from "./api/analytics/getUserInfo.js";
-import { getLiveSessionLocations } from "./api/analytics/getLiveSessionLocations.js";
-import { getRetention } from "./api/analytics/getRetention.js";
-import { getFunnel } from "./api/analytics/getFunnel.js";
-import { createFunnel } from "./api/analytics/createFunnel.js";
-import { getFunnels } from "./api/analytics/getFunnels.js";
-import { deleteReport } from "./api/analytics/deleteReport.js";
+import { extractSiteId, isSitePublic } from "./utils.js";
+import { getSite } from "./api/sites/getSite.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -98,12 +101,46 @@ server.register(
 
 const PUBLIC_ROUTES = ["/health", "/track", "/script", "/auth", "/api/auth"];
 
+// Define analytics routes that can be public
+const ANALYTICS_ROUTES = [
+  "/live-user-count/",
+  "/overview/",
+  "/overview-bucketed/",
+  "/single-col/",
+  "/retention/",
+  "/site-has-data/",
+  "/sessions/",
+  "/session/",
+  "/users/",
+  "/user/info/",
+  "/live-session-locations/",
+
+  "/get-site",
+];
+
+// Check if a route is an analytics route
+const isAnalyticsRoute = (path: string) => {
+  return ANALYTICS_ROUTES.some((route) => path.startsWith(route));
+};
+
 server.addHook("onRequest", async (request, reply) => {
   const { url } = request.raw;
 
+  if (!url) return;
+
   // Bypass auth for health check and tracking
-  if (PUBLIC_ROUTES.includes(url ?? "")) {
+  if (PUBLIC_ROUTES.some((route) => url.includes(route))) {
     return;
+  }
+
+  // Check if it's an analytics route and get site ID
+  if (isAnalyticsRoute(url)) {
+    const siteId = extractSiteId(url);
+
+    if (siteId && (await isSitePublic(siteId))) {
+      // Skip auth check for public sites
+      return;
+    }
   }
 
   try {
@@ -138,16 +175,18 @@ server.get("/users/:site", getUsers);
 server.get("/user/:userId/sessions/:site", getUserSessions);
 server.get("/user/info/:userId/:site", getUserInfo);
 server.get("/live-session-locations/:site", getLiveSessionLocations);
+server.get("/funnels/:site", getFunnels);
 server.post("/funnel/:site", getFunnel);
 server.post("/funnel/create/:site", createFunnel);
-server.get("/funnels/:site", getFunnels);
 server.delete("/report/:reportId", deleteReport);
 
 // Administrative
 server.post("/add-site", addSite);
 server.post("/change-site-domain", changeSiteDomain);
+server.post("/change-site-public", changeSitePublic);
 server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
+server.get("/get-site/:id", getSite);
 server.get("/list-users", listUsers);
 server.post("/create-account", createAccount);
 server.get(

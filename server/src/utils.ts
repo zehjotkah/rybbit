@@ -1,5 +1,8 @@
 import { FastifyRequest } from "fastify";
 import crypto from "crypto";
+import { db } from "./db/postgres/postgres.js";
+import { sites } from "./db/postgres/schema.js";
+import { eq } from "drizzle-orm";
 
 export function getUserId(ip: string, userAgent: string) {
   return crypto
@@ -163,4 +166,36 @@ export const getIpAddress = (request: FastifyRequest): string => {
 
   // Fallback to direct IP
   return request.ip;
+};
+
+// Check if a site is public
+export const isSitePublic = async (siteId: string | number) => {
+  try {
+    const site = await db.query.sites.findFirst({
+      where: eq(sites.siteId, Number(siteId)),
+      columns: {
+        public: true,
+      },
+    });
+    return site?.public || false;
+  } catch (err) {
+    console.error("Error checking if site is public:", err);
+    return false;
+  }
+};
+
+// Extract site ID from path
+export const extractSiteId = (path: string) => {
+  // Remove query parameters if present
+  const pathWithoutQuery = path.split("?")[0];
+
+  // Handle route patterns:
+  // /route/:site
+  // /route/:sessionId/:site
+  // /route/:userId/:site
+  const segments = pathWithoutQuery.split("/").filter(Boolean);
+  if (segments.length >= 2) {
+    return segments[segments.length - 1];
+  }
+  return null;
 };

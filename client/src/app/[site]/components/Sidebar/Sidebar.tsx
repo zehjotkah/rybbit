@@ -11,18 +11,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useGetSites } from "../../../../api/admin/sites";
+import { useGetSite } from "../../../../api/admin/sites";
 import { SiteSettings } from "../../../../components/SiteSettings/SiteSettings";
 import LiveUserCount from "./LiveUserCount";
 import { SiteSelector } from "./SiteSelector";
 
 export function Sidebar() {
-  const { data: sites } = useGetSites();
   const pathname = usePathname();
 
-  const site = sites?.find(
-    (site) => site.siteId === Number(pathname.split("/")[1])
-  );
+  const { data: site } = useGetSite(Number(pathname.split("/")[1]));
 
   // Check which tab is active based on the current path
   const getTabPath = (tabName: string) => {

@@ -3,7 +3,7 @@ import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
 import { authedFetch, genericQuery, useGenericQuery } from "../utils";
 
-export type GetSitesResponse = {
+export type SiteResponse = {
   siteId: number;
   name: string;
   domain: string;
@@ -11,11 +11,10 @@ export type GetSitesResponse = {
   updatedAt: string;
   createdBy: string;
   public: boolean;
-  overMonthlyLimit?: boolean;
-  monthlyEventCount?: number;
-  eventLimit?: number;
-  isOwner?: boolean;
-}[];
+  isOwner: boolean;
+};
+
+export type GetSitesResponse = SiteResponse[];
 
 export function useGetSites() {
   return useGenericQuery<GetSitesResponse>("get-sites");
@@ -58,6 +57,19 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
   });
 }
 
+export function changeSitePublic(siteId: number, isPublic: boolean) {
+  return authedFetch(`${BACKEND_URL}/change-site-public`, {
+    method: "POST",
+    body: JSON.stringify({
+      siteId,
+      isPublic,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 export function useSiteHasData(siteId: string) {
   return useQuery({
     queryKey: ["site-has-data", siteId],
@@ -73,14 +85,33 @@ export function useSiteHasData(siteId: string) {
   });
 }
 
-export function useGetSiteMetadata(siteId?: string | number) {
-  const { data, isLoading } = useGetSites();
-  const { site } = useStore();
+export function useGetSite(siteId?: string | number) {
+  const { site: storeSelectedSite } = useStore();
 
-  const siteIdToUse = siteId ?? site;
+  const siteIdToUse = siteId ?? storeSelectedSite;
 
-  return {
-    siteMetadata: data?.find((site) => site.siteId === Number(siteIdToUse)),
-    isLoading,
-  };
+  return useQuery({
+    queryKey: ["get-site", siteIdToUse],
+    queryFn: async () => {
+      if (!siteIdToUse) {
+        return null;
+      }
+
+      // Use regular fetch instead of authedFetch to support public sites
+      const response = await authedFetch(
+        `${BACKEND_URL}/get-site/${siteIdToUse}`
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error("Failed to fetch site");
+      }
+
+      return response.json() as Promise<SiteResponse>;
+    },
+    staleTime: 60000, // 1 minute
+    enabled: !!siteId,
+  });
 }

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useStore } from "../../lib/store";
 import { useSyncStateWithUrl } from "../../lib/urlParams";
 import { Header } from "./components/Header/Header";
-import { useSiteHasData, useGetSiteMetadata } from "../../api/admin/sites";
+import { useSiteHasData, useGetSite } from "../../api/admin/sites";
 import { NoData } from "./components/NoData";
 import { TopBar } from "../../components/TopBar";
 import { Sidebar } from "./components/Sidebar/Sidebar";
@@ -18,8 +18,8 @@ export default function SiteLayout({
   const { setSite, site } = useStore();
   const { data: siteHasData, isLoading } = useSiteHasData(site);
 
-  const { siteMetadata, isLoading: isLoadingSiteMetadata } =
-    useGetSiteMetadata();
+  const { data: siteMetadata, isLoading: isLoadingSiteMetadata } =
+    useGetSite(site);
 
   // Sync store state with URL parameters
   useSyncStateWithUrl();

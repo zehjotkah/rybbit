@@ -6,8 +6,6 @@ import { FilterParameter, goBack, goForward, useStore } from "@/lib/store";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
 
-import { usePathname } from "next/navigation";
-import { useGetSites } from "../../../../api/admin/sites";
 import { DateSelector } from "../../../../components/DateSelector/DateSelector";
 import { Time } from "../../../../components/DateSelector/types";
 
@@ -42,10 +40,6 @@ export function SubHeader({
   availableFilters?: FilterParameter[];
 }) {
   const { time, setTime } = useStore();
-  const { data: sites } = useGetSites();
-  const pathname = usePathname();
-
-  const site = sites?.find((site) => site.siteId === Number(pathname.slice(1)));
 
   return (
     <div className="flex gap-2 mb-3 mt-1 justify-between">
