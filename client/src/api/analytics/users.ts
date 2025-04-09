@@ -60,11 +60,10 @@ export function useGetUsers(options: GetUsersOptions) {
     queryFn: async () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      return authedFetch(`${BACKEND_URL}/users`, {
+      return authedFetch(`${BACKEND_URL}/users/${site}`, {
         startDate,
         endDate,
         timezone,
-        site,
         filters: filteredFilters,
         page,
         pageSize,

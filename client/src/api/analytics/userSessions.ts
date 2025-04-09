@@ -34,11 +34,10 @@ export function useGetUserSessions(userId: string) {
     queryKey: ["user-sessions", userId, time, site, filters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(`${BACKEND_URL}/user/${userId}/sessions`, {
+      return authedFetch(`${BACKEND_URL}/user/${userId}/sessions/${site}`, {
         startDate,
         endDate,
         timezone,
-        site,
         filters,
       }).then((res) => res.json());
     },
@@ -77,11 +76,10 @@ export function useGetSessionsInfinite(userId?: string) {
     queryKey: ["sessions-infinite", time, site, filteredFilters, userId],
     queryFn: ({ pageParam = 1 }) => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(`${BACKEND_URL}/sessions`, {
+      return authedFetch(`${BACKEND_URL}/sessions/${site}`, {
         startDate: userId ? undefined : startDate,
         endDate: userId ? undefined : endDate,
         timezone,
-        site,
         filters: filteredFilters,
         page: pageParam,
         userId,
@@ -148,9 +146,9 @@ export function useGetSessionDetails(sessionId: string | null) {
     queryFn: () => {
       if (!sessionId) throw new Error("Session ID is required");
 
-      return authedFetch(`${BACKEND_URL}/session/${sessionId}`, {
-        site,
-      }).then((res) => res.json());
+      return authedFetch(`${BACKEND_URL}/session/${sessionId}/${site}`).then(
+        (res) => res.json()
+      );
     },
     enabled: !!sessionId && !!site,
     staleTime: Infinity,

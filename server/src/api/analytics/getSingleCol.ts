@@ -10,12 +10,14 @@ import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { FilterParameter } from "./types.js";
 
 interface GenericRequest {
+  Params: {
+    site: string;
+  };
   Querystring: {
     startDate: string;
     endDate: string;
     minutes: number;
     timezone: string;
-    site: string;
     filters: string;
     parameter: FilterParameter;
     limit?: number;
@@ -30,17 +32,10 @@ type GetSingleColResponse = {
   bounce_rate?: number;
 }[];
 
-const getQuery = (request: GenericRequest["Querystring"]) => {
-  const {
-    startDate,
-    endDate,
-    timezone,
-    site,
-    filters,
-    parameter,
-    limit,
-    minutes,
-  } = request;
+const getQuery = (request: FastifyRequest<GenericRequest>) => {
+  const { startDate, endDate, timezone, filters, parameter, limit, minutes } =
+    request.query;
+  const site = request.params.site;
 
   const filterStatement = getFilterStatement(filters);
 
@@ -154,14 +149,15 @@ export async function getSingleCol(
   req: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
-  const { site, parameter } = req.query;
+  const { parameter } = req.query;
+  const site = req.params.site;
 
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
   }
 
-  const query = getQuery(req.query);
+  const query = getQuery(req);
 
   try {
     const result = await clickhouse.query({

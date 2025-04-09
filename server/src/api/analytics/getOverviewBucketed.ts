@@ -178,20 +178,23 @@ type getOverviewBucketed = { time: string; pageviews: number }[];
 
 export async function getOverviewBucketed(
   req: FastifyRequest<{
+    Params: {
+      site: string;
+    };
     Querystring: {
       startDate: string;
       endDate: string;
       timezone: string;
       bucket: TimeBucket;
-      site: string;
       filters: string;
       pastMinutes?: number;
     };
   }>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, bucket, site, filters, pastMinutes } =
+  const { startDate, endDate, timezone, bucket, filters, pastMinutes } =
     req.query;
+  const site = req.params.site;
 
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {

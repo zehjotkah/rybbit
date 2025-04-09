@@ -96,17 +96,13 @@ server.register(
   { auth: auth! }
 );
 
+const PUBLIC_ROUTES = ["/health", "/track", "/script", "/auth", "/api/auth"];
+
 server.addHook("onRequest", async (request, reply) => {
   const { url } = request.raw;
 
   // Bypass auth for health check and tracking
-  if (
-    url?.startsWith("/health") ||
-    url?.startsWith("/track") ||
-    url?.startsWith("/script") ||
-    url?.startsWith("/auth") ||
-    url?.startsWith("/api/auth")
-  ) {
+  if (PUBLIC_ROUTES.includes(url ?? "")) {
     return;
   }
 
@@ -129,18 +125,19 @@ server.addHook("onRequest", async (request, reply) => {
   }
 });
 
+// Analytics
 server.get("/live-user-count/:site", getLiveUsercount);
-server.get("/overview", getOverview);
-server.get("/overview-bucketed", getOverviewBucketed);
-server.get("/single-col", getSingleCol);
+server.get("/overview/:site", getOverview);
+server.get("/overview-bucketed/:site", getOverviewBucketed);
+server.get("/single-col/:site", getSingleCol);
 server.get("/retention/:site", getRetention);
 server.get("/site-has-data/:site", getSiteHasData);
-server.get("/sessions", getSessions);
-server.get("/session/:sessionId", getSession);
-server.get("/users", getUsers);
-server.get("/user/:userId/sessions", getUserSessions);
-server.get("/user/info/:siteId/:userId", getUserInfo);
-server.get("/live-session-locations/:siteId", getLiveSessionLocations);
+server.get("/sessions/:site", getSessions);
+server.get("/session/:sessionId/:site", getSession);
+server.get("/users/:site", getUsers);
+server.get("/user/:userId/sessions/:site", getUserSessions);
+server.get("/user/info/:userId/:site", getUserInfo);
+server.get("/live-session-locations/:site", getLiveSessionLocations);
 server.post("/funnel/:site", getFunnel);
 server.post("/funnel/create/:site", createFunnel);
 server.get("/funnels/:site", getFunnels);

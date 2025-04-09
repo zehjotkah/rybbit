@@ -10,6 +10,7 @@ export type GetSitesResponse = {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  public: boolean;
   overMonthlyLimit?: boolean;
   monthlyEventCount?: number;
   eventLimit?: number;

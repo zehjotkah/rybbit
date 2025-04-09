@@ -93,11 +93,13 @@ const getQuery = ({
 };
 
 export interface GenericRequest {
+  Params: {
+    site: string;
+  };
   Querystring: {
     startDate: string;
     endDate: string;
     timezone: string;
-    site: string;
     filters: string;
     parameter: FilterParameter;
     pastMinutes?: number;
@@ -109,8 +111,8 @@ export async function getOverview(
   req: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, site, filters, pastMinutes } =
-    req.query;
+  const { startDate, endDate, timezone, filters, pastMinutes } = req.query;
+  const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });

@@ -33,11 +33,10 @@ export function useSingleCol({
     queryKey: [parameter, timeToUse, site, filters, limit, useFilters],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(`${BACKEND_URL}/single-col`, {
+      return authedFetch(`${BACKEND_URL}/single-col/${site}`, {
         startDate,
         endDate,
         timezone,
-        site,
         parameter,
         limit,
         filters: useFilters ? filters : undefined,
@@ -72,9 +71,8 @@ export function useSingleColRealtime({
     queryKey: [parameter, site, limit, minutes],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return authedFetch(`${BACKEND_URL}/single-col`, {
+      return authedFetch(`${BACKEND_URL}/single-col/${site}`, {
         timezone,
-        site,
         parameter,
         limit,
         minutes,

@@ -24,11 +24,13 @@ export type GetUsersResponse = {
 }[];
 
 export interface GetUsersRequest {
+  Params: {
+    site: string;
+  };
   Querystring: {
     startDate: string;
     endDate: string;
     timezone: string;
-    site: string;
     filters: string;
     page?: string;
     pageSize?: string;
@@ -45,13 +47,13 @@ export async function getUsers(
     startDate,
     endDate,
     timezone,
-    site,
     filters,
     page = "1",
     pageSize = "20",
     sortBy = "last_seen",
     sortOrder = "desc",
   } = req.query;
+  const site = req.params.site;
 
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {

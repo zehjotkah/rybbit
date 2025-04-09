@@ -46,8 +46,6 @@ export interface SessionPageviewsAndEvents {
 export interface GetSessionRequest {
   Params: {
     sessionId: string;
-  };
-  Querystring: {
     site: string;
   };
 }
@@ -56,8 +54,7 @@ export async function getSession(
   req: FastifyRequest<GetSessionRequest>,
   res: FastifyReply
 ) {
-  const { sessionId } = req.params;
-  const { site } = req.query;
+  const { sessionId, site } = req.params;
 
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {

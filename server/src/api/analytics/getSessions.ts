@@ -29,11 +29,13 @@ export type GetSessionsResponse = {
 }[];
 
 export interface GetSessionsRequest {
+  Params: {
+    site: string;
+  };
   Querystring: {
     startDate: string;
     endDate: string;
     timezone: string;
-    site: string;
     filters: string;
     page: number;
     userId?: string;
@@ -44,8 +46,8 @@ export async function getSessions(
   req: FastifyRequest<GetSessionsRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, site, filters, page, userId } =
-    req.query;
+  const { startDate, endDate, timezone, filters, page, userId } = req.query;
+  const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSite(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });

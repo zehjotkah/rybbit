@@ -5,12 +5,12 @@ import { processResults } from "./utils.js";
 export async function getLiveSessionLocations(
   req: FastifyRequest<{
     Params: {
-      siteId: string;
+      site: string;
     };
   }>,
   res: FastifyReply
 ) {
-  const { siteId } = req.params;
+  const { site } = req.params;
 
   const result = await clickhouse.query({
     query: `
@@ -23,7 +23,7 @@ WITH stuff AS (
     FROM
         pageviews
     WHERE
-        site_id = {siteId:Int32}
+        site_id = {site:Int32}
         AND timestamp > now() - interval '30 minute'
     GROUP BY
         session_id
@@ -40,7 +40,7 @@ GROUP BY
     lon,
     city`,
     query_params: {
-      siteId: Number(siteId),
+      site,
     },
     format: "JSONEachRow",
   });
