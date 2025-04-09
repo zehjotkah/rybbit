@@ -1,12 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { useStore, Filter } from "../../lib/store";
+import {
+  useStore,
+  Filter,
+  USER_PAGE_FILTERS,
+  getFilteredFilters,
+} from "../../lib/store";
 import { getStartAndEndDate, authedFetch } from "../utils";
 import { APIResponse } from "../types";
 
 export type UsersResponse = {
   user_id: string;
   country: string;
+  iso_3166_2: string;
+  city: string;
+  language: string;
   browser: string;
   operating_system: string;
   device_type: string;
@@ -26,10 +34,11 @@ export interface GetUsersOptions {
 }
 
 export function useGetUsers(options: GetUsersOptions) {
-  const { time, site, filters: storeFilters } = useStore();
+  const { time, site } = useStore();
   const { startDate, endDate } = getStartAndEndDate(time);
 
   const { page, pageSize, sortBy, sortOrder } = options;
+  const filteredFilters = getFilteredFilters(USER_PAGE_FILTERS);
 
   return useQuery<
     APIResponse<UsersResponse[]> & {
@@ -46,7 +55,7 @@ export function useGetUsers(options: GetUsersOptions) {
       pageSize,
       sortBy,
       sortOrder,
-      storeFilters,
+      filteredFilters,
     ],
     queryFn: async () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,7 +65,7 @@ export function useGetUsers(options: GetUsersOptions) {
         endDate,
         timezone,
         site,
-        filters: storeFilters,
+        filters: filteredFilters,
         page,
         pageSize,
         sortBy,

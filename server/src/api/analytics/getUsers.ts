@@ -10,6 +10,9 @@ import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 export type GetUsersResponse = {
   user_id: string;
   country: string;
+  iso_3166_2: string;
+  city: string;
+  language: string;
   browser: string;
   operating_system: string;
   device_type: string;
@@ -70,30 +73,41 @@ export async function getUsers(
   const actualSortBy = validSortFields.includes(sortBy) ? sortBy : "last_seen";
   const actualSortOrder = sortOrder === "asc" ? "ASC" : "DESC";
 
+  // Generate filter statement and time statement
   const filterStatement = getFilterStatement(filters);
+  const timeStatement = getTimeStatement({
+    date: { startDate, endDate, timezone },
+  });
 
-  // Query to get user data with pagination
   const query = `
-SELECT
-    user_id,
-    argMax(country, timestamp) AS country,
-    argMax(browser, timestamp) AS browser,
-    argMax(operating_system, timestamp) AS operating_system,
-    argMax(device_type, timestamp) AS device_type,
-    countIf(type = 'pageview') AS pageviews,
-    countIf(type = 'custom_event') AS events,
-    count(distinct session_id) AS sessions,
-    max(timestamp) AS last_seen,
-    min(timestamp) AS first_seen
-FROM pageviews
-WHERE
-    site_id = ${site}
-    ${filterStatement}
-    ${getTimeStatement({
-      date: { startDate, endDate, timezone },
-    })}
-GROUP BY
-    user_id
+WITH AggregatedUsers AS (
+    SELECT
+        user_id,
+        argMax(country, timestamp) AS country,
+        argMax(iso_3166_2, timestamp) AS iso_3166_2,
+        argMax(city, timestamp) AS city,
+        argMax(language, timestamp) AS language,
+        argMax(browser, timestamp) AS browser,
+        argMax(operating_system, timestamp) AS operating_system,
+        argMax(device_type, timestamp) AS device_type,
+        argMax(screen_width, timestamp) AS screen_width, 
+        argMax(screen_height, timestamp) AS screen_height,
+        argMin(referrer, timestamp) AS referrer,
+        countIf(type = 'pageview') AS pageviews,
+        countIf(type = 'custom_event') AS events,
+        count(distinct session_id) AS sessions,
+        max(timestamp) AS last_seen,
+        min(timestamp) AS first_seen
+    FROM pageviews
+    WHERE
+        site_id = ${site}
+        ${timeStatement}
+    GROUP BY
+        user_id
+)
+SELECT *
+FROM AggregatedUsers
+WHERE 1 = 1 ${filterStatement}
 ORDER BY ${actualSortBy} ${actualSortOrder}
 LIMIT ${pageSizeNum} OFFSET ${offset}
   `;

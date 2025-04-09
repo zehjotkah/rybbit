@@ -2,7 +2,7 @@
 import { Filters } from "./Filters/Filters";
 
 import { Button } from "@/components/ui/button";
-import { goBack, goForward, useStore } from "@/lib/store";
+import { FilterParameter, goBack, goForward, useStore } from "@/lib/store";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
 
@@ -36,7 +36,11 @@ const canGoForward = (time: Time) => {
   return false;
 };
 
-export function SubHeader() {
+export function SubHeader({
+  availableFilters,
+}: {
+  availableFilters?: FilterParameter[];
+}) {
   const { time, setTime } = useStore();
   const { data: sites } = useGetSites();
   const pathname = usePathname();
@@ -45,7 +49,7 @@ export function SubHeader() {
 
   return (
     <div className="flex gap-2 mb-3 mt-1 justify-between">
-      <Filters />
+      <Filters availableFilters={availableFilters} />
       <div className="flex items-center gap-2">
         <DateSelector time={time} setTime={setTime} />
         <div className="flex items-center">

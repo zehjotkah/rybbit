@@ -37,6 +37,7 @@ import {
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
 import { SubHeader } from "../components/SubHeader/SubHeader";
+import { USER_PAGE_FILTERS } from "../../../lib/store";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -269,7 +270,7 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <SubHeader />
+      <SubHeader availableFilters={USER_PAGE_FILTERS} />
       {/* <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Users className="w-6 h-6" />

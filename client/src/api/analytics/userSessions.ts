@@ -1,6 +1,10 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { useStore } from "../../lib/store";
+import {
+  getFilteredFilters,
+  SESSION_PAGE_FILTERS,
+  useStore,
+} from "../../lib/store";
 import { APIResponse } from "../types";
 import { getStartAndEndDate, authedFetch } from "../utils";
 
@@ -46,12 +50,14 @@ export type GetSessionsResponse = {
   session_id: string;
   user_id: string;
   country: string;
+  city: string;
   iso_3166_2: string;
   language: string;
   device_type: string;
   browser: string;
   operating_system: string;
   referrer: string;
+  channel: string;
   session_end: string;
   session_start: string;
   session_duration: number;
@@ -65,8 +71,10 @@ export function useGetSessionsInfinite(userId?: string) {
   const { time, site, filters } = useStore();
   const { startDate, endDate } = getStartAndEndDate(time);
 
+  const filteredFilters = getFilteredFilters(SESSION_PAGE_FILTERS);
+
   return useInfiniteQuery<APIResponse<GetSessionsResponse>>({
-    queryKey: ["sessions-infinite", time, site, filters, userId],
+    queryKey: ["sessions-infinite", time, site, filteredFilters, userId],
     queryFn: ({ pageParam = 1 }) => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/sessions`, {
@@ -74,7 +82,7 @@ export function useGetSessionsInfinite(userId?: string) {
         endDate: userId ? undefined : endDate,
         timezone,
         site,
-        filters,
+        filters: filteredFilters,
         page: pageParam,
         userId,
       }).then((res) => res.json());

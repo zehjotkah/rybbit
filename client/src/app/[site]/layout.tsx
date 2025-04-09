@@ -25,7 +25,7 @@ export default function SiteLayout({
   useSyncStateWithUrl();
 
   useEffect(() => {
-    if (pathname.includes("/")) {
+    if (pathname.includes("/") && pathname.split("/")[1] !== site) {
       setSite(pathname.split("/")[1]);
     }
   }, [pathname]);
