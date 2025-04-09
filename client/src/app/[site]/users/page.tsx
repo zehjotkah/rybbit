@@ -38,6 +38,7 @@ import {
 } from "../../../components/ui/tooltip";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { USER_PAGE_FILTERS } from "../../../lib/store";
+import Avatar from "boring-avatars";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -111,15 +112,21 @@ export default function UsersPage() {
     columnHelper.accessor("user_id", {
       header: "User ID",
       cell: (info) => (
-        <div className="max-w-[100px] truncate">
-          {info.getValue().slice(0, 10)}...
+        <div className="] truncate flex items-center gap-2 text-neutral-250">
+          <Avatar
+            size={20}
+            name={info.getValue() as string}
+            variant="marble"
+            colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
+          />
+          {info.getValue().slice(0, 6)}
         </div>
       ),
     }),
     columnHelper.accessor("country", {
       header: "Country",
       cell: (info) => (
-        <div className="flex items-center gap-1 whitespace-nowrap">
+        <div className="flex items-center gap-2 whitespace-nowrap">
           <CountryFlag country={info.getValue() || ""} />
           {info.getValue() ? getCountryName(info.getValue()) : "Unknown"}
         </div>
@@ -128,7 +135,7 @@ export default function UsersPage() {
     columnHelper.accessor("browser", {
       header: "Browser",
       cell: (info) => (
-        <div className="flex items-center gap-1 whitespace-nowrap">
+        <div className="flex items-center gap-2 whitespace-nowrap">
           <Browser browser={info.getValue() || "Unknown"} />
           {info.getValue() || "Unknown"}
         </div>
@@ -137,7 +144,7 @@ export default function UsersPage() {
     columnHelper.accessor("operating_system", {
       header: "Operating System",
       cell: (info) => (
-        <div className="flex items-center gap-1 whitespace-nowrap">
+        <div className="flex items-center gap-2 whitespace-nowrap">
           <OperatingSystem os={info.getValue() || ""} />
           {info.getValue() || "Unknown"}
         </div>
@@ -148,7 +155,7 @@ export default function UsersPage() {
       cell: (info) => {
         const deviceType = info.getValue();
         return (
-          <div className="flex items-center gap-1 whitespace-nowrap">
+          <div className="flex items-center gap-2 whitespace-nowrap">
             {deviceType === "Desktop" && <Monitor className="w-4 h-4" />}
             {deviceType === "Mobile" && <Smartphone className="w-4 h-4" />}
             {deviceType === "Tablet" && <Tablet className="w-4 h-4" />}
@@ -269,15 +276,8 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <SubHeader availableFilters={USER_PAGE_FILTERS} />
-      {/* <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Users className="w-6 h-6" />
-          Users
-        </h1>
-      </div> */}
-
       <div className="rounded-md border border-neutral-800 bg-neutral-900">
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -288,7 +288,7 @@ export default function UsersPage() {
                     <th
                       key={header.id}
                       scope="col"
-                      className="px-4 py-1 font-medium whitespace-nowrap"
+                      className="px-3 py-1 font-medium whitespace-nowrap"
                       style={{
                         minWidth: header.id === "user_id" ? "100px" : "auto",
                       }}
@@ -313,7 +313,7 @@ export default function UsersPage() {
                   >
                     {Array.from({ length: columns.length }).map(
                       (_, cellIndex) => (
-                        <td key={cellIndex} className="px-4 py-3">
+                        <td key={cellIndex} className="px-3 py-3">
                           <div className="h-4 bg-neutral-800 rounded"></div>
                         </td>
                       )
@@ -324,7 +324,7 @@ export default function UsersPage() {
                 <tr>
                   <td
                     colSpan={columns.length}
-                    className="px-4 py-8 text-center text-neutral-400"
+                    className="px-3 py-8 text-center text-neutral-400"
                   >
                     No users found
                   </td>
@@ -340,7 +340,7 @@ export default function UsersPage() {
                       className="border-b border-neutral-800 hover:bg-neutral-800 cursor-pointer group"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3 relative">
+                        <td key={cell.id} className="px-3 py-3 relative">
                           <Link
                             href={href}
                             className="absolute inset-0 z-10"
