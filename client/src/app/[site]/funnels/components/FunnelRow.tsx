@@ -37,6 +37,7 @@ import {
 } from "../../components/shared/Filters/utils";
 import { EditFunnelDialog } from "./EditFunnel";
 import { Funnel } from "./Funnel";
+import { ThreeDotLoader } from "../../../../components/Loaders";
 
 interface FunnelRowProps {
   funnel: SavedFunnel;
@@ -230,13 +231,7 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
         <div className="border-t border-neutral-200 dark:border-neutral-800">
           <div className="p-4">
             {isPending ? (
-              <div className="flex justify-center items-center h-[400px]">
-                <div className="animate-pulse flex items-center">
-                  <div className="h-2 w-2 bg-neutral-500 rounded-full mr-1 animate-bounce"></div>
-                  <div className="h-2 w-2 bg-neutral-500 rounded-full mr-1 animate-bounce [animation-delay:0.2s]"></div>
-                  <div className="h-2 w-2 bg-neutral-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-                </div>
-              </div>
+              <ThreeDotLoader className="h-[400px]" />
             ) : isError ? (
               <div className="text-red-500 p-4 text-center">
                 Error loading funnel:{" "}
