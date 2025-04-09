@@ -14,7 +14,19 @@ export type SiteResponse = {
   isOwner: boolean;
 };
 
-export type GetSitesResponse = SiteResponse[];
+export type GetSitesResponse = {
+  siteId: number;
+  name: string;
+  domain: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  public: boolean;
+  overMonthlyLimit?: boolean;
+  monthlyEventCount?: number;
+  eventLimit?: number;
+  isOwner?: boolean;
+}[];
 
 export function useGetSites() {
   return useGenericQuery<GetSitesResponse>("get-sites");
