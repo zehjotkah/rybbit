@@ -90,7 +90,7 @@ function PageviewItem({
           <div className="flex-1 min-w-0 mr-4">
             {item.type === "pageview" ? (
               <Link
-                href={`${item.hostname}${item.pathname}${
+                href={`https://${item.hostname}${item.pathname}${
                   item.querystring ? `${item.querystring}` : ""
                 }`}
                 target="_blank"

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { User } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function TopBar() {
   const session = authClient.useSession();
@@ -25,30 +26,38 @@ export function TopBar() {
             🐸 Frogstats
           </Link>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex items-center gap-1 text-xs font-medium px-2 py-0"
-            variant="ghost"
-          >
-            <User className="w-4 h-4" />
-            {session.data?.user.name}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <Link href="/settings/account" legacyBehavior passHref>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem
-              onClick={async () => {
-                // Clear the query cache before signing out
-                queryClient.clear();
-                await authClient.signOut();
-                router.push("/login");
-              }}
+        {session.data ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex items-center gap-1 text-xs font-medium px-2 py-0"
+              variant="ghost"
             >
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <User className="w-4 h-4" />
+              {session.data?.user.name}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <Link href="/settings/account" legacyBehavior passHref>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem
+                onClick={async () => {
+                  // Clear the query cache before signing out
+                  queryClient.clear();
+                  await authClient.signOut();
+                  router.push("/login");
+                }}
+              >
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link href="/signup" legacyBehavior passHref>
+            <Button variant="ghost" size="sm">
+              Sign up
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
