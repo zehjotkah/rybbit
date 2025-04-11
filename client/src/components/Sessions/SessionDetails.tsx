@@ -190,7 +190,7 @@ const SessionDetailsTimelineSkeleton = memo(
           </div>
 
           {/* Timeline items skeleton */}
-          {Array.from({ length: itemCount }).map((_, i) => (
+          {Array.from({ length: Math.min(itemCount, 100) }).map((_, i) => (
             <div key={i} className="flex mb-3">
               <Skeleton className="h-8 w-8 rounded-full" />
               <div className="ml-3 flex-1">
@@ -515,71 +515,6 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                       </span>
                     </div>
                   ) : null}
-                </div>
-              </div>
-
-              {/* Session Information */}
-              <div className="col-span-2 mt-2">
-                <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
-                  Session Information
-                </h4>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-300 min-w-[80px]">
-                      Duration:
-                    </span>
-                    <div className="flex items-center gap-1.5 text-gray-400">
-                      <Clock className="w-4 h-4 text-gray-500" />
-                      <span>{getDurationFormatted()}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-300 min-w-[80px]">
-                      Start:
-                    </span>
-                    <span className="text-gray-400">
-                      {sessionDetails &&
-                        DateTime.fromSQL(sessionDetails.session_start, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("MMM d, yyyy h:mm:ss a")}
-                    </span>
-                  </div>
-
-                  {sessionDetails?.referrer ? (
-                    <div className="flex items-start gap-2 text-sm col-span-2">
-                      <span className="font-medium text-gray-300 min-w-[80px] mt-0.5">
-                        Referrer:
-                      </span>
-                      <CopyText
-                        text={sessionDetails.referrer}
-                        maxLength={60}
-                        className="text-gray-400"
-                      >
-                        <span className="font-normal text-gray-400 break-all">
-                          {sessionDetails.referrer}
-                        </span>
-                      </CopyText>
-                    </div>
-                  ) : (
-                    <div />
-                  )}
-
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-300 min-w-[80px]">
-                      End:
-                    </span>
-                    <span className="text-gray-400">
-                      {sessionDetails &&
-                        DateTime.fromSQL(sessionDetails.session_end, {
-                          zone: "utc",
-                        })
-                          .toLocal()
-                          .toFormat("MMM d, yyyy h:mm:ss a")}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
