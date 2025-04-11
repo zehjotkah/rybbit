@@ -22,7 +22,6 @@ import NumberFlow from "@number-flow/react";
 
 export default function RealtimePage() {
   const [ref, { width }] = useMeasure();
-  const size = useWindowSize();
 
   const [minutes, setMinutes] = useAtom(minutesAtom);
 

@@ -71,7 +71,7 @@ export async function getEvents(
       format: "JSONEachRow",
       query_params: {
         siteId: Number(site),
-        limit: limitCount,
+        limit: Number(limitCount),
       },
     });
 

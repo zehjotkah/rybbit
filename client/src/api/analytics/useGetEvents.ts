@@ -26,8 +26,8 @@ export function useGetEvents(count = 10) {
     queryKey: ["events", site, count],
     refetchInterval: 5000,
     queryFn: () =>
-      authedFetch(`${BACKEND_URL}/events/${site}?count=${count}`).then((res) =>
-        res.json()
+      authedFetch(`${BACKEND_URL}/recent-events/${site}?count=${count}`).then(
+        (res) => res.json()
       ),
   });
 }

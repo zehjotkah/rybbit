@@ -114,7 +114,7 @@ const ANALYTICS_ROUTES = [
   "/site-is-public/",
   "/sessions/",
   "/session/",
-  "/events/",
+  "/recent-events/",
   "/users/",
   "/user/info/",
   "/live-session-locations/",
@@ -183,7 +183,7 @@ server.get("/user/:userId/sessions/:site", getUserSessions);
 server.get("/user/info/:userId/:site", getUserInfo);
 server.get("/live-session-locations/:site", getLiveSessionLocations);
 server.get("/funnels/:site", getFunnels);
-server.get("/events/:site", getEvents);
+server.get("/recent-events/:site", getEvents);
 server.post("/funnel/:site", getFunnel);
 server.post("/funnel/create/:site", createFunnel);
 server.delete("/report/:reportId", deleteReport);
