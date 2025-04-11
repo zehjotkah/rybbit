@@ -14,6 +14,9 @@ export async function getLiveSessionLocations(
   res: FastifyReply
 ) {
   const { site } = req.params;
+  if (isNaN(Number(req.query.time))) {
+    return res.status(400).send({ error: "Invalid time" });
+  }
 
   const result = await clickhouse.query({
     query: `
@@ -27,7 +30,7 @@ WITH stuff AS (
         pageviews
     WHERE
         site_id = {site:Int32}
-        AND timestamp > now() - interval '{time:Int32} minute'
+        AND timestamp > now() - interval '${req.query.time} minute'
     GROUP BY
         session_id
 )
@@ -44,7 +47,6 @@ GROUP BY
     city`,
     query_params: {
       site,
-      time: req.query.time,
     },
     format: "JSONEachRow",
   });

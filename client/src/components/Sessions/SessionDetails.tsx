@@ -255,19 +255,6 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
       .length;
   }, [allPageviews]);
 
-  // Calculate session duration for the details section
-  const getDurationFormatted = () => {
-    if (!sessionDetails) return "";
-    const start = DateTime.fromSQL(sessionDetails.session_start, {
-      zone: "utc",
-    }).toLocal();
-    const end = DateTime.fromSQL(sessionDetails.session_end, {
-      zone: "utc",
-    }).toLocal();
-    const duration = end.diff(start, ["minutes", "seconds"]);
-    return `${Math.floor(duration.minutes)}m ${Math.floor(duration.seconds)}s`;
-  };
-
   return (
     <div className="px-4 bg-neutral-900 border-t border-neutral-800">
       {isLoading ? (

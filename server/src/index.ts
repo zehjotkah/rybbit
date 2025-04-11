@@ -8,6 +8,7 @@ import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
 import { createFunnel } from "./api/analytics/createFunnel.js";
 import { deleteReport } from "./api/analytics/deleteReport.js";
+import { getEvents } from "./api/analytics/getEvents.js";
 import { getFunnel } from "./api/analytics/getFunnel.js";
 import { getFunnels } from "./api/analytics/getFunnels.js";
 import { getLiveSessionLocations } from "./api/analytics/getLiveSessionLocations.js";
@@ -113,6 +114,7 @@ const ANALYTICS_ROUTES = [
   "/site-is-public/",
   "/sessions/",
   "/session/",
+  "/events/",
   "/users/",
   "/user/info/",
   "/live-session-locations/",
@@ -181,6 +183,7 @@ server.get("/user/:userId/sessions/:site", getUserSessions);
 server.get("/user/info/:userId/:site", getUserInfo);
 server.get("/live-session-locations/:site", getLiveSessionLocations);
 server.get("/funnels/:site", getFunnels);
+server.get("/events/:site", getEvents);
 server.post("/funnel/:site", getFunnel);
 server.post("/funnel/create/:site", createFunnel);
 server.delete("/report/:reportId", deleteReport);

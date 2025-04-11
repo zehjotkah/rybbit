@@ -89,13 +89,12 @@ export const World = ({ width }: { width: number }) => {
         ref={globeEl as any}
         width={width ?? 0}
         height={(size.height ?? 0) - 50}
-        globeOffset={[0, -36]}
+        globeOffset={[-100, 0]}
         atmosphereColor="rgba(170, 170, 200, 1)"
         globeMaterial={oceanBlueMaterial}
         hexPolygonsData={countries.features}
         hexPolygonResolution={3}
         hexPolygonMargin={0.2}
-        // hexBinMargin={0.2}
         hexBinResolution={3}
         hexBinPointsData={liveSessionLocationsData}
         hexBinMerge={true}
@@ -104,9 +103,6 @@ export const World = ({ width }: { width: number }) => {
         hexPolygonColor={(e: any) => {
           return randomShader(e.properties.ISO_A2);
         }}
-        // hexPolygonColor={(e) => {
-        //   return `rgba(100, 100, 100, ${Math.random() / 3 + 0.5})`;
-        // }}
         hexTopColor={(d) => weightColor(d.sumWeight)}
         hexSideColor={(d) => weightColor(d.sumWeight)}
         // @ts-ignore
