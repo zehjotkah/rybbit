@@ -2,7 +2,10 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { reports } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import {
+  getUserHasAccessToSite,
+  getUserHasAccessToSitePublic,
+} from "../../lib/auth-utils.js";
 
 export async function deleteReport(
   request: FastifyRequest<{

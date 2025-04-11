@@ -6,7 +6,7 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { FilterParameter } from "./types.js";
 
 interface GenericRequest {
@@ -152,7 +152,7 @@ export async function getSingleCol(
   const { parameter } = req.query;
   const site = req.params.site;
 
-  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
+  const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
   }

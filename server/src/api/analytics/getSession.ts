@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { processResults } from "./utils.js";
 
 export interface SessionDetails {
@@ -56,7 +56,7 @@ export async function getSession(
 ) {
   const { sessionId, site } = req.params;
 
-  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
+  const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
   }

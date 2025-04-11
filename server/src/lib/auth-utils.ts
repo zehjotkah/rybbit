@@ -61,13 +61,22 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest) {
   }
 }
 
-export async function getUserHasAccessToSite(
+// for routes that are potentially public
+export async function getUserHasAccessToSitePublic(
   req: FastifyRequest,
-  siteId: string
+  siteId: string | number
 ) {
   const [sites, isPublic] = await Promise.all([
     getSitesUserHasAccessTo(req),
     isSitePublic(siteId),
   ]);
   return sites.some((site) => site.siteId === Number(siteId)) || isPublic;
+}
+
+export async function getUserHasAccessToSite(
+  req: FastifyRequest,
+  siteId: string | number
+) {
+  const sites = await getSitesUserHasAccessTo(req);
+  return sites.some((site) => site.siteId === Number(siteId));
 }

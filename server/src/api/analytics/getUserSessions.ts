@@ -5,7 +5,7 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 
 // Individual pageview type
 type Pageview = {
@@ -60,7 +60,7 @@ export async function getUserSessions(
   const { startDate, endDate, timezone, site, filters } = req.query;
   const userId = req.params.userId;
 
-  const userHasAccessToSite = await getUserHasAccessToSite(req, site);
+  const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
   }

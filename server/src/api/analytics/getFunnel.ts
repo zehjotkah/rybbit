@@ -6,7 +6,7 @@ import {
   processResults,
   getFilterStatement,
 } from "./utils.js";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 
 type FunnelStep = {
   value: string;
@@ -56,7 +56,7 @@ export async function getFunnel(
   }
 
   // Check user access to site
-  const userHasAccessToSite = await getUserHasAccessToSite(request, site);
+  const userHasAccessToSite = await getUserHasAccessToSitePublic(request, site);
   if (!userHasAccessToSite) {
     return reply.status(403).send({ error: "Forbidden" });
   }

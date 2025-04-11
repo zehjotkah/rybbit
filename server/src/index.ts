@@ -25,13 +25,13 @@ import { addSite } from "./api/sites/addSite.js";
 import { changeSiteDomain } from "./api/sites/changeSiteDomain.js";
 import { changeSitePublic } from "./api/sites/changeSitePublic.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
+import { getSite } from "./api/sites/getSite.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSites } from "./api/sites/getSites.js";
 import { createAccount } from "./api/user/createAccount.js";
 import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { getUserSubscription } from "./api/user/getUserSubscription.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
-import { listUsers } from "./api/user/listUsers.js";
 import { initializeCronJobs } from "./cron/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initializePostgres } from "./db/postgres/postgres.js";
@@ -41,7 +41,6 @@ import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic } from "./utils.js";
-import { getSite } from "./api/sites/getSite.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -114,6 +113,8 @@ const ANALYTICS_ROUTES = [
   "/users/",
   "/user/info/",
   "/live-session-locations/",
+  "/funnels/",
+  "/funnel/",
 
   "/get-site",
 ];
@@ -187,7 +188,6 @@ server.post("/change-site-public", changeSitePublic);
 server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/get-site/:id", getSite);
-server.get("/list-users", listUsers);
 server.post("/create-account", createAccount);
 server.get(
   "/list-organization-members/:organizationId",

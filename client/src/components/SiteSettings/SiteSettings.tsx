@@ -52,12 +52,8 @@ export function SiteSettings({
 }) {
   const { data: siteMetadata, isLoading, error } = useGetSite(siteId);
 
-  if (isLoading) {
-    return <div className="loading-spinner">Loading...</div>;
-  }
-
-  if (error || !siteMetadata) {
-    return <div>Error loading site settings</div>;
+  if (isLoading || !siteMetadata || error) {
+    return null;
   }
 
   return <SiteSettingsInner siteMetadata={siteMetadata} trigger={trigger} />;
