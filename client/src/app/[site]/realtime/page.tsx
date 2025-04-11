@@ -9,13 +9,12 @@ import { RealtimeChart } from "./RealtimeChart/RealtimeChart";
 import { World } from "./RealtimeGlobe/RealtimeGlobe";
 
 export default function RealtimePage() {
-  const [ref, { width, height }] = useMeasure();
+  const [ref, { width }] = useMeasure();
 
   return (
     <div className="flex flex-col gap-4" ref={ref}>
       <World width={width ?? 0} />
       <RealtimeChart />
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Pages isRealtime />
         <Events isRealtime />

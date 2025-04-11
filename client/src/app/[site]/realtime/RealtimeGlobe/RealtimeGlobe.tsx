@@ -11,9 +11,12 @@ import {
   interpolatePuBu,
   interpolateOranges,
 } from "d3-scale-chromatic";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export const World = memo(({ width }: { width: number }) => {
   const globeEl = useRef<any>(null);
+
+  const size = useWindowSize();
 
   const {
     data: liveSessionLocations,
@@ -81,7 +84,7 @@ export const World = memo(({ width }: { width: number }) => {
         }}
         ref={globeEl as any}
         width={width ?? 0}
-        height={width ?? 0}
+        height={size.height ?? 0 - 36}
         atmosphereColor="rgba(170, 170, 200, 1)"
         globeMaterial={oceanBlueMaterial}
         hexPolygonsData={countries.features}

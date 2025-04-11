@@ -42,7 +42,7 @@ export function SubHeader({
   const { time, setTime } = useStore();
 
   return (
-    <div className="flex gap-2 mb-3 mt-1 justify-between">
+    <div className="flex gap-2 mb-3 justify-between">
       <Filters availableFilters={availableFilters} />
       <div className="flex items-center gap-2">
         <DateSelector time={time} setTime={setTime} />
