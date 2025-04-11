@@ -7,6 +7,9 @@ export async function getLiveSessionLocations(
     Params: {
       site: string;
     };
+    Querystring: {
+      time: number;
+    };
   }>,
   res: FastifyReply
 ) {
@@ -24,7 +27,7 @@ WITH stuff AS (
         pageviews
     WHERE
         site_id = {site:Int32}
-        AND timestamp > now() - interval '30 minute'
+        AND timestamp > now() - interval '{time:Int32} minute'
     GROUP BY
         session_id
 )
@@ -41,6 +44,7 @@ GROUP BY
     city`,
     query_params: {
       site,
+      time: req.query.time,
     },
     format: "JSONEachRow",
   });
