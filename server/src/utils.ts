@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { db } from "./db/postgres/postgres.js";
 import { sites } from "./db/postgres/schema.js";
 import { eq } from "drizzle-orm";
+import { publicSites } from "./lib/publicSites.js";
 
 export function getUserId(ip: string, userAgent: string) {
   return crypto
@@ -171,13 +172,11 @@ export const getIpAddress = (request: FastifyRequest): string => {
 // Check if a site is public
 export const isSitePublic = async (siteId: string | number) => {
   try {
-    const site = await db.query.sites.findFirst({
-      where: eq(sites.siteId, Number(siteId)),
-      columns: {
-        public: true,
-      },
-    });
-    return site?.public || false;
+    // Ensure the publicSites cache is initialized
+    await publicSites.ensureInitialized();
+
+    // Use the cached value
+    return publicSites.isSitePublic(siteId);
   } catch (err) {
     console.error("Error checking if site is public:", err);
     return false;

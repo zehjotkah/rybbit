@@ -3,6 +3,7 @@ import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { publicSites } from "../../lib/publicSites.js";
 
 interface ChangeSitePublicRequest {
   Body: {
@@ -48,6 +49,9 @@ export async function changeSitePublic(
         updatedAt: new Date(),
       })
       .where(eq(sites.siteId, siteId));
+
+    // Update the public sites cache
+    publicSites.updateSitePublicStatus(siteId, isPublic);
 
     return reply.status(200).send({ success: true });
   } catch (error) {

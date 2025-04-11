@@ -41,6 +41,7 @@ import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic } from "./utils.js";
+import { publicSites } from "./lib/publicSites.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -204,6 +205,10 @@ const start = async () => {
     // Initialize the database
     await Promise.all([initializeClickhouse(), initializePostgres()]);
     await loadAllowedDomains();
+
+    // Load public sites cache
+    await publicSites.loadPublicSites();
+
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });
 
