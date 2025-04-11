@@ -89,9 +89,9 @@ export function useSiteHasData(siteId: string) {
       if (!siteId) {
         return Promise.resolve(false);
       }
-      return authedFetch(`${BACKEND_URL}/site-has-data/${siteId}`).then((res) =>
-        res.json()
-      );
+      return authedFetch(`${BACKEND_URL}/site-has-data/${siteId}`)
+        .then((res) => res.json())
+        .then((data) => data.hasData as Boolean);
     },
     staleTime: Infinity,
   });

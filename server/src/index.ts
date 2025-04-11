@@ -42,6 +42,7 @@ import { auth } from "./lib/auth.js";
 import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic } from "./utils.js";
 import { publicSites } from "./lib/publicSites.js";
+import { getSiteIsPublic } from "./api/sites/getSiteIsPublic.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -109,6 +110,7 @@ const ANALYTICS_ROUTES = [
   "/single-col/",
   "/retention/",
   "/site-has-data/",
+  "/site-is-public/",
   "/sessions/",
   "/session/",
   "/users/",
@@ -171,6 +173,7 @@ server.get("/overview-bucketed/:site", getOverviewBucketed);
 server.get("/single-col/:site", getSingleCol);
 server.get("/retention/:site", getRetention);
 server.get("/site-has-data/:site", getSiteHasData);
+server.get("/site-is-public/:site", getSiteIsPublic);
 server.get("/sessions/:site", getSessions);
 server.get("/session/:sessionId/:site", getSession);
 server.get("/users/:site", getUsers);

@@ -22,10 +22,10 @@ const publicRoutes = ["/login", "/signup"];
 // Helper function to check if a site is public
 async function checkIfSiteIsPublic(siteId: string): Promise<boolean> {
   try {
-    const response = await fetch(`${BACKEND_URL}/site-has-data/${siteId}`);
+    const response = await fetch(`${BACKEND_URL}/site-is-public/${siteId}`);
     if (response.ok) {
       const data = await response.json();
-      return !!data.public;
+      return !!data.isPublic;
     }
   } catch (error) {
     console.error("Error checking if site is public:", error);
