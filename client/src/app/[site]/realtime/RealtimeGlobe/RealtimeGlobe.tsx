@@ -1,27 +1,31 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useWindowSize } from "@uidotdev/usehooks";
+import { scaleSequentialSqrt } from "d3-scale";
+import { interpolateYlOrRd } from "d3-scale-chromatic";
+import { memoize } from "lodash";
+import { useEffect, useMemo, useRef } from "react";
 import Globe from "react-globe.gl";
 import { MeshPhongMaterial } from "three";
 import { useGetLiveSessionLocations } from "../../../../api/analytics/useGetLiveSessionLocations";
-import { useQuery } from "@tanstack/react-query";
-import { scaleSequentialSqrt } from "d3-scale";
-import {
-  interpolateYlOrRd,
-  interpolatePuBu,
-  interpolateOranges,
-} from "d3-scale-chromatic";
-import { useWindowSize } from "@uidotdev/usehooks";
+import { useAtom } from "jotai";
+import { minutesAtom } from "../realtimeStore";
 
-export const World = memo(({ width }: { width: number }) => {
+const randomShader = memoize((e: string) => {
+  return `rgba(100, 100, 100, ${Math.random() / 2 + 0.5})`;
+});
+
+export const World = ({ width }: { width: number }) => {
   const globeEl = useRef<any>(null);
-
   const size = useWindowSize();
+
+  const [minutes] = useAtom(minutesAtom);
 
   const {
     data: liveSessionLocations,
     isLoading: isLiveSessionLocationsLoading,
-  } = useGetLiveSessionLocations(60);
+  } = useGetLiveSessionLocations(Number(minutes));
 
   const { data: countries = { features: [] } } = useQuery({
     queryKey: ["countries"],
@@ -31,14 +35,14 @@ export const World = memo(({ width }: { width: number }) => {
     },
   });
 
-  const highest = liveSessionLocations?.reduce(
-    (acc, curr) => Math.max(acc, curr.count),
-    0
-  );
+  const highest =
+    liveSessionLocations?.reduce((acc, curr) => Math.max(acc, curr.count), 0) ??
+    1;
 
+  const normalized = 5 / Number(minutes);
   const weightColor = scaleSequentialSqrt(interpolateYlOrRd).domain([
     0,
-    (highest ?? 0) * 5,
+    highest * normalized * 15,
   ]);
 
   useEffect(() => {
@@ -63,7 +67,7 @@ export const World = memo(({ width }: { width: number }) => {
     return liveSessionLocations?.map((e) => ({
       lat: e.lat,
       lng: e.lon,
-      count: e.count,
+      count: Math.max(1, e.count / highest),
     }));
   }, [liveSessionLocations]);
 
@@ -84,37 +88,43 @@ export const World = memo(({ width }: { width: number }) => {
         }}
         ref={globeEl as any}
         width={width ?? 0}
-        height={size.height ?? 0 - 36}
+        height={(size.height ?? 0) - 50}
+        globeOffset={[0, -36]}
         atmosphereColor="rgba(170, 170, 200, 1)"
         globeMaterial={oceanBlueMaterial}
         hexPolygonsData={countries.features}
         hexPolygonResolution={3}
         hexPolygonMargin={0.2}
-        hexBinMargin={0.2}
+        // hexBinMargin={0.2}
         hexBinResolution={3}
         hexBinPointsData={liveSessionLocationsData}
         hexBinMerge={true}
         hexBinPointWeight={"count"}
         backgroundColor="rgba(0, 0, 0, 0)"
-        hexPolygonColor={(e) => {
-          return `rgba(100, 100, 100, ${Math.random() / 3 + 0.5})`;
+        hexPolygonColor={(e: any) => {
+          return randomShader(e.properties.ISO_A2);
         }}
+        // hexPolygonColor={(e) => {
+        //   return `rgba(100, 100, 100, ${Math.random() / 3 + 0.5})`;
+        // }}
         hexTopColor={(d) => weightColor(d.sumWeight)}
         hexSideColor={(d) => weightColor(d.sumWeight)}
         // @ts-ignore
-        hexPolygonLabel={({ properties: d }) => (
-          <div className="text-neutral-100 bg-neutral-900 border border-neutral-700 rounded-md p-2 ">
-            <div>
-              <b>
-                {d.ADMIN} ({d.ISO_A2})
-              </b>
-            </div>
-            <div>
-              Population: <i>{d.POP_EST}</i>
-            </div>
-          </div>
-        )}
+        // hexPolygonLabel={(props: any) => {
+        //   console.info(props);
+        //   return <div>{props.properties.ADMIN}</div>;
+        //   // <div className="text-neutral-100 bg-neutral-900 border border-neutral-700 rounded-md p-2 ">
+        //   //   <div>
+        //   //     <b>
+        //   //       {d.ADMIN} ({d.ISO_A2})
+        //   //     </b>
+        //   //   </div>
+        //   //   <div>
+        //   //     Population: <i>{d.POP_EST}</i>
+        //   //   </div>
+        //   // </div>
+        // }}
       />
     </div>
   );
-});
+};

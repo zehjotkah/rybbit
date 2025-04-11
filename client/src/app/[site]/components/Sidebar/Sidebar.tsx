@@ -2,6 +2,7 @@
 import { Funnel } from "@phosphor-icons/react/dist/ssr";
 import {
   ChartBarDecreasing,
+  Globe,
   LayoutDashboard,
   LayoutGrid,
   Radio,
@@ -66,7 +67,7 @@ export function Sidebar() {
           label="Realtime"
           active={isActiveTab("realtime")}
           href={getTabPath("realtime")}
-          icon={<Radio className="w-4 h-4" />}
+          icon={<Globe className="w-4 h-4" />}
         />
         <SidebarLink
           label="Retention"
