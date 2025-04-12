@@ -28,7 +28,7 @@ function MainPageContent() {
   }
 
   return (
-    <div className="p-4 max-w-[1300px] mx-auto space-y-3">
+    <div className="p-4 max-w-[1100px] mx-auto space-y-3">
       <SubHeader />
       <MainSection />
       <div className="grid grid-cols-2 gap-4 mt-4">

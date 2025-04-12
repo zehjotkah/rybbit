@@ -73,6 +73,7 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
               title="Countries"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
+              getFilterLabel={(e) => getCountryName(e.value)}
               getLabel={(e) => {
                 return (
                   <div className="flex gap-2 items-center">
@@ -89,6 +90,12 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
               title="Regions"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
+              getFilterLabel={(e) => {
+                const region = subdivisions?.features.find(
+                  (feature) => feature.properties.iso_3166_2 === e.value
+                )?.properties;
+                return region?.name ?? "";
+              }}
               getLabel={(e) => {
                 if (!e.value) {
                   return "Unknown";
@@ -131,6 +138,7 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
               title="Languages"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
+              getFilterLabel={(e) => getLanguageName(e.value) ?? ""}
               getLabel={(e) => (
                 <div className="flex gap-2 items-center">
                   {getCountryFromLanguage(e.value) ? (

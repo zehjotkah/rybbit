@@ -13,6 +13,7 @@ export function StandardSection({
   getKey,
   getLabel,
   getValue,
+  getFilterLabel,
   getLink,
   countLabel,
   filterParameter,
@@ -22,6 +23,7 @@ export function StandardSection({
   getKey: (item: SingleColResponse) => string;
   getLabel: (item: SingleColResponse) => ReactNode;
   getValue: (item: SingleColResponse) => string;
+  getFilterLabel?: (item: SingleColResponse) => string;
   getLink?: (item: SingleColResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
@@ -56,6 +58,7 @@ export function StandardSection({
       getKey={getKey}
       getLabel={getLabel}
       getValue={getValue}
+      getFilterLabel={getFilterLabel}
       getLink={getLink}
       countLabel={countLabel}
       filterParameter={filterParameter}
