@@ -65,6 +65,7 @@ export async function getEvents(
         WHERE
           site_id = {siteId:Int32}
           AND (type = 'custom_event' OR type = 'pageview')
+          AND timestamp > now() - INTERVAL 30 MINUTE
         ORDER BY timestamp DESC
         LIMIT {limit:Int32}
       `,

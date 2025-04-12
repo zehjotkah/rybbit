@@ -11,4 +11,4 @@ export type MinutesType =
   | "720"
   | "1440";
 
-export const minutesAtom = atom<MinutesType>("5");
+export const minutesAtom = atom<MinutesType>("30");

@@ -47,86 +47,91 @@ function EventCard({ event }: { event: Event }) {
   }`;
 
   return (
-    <div className="mb-3 rounded-lg bg-neutral-850/50 border border-neutral-800 overflow-hidden p-3 flex flex-col filter backdrop-blur-sm">
-      <div className="flex items-center gap-2 text-sm text-neutral-100 mb-2">
-        <div className="flex items-center gap-2">
-          {isPageview ? (
-            <FileText className="w-4 h-4 text-blue-500" />
+    <Link
+      href={`user/${event.user_id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div className="mb-3 rounded-lg bg-neutral-850/50 border border-neutral-800 overflow-hidden p-3 flex flex-col filter backdrop-blur-sm hover:bg-neutral-800/70 transition-all duration-200">
+        <div className="flex items-center gap-2 text-sm text-neutral-100 mb-2">
+          <div className="flex items-center gap-2">
+            {isPageview ? (
+              <FileText className="w-4 h-4 text-blue-500" />
+            ) : (
+              <MousePointerClick className="w-4 h-4 text-amber-500" />
+            )}
+          </div>
+
+          {event.type === "pageview" ? (
+            <div>
+              <Link href={fullPath} target="_blank" rel="noopener noreferrer">
+                <div
+                  className="text-sm truncate hover:underline "
+                  title={event.pathname}
+                  style={{
+                    maxWidth: "calc(min(100vw, 1150px) - 250px)",
+                  }}
+                >
+                  {truncatePath(
+                    `${event.pathname}${
+                      event.querystring ? `${event.querystring}` : ""
+                    }`
+                  )}
+                </div>
+              </Link>
+            </div>
           ) : (
-            <MousePointerClick className="w-4 h-4 text-amber-500" />
+            <div>{event.event_name}</div>
           )}
         </div>
-
-        {event.type === "pageview" ? (
-          <div>
-            <Link href={fullPath} target="_blank" rel="noopener noreferrer">
-              <div
-                className="text-sm truncate hover:underline "
-                title={event.pathname}
-                style={{
-                  maxWidth: "calc(min(100vw, 1150px) - 250px)",
-                }}
-              >
-                {truncatePath(
-                  `${event.pathname}${
-                    event.querystring ? `${event.querystring}` : ""
-                  }`
-                )}
-              </div>
-            </Link>
-          </div>
-        ) : (
-          <div>{event.event_name}</div>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="flex space-x-2 items-center ml-6">
-          {event.country && (
+        <div className="flex items-center gap-2">
+          <div className="flex space-x-2 items-center ml-6">
+            {event.country && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center">
+                    <CountryFlag country={event.country} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{getCountryName(event.country)}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center">
-                  <CountryFlag country={event.country} />
+                <div>
+                  <Browser browser={event.browser || "Unknown"} />
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{getCountryName(event.country)}</p>
+                <p>{event.browser || "Unknown browser"}</p>
               </TooltipContent>
             </Tooltip>
-          )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Browser browser={event.browser || "Unknown"} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{event.browser || "Unknown browser"}</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <OperatingSystem os={event.operating_system || ""} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{event.operating_system || "Unknown OS"}</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <DeviceIcon deviceType={event.device_type || ""} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{event.device_type || "Unknown device"}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <OperatingSystem os={event.operating_system || ""} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{event.operating_system || "Unknown OS"}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <DeviceIcon deviceType={event.device_type || ""} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{event.device_type || "Unknown device"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
 
-        {/* Path with tooltip for long paths */}
-        {/* <div className="flex items-center ml-3 flex-1 min-w-0">
+          {/* Path with tooltip for long paths */}
+          {/* <div className="flex items-center ml-3 flex-1 min-w-0">
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
@@ -147,12 +152,13 @@ function EventCard({ event }: { event: Event }) {
             </Tooltip>
           </div> */}
 
-        {/* Time information */}
-        <div className="flex items-center text-xs text-gray-300">
-          <span className="text-gray-400">{eventTime.toRelative()}</span>
+          {/* Time information */}
+          <div className="flex items-center text-xs text-gray-300">
+            <span className="text-gray-400">{eventTime.toRelative()}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -186,49 +192,46 @@ export function RealtimeEvents() {
 function EventCardSkeleton() {
   // Function to get a random width class for skeletons
   const getRandomWidth = () => {
-    const widths = ["w-16", "w-20", "w-24", "w-28", "w-32"];
+    const widths = ["w-16", "w-20", "w-24", "w-28", "w-32", "w-36", "w-40"];
     return widths[Math.floor(Math.random() * widths.length)];
   };
 
   // Create multiple skeletons for a realistic loading state
   const skeletons = Array.from({ length: 5 }).map((_, index) => (
     <div
-      className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden"
+      className="mb-3 rounded-lg bg-neutral-850/50 border border-neutral-800 overflow-hidden p-3 flex flex-col filter backdrop-blur-sm"
       key={index}
     >
-      <div className="p-3">
+      {/* Title row */}
+      <div className="flex items-center gap-2 text-sm text-neutral-100 mb-2">
         <div className="flex items-center gap-2">
-          {/* Event badge and User ID */}
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-6 w-20 rounded-md" />
-            <Skeleton className="h-3 w-14" />
-          </div>
+          <Skeleton className="h-4 w-4 rounded-sm" />
+        </div>
+        <Skeleton className={`h-4 ${getRandomWidth()}`} />
+      </div>
 
-          {/* Icons */}
-          <div className="flex space-x-2 items-center ml-3">
-            <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-4 rounded-sm" />
-          </div>
+      {/* Details row */}
+      <div className="flex items-center gap-2">
+        <div className="flex space-x-2 items-center ml-6">
+          <Skeleton className="h-4 w-4 rounded-sm" />
+          <Skeleton className="h-4 w-4 rounded-sm" />
+          <Skeleton className="h-4 w-4 rounded-sm" />
+          <Skeleton className="h-4 w-4 rounded-sm" />
+        </div>
 
-          {/* Path with randomized width */}
-          <div className="flex items-center ml-3 flex-1 min-w-0">
-            <Skeleton className={`h-3 max-w-[200px] ${getRandomWidth()}`} />
-          </div>
-
-          {/* Time */}
-          <div className="flex items-center ml-3">
-            <Skeleton className="h-3 w-24" />
-          </div>
+        {/* Time */}
+        <div className="flex items-center text-xs">
+          <Skeleton className="h-3 w-16" />
         </div>
       </div>
     </div>
   ));
 
   return (
-    <div className="max-h-[400px] overflow-y-auto p-2">
-      <div className="mb-2 text-sm font-medium">Recent Events</div>
+    <div
+      className="overflow-y-auto p-2"
+      style={{ height: "calc(100vh - 50px)" }}
+    >
       {skeletons}
     </div>
   );

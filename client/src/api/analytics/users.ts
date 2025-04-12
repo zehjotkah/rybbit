@@ -76,6 +76,6 @@ export function useGetUsers(options: GetUsersOptions) {
     // Enable refetching when the window regains focus
     refetchOnWindowFocus: true,
     // Add a background refetch interval (every 30 seconds)
-    refetchInterval: 30000,
+    // refetchInterval: 30000,
   });
 }
