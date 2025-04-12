@@ -16,18 +16,18 @@ import { OperatingSystem } from "../../../components/shared/icons/OperatingSyste
 type Tab = "devices" | "browsers" | "os" | "dimensions";
 
 export function Devices() {
-  const [tab, setTab] = useState<Tab>("devices");
+  const [tab, setTab] = useState<Tab>("browsers");
   return (
     <Card className="h-[445px]">
       <CardContent className="mt-2">
         <Tabs
-          defaultValue="devices"
+          defaultValue="browsers"
           value={tab}
           onValueChange={(value) => setTab(value as Tab)}
         >
           <TabsList>
-            <TabsTrigger value="devices">Devices</TabsTrigger>
             <TabsTrigger value="browsers">Browsers</TabsTrigger>
+            <TabsTrigger value="devices">Devices</TabsTrigger>
             <TabsTrigger value="os">Operating Systems</TabsTrigger>
             <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
           </TabsList>

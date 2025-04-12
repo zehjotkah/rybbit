@@ -46,7 +46,10 @@ export function FilterComponent({
         <SelectContent>
           {FilterOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
-              {option.label}
+              <div className="flex items-center gap-2">
+                {option.icon}
+                {option.label}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
