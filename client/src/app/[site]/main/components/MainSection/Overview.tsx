@@ -7,6 +7,8 @@ import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
 import { StatType, useStore } from "../../../../../lib/store";
 import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
 import { SparklinesChart } from "./SparklinesChart";
+import { TrendingDown } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 const ChangePercentage = ({
   current,
@@ -30,10 +32,17 @@ const ChangePercentage = ({
 
   return (
     <div
-      className={cn("text-sm", change > 0 ? "text-green-400" : "text-red-400")}
+      className={cn(
+        "text-sm flex items-center gap-1",
+        change > 0 ? "text-green-400" : "text-red-400"
+      )}
     >
-      {change > 0 ? "+" : ""}
-      {change.toFixed(0)}%
+      {change > 0 ? (
+        <TrendingUp className="w-4 h-4" />
+      ) : (
+        <TrendingDown className="w-4 h-4" />
+      )}
+      {Math.abs(change).toFixed(1)}%
     </div>
   );
 };
@@ -70,14 +79,13 @@ const Stat = ({
     <div
       className={cn(
         "flex flex-col hover:bg-neutral-800 cursor-pointer border-r border-neutral-800 last:border-r-0 text-nowrap",
-        isFetching && "opacity-50",
         selectedStat === id && "bg-neutral-850"
       )}
       onClick={() => setSelectedStat(id)}
     >
       <div className={cn("flex flex-col px-3 py-2")}>
         <div className="text-sm font-medium text-muted-foreground">{title}</div>
-        <div className="text-2xl font-medium flex gap-2 items-center">
+        <div className="text-2xl font-medium flex gap-2 items-center justify-between">
           {isLoading ? (
             <>
               <Skeleton className="w-[60px] h-7 rounded-md" />

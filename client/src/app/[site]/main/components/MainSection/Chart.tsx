@@ -85,6 +85,8 @@ const formatTooltipValue = (value: number, selectedStat: StatType) => {
   return value.toLocaleString();
 };
 
+const Y_TICK_VALUES = 5;
+
 export function Chart({
   data,
   previousData,
@@ -151,7 +153,7 @@ export function Chart({
       }}
       enableGridX={false}
       enableGridY={true}
-      gridYValues={4}
+      gridYValues={Y_TICK_VALUES}
       yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}
@@ -179,7 +181,7 @@ export function Chart({
         tickPadding: 10,
         tickRotation: 0,
         truncateTickAt: 0,
-        tickValues: 4,
+        tickValues: Y_TICK_VALUES,
         format: formatter.format,
       }}
       enableTouchCrosshair={true}

@@ -8,6 +8,15 @@ import { useStore } from "../../../../../lib/store";
 import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
 import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
 
+const SELECTED_STAT_MAP = {
+  pageviews: "Pageviews",
+  sessions: "Sessions",
+  pages_per_session: "Pages per Session",
+  bounce_rate: "Bounce Rate",
+  session_duration: "Session Duration",
+  users: "Users",
+};
+
 export function MainSection() {
   const { selectedStat, time, site } = useStore();
 
@@ -38,7 +47,14 @@ export function MainSection() {
       </Card>
       <Card>
         {(isFetching || isPreviousFetching) && <CardLoader />}
-        <CardContent className="pt-4 w-full">
+        <CardContent className="pt-3 w-full">
+          <div className="flex items-center justify-between ">
+            <span className="w-24" />
+            <span className="text-sm text-neutral-200">
+              {SELECTED_STAT_MAP[selectedStat]}
+            </span>
+            <BucketSelection />
+          </div>
           <div className="h-[290px] relative">
             <div className="absolute top-0 left-0 w-full h-full">
               <PreviousChart
@@ -54,9 +70,6 @@ export function MainSection() {
                   time.mode === "all-time" ? undefined : previousData
                 }
               />
-            </div>
-            <div className="absolute top-0 right-[14px]">
-              <BucketSelection />
             </div>
           </div>
         </CardContent>
