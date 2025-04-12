@@ -150,7 +150,8 @@ export function Chart({
         max: Math.max(max, 1),
       }}
       enableGridX={false}
-      enableGridY={false}
+      enableGridY={true}
+      gridYValues={4}
       yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}

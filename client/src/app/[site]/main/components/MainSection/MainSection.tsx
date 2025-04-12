@@ -32,7 +32,7 @@ export function MainSection() {
     <>
       <Card>
         {(isOverviewFetching || isOverviewFetchingPrevious) && <CardLoader />}
-        <CardContent className="pt-4 w-full">
+        <CardContent className="p-0 w-full">
           <Overview />
         </CardContent>
       </Card>

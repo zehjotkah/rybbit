@@ -1,12 +1,12 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, formatSecondsAsMinutesAndSeconds, formatter } from "@/lib/utils";
-import { StatType, useStore } from "../../../../../lib/store";
-import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
+import { cn, formatSecondsAsMinutesAndSeconds } from "@/lib/utils";
 import NumberFlow from "@number-flow/react";
-import { round } from "lodash";
+import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
+import { StatType, useStore } from "../../../../../lib/store";
+import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
+import { SparklinesChart } from "./SparklinesChart";
 
 const ChangePercentage = ({
   current,
@@ -57,41 +57,55 @@ const Stat = ({
   decimals?: number;
   postfix?: string;
 }) => {
-  const { selectedStat, setSelectedStat } = useStore();
+  const { selectedStat, setSelectedStat, site } = useStore();
+
+  const { data, isFetching, error } = useGetOverviewBucketed({ site });
+
+  const sparklinesData = data?.data.map((d) => ({
+    value: d[id],
+    time: d.time,
+  }));
+
   return (
     <div
       className={cn(
-        "flex flex-col hover:bg-neutral-800 rounded-md px-3 py-2 cursor-pointer",
+        "flex flex-col hover:bg-neutral-800 cursor-pointer border-r border-neutral-800 last:border-r-0 text-nowrap",
+        isFetching && "opacity-50",
         selectedStat === id && "bg-neutral-850"
       )}
       onClick={() => setSelectedStat(id)}
     >
-      <div className="text-sm font-medium text-muted-foreground">{title}</div>
-      <div className="text-2xl font-medium flex gap-2 items-center">
-        {isLoading ? (
-          <>
-            <Skeleton className="w-[60px] h-7 rounded-md" />
-            <Skeleton className="w-[30px] h-5 rounded-md" />
-          </>
-        ) : (
-          <>
-            {valueFormatter ? (
-              valueFormatter(value)
-            ) : (
-              <span>
-                {
-                  <NumberFlow
-                    respectMotionPreference={false}
-                    value={decimals ? Number(value.toFixed(decimals)) : value}
-                    format={{ notation: "compact" }}
-                  />
-                }
-                {postfix && <span>{postfix}</span>}
-              </span>
-            )}
-            <ChangePercentage current={value} previous={previous} />
-          </>
-        )}
+      <div className={cn("flex flex-col px-3 py-2")}>
+        <div className="text-sm font-medium text-muted-foreground">{title}</div>
+        <div className="text-2xl font-medium flex gap-2 items-center">
+          {isLoading ? (
+            <>
+              <Skeleton className="w-[60px] h-7 rounded-md" />
+              <Skeleton className="w-[30px] h-5 rounded-md" />
+            </>
+          ) : (
+            <>
+              {valueFormatter ? (
+                valueFormatter(value)
+              ) : (
+                <span>
+                  {
+                    <NumberFlow
+                      respectMotionPreference={false}
+                      value={decimals ? Number(value.toFixed(decimals)) : value}
+                      format={{ notation: "compact" }}
+                    />
+                  }
+                  {postfix && <span>{postfix}</span>}
+                </span>
+              )}
+              <ChangePercentage current={value} previous={previous} />
+            </>
+          )}
+        </div>
+      </div>
+      <div className="h-[40px] mt-[-16]">
+        <SparklinesChart data={sparklinesData} />
       </div>
     </div>
   );
