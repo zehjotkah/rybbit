@@ -28,10 +28,10 @@ export default function RealtimePage() {
   const { data } = useGetLiveUsercount(Number(minutes));
 
   return (
-    <div style={{ position: "relative", overflow: "hidden" }} ref={ref}>
+    <div className="relative overflow-hidden" ref={ref}>
       <World width={width ?? 0} />
 
-      <div className="absolute top-4 left-4 flex items-center w-full">
+      <div className="absolute top-4 left-4 w-full h-full">
         <div className="flex flex-col p-3 bg-neutral-900 rounded-lg shadow-lg border border-neutral-750 w-[400px]">
           <div className="p-2">
             <div className="text-sm text-gray-400 flex gap-2 text-nowrap items-center">
