@@ -29,29 +29,38 @@ export function MainSection() {
   );
 
   return (
-    <Card>
-      {(isFetching ||
-        isPreviousFetching ||
-        isOverviewFetching ||
-        isOverviewFetchingPrevious) && <CardLoader />}
-      <CardContent className="pt-4 w-full">
-        <div className="flex justify-between items-center">
-          <Overview />
-          <BucketSelection />
-        </div>
-        <div className="h-[310px] relative">
-          <div className="absolute top-0 left-0 w-full h-full">
-            <PreviousChart data={previousData} max={maxOfDataAndPreviousData} />
+    <>
+      <Card>
+        {(isOverviewFetching || isOverviewFetchingPrevious) && <CardLoader />}
+        <CardContent className="pt-4 w-full">
+          <div className="flex justify-between items-center">
+            <Overview />
+            <BucketSelection />
           </div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <Chart
-              data={data}
-              max={maxOfDataAndPreviousData}
-              previousData={time.mode === "all-time" ? undefined : previousData}
-            />
+        </CardContent>
+      </Card>
+      <Card>
+        {(isFetching || isPreviousFetching) && <CardLoader />}
+        <CardContent className="pt-4 w-full">
+          <div className="h-[310px] relative">
+            <div className="absolute top-0 left-0 w-full h-full">
+              <PreviousChart
+                data={previousData}
+                max={maxOfDataAndPreviousData}
+              />
+            </div>
+            <div className="absolute top-0 left-0 w-full h-full">
+              <Chart
+                data={data}
+                max={maxOfDataAndPreviousData}
+                previousData={
+                  time.mode === "all-time" ? undefined : previousData
+                }
+              />
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 }

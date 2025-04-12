@@ -19,7 +19,7 @@ export function TopBar() {
   const queryClient = useQueryClient();
 
   return (
-    <div className="flex py-1 px-3 items-center w-full  bg-neutral-900 justify-center">
+    <div className="flex py-1 px-3 items-center w-full  bg-neutral-950 justify-center border-b border-neutral-750">
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-4">
           <Link href="/" className="font-semibold text-base">

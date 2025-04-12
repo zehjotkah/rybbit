@@ -51,7 +51,7 @@ export function BaseStandardSectionDialog({
         ? (labelFnToUse(item) as string)
         : labelFnToUse(item);
 
-    return label.toLowerCase().includes(searchTerm.toLowerCase());
+    return String(label).toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   return (

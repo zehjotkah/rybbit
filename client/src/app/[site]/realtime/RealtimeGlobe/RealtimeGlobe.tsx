@@ -13,7 +13,7 @@ import { useAtom } from "jotai";
 import { minutesAtom } from "../realtimeStore";
 
 const randomShader = memoize((e: string) => {
-  return `rgba(100, 100, 100, ${Math.random() / 2 + 0.5})`;
+  return `rgba(120, 140, 110, ${Math.random() / 2 + 0.5})`;
 });
 
 export const World = ({ width }: { width: number }) => {

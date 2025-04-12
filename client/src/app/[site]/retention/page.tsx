@@ -1,18 +1,20 @@
 "use client";
 
-import {
-  useGetRetention,
-  RetentionMode,
-} from "../../../api/analytics/useGetRetention";
+import { HelpCircle } from "lucide-react";
 import { DateTime } from "luxon"; // Import Luxon for date formatting
 import { Fragment, useMemo, useState } from "react";
+import {
+  RetentionMode,
+  useGetRetention,
+} from "../../../api/analytics/useGetRetention";
+import { ThreeDotLoader } from "../../../components/Loaders";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Label } from "../../../components/ui/label";
 import {
   Select,
   SelectContent,
@@ -20,17 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import { Label } from "../../../components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
-import { Skeleton } from "../../../components/ui/skeleton";
 import { RetentionChart } from "./RetentionChart";
-import { ThreeDotLoader } from "../../../components/Loaders";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
@@ -42,10 +41,6 @@ const RANGE_OPTIONS = [
   { value: "180", label: "6 months" },
   { value: "365", label: "1 year" },
 ];
-
-// Default number of periods and cohorts for skeleton
-const DEFAULT_SKELETON_PERIODS = 6;
-const DEFAULT_SKELETON_COHORTS = 8;
 
 // Dynamic color function that creates a smooth gradient based on retention percentage
 const getRetentionColor = (
@@ -89,7 +84,7 @@ export default function RetentionPage() {
   // State for the retention mode (day or week)
   const [mode, setMode] = useState<RetentionMode>("week");
   // State for the data time range (days)
-  const [timeRange, setTimeRange] = useState<number>(90);
+  const [timeRange, setTimeRange] = useState<number>(30);
 
   // Use the updated hook without the limit parameter
   const { data, isLoading, isError } = useGetRetention(mode, timeRange);
