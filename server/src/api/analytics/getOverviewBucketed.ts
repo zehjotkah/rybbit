@@ -85,46 +85,65 @@ const getQuery = ({
 
   const query = `
 SELECT
-    session_stats.time AS time,
-    session_stats.sessions,
-    session_stats.pages_per_session,
-    session_stats.bounce_rate * 100 AS bounce_rate,
-    session_stats.session_duration,
-    page_stats.pageviews,
-    page_stats.users
-FROM 
+    time,
+    pageviews,
+    users,
+    sessions,
+    IF(sessions > 0, pageviews / sessions, 0) AS pages_per_session,
+    IF(sessions > 0, bounce_count / sessions * 100, 0) AS bounce_rate,
+    IF(sessions > 0, total_duration / sessions, 0) AS session_duration
+FROM
 (
     SELECT
-         toDateTime(${
-           TimeBucketToFn[bucket]
-         }(toTimeZone(start_time, '${timezone}'))) AS time,
-        COUNT() AS sessions,
-        AVG(pages_in_session) AS pages_per_session,
-        sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
-        AVG(end_time - start_time) AS session_duration
+        bucketed_time AS time,
+        COUNT(*) AS pageviews,
+        COUNT(DISTINCT user_id) AS users,
+        COUNT(DISTINCT session_id) AS sessions,
+        SUM(is_bounce) AS bounce_count,
+        SUM(duration) AS total_duration
     FROM
     (
-        /* One row per session */
         SELECT
+            user_id,
             session_id,
-            MIN(timestamp) AS start_time,
-            MAX(timestamp) AS end_time,
-            COUNT(*) AS pages_in_session
-        FROM pageviews
-        WHERE 
-            site_id = ${site}
-            ${filterStatement}
-            ${getTimeStatement(
-              pastMinutes
-                ? { pastMinutes }
-                : {
-                    date: { startDate, endDate, timezone },
-                  }
-            )}
-            AND type = 'pageview'
-        GROUP BY session_id
+            toDateTime(${
+              TimeBucketToFn[bucket]
+            }(toTimeZone(timestamp, '${timezone}'))) AS bucketed_time,
+            multiIf(
+                session_pageviews = 1, 1,
+                0
+            ) AS is_bounce,
+            if(
+                is_session_start,
+                session_duration,
+                0
+            ) AS duration
+        FROM
+        (
+            SELECT
+                p.user_id,
+                p.session_id,
+                p.timestamp,
+                p.type,
+                COUNT(*) OVER (PARTITION BY p.session_id) AS session_pageviews,
+                min(p.timestamp) OVER (PARTITION BY p.session_id) = p.timestamp AS is_session_start,
+                max(p.timestamp) OVER (PARTITION BY p.session_id) - min(p.timestamp) OVER (PARTITION BY p.session_id) AS session_duration
+            FROM pageviews p
+            WHERE
+                p.site_id = ${site}
+                ${filterStatement}
+                ${getTimeStatement(
+                  pastMinutes
+                    ? { pastMinutes }
+                    : {
+                        date: { startDate, endDate, timezone },
+                      }
+                )}
+                AND p.type = 'pageview'
+        )
     )
-    GROUP BY time ORDER BY time ${
+    GROUP BY time
+    ORDER BY time ${
       isAllTime
         ? ""
         : getTimeStatementFill(
@@ -134,39 +153,7 @@ FROM
             bucket
           )
     }
-) AS session_stats
-FULL JOIN
-(
-    SELECT
-         toDateTime(${
-           TimeBucketToFn[bucket]
-         }(toTimeZone(timestamp, '${timezone}'))) AS time,
-        COUNT(*) AS pageviews,
-        COUNT(DISTINCT user_id) AS users
-    FROM pageviews
-    WHERE
-        site_id = ${site}
-        ${filterStatement}
-        ${getTimeStatement(
-          pastMinutes
-            ? { pastMinutes }
-            : {
-                date: { startDate, endDate, timezone },
-              }
-        )}
-        AND type = 'pageview'
-    GROUP BY time ORDER BY time ${
-      isAllTime
-        ? ""
-        : getTimeStatementFill(
-            pastMinutes
-              ? { pastMinutes }
-              : { date: { startDate, endDate, timezone } },
-            bucket
-          )
-    }
-) AS page_stats
-USING time
+)
 ORDER BY time`;
 
   return query;

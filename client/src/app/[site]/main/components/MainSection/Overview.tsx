@@ -83,7 +83,7 @@ const Stat = ({
                   <NumberFlow
                     respectMotionPreference={false}
                     value={decimals ? Number(value.toFixed(decimals)) : value}
-                    // format={{ notation: "compact" }}
+                    format={{ notation: "compact" }}
                   />
                 }
                 {postfix && <span>{postfix}</span>}
