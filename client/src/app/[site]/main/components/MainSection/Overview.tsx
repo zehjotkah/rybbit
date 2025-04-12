@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatSecondsAsMinutesAndSeconds, formatter } from "@/lib/utils";
 import { StatType, useStore } from "../../../../../lib/store";
 import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
+import NumberFlow from "@number-flow/react";
+import { round } from "lodash";
 
 const ChangePercentage = ({
   current,
@@ -43,6 +45,8 @@ const Stat = ({
   previous,
   valueFormatter,
   isLoading,
+  decimals,
+  postfix,
 }: {
   title: string;
   id: StatType;
@@ -50,6 +54,8 @@ const Stat = ({
   previous: number;
   valueFormatter?: (value: number) => string;
   isLoading: boolean;
+  decimals?: number;
+  postfix?: string;
 }) => {
   const { selectedStat, setSelectedStat } = useStore();
   return (
@@ -69,7 +75,20 @@ const Stat = ({
           </>
         ) : (
           <>
-            {valueFormatter ? valueFormatter(value) : value}
+            {valueFormatter ? (
+              valueFormatter(value)
+            ) : (
+              <span>
+                {
+                  <NumberFlow
+                    respectMotionPreference={false}
+                    value={decimals ? Number(value.toFixed(decimals)) : value}
+                    // format={{ notation: "compact" }}
+                  />
+                }
+                {postfix && <span>{postfix}</span>}
+              </span>
+            )}
             <ChangePercentage current={value} previous={previous} />
           </>
         )}
@@ -119,7 +138,6 @@ export function Overview() {
         value={currentUsers}
         previous={previousUsers}
         isLoading={isLoading}
-        valueFormatter={formatter}
       />
       <Stat
         title="Sessions"
@@ -127,7 +145,6 @@ export function Overview() {
         value={currentSessions}
         previous={previousSessions}
         isLoading={isLoading}
-        valueFormatter={formatter}
       />
       <Stat
         title="Pageviews"
@@ -135,15 +152,14 @@ export function Overview() {
         value={currentPageviews}
         previous={previousPageviews}
         isLoading={isLoading}
-        valueFormatter={formatter}
       />
       <Stat
         title="Pages per Session"
         id="pages_per_session"
         value={currentPagesPerSession}
         previous={previousPagesPerSession}
+        decimals={1}
         isLoading={isLoading}
-        valueFormatter={(value) => value.toFixed(1)}
       />
       <Stat
         title="Bounce Rate"
@@ -151,7 +167,8 @@ export function Overview() {
         value={currentBounceRate}
         previous={previousBounceRate}
         isLoading={isLoading}
-        valueFormatter={(value) => `${value.toFixed(1)}%`}
+        postfix="%"
+        decimals={1}
       />
       <Stat
         title="Session Duration"

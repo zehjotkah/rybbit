@@ -133,7 +133,7 @@ export function Chart({
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 0, right: 15, bottom: 20, left: 40 }}
+      margin={{ top: 10, right: 15, bottom: 20, left: 40 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
@@ -150,7 +150,7 @@ export function Chart({
         max: Math.max(max, 1),
       }}
       enableGridX={false}
-      enableGridY={true}
+      enableGridY={false}
       yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}

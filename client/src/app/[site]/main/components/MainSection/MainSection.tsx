@@ -39,7 +39,7 @@ export function MainSection() {
       <Card>
         {(isFetching || isPreviousFetching) && <CardLoader />}
         <CardContent className="pt-4 w-full">
-          <div className="h-[310px] relative">
+          <div className="h-[290px] relative">
             <div className="absolute top-0 left-0 w-full h-full">
               <PreviousChart
                 data={previousData}
