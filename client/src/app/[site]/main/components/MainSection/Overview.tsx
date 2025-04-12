@@ -70,10 +70,11 @@ const Stat = ({
 
   const { data, isFetching, error } = useGetOverviewBucketed({ site });
 
-  const sparklinesData = data?.data.map((d) => ({
-    value: d[id],
-    time: d.time,
-  }));
+  const sparklinesData =
+    data?.data?.map((d) => ({
+      value: d[id],
+      time: d.time,
+    })) ?? [];
 
   return (
     <div
