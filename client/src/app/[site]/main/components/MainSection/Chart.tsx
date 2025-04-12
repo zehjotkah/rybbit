@@ -133,7 +133,7 @@ export function Chart({
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
+      margin={{ top: 0, right: 15, bottom: 20, left: 40 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
@@ -184,7 +184,8 @@ export function Chart({
       enableTouchCrosshair={true}
       enablePoints={false}
       useMesh={true}
-      motionConfig="stiff"
+      animate={false}
+      // motionConfig="stiff"
       enableSlices={"x"}
       colors={["hsl(var(--accent-400))"]}
       enableArea={true}

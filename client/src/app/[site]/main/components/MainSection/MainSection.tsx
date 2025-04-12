@@ -33,10 +33,7 @@ export function MainSection() {
       <Card>
         {(isOverviewFetching || isOverviewFetchingPrevious) && <CardLoader />}
         <CardContent className="pt-4 w-full">
-          <div className="flex justify-between items-center">
-            <Overview />
-            <BucketSelection />
-          </div>
+          <Overview />
         </CardContent>
       </Card>
       <Card>
@@ -57,6 +54,9 @@ export function MainSection() {
                   time.mode === "all-time" ? undefined : previousData
                 }
               />
+            </div>
+            <div className="absolute top-0 right-[14px]">
+              <BucketSelection />
             </div>
           </div>
         </CardContent>

@@ -17,32 +17,22 @@ const ChangePercentage = ({
 
   if (previous === 0) {
     if (current === 0) {
-      return (
-        <Badge variant="minimal" className="text-xs">
-          0%
-        </Badge>
-      );
+      return <div className="text-sm">0%</div>;
     }
-    return (
-      <Badge className="text-xs" variant="green">
-        +999%
-      </Badge>
-    );
+    return <div className="text-sm">+999%</div>;
   }
 
   if (change === 0) {
-    return (
-      <Badge variant="minimal" className="text-xs">
-        0%
-      </Badge>
-    );
+    return <div className="text-sm">0%</div>;
   }
 
   return (
-    <Badge variant={change > 0 ? "green" : "red"} className="text-xs">
+    <div
+      className={cn("text-sm", change > 0 ? "text-green-400" : "text-red-400")}
+    >
       {change > 0 ? "+" : ""}
       {change.toFixed(0)}%
-    </Badge>
+    </div>
   );
 };
 
@@ -122,7 +112,7 @@ export function Overview() {
     overviewDataPrevious?.data?.session_duration ?? 0;
 
   return (
-    <div className="flex gap-0 items-center">
+    <div className="grid grid-cols-6 gap-0 items-center">
       <Stat
         title="Unique Users"
         id="users"
