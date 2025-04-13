@@ -47,15 +47,15 @@ export function MainSection() {
       </Card>
       <Card>
         {(isFetching || isPreviousFetching) && <CardLoader />}
-        <CardContent className="pt-3 w-full">
-          <div className="flex items-center justify-between ">
+        <CardContent className="p-2 md:p-4 py-3 w-full">
+          <div className="flex items-center justify-between px-2 md:px-0">
             <span className="w-24" />
             <span className="text-sm text-neutral-200">
               {SELECTED_STAT_MAP[selectedStat]}
             </span>
             <BucketSelection />
           </div>
-          <div className="h-[290px] relative">
+          <div className="h-[200px] md:h-[290px] relative">
             <div className="absolute top-0 left-0 w-full h-full">
               <PreviousChart
                 data={previousData}

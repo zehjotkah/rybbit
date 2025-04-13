@@ -154,7 +154,7 @@ export function Overview() {
     overviewDataPrevious?.data?.session_duration ?? 0;
 
   return (
-    <div className="grid grid-cols-6 gap-0 items-center">
+    <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 items-center">
       <Stat
         title="Unique Users"
         id="users"

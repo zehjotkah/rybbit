@@ -7,6 +7,7 @@ import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 import { APIResponse } from "../../../../../api/types";
 import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGetOverviewBucketed";
 import { Time } from "../../../../../components/DateSelector/types";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -97,6 +98,9 @@ export function Chart({
   max: number;
 }) {
   const { time, bucket, selectedStat } = useStore();
+  const { width } = useWindowSize();
+
+  const maxTicks = Math.round((width ?? Infinity) / 75);
 
   // When the current period has more datapoints than the previous period,
   // we need to shift the previous datapoints to the right by the difference in length
@@ -135,7 +139,7 @@ export function Chart({
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 10, right: 15, bottom: 20, left: 40 }}
+      margin={{ top: 10, right: 10, bottom: 20, left: 35 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",
@@ -162,8 +166,10 @@ export function Chart({
         tickPadding: 10,
         tickRotation: 0,
         truncateTickAt: 0,
-        tickValues:
-          time.mode === "day" ? 24 : Math.min(12, data?.data?.length ?? 0),
+        tickValues: Math.min(
+          maxTicks,
+          time.mode === "day" ? 24 : Math.min(12, data?.data?.length ?? 0)
+        ),
         format: (value) => {
           if (time.mode === "day") {
             return DateTime.fromJSDate(value).toFormat("ha");
