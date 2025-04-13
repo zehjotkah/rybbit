@@ -30,8 +30,8 @@ export const Skeleton = memo(() => {
   return (
     <>
       <div className="flex flex-row gap-2 justify-between pr-1 text-xs text-neutral-400">
-        <div className="h-3 bg-neutral-800 rounded animate-pulse w-16"></div>
-        <div className="h-3 bg-neutral-800 rounded animate-pulse w-12"></div>
+        <div className="h-4 bg-neutral-800 rounded animate-pulse w-16"></div>
+        <div className="h-4 bg-neutral-800 rounded animate-pulse w-12"></div>
       </div>
       {Array.from({ length: 10 }).map((_, index) => (
         <div key={index} className="relative h-6 flex items-center">

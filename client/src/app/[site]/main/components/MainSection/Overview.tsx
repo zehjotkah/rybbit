@@ -89,8 +89,8 @@ const Stat = ({
         <div className="text-2xl font-medium flex gap-2 items-center justify-between">
           {isLoading ? (
             <>
-              <Skeleton className="w-[60px] h-7 rounded-md" />
-              <Skeleton className="w-[30px] h-5 rounded-md" />
+              <Skeleton className="w-[60px] h-9 rounded-md" />
+              <Skeleton className="w-[50px] h-5 rounded-md" />
             </>
           ) : (
             <>

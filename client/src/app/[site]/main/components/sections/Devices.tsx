@@ -25,12 +25,14 @@ export function Devices() {
           value={tab}
           onValueChange={(value) => setTab(value as Tab)}
         >
-          <TabsList>
-            <TabsTrigger value="browsers">Browsers</TabsTrigger>
-            <TabsTrigger value="devices">Devices</TabsTrigger>
-            <TabsTrigger value="os">Operating Systems</TabsTrigger>
-            <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-1">
+            <TabsList>
+              <TabsTrigger value="browsers">Browsers</TabsTrigger>
+              <TabsTrigger value="devices">Devices</TabsTrigger>
+              <TabsTrigger value="os">Operating Systems</TabsTrigger>
+              <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="devices">
             <StandardSection
               filterParameter="device_type"
