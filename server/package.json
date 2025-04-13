@@ -16,12 +16,12 @@
     "db:check": "drizzle-kit check --config=drizzle.config.ts"
   },
   "dependencies": {
-    "@better-auth/stripe": "^1.2.3",
+    "@better-auth/stripe": "^1.2.7",
     "@clickhouse/client": "^1.10.1",
     "@fastify/cors": "^10.0.2",
     "@fastify/one-line-logger": "^1.4.0",
     "@fastify/static": "^8.0.4",
-    "better-auth": "^1.2.2",
+    "better-auth": "^1.2.6",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "fastify": "^5.1.0",
