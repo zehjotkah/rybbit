@@ -360,7 +360,7 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
           </TabsContent>
 
           <TabsContent value="info" className="mt-4">
-            <div className="grid grid-cols-2 gap-8 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
               {/* User Information */}
               <div>
                 <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">

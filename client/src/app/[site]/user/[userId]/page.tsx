@@ -43,8 +43,8 @@ export default function UserPage() {
           />
           {userId?.slice(0, 10)}
         </h1>
-        <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-4">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="grid grid-cols-[100px_auto] gap-2">
               <span className=" text-neutral-100">User ID:</span>
               <CopyText
@@ -103,7 +103,7 @@ export default function UserPage() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 justify-between">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 justify-between">
           <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Clock className="w-4 h-4" />
