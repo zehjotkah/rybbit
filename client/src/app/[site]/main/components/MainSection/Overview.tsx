@@ -33,7 +33,7 @@ const ChangePercentage = ({
   return (
     <div
       className={cn(
-        "text-sm flex items-center gap-1",
+        "text-xs flex items-center gap-1",
         change > 0 ? "text-green-400" : "text-red-400"
       )}
     >
@@ -154,7 +154,7 @@ export function Overview() {
     overviewDataPrevious?.data?.session_duration ?? 0;
 
   return (
-    <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 items-center">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 items-center">
       <Stat
         title="Unique Users"
         id="users"

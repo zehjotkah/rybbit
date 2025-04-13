@@ -70,7 +70,10 @@ export function NewFilterButton() {
           Filter
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="flex flex-col  p-0">
+      <DropdownMenuContent
+        align="start"
+        className="flex flex-col p-0 max-w-[95vw]"
+      >
         <div className="flex flex-col gap-2 p-3">
           {localFilters.map((filter, index) => (
             <FilterComponent

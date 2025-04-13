@@ -43,26 +43,33 @@ export function SubHeader({
   const { time, setTime } = useStore();
 
   return (
-    <div className="flex gap-2 mb-3 justify-between">
-      <div className="flex items-center gap-2">
-        <MobileSidebar />
-        <Filters availableFilters={availableFilters} />
-      </div>
-      <div className="flex items-center gap-2">
-        <DateSelector time={time} setTime={setTime} />
-        <div className="flex items-center">
-          <Button variant="default" size="icon" onClick={goBack}>
-            <ChevronLeft />
-          </Button>
-          <Button
-            variant="default"
-            size="icon"
-            onClick={goForward}
-            disabled={!canGoForward(time)}
-          >
-            <ChevronRight />
-          </Button>
+    <div>
+      <div className="flex gap-2 mb-2 justify-between">
+        <div className="flex items-center gap-2">
+          <MobileSidebar />
+          <div className="hidden md:block">
+            <Filters availableFilters={availableFilters} />
+          </div>
         </div>
+        <div className="flex items-center gap-2">
+          <DateSelector time={time} setTime={setTime} />
+          <div className="flex items-center">
+            <Button variant="default" size="icon" onClick={goBack}>
+              <ChevronLeft />
+            </Button>
+            <Button
+              variant="default"
+              size="icon"
+              onClick={goForward}
+              disabled={!canGoForward(time)}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className=" md:hidden">
+        <Filters availableFilters={availableFilters} />
       </div>
     </div>
   );

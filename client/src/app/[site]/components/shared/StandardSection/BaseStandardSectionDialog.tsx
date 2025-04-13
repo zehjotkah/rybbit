@@ -59,7 +59,7 @@ export function BaseStandardSectionDialog({
       <DialogTrigger asChild>
         <Button variant="outline">View All</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[95vh] max-w-[95vw] w-[600px]">
+      <DialogContent className="max-h-[80vh] max-w-[95vw] w-[600px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
