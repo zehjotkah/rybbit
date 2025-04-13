@@ -58,7 +58,6 @@ export function NewFilterButton() {
     >
       <DropdownMenuTrigger asChild>
         <Button
-          variant="default"
           className="px-3"
           onClick={() => {
             if (localFilters.length === 0) {

@@ -37,7 +37,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-56 bg-neutral-900 border-r border-neutral-800 h-full flex flex-col">
+    <div className="w-56 bg-neutral-900 border-r border-neutral-800 h-full flex-col">
       {site && (
         <div className="p-3 border-b  border-neutral-800 flex flex-col gap-2">
           <SiteSelector />
