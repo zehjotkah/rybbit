@@ -30,6 +30,7 @@ import {
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
 import { RetentionChart } from "./RetentionChart";
+import { MobileSidebar } from "../../../components/MobileSidebar";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
@@ -141,52 +142,57 @@ export default function RetentionPage() {
 
   // Common filters for both views
   const FilterControls = () => (
-    <div className="flex items-center gap-4 flex-wrap justify-end">
-      <div className="flex items-center gap-2">
-        <Label htmlFor="time-range" className="text-sm whitespace-nowrap">
-          Time Range:
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="h-3.5 w-3.5 ml-1 inline-block text-neutral-400" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="w-[200px] text-xs">
-                  Amount of historical data to include in the retention
-                  calculation. All available periods within this timeframe will
-                  be shown.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </Label>
-        <Select
-          value={timeRange.toString()}
-          onValueChange={handleRangeChange}
-          disabled={isLoading}
-        >
-          <SelectTrigger id="time-range" className="w-28" size="sm">
-            <SelectValue placeholder="90 days" />
-          </SelectTrigger>
-          <SelectContent size="sm">
-            {RANGE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="flex justify-between items-center">
+      <div>
+        <MobileSidebar />
       </div>
-      <Tabs value={mode} onValueChange={handleModeChange}>
-        <TabsList>
-          <TabsTrigger value="day" disabled={isLoading}>
-            Daily
-          </TabsTrigger>
-          <TabsTrigger value="week" disabled={isLoading}>
-            Weekly
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="flex items-center gap-3 flex-wrap justify-end">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="time-range" className="text-sm whitespace-nowrap">
+            Time Range:
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 ml-1 inline-block text-neutral-400" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="w-[200px] text-xs">
+                    Amount of historical data to include in the retention
+                    calculation. All available periods within this timeframe
+                    will be shown.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
+          <Select
+            value={timeRange.toString()}
+            onValueChange={handleRangeChange}
+            disabled={isLoading}
+          >
+            <SelectTrigger id="time-range" className="w-28" size="sm">
+              <SelectValue placeholder="90 days" />
+            </SelectTrigger>
+            <SelectContent size="sm">
+              {RANGE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Tabs value={mode} onValueChange={handleModeChange}>
+          <TabsList>
+            <TabsTrigger value="day" disabled={isLoading}>
+              Daily
+            </TabsTrigger>
+            <TabsTrigger value="week" disabled={isLoading}>
+              Weekly
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
     </div>
   );
 
@@ -195,9 +201,6 @@ export default function RetentionPage() {
     return (
       <div className="pt-4">
         <Card>
-          <CardHeader>
-            <CardTitle>User Retention</CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="p-8 text-center">
               <div className="text-red-500 mb-2 font-medium">
@@ -219,9 +222,6 @@ export default function RetentionPage() {
     return (
       <div className="pt-4">
         <Card>
-          <CardHeader>
-            <CardTitle>User Retention</CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="p-8 text-center">
               <div className="text-neutral-300 mb-2 font-medium">
@@ -244,19 +244,23 @@ export default function RetentionPage() {
       : [];
 
   return (
-    <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
+    <div className="p-2 md:p-4 max-w-[1300px] mx-auto flex flex-col gap-3">
       {/* Single Card containing both chart and grid */}
+      <FilterControls />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle>User Retention</CardTitle>
-          <FilterControls />
+          <CardTitle>Retention</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Retention Chart */}
-          {isLoading ? null : data ? (
+          {isLoading ? (
+            <ThreeDotLoader />
+          ) : data ? (
             <RetentionChart data={data} isLoading={false} mode={mode} />
           ) : null}
-
+        </CardContent>
+      </Card>
+      <Card className="pt-3">
+        <CardContent className="space-y-6 px-2">
           <div>
             {isLoading ? (
               <ThreeDotLoader />
