@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useGetSites } from "../api/admin/sites";
+import { usePathname } from "next/navigation";
+import { useGetSite } from "../api/admin/sites";
 import { Sidebar } from "../app/[site]/components/Sidebar/Sidebar";
 import { Button } from "./ui/button";
 import {
@@ -16,11 +16,8 @@ import { Menu } from "lucide-react";
 import { VisuallyHidden } from "radix-ui";
 
 export function MobileSidebar() {
-  const { data: sites } = useGetSites();
   const pathname = usePathname();
-  const currentSiteId = Number(pathname.split("/")[1]);
-
-  const site = sites?.find((site) => site.siteId === currentSiteId);
+  const { data: site } = useGetSite(Number(pathname.split("/")[1]));
 
   return (
     <div className="md:hidden flex items-center gap-2">
