@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from "../../../../components/ui/sheet";
 import { Sidebar } from "../Sidebar/Sidebar";
+import { MobileSidebar } from "../../../../components/MobileSidebar";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -53,23 +54,7 @@ export function SubHeader({
   return (
     <div className="flex gap-2 mb-3 justify-between">
       <div className="flex items-center gap-2">
-        <div className=" md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="outline">
-                <Menu />
-              </Button>
-            </SheetTrigger>
-            <VisuallyHidden.Root>
-              <SheetHeader>
-                <SheetTitle>Frogstats Sidebar</SheetTitle>
-              </SheetHeader>
-            </VisuallyHidden.Root>
-            <SheetContent side="left" className="p-0 w-[223px]">
-              <Sidebar />
-            </SheetContent>
-          </Sheet>
-        </div>
+        <MobileSidebar />
         <Filters availableFilters={availableFilters} />
       </div>
       <div className="flex items-center gap-2">

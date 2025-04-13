@@ -71,6 +71,8 @@ export const World = ({ width }: { width: number }) => {
     }));
   }, [liveSessionLocations]);
 
+  const { width: windowWidth } = useWindowSize();
+
   return (
     <div
       onMouseDown={() => {
@@ -83,13 +85,20 @@ export const World = ({ width }: { width: number }) => {
         onGlobeReady={() => {
           if (globeEl.current) {
             // Set initial view: lat, lng, and altitude (zoom)
-            globeEl.current.pointOfView({ lat: 20, lng: -36, altitude: 2 });
+            globeEl.current.pointOfView({
+              lat: 20,
+              lng: -36,
+              altitude: windowWidth && windowWidth > 768 ? 2 : 3,
+            });
           }
         }}
         ref={globeEl as any}
         width={width ?? 0}
         height={(size.height ?? 0) - 50}
-        globeOffset={[-100, 0]}
+        globeOffset={[
+          windowWidth && windowWidth > 768 ? -100 : 0,
+          windowWidth && windowWidth > 768 ? 0 : 100,
+        ]}
         atmosphereColor="rgba(170, 170, 200, 1)"
         globeMaterial={oceanBlueMaterial}
         hexPolygonsData={countries.features}
