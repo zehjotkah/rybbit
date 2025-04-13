@@ -59,11 +59,11 @@ export function BaseStandardSectionDialog({
       <DialogTrigger asChild>
         <Button variant="outline">View All</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[90vw] w-[1000px]">
+      <DialogContent className="max-h-[95vh] max-w-[95vw] w-[600px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 max-h-[85vh]">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-400" />
             <Input
@@ -78,12 +78,12 @@ export function BaseStandardSectionDialog({
             <div>{title}</div>
             <div>{countLabel || "Sessions"}</div>
           </div>
-          <div className="flex flex-col gap-2 max-h-[85vh] overflow-x-hidden">
+          <div className="flex flex-col gap-2 overflow-x-hidden">
             {filteredData.length > 0 ? (
               filteredData.map((e) => (
                 <div
                   key={getKey(e)}
-                  className="relative flex items-center mr-3 cursor-pointer hover:bg-neutral-850"
+                  className="relative flex items-center mr-1 cursor-pointer hover:bg-neutral-850"
                   onClick={() =>
                     addFilter({
                       parameter: filterParameter,

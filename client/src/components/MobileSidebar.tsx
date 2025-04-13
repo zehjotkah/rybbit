@@ -27,7 +27,7 @@ export function MobileSidebar() {
             <SheetTitle>Frogstats Sidebar</SheetTitle>
           </SheetHeader>
         </VisuallyHidden.Root>
-        <SheetContent side="left" className="p-0 w-[223px]">
+        <SheetContent side="left" className="p-0 w-[223px]" showClose={false}>
           <Sidebar />
         </SheetContent>
       </Sheet>

@@ -3,20 +3,11 @@ import { Filters } from "./Filters/Filters";
 
 import { Button } from "@/components/ui/button";
 import { FilterParameter, goBack, goForward, useStore } from "@/lib/store";
-import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
-import { VisuallyHidden } from "radix-ui";
 
 import { DateSelector } from "../../../../components/DateSelector/DateSelector";
 import { Time } from "../../../../components/DateSelector/types";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../../../../components/ui/sheet";
-import { Sidebar } from "../Sidebar/Sidebar";
 import { MobileSidebar } from "../../../../components/MobileSidebar";
 
 const canGoForward = (time: Time) => {
