@@ -192,9 +192,11 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
 
           <div className="flex items-center gap-4 text-xs text-gray-300">
             <span className="text-gray-400">
-              {DateTime.fromSQL(session.session_start).toFormat(
-                "MMM d, h:mm a"
-              )}
+              {DateTime.fromSQL(session.session_start, {
+                zone: "utc",
+              })
+                .toLocal()
+                .toFormat("MMM d, h:mm a")}
             </span>
             <span className="hidden md:block">{durationFormatted}</span>
           </div>

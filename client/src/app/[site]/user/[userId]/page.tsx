@@ -23,18 +23,27 @@ import { formatDuration, getCountryName } from "../../../../lib/utils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
+import { MobileSidebar } from "../../../../components/MobileSidebar";
+import { VisitCalendar } from "./components/Calendar";
+import { useGetUserSessionCount } from "../../../../api/analytics/userSessions";
 
 export default function UserPage() {
   const { userId } = useParams();
   const { site } = useParams();
 
   const { data } = useUserInfo(Number(site), userId as string);
+
+  const { data: sessionCount } = useGetUserSessionCount(userId as string);
+
   const { getRegionName } = useGetRegionName();
 
   return (
     <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
       <div className="mb-4">
         <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <div>
+            <MobileSidebar />
+          </div>
           <Avatar
             size={40}
             name={userId as string}
@@ -157,6 +166,9 @@ export default function UserPage() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 h-[150px]">
+        <VisitCalendar sessionCount={sessionCount?.data ?? []} />
       </div>
 
       <h2 className="text-lg font-bold mb-4">Sessions</h2>

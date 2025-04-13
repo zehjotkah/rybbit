@@ -44,6 +44,7 @@ import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic } from "./utils.js";
 import { publicSites } from "./lib/publicSites.js";
 import { getSiteIsPublic } from "./api/sites/getSiteIsPublic.js";
+import { getUserSessionCount } from "./api/analytics/getUserSessionCount.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -117,6 +118,7 @@ const ANALYTICS_ROUTES = [
   "/recent-events/",
   "/users/",
   "/user/info/",
+  "/user/session-count/",
   "/live-session-locations/",
   "/funnels/",
   "/funnel/",
@@ -180,6 +182,7 @@ server.get("/sessions/:site", getSessions);
 server.get("/session/:sessionId/:site", getSession);
 server.get("/users/:site", getUsers);
 server.get("/user/:userId/sessions/:site", getUserSessions);
+server.get("/user/session-count/:site", getUserSessionCount);
 server.get("/user/info/:userId/:site", getUserInfo);
 server.get("/live-session-locations/:site", getLiveSessionLocations);
 server.get("/funnels/:site", getFunnels);

@@ -189,3 +189,27 @@ export function useGetSessionDetailsInfinite(sessionId: string | null) {
     staleTime: Infinity,
   });
 }
+
+export interface UserSessionCountResponse {
+  date: string;
+  sessions: number;
+}
+
+export function useGetUserSessionCount(userId: string) {
+  const { time, site } = useStore();
+  const { startDate, endDate } = getStartAndEndDate(time);
+
+  return useQuery<APIResponse<UserSessionCountResponse[]>>({
+    queryKey: ["user-session-count", userId, time, site],
+    queryFn: () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return authedFetch(`${BACKEND_URL}/user/session-count/${site}`, {
+        userId,
+        startDate,
+        endDate,
+        timezone,
+      }).then((res) => res.json());
+    },
+    staleTime: Infinity,
+  });
+}
