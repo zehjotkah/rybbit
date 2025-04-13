@@ -196,17 +196,14 @@ export interface UserSessionCountResponse {
 }
 
 export function useGetUserSessionCount(userId: string) {
-  const { time, site } = useStore();
-  const { startDate, endDate } = getStartAndEndDate(time);
+  const { site } = useStore();
 
   return useQuery<APIResponse<UserSessionCountResponse[]>>({
-    queryKey: ["user-session-count", userId, time, site],
+    queryKey: ["user-session-count", userId, site],
     queryFn: () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/user/session-count/${site}`, {
         userId,
-        startDate,
-        endDate,
         timezone,
       }).then((res) => res.json());
     },

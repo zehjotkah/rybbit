@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
-import { getTimeStatement, processResults } from "./utils.js";
+import { processResults } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 
 export interface GetUserSessionCountRequest {
@@ -9,8 +9,6 @@ export interface GetUserSessionCountRequest {
   };
   Querystring: {
     userId?: string;
-    startDate?: string;
-    endDate?: string;
     timezone?: string;
   };
 }
@@ -25,7 +23,7 @@ export async function getUserSessionCount(
   res: FastifyReply
 ) {
   const { site } = req.params;
-  const { userId, startDate, endDate, timezone } = req.query;
+  const { userId, timezone = "UTC" } = req.query;
 
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
@@ -36,25 +34,14 @@ export async function getUserSessionCount(
     return res.status(400).send({ error: "userId is required" });
   }
 
-  // Generate time statement
-  const timeStatement = getTimeStatement({
-    date: {
-      startDate: startDate || "",
-      endDate: endDate || "",
-      timezone: timezone || "UTC",
-      table: "sessions",
-    },
-  });
-
   const query = `
     SELECT
-      toDate(session_start, '${timezone || "UTC"}') as date,
+      toDate(session_start, '${timezone}') as date,
       count() as sessions
     FROM sessions
     WHERE
       site_id = ${site}
       AND user_id = '${userId}'
-      ${timeStatement}
     GROUP BY date
     ORDER BY date ASC
   `;
