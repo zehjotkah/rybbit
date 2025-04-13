@@ -54,14 +54,20 @@ export function SubHeader({
         <div className="flex items-center gap-2">
           <DateSelector time={time} setTime={setTime} />
           <div className="flex items-center">
-            <Button variant="default" size="icon" onClick={goBack}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={goBack}
+              className="rounded-r-none h-8 w-8 sm:h-9 sm:w-9"
+            >
               <ChevronLeft />
             </Button>
             <Button
-              variant="default"
+              variant="outline"
               size="icon"
               onClick={goForward}
               disabled={!canGoForward(time)}
+              className="rounded-l-none -ml-px h-8 w-8 sm:h-9 sm:w-9"
             >
               <ChevronRight />
             </Button>

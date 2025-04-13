@@ -50,7 +50,7 @@ export const VisitCalendar = ({
           <div className="bg-neutral-900 p-2 rounded-md border border-neutral-800 text-sm">
             {value}{" "}
             <span className="text-neutral-300">
-              battle{Number(value) > 1 && "s"} on
+              session{Number(value) > 1 && "s"} on
             </span>{" "}
             {day}
           </div>

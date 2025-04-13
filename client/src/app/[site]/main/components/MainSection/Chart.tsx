@@ -179,6 +179,10 @@ export function Chart({
             return DateTime.fromJSDate(value).toFormat("MMM d");
           } else if (time.mode === "month") {
             return DateTime.fromJSDate(value).toFormat("MMM d");
+          } else if (time.mode === "year") {
+            return DateTime.fromJSDate(value).toFormat("MMM d");
+          } else if (time.mode === "all-time") {
+            return DateTime.fromJSDate(value).toFormat("MMM d");
           }
         },
       }}

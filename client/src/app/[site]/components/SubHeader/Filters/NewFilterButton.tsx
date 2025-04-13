@@ -58,7 +58,7 @@ export function NewFilterButton() {
     >
       <DropdownMenuTrigger asChild>
         <Button
-          className="px-3"
+          className="text-xs sm:text-sm h-8 sm:h-9 px-3 p-2 sm:p-3"
           onClick={() => {
             if (localFilters.length === 0) {
               addLocalFilter();

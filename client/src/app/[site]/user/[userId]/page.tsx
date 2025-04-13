@@ -52,7 +52,7 @@ export default function UserPage() {
           />
           {userId?.slice(0, 10)}
         </h1>
-        <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-3">
+        <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="grid grid-cols-[100px_auto] gap-2">
               <span className=" text-neutral-100">User ID:</span>
@@ -113,7 +113,7 @@ export default function UserPage() {
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 justify-between">
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Clock className="w-4 h-4" />
               Avg. Session Duration
@@ -122,28 +122,28 @@ export default function UserPage() {
               {data?.duration ? formatDuration(data.duration) : "N/A"}
             </div>
           </div>
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750  flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Files className="w-4 h-4" />
               Sessions
             </div>
             <div className="font-semibold">{data?.sessions}</div>
           </div>
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750  flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <FileText className="w-4 h-4" />
               Pageviews
             </div>
             <div className="font-semibold">{data?.pageviews}</div>
           </div>
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750  flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <MousePointerClick className="w-4 h-4" />
               Events
             </div>
             <div className="font-semibold">{data?.events}</div>
           </div>
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750  flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               First Seen
@@ -154,7 +154,7 @@ export default function UserPage() {
               )}
             </div>
           </div>
-          <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750  flex-grow">
+          <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <CalendarCheck className="w-4 h-4" />
               Last Seen
@@ -167,7 +167,7 @@ export default function UserPage() {
           </div>
         </div>
       </div>
-      <div className="bg-neutral-850 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 h-[150px]">
+      <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800 h-[150px]">
         <VisitCalendar sessionCount={sessionCount?.data ?? []} />
       </div>
 

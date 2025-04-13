@@ -33,6 +33,7 @@ const buttonVariants = cva(
         xs: "h-6 rounded-sm px-2 text-xs",
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
+        smIcon: "h-7 w-7",
       },
     },
     defaultVariants: {
