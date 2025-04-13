@@ -96,7 +96,7 @@ export function BaseStandardSectionDialog({
                     className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
                     style={{ width: `${e.percentage * ratio}%` }}
                   ></div>
-                  <div className="z-10 ml-2 mr-4 flex justify-between items-center text-xs w-full h-6">
+                  <div className="z-5 ml-2 mr-4 flex justify-between items-center text-xs w-full h-6">
                     <div className="flex items-center gap-1">
                       {getLabel(e)}
                       {getLink && (
