@@ -83,23 +83,9 @@ export default function RootLayout({
   }, [isPending, user, pathname, isCheckingPublic, isPublicSite]);
 
   return (
-    <html lang="en" className="h-full dark">
-      <body
-        className={`${inter.className} h-full bg-background text-foreground`}
-      >
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-background text-foreground`}>
         <Toaster />
-        {/* The ldrs are very pretty but it's super annoying to load them
-        https://github.com/GriffinJohnston/ldrs/blob/main/framework-guides.md#nextjs */}
-        <script
-          type="module"
-          defer
-          src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/zoomies.js"
-        ></script>
-        <script
-          type="module"
-          defer
-          src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/ping.js"
-        ></script>
         <TooltipProvider>
           <QueryProvider>
             {pathname === "/login" || pathname === "/signup" ? (

@@ -40,10 +40,10 @@ export function MainSection() {
   return (
     <>
       <Card>
-        {(isOverviewFetching || isOverviewFetchingPrevious) && <CardLoader />}
         <CardContent className="p-0 w-full">
           <Overview />
         </CardContent>
+        {(isOverviewFetching || isOverviewFetchingPrevious) && <CardLoader />}
       </Card>
       <Card>
         {(isFetching || isPreviousFetching) && <CardLoader />}
