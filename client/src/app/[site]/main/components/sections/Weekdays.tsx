@@ -81,8 +81,6 @@ export function Weekdays() {
     return aggregated;
   }, [data, metric]);
 
-  console.log(heatmapData);
-
   // Find max value for color intensity scaling
   const maxValue = useMemo(() => {
     if (!heatmapData || !heatmapData.length) return 0;
@@ -98,8 +96,17 @@ export function Weekdays() {
     return max;
   }, [heatmapData]);
 
-  // Days of the week for column headers
-  const days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+  // Days of the week for column headers and full day names
+  const days = ["Mon", "Tues", "Weds", "Thus", "Fri", "Sat", "Sun"];
+  const fullDayNames = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   // Generate time labels for the row headers
   const timeLabels = useMemo(() => {
@@ -133,6 +140,45 @@ export function Weekdays() {
     return "bg-green-500";
   };
 
+  // Format the metric value based on its type
+  const formatMetricValue = (value: number): string => {
+    if (value === 0 || isNaN(value) || !isFinite(value)) return "0";
+
+    switch (metric) {
+      case "bounce_rate":
+        return `${value.toFixed(2)}%`;
+      case "pages_per_session":
+        return value.toFixed(2);
+      case "session_duration":
+        // Format as minutes and seconds
+        const minutes = Math.floor(value / 60);
+        const seconds = Math.floor(value % 60);
+        return `${minutes}m ${seconds}s`;
+      default:
+        return Math.round(value).toString();
+    }
+  };
+
+  // Get a friendly name for the metric
+  const getMetricDisplayName = (metric: StatType): string => {
+    switch (metric) {
+      case "users":
+        return "Unique Visitors";
+      case "pageviews":
+        return "Pageviews";
+      case "sessions":
+        return "Sessions";
+      case "bounce_rate":
+        return "Bounce Rate";
+      case "pages_per_session":
+        return "Pages per Session";
+      case "session_duration":
+        return "Session Duration";
+      default:
+        return metric;
+    }
+  };
+
   return (
     <Card>
       {isFetching && <CardLoader />}
@@ -164,29 +210,31 @@ export function Weekdays() {
           </Select>
         </div>
         <TooltipProvider delayDuration={0}>
-          <div className="flex mt-2 p-2">
+          <div className="flex mt-1 p-2">
             <div className="w-12">
               {/* Empty top-left cell */}
-              <div className="h-6"></div>
+              <div className="h-5"></div>
 
-              {/* Time labels */}
-              {timeLabels.map((label, i) => (
-                <div
-                  key={i}
-                  className="h-6 text-xs flex items-center justify-end pr-2 text-neutral-400"
-                >
-                  {label}
-                </div>
-              ))}
+              {/* Time labels - only display every other hour */}
+              {Array(24)
+                .fill(0)
+                .map((_, hour) => (
+                  <div
+                    key={hour}
+                    className="h-4 text-xs flex items-center justify-end pr-2 text-neutral-400"
+                  >
+                    {hour % 2 === 0 ? timeLabels[hour] : ""}
+                  </div>
+                ))}
             </div>
 
             <div className="flex-1">
               {/* Day labels */}
-              <div className="flex h-6">
+              <div className="flex h-5">
                 {days.map((day, i) => (
                   <div
                     key={i}
-                    className="flex-1 text-center text-sm text-neutral-400"
+                    className="flex-1 text-center text-xs text-neutral-400"
                   >
                     {day}
                   </div>
@@ -197,7 +245,7 @@ export function Weekdays() {
               {Array(24)
                 .fill(0)
                 .map((_, hour) => (
-                  <div key={hour} className="flex h-6">
+                  <div key={hour} className="flex h-4">
                     {Array(7)
                       .fill(0)
                       .map((_, day) => {
@@ -219,10 +267,18 @@ export function Weekdays() {
                                 className={`flex-1 mx-0.5 ${colorClass} hover:ring-1 hover:ring-green-300 transition-all rounded-sm my-0.5`}
                               />
                             </TooltipTrigger>
-                            <TooltipContent>
-                              {`${days[day]} ${timeLabels[hour]}: ${Math.round(
-                                value || 0
-                              )} ${metric}`}
+                            <TooltipContent className="flex flex-col gap-1 p-2">
+                              <div className="font-medium text-sm">
+                                {fullDayNames[day]} at {timeLabels[hour]}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">
+                                  {formatMetricValue(value)}
+                                </span>
+                                <span className="text-neutral-400 text-xs">
+                                  {getMetricDisplayName(metric)}
+                                </span>
+                              </div>
                             </TooltipContent>
                           </Tooltip>
                         );
