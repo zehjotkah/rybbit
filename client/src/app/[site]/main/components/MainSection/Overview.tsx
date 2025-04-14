@@ -66,9 +66,9 @@ const Stat = ({
   decimals?: number;
   postfix?: string;
 }) => {
-  const { selectedStat, setSelectedStat, site } = useStore();
+  const { selectedStat, setSelectedStat, site, bucket } = useStore();
 
-  const { data, isFetching, error } = useGetOverviewBucketed({ site });
+  const { data, isFetching, error } = useGetOverviewBucketed({ site, bucket });
 
   const sparklinesData =
     data?.data?.map((d) => ({

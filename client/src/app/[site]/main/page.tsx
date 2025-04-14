@@ -9,6 +9,7 @@ import { Events } from "./components/sections/Events";
 import { Map } from "./components/sections/Map";
 import { Pages } from "./components/sections/Pages";
 import { Referrers } from "./components/sections/Referrers";
+import { Weekdays } from "./components/sections/Weekdays";
 
 export default function MainPage() {
   const { site } = useStore();
@@ -37,8 +38,8 @@ function MainPageContent() {
         <Referrers />
         <Countries />
         <Events />
+        <Weekdays />
         <Map />
-        {/* <Chloropleth /> */}
       </div>
     </div>
   );

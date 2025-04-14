@@ -18,14 +18,14 @@ const SELECTED_STAT_MAP = {
 };
 
 export function MainSection() {
-  const { selectedStat, time, site } = useStore();
+  const { selectedStat, time, site, bucket } = useStore();
 
-  const { data, isFetching, error } = useGetOverviewBucketed({ site });
+  const { data, isFetching, error } = useGetOverviewBucketed({ site, bucket });
   const {
     data: previousData,
     isFetching: isPreviousFetching,
     error: previousError,
-  } = useGetOverviewBucketed({ periodTime: "previous", site });
+  } = useGetOverviewBucketed({ periodTime: "previous", site, bucket });
   const { isFetching: isOverviewFetching } = useGetOverview({ site });
   const { isFetching: isOverviewFetchingPrevious } = useGetOverview({
     site,
