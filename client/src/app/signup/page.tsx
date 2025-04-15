@@ -196,9 +196,7 @@ export default function SignupPage() {
             animate="visible"
             variants={contentVariants}
           >
-            <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
-              Create your account
-            </h2>
+            <h2 className="text-2xl font-semibold mb-6">Create your account</h2>
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
@@ -208,7 +206,7 @@ export default function SignupPage() {
                   placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
               </div>
               <div className="grid gap-2">
@@ -220,7 +218,7 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
               </div>
               <div className="grid gap-2">
@@ -232,12 +230,12 @@ export default function SignupPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
               </div>
               <Button
                 onClick={handleAccountSubmit}
-                className="w-full mt-6 bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
+                className="w-full mt-6 transition-all duration-300 h-11"
                 disabled={isLoading || !email || !password}
               >
                 {isLoading ? "Creating account..." : "Continue"}
@@ -311,8 +309,8 @@ export default function SignupPage() {
             animate="visible"
             variants={contentVariants}
           >
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
-              <Building2 className="h-6 w-6 text-indigo-500" />
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <Building2 className="h-6 w-6 text-primary" />
               Create your organization
             </h2>
             <div className="space-y-4">
@@ -325,7 +323,7 @@ export default function SignupPage() {
                   value={orgName}
                   onChange={(e) => handleOrgNameChange(e.target.value)}
                   required
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
               </div>
 
@@ -350,7 +348,7 @@ export default function SignupPage() {
                     )
                   }
                   required
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
                 <p className="text-xs text-muted-foreground">
                   This will be used in your URL: frogstats.io/{orgSlug}
@@ -359,7 +357,7 @@ export default function SignupPage() {
 
               <div className="flex justify-between pt-4">
                 <Button
-                  className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
+                  className="w-full transition-all duration-300 h-11"
                   onClick={handleOrganizationSubmit}
                   disabled={isLoading || !orgName || !orgSlug}
                 >
@@ -377,8 +375,8 @@ export default function SignupPage() {
             animate="visible"
             variants={contentVariants}
           >
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
-              <AppWindow className="h-6 w-6 text-indigo-500" />
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <AppWindow className="h-6 w-6 text-primary" />
               Add your first website
             </h2>
             <div className="space-y-4">
@@ -391,7 +389,7 @@ export default function SignupPage() {
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
                   required
-                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
+                  className="h-10 transition-all"
                 />
                 <p className="text-xs text-muted-foreground">
                   Enter the domain of the website you want to track
@@ -400,7 +398,7 @@ export default function SignupPage() {
 
               <div className="flex justify-between pt-4">
                 <Button
-                  className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
+                  className="w-full transition-all duration-300 h-11"
                   onClick={handleWebsiteSubmit}
                   disabled={isLoading || !domain}
                 >
@@ -418,14 +416,14 @@ export default function SignupPage() {
             animate="visible"
             variants={contentVariants}
           >
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
-              <Code className="h-6 w-6 text-indigo-500" />
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <Code className="h-6 w-6 text-primary" />
               Add tracking code to your website
             </h2>
             <div className="space-y-6">
-              <div className="rounded-lg bg-gradient-to-r from-indigo-500/10 to-teal-500/10 p-5 border border-indigo-200/20 backdrop-blur">
+              <div className="rounded-lg bg-muted p-5 border border-border">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-teal-500 text-white">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
                     <Check className="h-4 w-4" />
                   </div>
                   <p className="text-base font-medium">
@@ -442,7 +440,7 @@ export default function SignupPage() {
                 <Label>
                   Place this snippet in the &lt;head&gt; of your website
                 </Label>
-                <div className="border border-indigo-200/20 rounded-lg overflow-hidden">
+                <div className="border border-border rounded-lg overflow-hidden">
                   <CodeSnippet
                     language="HTML"
                     code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n/>`}
@@ -470,7 +468,7 @@ export default function SignupPage() {
                 <Button
                   onClick={() => router.push("/")}
                   variant="success"
-                  className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 h-11"
+                  className="flex-1 transition-all duration-300 h-11"
                 >
                   Go to Dashboard
                   <Check className="ml-2 h-4 w-4" />
@@ -490,13 +488,13 @@ export default function SignupPage() {
   return (
     <StandardPage>
       <div className="flex justify-center items-center min-h-screen bg-background p-4">
-        <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-indigo-200/20 backdrop-blur-sm">
+        <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-border">
           <div className="flex flex-col md:flex-row h-full">
             {/* Left sidebar with steps */}
-            <div className="bg-gradient-to-b from-indigo-950/40 to-slate-950/40 md:w-80 p-6 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800 overflow-hidden">
+            <div className="bg-muted/70 md:w-80 p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-muted-foreground/20 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-500 to-teal-500 transition-all duration-500 ease-out"
+                  className="h-full bg-primary transition-all duration-500 ease-out"
                   style={{ width: `${progressPercentage}%` }}
                 />
               </div>
@@ -521,7 +519,7 @@ export default function SignupPage() {
                       flex items-center justify-center w-8 h-8 rounded-full 
                       ${
                         currentStep === step
-                          ? "bg-gradient-to-r from-indigo-500 to-teal-500 text-white shadow-md"
+                          ? "bg-primary text-primary-foreground"
                           : currentStep > step
                           ? "bg-primary/20 text-primary"
                           : "bg-muted-foreground/20 text-muted-foreground"
@@ -546,7 +544,7 @@ export default function SignupPage() {
 
                 {/* Visual element at the bottom */}
                 <div className="mt-auto pt-8">
-                  <div className="rounded-lg bg-gradient-to-r from-indigo-500/10 to-teal-500/10 p-4 backdrop-blur border border-indigo-200/10">
+                  <div className="rounded-lg bg-background/50 p-4 border border-border">
                     <p className="text-xs text-muted-foreground">
                       Analytics that respect privacy while providing powerful
                       insights
