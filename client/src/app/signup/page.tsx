@@ -13,6 +13,8 @@ import {
   Check,
   AppWindow,
   Code,
+  Sparkles,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +24,14 @@ import { userStore } from "../../lib/userStore";
 import { BACKEND_URL } from "../../lib/const";
 import { CodeSnippet } from "../../components/CodeSnippet";
 import { StandardPage } from "../../components/StandardPage";
+import { motion } from "framer-motion";
+import { addSite } from "../../api/admin/sites";
+
+// Animation variants for step transitions
+const contentVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+};
 
 export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -39,6 +49,7 @@ export default function SignupPage() {
   const [orgSlug, setOrgSlug] = useState("");
 
   // Step 3: Website addition
+  const [organizationId, setOrganizationId] = useState("");
   const [domain, setDomain] = useState("");
 
   // Step 4: Data for tracking code
@@ -117,6 +128,8 @@ export default function SignupPage() {
         organizationId: data.id,
       });
 
+      setOrganizationId(data.id);
+
       setCurrentStep(3);
     } catch (error) {
       setError(String(error));
@@ -140,17 +153,7 @@ export default function SignupPage() {
         return;
       }
 
-      const response = await fetch("/api/admin/sites", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          domain,
-          name: domain,
-          // The organization ID is already set as active from previous step
-        }),
-      });
+      const response = await addSite(domain, domain, organizationId);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -167,13 +170,35 @@ export default function SignupPage() {
     }
   };
 
+  // Get step icon based on step number
+  const getStepIcon = (step: number) => {
+    switch (step) {
+      case 1:
+        return <User className="h-4 w-4" />;
+      case 2:
+        return <Building2 className="h-4 w-4" />;
+      case 3:
+        return <AppWindow className="h-4 w-4" />;
+      case 4:
+        return <Sparkles className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
   // Render the content based on current step
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
-          <>
-            <h2 className="text-2xl font-semibold mb-6">Create your account</h2>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={contentVariants}
+          >
+            <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
+              Create your account
+            </h2>
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
@@ -183,6 +208,7 @@ export default function SignupPage() {
                   placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
               </div>
               <div className="grid gap-2">
@@ -194,6 +220,7 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
               </div>
               <div className="grid gap-2">
@@ -205,11 +232,12 @@ export default function SignupPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
               </div>
               <Button
                 onClick={handleAccountSubmit}
-                className="w-full mt-6"
+                className="w-full mt-6 bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
                 disabled={isLoading || !email || !password}
               >
                 {isLoading ? "Creating account..." : "Continue"}
@@ -232,6 +260,7 @@ export default function SignupPage() {
                       callbackURL: "/",
                     });
                   }}
+                  className="transition-all duration-300 hover:bg-muted"
                 >
                   Google
                 </Button>
@@ -244,6 +273,7 @@ export default function SignupPage() {
                       callbackURL: "/",
                     });
                   }}
+                  className="transition-all duration-300 hover:bg-muted"
                 >
                   GitHub
                 </Button>
@@ -256,6 +286,7 @@ export default function SignupPage() {
                       callbackURL: "/",
                     });
                   }}
+                  className="transition-all duration-300 hover:bg-muted"
                 >
                   X
                 </Button>
@@ -265,19 +296,23 @@ export default function SignupPage() {
                 Already have an account?{" "}
                 <Link
                   href="/login"
-                  className="underline underline-offset-4 hover:text-primary"
+                  className="underline underline-offset-4 hover:text-primary transition-colors duration-300"
                 >
                   Log in
                 </Link>
               </div>
             </div>
-          </>
+          </motion.div>
         );
       case 2:
         return (
-          <>
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Building2 className="h-6 w-6" />
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={contentVariants}
+          >
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
+              <Building2 className="h-6 w-6 text-indigo-500" />
               Create your organization
             </h2>
             <div className="space-y-4">
@@ -290,6 +325,7 @@ export default function SignupPage() {
                   value={orgName}
                   onChange={(e) => handleOrgNameChange(e.target.value)}
                   required
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
               </div>
 
@@ -314,6 +350,7 @@ export default function SignupPage() {
                     )
                   }
                   required
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
                 <p className="text-xs text-muted-foreground">
                   This will be used in your URL: frogstats.io/{orgSlug}
@@ -322,7 +359,7 @@ export default function SignupPage() {
 
               <div className="flex justify-between pt-4">
                 <Button
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
                   onClick={handleOrganizationSubmit}
                   disabled={isLoading || !orgName || !orgSlug}
                 >
@@ -331,13 +368,17 @@ export default function SignupPage() {
                 </Button>
               </div>
             </div>
-          </>
+          </motion.div>
         );
       case 3:
         return (
-          <>
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <AppWindow className="h-6 w-6" />
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={contentVariants}
+          >
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
+              <AppWindow className="h-6 w-6 text-indigo-500" />
               Add your first website
             </h2>
             <div className="space-y-4">
@@ -350,6 +391,7 @@ export default function SignupPage() {
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
                   required
+                  className="h-10 transition-all focus:ring-2 focus:ring-indigo-400"
                 />
                 <p className="text-xs text-muted-foreground">
                   Enter the domain of the website you want to track
@@ -358,7 +400,7 @@ export default function SignupPage() {
 
               <div className="flex justify-between pt-4">
                 <Button
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 transition-all duration-300 h-11"
                   onClick={handleWebsiteSubmit}
                   disabled={isLoading || !domain}
                 >
@@ -367,22 +409,30 @@ export default function SignupPage() {
                 </Button>
               </div>
             </div>
-          </>
+          </motion.div>
         );
       case 4:
         return (
-          <>
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Code className="h-6 w-6" />
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={contentVariants}
+          >
+            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 bg-clip-text text-transparent">
+              <Code className="h-6 w-6 text-indigo-500" />
               Add tracking code to your website
             </h2>
             <div className="space-y-6">
-              <div className="rounded-lg bg-muted p-4 border border-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <p className="text-sm font-medium">Your account is ready!</p>
+              <div className="rounded-lg bg-gradient-to-r from-indigo-500/10 to-teal-500/10 p-5 border border-indigo-200/20 backdrop-blur">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-teal-500 text-white">
+                    <Check className="h-4 w-4" />
+                  </div>
+                  <p className="text-base font-medium">
+                    Your account is ready!
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground ml-11">
                   To start collecting analytics data, add this tracking code to
                   your website.
                 </p>
@@ -392,10 +442,12 @@ export default function SignupPage() {
                 <Label>
                   Place this snippet in the &lt;head&gt; of your website
                 </Label>
-                <CodeSnippet
-                  language="HTML"
-                  code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n/>`}
-                />
+                <div className="border border-indigo-200/20 rounded-lg overflow-hidden">
+                  <CodeSnippet
+                    language="HTML"
+                    code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n/>`}
+                  />
+                </div>
               </div>
 
               <div className="rounded-lg bg-muted p-4 border border-border">
@@ -405,36 +457,50 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-4 gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentStep(3)}
+                  className="transition-all duration-300 h-11"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
-                <Button onClick={() => router.push("/")} variant="success">
+                <Button
+                  onClick={() => router.push("/")}
+                  variant="success"
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 h-11"
+                >
                   Go to Dashboard
                   <Check className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
-          </>
+          </motion.div>
         );
       default:
         return null;
     }
   };
 
+  // Calculate progress percentage
+  const progressPercentage = ((currentStep - 1) / 3) * 100;
+
   return (
     <StandardPage>
       <div className="flex justify-center items-center min-h-screen bg-background p-4">
-        <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg">
+        <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-indigo-200/20 backdrop-blur-sm">
           <div className="flex flex-col md:flex-row h-full">
             {/* Left sidebar with steps */}
-            <div className="bg-muted md:w-80 p-6">
-              <div className="flex flex-col space-y-4">
+            <div className="bg-gradient-to-b from-indigo-950/40 to-slate-950/40 md:w-80 p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-teal-500 transition-all duration-500 ease-out"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+              <div className="relative z-10 flex flex-col space-y-4">
                 <h1 className="text-xl font-bold mb-6">
                   Get Started with Frogstats
                 </h1>
@@ -442,7 +508,7 @@ export default function SignupPage() {
                 {[1, 2, 3, 4].map((step) => (
                   <div
                     key={step}
-                    className={`flex items-center space-x-3 py-2 ${
+                    className={`flex items-center space-x-3 py-3 ${
                       currentStep === step
                         ? "text-primary font-medium"
                         : currentStep > step
@@ -452,30 +518,41 @@ export default function SignupPage() {
                   >
                     <div
                       className={`
-                    flex items-center justify-center w-8 h-8 rounded-full 
-                    ${
-                      currentStep === step
-                        ? "bg-primary text-primary-foreground"
-                        : currentStep > step
-                        ? "bg-primary/20 text-primary"
-                        : "bg-muted-foreground/20 text-muted-foreground"
-                    }
-                  `}
+                      flex items-center justify-center w-8 h-8 rounded-full 
+                      ${
+                        currentStep === step
+                          ? "bg-gradient-to-r from-indigo-500 to-teal-500 text-white shadow-md"
+                          : currentStep > step
+                          ? "bg-primary/20 text-primary"
+                          : "bg-muted-foreground/20 text-muted-foreground"
+                      }
+                      transition-all duration-300
+                    `}
                     >
                       {currentStep > step ? (
                         <Check className="h-4 w-4" />
                       ) : (
-                        <span>{step}</span>
+                        getStepIcon(step)
                       )}
                     </div>
                     <span>
                       {step === 1 && "Create account"}
                       {step === 2 && "Create organization"}
                       {step === 3 && "Add website"}
-                      {step === 4 && "Track your first pageview"!}
+                      {step === 4 && "Track your first pageview"}
                     </span>
                   </div>
                 ))}
+
+                {/* Visual element at the bottom */}
+                <div className="mt-auto pt-8">
+                  <div className="rounded-lg bg-gradient-to-r from-indigo-500/10 to-teal-500/10 p-4 backdrop-blur border border-indigo-200/10">
+                    <p className="text-xs text-muted-foreground">
+                      Analytics that respect privacy while providing powerful
+                      insights
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
