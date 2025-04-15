@@ -13,8 +13,9 @@ import { StandardSection } from "../../../components/shared/StandardSection/Stan
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
 import { useSubdivisions } from "../../../../../lib/geo";
 import { StandardSectionRealtime } from "../../../components/shared/StandardSection/StandardSectionRealtime";
+import { MapComponent } from "./Map";
 
-type Tab = "countries" | "regions" | "languages";
+type Tab = "countries" | "regions" | "languages" | "cities" | "map";
 
 const regionNamesInEnglish = new Intl.DisplayNames(["en"], { type: "region" });
 const languageNamesInEnglish = new Intl.DisplayNames(["en"], {
@@ -66,6 +67,7 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
             <TabsTrigger value="regions">Regions</TabsTrigger>
             <TabsTrigger value="cities">Cities</TabsTrigger>
             <TabsTrigger value="languages">Languages</TabsTrigger>
+            <TabsTrigger value="map">Map</TabsTrigger>
           </TabsList>
           <TabsContent value="countries">
             <ComponentToUse
@@ -150,6 +152,9 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
                 </div>
               )}
             />
+          </TabsContent>
+          <TabsContent value="map">
+            <MapComponent />
           </TabsContent>
         </Tabs>
       </CardContent>
