@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AlertCircle, Shield, Zap } from "lucide-react";
+import { AlertCircle, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Subscription } from "@/api/admin/subscription";
 
@@ -93,7 +93,7 @@ export function ChangePlanDialog({
           </Alert>
         )}
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4">
           {/* Basic Plans */}
           <div>
             <h3 className="font-medium mb-3 flex items-center">
@@ -111,77 +111,6 @@ export function ChangePlanDialog({
                         !activeSubscription?.cancelAtPeriodEnd) ||
                       resumingPlan === plan.name
                         ? "ring-2 ring-green-400"
-                        : ""
-                    }`}
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-bold">
-                            {plan.limits.events.toLocaleString()} events
-                          </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            ${plan.price} / {plan.interval}
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant={
-                            (activeSubscription?.plan === plan.name &&
-                              !activeSubscription?.cancelAtPeriodEnd) ||
-                            (resumingPlan === plan.name &&
-                              resumingPlan === activeSubscription?.plan)
-                              ? "outline"
-                              : "default"
-                          }
-                          onClick={() => {
-                            if (
-                              activeSubscription?.plan !== plan.name ||
-                              activeSubscription?.cancelAtPeriodEnd
-                            ) {
-                              handleUpgradeSubscription(plan.name);
-                            }
-                          }}
-                          disabled={
-                            (activeSubscription?.plan === plan.name &&
-                              !activeSubscription?.cancelAtPeriodEnd) ||
-                            isProcessing
-                          }
-                        >
-                          {activeSubscription?.plan === plan.name &&
-                          !activeSubscription?.cancelAtPeriodEnd
-                            ? "Current"
-                            : resumingPlan === plan.name &&
-                              resumingPlan === activeSubscription?.plan
-                            ? "Resume"
-                            : isProcessing
-                            ? "Processing..."
-                            : "Select"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-
-          {/* Pro Plans */}
-          <div>
-            <h3 className="font-medium mb-3 flex items-center">
-              <Zap className="h-4 w-4 mr-2 text-emerald-500" />
-              Pro Plans
-            </h3>
-            <div className="space-y-3">
-              {upgradePlans
-                .filter((plan) => plan.name.startsWith("pro"))
-                .map((plan) => (
-                  <Card
-                    key={plan.priceId}
-                    className={`cursor-pointer hover:shadow-md transition-shadow ${
-                      (activeSubscription?.plan === plan.name &&
-                        !activeSubscription?.cancelAtPeriodEnd) ||
-                      resumingPlan === plan.name
-                        ? "ring-2 ring-emerald-400"
                         : ""
                     }`}
                   >

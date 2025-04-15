@@ -24,7 +24,7 @@ const EVENT_TIERS = [20_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000];
 
 // Define types for plans
 interface PlanTemplate {
-  id: "free" | "basic" | "pro" | "enterprise";
+  id: "free" | "basic";
   name: string;
   price?: string;
   interval?: string;
@@ -80,35 +80,6 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
     color:
       "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
   },
-  {
-    id: "pro",
-    name: "Pro",
-    description: "Advanced analytics for growing businesses",
-    baseFeatures: [
-      "Advanced dashboard features",
-      "30-day data retention",
-      "Priority support",
-      "Custom event definitions",
-      "Team collaboration",
-    ],
-    color:
-      "bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-800 dark:to-teal-800",
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    description: "Custom solutions for large organizations",
-    baseFeatures: [
-      "Unlimited events",
-      "90-day data retention",
-      "Dedicated support",
-      "Custom integrations",
-      "Advanced security features",
-      "SLA guarantees",
-    ],
-    color:
-      "bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-blue-900",
-  },
 ];
 
 // Format price with dollar sign
@@ -118,7 +89,7 @@ function getFormattedPrice(price: number): string {
 
 // Find the appropriate price for a tier at current event limit
 function findPriceForTier(
-  tier: "basic" | "pro" | "enterprise",
+  tier: "basic",
   eventLimit: number,
   interval: "month" | "year"
 ): StripePrice | null {
@@ -182,7 +153,7 @@ function calculateSavings(monthlyPrice: number, annualPrice: number): string {
 
 // Function to get the direct plan ID based on criteria
 function getDirectPlanID(
-  tier: "basic" | "pro",
+  tier: "basic",
   eventLimit: number,
   isAnnual: boolean
 ): string {
@@ -211,9 +182,7 @@ function getDirectPlanID(
 }
 
 export default function Subscribe() {
-  const [selectedTier, setSelectedTier] = useState<
-    "free" | "basic" | "pro" | "enterprise"
-  >("free");
+  const [selectedTier, setSelectedTier] = useState<"free" | "basic">("free");
   const [eventLimitIndex, setEventLimitIndex] = useState<number>(0); // Default to 20k (index 0)
   const [selectedPrice, setSelectedPrice] = useState<StripePrice | null>(null);
   const [isAnnual, setIsAnnual] = useState<boolean>(false);
@@ -231,51 +200,36 @@ export default function Subscribe() {
   const basicAnnualPlans = STRIPE_PRICES.filter(
     (plan) => plan.name.includes("basic") && plan.name.includes("-annual")
   );
-  const proMonthlyPlans = STRIPE_PRICES.filter(
-    (plan) => plan.name.startsWith("pro") && !plan.name.includes("-annual")
-  );
-  const proAnnualPlans = STRIPE_PRICES.filter(
-    (plan) => plan.name.includes("pro") && plan.name.includes("-annual")
-  );
 
   // Update the selected price when tier or event limit changes
   useEffect(() => {
-    if (selectedTier === "free" || selectedTier === "enterprise") {
+    if (selectedTier === "free") {
       setSelectedPrice(null);
       return;
     }
-
-    const interval = isAnnual ? "year" : "month";
 
     // Get the correct set of plans based on the tier and interval
     let filteredPlans;
     if (selectedTier === "basic") {
       filteredPlans = isAnnual ? basicAnnualPlans : basicMonthlyPlans;
-    } else {
-      filteredPlans = isAnnual ? proAnnualPlans : proMonthlyPlans;
     }
 
     const matchingPlan =
-      filteredPlans.find((plan) => plan.limits.events >= eventLimit) ||
-      filteredPlans[filteredPlans.length - 1];
-
-    setSelectedPrice(matchingPlan);
+      filteredPlans?.find((plan) => plan.limits.events >= eventLimit) ||
+      filteredPlans?.[filteredPlans.length - 1];
+    if (matchingPlan) {
+      setSelectedPrice(matchingPlan);
+    }
   }, [selectedTier, eventLimit, isAnnual]);
 
   // Handle subscription
-  function handleSubscribe(
-    planId: "free" | "basic" | "pro" | "enterprise"
-  ): void {
+  function handleSubscribe(planId: "free" | "basic"): void {
     setSelectedTier(planId);
 
-    if (planId === "free" || planId === "enterprise") return;
+    if (planId === "free") return;
 
     // Use the direct plan mapping approach with the new naming scheme
-    const planName = getDirectPlanID(
-      planId as "basic" | "pro",
-      eventLimit,
-      isAnnual
-    );
+    const planName = getDirectPlanID("basic", eventLimit, isAnnual);
 
     console.log(
       `Direct plan mapping selected: ${planName}, interval=${
@@ -323,11 +277,6 @@ export default function Subscribe() {
       });
   }
 
-  // Handle contact for enterprise
-  function handleContactEnterprise(): void {
-    globalThis.location.href = "/contact";
-  }
-
   // Handle slider changes
   function handleSliderChange(value: number[]): void {
     setEventLimitIndex(value[0]);
@@ -341,13 +290,10 @@ export default function Subscribe() {
   // Find the current prices for each tier based on the event limit
   const interval = isAnnual ? "year" : "month";
   const basicTierPrice = findPriceForTier("basic", eventLimit, interval);
-  const proTierPrice = findPriceForTier("pro", eventLimit, interval);
 
   // Also get monthly prices for savings calculation
   const basicMonthly = findPriceForTier("basic", eventLimit, "month");
-  const proMonthly = findPriceForTier("pro", eventLimit, "month");
   const basicAnnual = findPriceForTier("basic", eventLimit, "year");
-  const proAnnual = findPriceForTier("pro", eventLimit, "year");
 
   // Generate plan objects with current state
   const plans: Plan[] = PLAN_TEMPLATES.map((template) => {
@@ -363,19 +309,6 @@ export default function Subscribe() {
         plan.annualPrice = basicAnnual.price;
         plan.savings = calculateSavings(basicMonthly.price, basicAnnual.price);
       }
-    } else if (plan.id === "pro") {
-      const tierPrice = proTierPrice;
-      plan.price = tierPrice ? getFormattedPrice(tierPrice.price) : "$39+";
-      plan.interval = isAnnual ? "year" : "month";
-
-      if (proMonthly && proAnnual) {
-        plan.monthlyPrice = proMonthly.price;
-        plan.annualPrice = proAnnual.price;
-        plan.savings = calculateSavings(proMonthly.price, proAnnual.price);
-      }
-    } else if (plan.id === "enterprise") {
-      plan.price = "Custom";
-      plan.interval = "";
     } else {
       plan.price = "$0";
       plan.interval = "month";
@@ -385,8 +318,6 @@ export default function Subscribe() {
     const eventFeature =
       plan.id === "free"
         ? "20,000 events per month"
-        : plan.id === "enterprise"
-        ? "Unlimited events"
         : `${Math.max(eventLimit, 100_000).toLocaleString()} events per month`;
 
     plan.features = [eventFeature, ...plan.baseFeatures];
@@ -477,7 +408,7 @@ export default function Subscribe() {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-4 max-w-6xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <div key={plan.id} className="transition-all duration-300 h-full">
               <Card
@@ -502,13 +433,11 @@ export default function Subscribe() {
                         </span>
                       )}
                     </div>
-                    {isAnnual &&
-                      plan.id !== "free" &&
-                      plan.id !== "enterprise" && (
-                        <Badge className="bg-emerald-500 text-white border-0">
-                          2 months free
-                        </Badge>
-                      )}
+                    {isAnnual && plan.id !== "free" && (
+                      <Badge className="bg-emerald-500 text-white border-0">
+                        2 months free
+                      </Badge>
+                    )}
                     <p>{plan.description}</p>
                   </CardDescription>
                 </CardHeader>
@@ -517,7 +446,7 @@ export default function Subscribe() {
                   <div className="w-full h-px bg-neutral-200 dark:bg-neutral-800 mb-4"></div>
                   <ul className="space-y-3 text-sm">
                     {plan.features.map((feature, i) => (
-                      <li key={feature} className="flex items-start">
+                      <li key={`${feature}-${i}`} className="flex items-start">
                         <Check
                           className={`mr-2 h-4 w-4 ${
                             i === 0 ? "text-emerald-400" : "text-green-400"
@@ -530,24 +459,12 @@ export default function Subscribe() {
                 </CardContent>
 
                 <CardFooter>
-                  {plan.id === "basic" || plan.id === "pro" ? (
+                  {plan.id === "basic" ? (
                     <Button
                       onClick={() => handleSubscribe(plan.id)}
-                      className={`w-full ${
-                        plan.id === "pro"
-                          ? "bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500"
-                          : ""
-                      }`}
-                      variant={plan.id === "pro" ? "default" : "outline"}
+                      className="w-full"
                     >
                       Subscribe to {plan.name}
-                    </Button>
-                  ) : plan.id === "enterprise" ? (
-                    <Button
-                      onClick={handleContactEnterprise}
-                      className="w-full bg-gradient-to-r from-slate-500 to-blue-400 hover:from-slate-600 hover:to-blue-500"
-                    >
-                      Contact Sales
                     </Button>
                   ) : (
                     <Button
@@ -562,26 +479,6 @@ export default function Subscribe() {
               </Card>
             </div>
           ))}
-        </div>
-
-        <div className="mt-16 text-center text-sm max-w-2xl mx-auto p-6 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800">
-          <div className="flex items-center justify-center mb-4">
-            <Users className="h-5 w-5 text-emerald-400 mr-2" />
-            <span className="font-medium">Important Information</span>
-          </div>
-          <p className="mb-3 text-neutral-600 dark:text-neutral-400">
-            All paid plans include a 14-day free trial. No credit card required
-            until your trial ends.
-          </p>
-          <p className="text-neutral-600 dark:text-neutral-400">
-            Have questions about our plans?{" "}
-            <a
-              href="/contact"
-              className="text-emerald-400 hover:underline font-medium"
-            >
-              Contact our sales team
-            </a>
-          </p>
         </div>
       </div>
     </StandardPage>
