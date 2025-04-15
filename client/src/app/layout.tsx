@@ -88,7 +88,7 @@ export default function RootLayout({
         <Toaster />
         <TooltipProvider>
           <QueryProvider>
-            {pathname === "/login" || pathname === "/signup" ? (
+            {pathname === "/login" ? (
               <div className="min-h-full flex items-center justify-center">
                 {children}
               </div>
