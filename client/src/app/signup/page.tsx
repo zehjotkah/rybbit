@@ -328,12 +328,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="orgSlug">
-                  Organization Slug
-                  <span className="text-xs text-muted-foreground ml-2">
-                    (URL identifier)
-                  </span>
-                </Label>
+                <Label htmlFor="orgSlug">Organization Slug</Label>
                 <Input
                   id="orgSlug"
                   type="text"
@@ -350,9 +345,6 @@ export default function SignupPage() {
                   required
                   className="h-10 transition-all"
                 />
-                <p className="text-xs text-muted-foreground">
-                  This will be used in your URL: frogstats.io/{orgSlug}
-                </p>
               </div>
 
               <div className="flex justify-between pt-4">
@@ -466,7 +458,7 @@ export default function SignupPage() {
                   Back
                 </Button>
                 <Button
-                  onClick={() => router.push("/")}
+                  onClick={() => router.push(`/${siteId}`)}
                   variant="success"
                   className="flex-1 transition-all duration-300 h-11"
                 >
@@ -541,16 +533,6 @@ export default function SignupPage() {
                     </span>
                   </div>
                 ))}
-
-                {/* Visual element at the bottom */}
-                <div className="mt-auto pt-8">
-                  <div className="rounded-lg bg-background/50 p-4 border border-border">
-                    <p className="text-xs text-muted-foreground">
-                      Analytics that respect privacy while providing powerful
-                      insights
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
