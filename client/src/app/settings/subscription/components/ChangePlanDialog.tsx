@@ -12,6 +12,8 @@ import {
 import { AlertCircle, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Subscription } from "@/api/admin/subscription";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface ChangePlanDialogProps {
   showUpgradeDialog: boolean;
@@ -38,6 +40,8 @@ export function ChangePlanDialog({
 }: ChangePlanDialogProps) {
   // State to track if we're resuming a subscription
   const [resumingPlan, setResumingPlan] = useState<string | null>(null);
+  // State to track billing interval preference
+  const [isAnnual, setIsAnnual] = useState<boolean>(false);
 
   // When dialog opens and subscription is canceled, highlight the current plan
   useEffect(() => {
@@ -47,10 +51,24 @@ export function ChangePlanDialog({
       activeSubscription?.plan
     ) {
       setResumingPlan(activeSubscription.plan);
+      // Initialize the annual toggle based on the current subscription
+      setIsAnnual(activeSubscription.plan.includes("-annual"));
+    } else if (showUpgradeDialog && activeSubscription?.plan) {
+      // Initialize the annual toggle based on the current subscription
+      setIsAnnual(activeSubscription.plan.includes("-annual"));
     } else {
       setResumingPlan(null);
     }
   }, [showUpgradeDialog, activeSubscription]);
+
+  // Filter plans based on the selected billing interval
+  const filteredPlans = upgradePlans.filter(
+    (plan) =>
+      plan.name.startsWith("basic") &&
+      (isAnnual
+        ? plan.name.includes("-annual")
+        : !plan.name.includes("-annual"))
+  );
 
   return (
     <Dialog
@@ -93,75 +111,111 @@ export function ChangePlanDialog({
           </Alert>
         )}
 
+        {/* Billing toggle buttons */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-full inline-flex relative">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={cn(
+                "px-6 py-2 rounded-full text-sm font-medium transition-all",
+                !isAnnual
+                  ? "bg-white dark:bg-neutral-700 shadow-sm text-black dark:text-white"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+              )}
+            >
+              Monthly
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={cn(
+                  "px-6 py-2 rounded-full text-sm font-medium transition-all",
+                  isAnnual
+                    ? "bg-white dark:bg-neutral-700 shadow-sm text-black dark:text-white"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                )}
+              >
+                Annual
+              </button>
+              <Badge className="absolute -top-2 -right-2 bg-emerald-500 text-white border-0 pointer-events-none">
+                2 months free
+              </Badge>
+            </div>
+          </div>
+        </div>
+
         <div className="grid gap-4">
-          {/* Basic Plans */}
+          {/* Pro Plans */}
           <div>
             <h3 className="font-medium mb-3 flex items-center">
               <Shield className="h-4 w-4 mr-2 text-green-500" />
-              Basic Plans
+              Pro Plans
             </h3>
             <div className="space-y-3">
-              {upgradePlans
-                .filter((plan) => plan.name.startsWith("basic"))
-                .map((plan) => (
-                  <Card
-                    key={plan.priceId}
-                    className={`cursor-pointer hover:shadow-md transition-shadow ${
-                      (activeSubscription?.plan === plan.name &&
-                        !activeSubscription?.cancelAtPeriodEnd) ||
-                      resumingPlan === plan.name
-                        ? "ring-2 ring-green-400"
-                        : ""
-                    }`}
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-bold">
-                            {plan.limits.events.toLocaleString()} events
-                          </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            ${plan.price} / {plan.interval}
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant={
-                            (activeSubscription?.plan === plan.name &&
-                              !activeSubscription?.cancelAtPeriodEnd) ||
-                            (resumingPlan === plan.name &&
-                              resumingPlan === activeSubscription?.plan)
-                              ? "outline"
-                              : "default"
-                          }
-                          onClick={() => {
-                            if (
-                              activeSubscription?.plan !== plan.name ||
-                              activeSubscription?.cancelAtPeriodEnd
-                            ) {
-                              handleUpgradeSubscription(plan.name);
-                            }
-                          }}
-                          disabled={
-                            (activeSubscription?.plan === plan.name &&
-                              !activeSubscription?.cancelAtPeriodEnd) ||
-                            isProcessing
-                          }
-                        >
-                          {activeSubscription?.plan === plan.name &&
-                          !activeSubscription?.cancelAtPeriodEnd
-                            ? "Current"
-                            : resumingPlan === plan.name &&
-                              resumingPlan === activeSubscription?.plan
-                            ? "Resume"
-                            : isProcessing
-                            ? "Processing..."
-                            : "Select"}
-                        </Button>
+              {filteredPlans.map((plan) => (
+                <Card
+                  key={plan.priceId}
+                  className={`cursor-pointer hover:shadow-md transition-shadow ${
+                    (activeSubscription?.plan === plan.name &&
+                      !activeSubscription?.cancelAtPeriodEnd) ||
+                    resumingPlan === plan.name
+                      ? "ring-2 ring-green-400"
+                      : ""
+                  }`}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-bold">
+                          {plan.limits.events.toLocaleString()} events
+                          {isAnnual && (
+                            <Badge className="ml-2 bg-emerald-500 text-white border-0 text-xs">
+                              Save 17%
+                            </Badge>
+                          )}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          ${plan.price} / {plan.interval}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <Button
+                        size="sm"
+                        variant={
+                          (activeSubscription?.plan === plan.name &&
+                            !activeSubscription?.cancelAtPeriodEnd) ||
+                          (resumingPlan === plan.name &&
+                            resumingPlan === activeSubscription?.plan)
+                            ? "outline"
+                            : "default"
+                        }
+                        onClick={() => {
+                          if (
+                            activeSubscription?.plan !== plan.name ||
+                            activeSubscription?.cancelAtPeriodEnd
+                          ) {
+                            handleUpgradeSubscription(plan.name);
+                          }
+                        }}
+                        disabled={
+                          (activeSubscription?.plan === plan.name &&
+                            !activeSubscription?.cancelAtPeriodEnd) ||
+                          isProcessing
+                        }
+                      >
+                        {activeSubscription?.plan === plan.name &&
+                        !activeSubscription?.cancelAtPeriodEnd
+                          ? "Current"
+                          : resumingPlan === plan.name &&
+                            resumingPlan === activeSubscription?.plan
+                          ? "Resume"
+                          : isProcessing
+                          ? "Processing..."
+                          : "Select"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>

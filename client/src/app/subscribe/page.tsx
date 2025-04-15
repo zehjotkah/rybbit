@@ -20,7 +20,10 @@ import { cn } from "@/lib/utils";
 import { StandardPage } from "../../components/StandardPage";
 
 // Available event tiers for the slider
-const EVENT_TIERS = [20_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000];
+const EVENT_TIERS = [
+  20_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000,
+  10_000_000,
+];
 
 // Define types for plans
 interface PlanTemplate {
@@ -70,12 +73,12 @@ const PLAN_TEMPLATES: PlanTemplate[] = [
   },
   {
     id: "basic",
-    name: "Basic",
-    description: "Essential analytics for small projects",
+    name: "Pro",
+    description: "Advanced analytics for growing projects",
     baseFeatures: [
-      "Core analytics features",
+      "Advanced analytics features",
       "14-day data retention",
-      "Basic support",
+      "Priority support",
     ],
     color:
       "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
@@ -170,8 +173,12 @@ function getDirectPlanID(
     eventSuffix = "500k";
   } else if (eventLimit <= 1_000_000) {
     eventSuffix = "1m";
-  } else {
+  } else if (eventLimit <= 2_000_000) {
     eventSuffix = "2m";
+  } else if (eventLimit <= 5_000_000) {
+    eventSuffix = "5m";
+  } else {
+    eventSuffix = "10m";
   }
 
   // Construct the plan name with annual suffix if needed

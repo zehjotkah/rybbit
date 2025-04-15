@@ -79,10 +79,42 @@ export const STRIPE_PRICES = [
   },
   {
     name: "basic2m-annual",
-    priceId: "price_1R1fRMDFVprnAny24AMo0Vuu",
+    priceId: "price_1RE1bQDFVprnAny2ELKQS79d",
     interval: "year",
     limits: {
       events: 2_000_000,
+    },
+  },
+  {
+    name: "basic5m",
+    priceId: "price_1R2kybDFVprnAny21Mo1Wjuz",
+    interval: "month",
+    limits: {
+      events: 5_000_000,
+    },
+  },
+  {
+    name: "basic5m-annual",
+    priceId: "price_1RE1ebDFVprnAny2BbHtnuko",
+    interval: "year",
+    limits: {
+      events: 5_000_000,
+    },
+  },
+  {
+    name: "basic10m",
+    priceId: "price_1R2kzxDFVprnAny2wdMx2Npp",
+    interval: "month",
+    limits: {
+      events: 10_000_000,
+    },
+  },
+  {
+    name: "basic10m-annual",
+    priceId: "price_1RE1fHDFVprnAny2SKY4gFCA",
+    interval: "year",
+    limits: {
+      events: 10_000_000,
     },
   },
 ];

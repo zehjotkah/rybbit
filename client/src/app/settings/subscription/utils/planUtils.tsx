@@ -41,14 +41,14 @@ export const getPlanDetails = (
     },
     basic: {
       id: "basic",
-      name: "Basic",
+      name: "Pro",
       price: "$19+",
       interval: "month",
-      description: "Essential analytics for small projects",
+      description: "Advanced analytics for growing projects",
       features: [
-        "Core analytics features",
+        "Advanced analytics features",
         "14-day data retention",
-        "Basic support",
+        "Priority support",
       ],
       color:
         "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",

@@ -173,20 +173,18 @@ export default function SubscriptionPage() {
   const getCurrentTierPrices = () => {
     if (!activeSubscription?.plan) return [];
 
-    // Get the current interval
-    const currentInterval = isAnnualPlan ? "year" : "month";
+    // Return all available plans for switching, regardless of interval
+    // The ChangePlanDialog will handle filtering by interval
+    return STRIPE_PRICES.sort((a, b) => {
+      // First sort by plan type (basic only now)
 
-    // Return all available plans for switching, matching the current interval
-    return STRIPE_PRICES.filter((p) => p.interval === currentInterval).sort(
-      (a, b) => {
-        // First sort by plan type (basic first, then pro)
-        if (a.name.startsWith("basic") && b.name.startsWith("pro")) return -1;
-        if (a.name.startsWith("pro") && b.name.startsWith("basic")) return 1;
+      // Then sort by interval (month first, then year)
+      if (a.interval === "month" && b.interval === "year") return -1;
+      if (a.interval === "year" && b.interval === "month") return 1;
 
-        // Then sort by event limit
-        return a.limits.events - b.limits.events;
-      }
-    );
+      // Then sort by event limit
+      return a.limits.events - b.limits.events;
+    });
   };
 
   const upgradePlans = getCurrentTierPrices();
@@ -227,6 +225,10 @@ export default function SubscriptionPage() {
 
     if (activeSubscription.status === "canceled") {
       return `Expires on ${formattedDate}`;
+    }
+
+    if (activeSubscription.cancelAtPeriodEnd) {
+      return `Ends on ${formattedDate}`;
     }
 
     return isAnnualPlan
@@ -334,9 +336,16 @@ export default function SubscriptionPage() {
                         Annual
                       </Badge>
                     )}
+                    {activeSubscription.cancelAtPeriodEnd && (
+                      <Badge className="ml-2 bg-orange-500 text-white">
+                        Canceling
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription>
-                    {activeSubscription.status === "active"
+                    {activeSubscription.cancelAtPeriodEnd
+                      ? "Your subscription will be canceled at the end of the current billing period."
+                      : activeSubscription.status === "active"
                       ? "Your subscription is active."
                       : activeSubscription.status === "canceled"
                       ? "Your subscription has been canceled but is still active until the end of the billing period."
@@ -375,7 +384,9 @@ export default function SubscriptionPage() {
                     <h3 className="font-medium">Renewal Date</h3>
                     <p className="text-lg font-bold">{formatRenewalDate()}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {isAnnualPlan
+                      {activeSubscription.cancelAtPeriodEnd
+                        ? "Your subscription will not renew after this date"
+                        : isAnnualPlan
                         ? "Your plan renews once per year"
                         : "Your plan renews monthly"}
                     </p>
@@ -413,14 +424,24 @@ export default function SubscriptionPage() {
             </CardContent>
             <CardFooter>
               {activeSubscription.status === "active" ? (
-                <Button
-                  variant="outline"
-                  onClick={handleCancelSubscription}
-                  disabled={isProcessing}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  {isProcessing ? "Processing..." : "Cancel Subscription"}
-                </Button>
+                activeSubscription.cancelAtPeriodEnd ? (
+                  <Button
+                    onClick={handleResumeSubscription}
+                    disabled={isProcessing}
+                    className="text-emerald-500 hover:text-emerald-600"
+                  >
+                    {isProcessing ? "Processing..." : "Resume Subscription"}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelSubscription}
+                    disabled={isProcessing}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    {isProcessing ? "Processing..." : "Cancel Subscription"}
+                  </Button>
+                )
               ) : (
                 <Button
                   onClick={handleResumeSubscription}
