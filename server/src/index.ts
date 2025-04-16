@@ -35,7 +35,6 @@ import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { initializeCronJobs } from "./cron/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
-import { initializePostgres } from "./db/postgres/postgres.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
@@ -234,7 +233,7 @@ const start = async () => {
   try {
     console.info("Starting server...");
     // Initialize the database
-    await Promise.all([initializeClickhouse(), initializePostgres()]);
+    await Promise.all([initializeClickhouse()]);
     await loadAllowedDomains();
 
     // Load public sites cache

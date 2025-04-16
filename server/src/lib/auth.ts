@@ -1,17 +1,14 @@
 import { betterAuth } from "better-auth";
-import { username, admin, organization } from "better-auth/plugins";
-import dotenv from "dotenv";
-import pg from "pg";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../db/postgres/postgres.js";
-import { IS_CLOUD, STRIPE_PRICES } from "./const.js";
-import * as schema from "../db/postgres/schema.js";
+import { admin, organization, username } from "better-auth/plugins";
+import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import Stripe from "stripe";
+import pg from "pg";
+import { db } from "../db/postgres/postgres.js";
+import * as schema from "../db/postgres/schema.js";
+import { IS_CLOUD } from "./const.js";
 
 dotenv.config();
-
-const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 type AuthType = ReturnType<typeof betterAuth> | null;
 

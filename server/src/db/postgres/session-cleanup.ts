@@ -1,5 +1,4 @@
 import { sql } from "./postgres.js";
-import { Session } from "./types.js";
 
 // function convertPostgresToClickhouse(postgresTimestamp: string): string {
 //   console.log("Parsing timestamp:", postgresTimestamp);
@@ -35,7 +34,7 @@ function convertPostgresToClickhouse(postgresTimestamp: string): string {
 }
 
 export async function cleanupOldSessions() {
-  const deletedSessions = await sql<Session[]>`
+  const deletedSessions = await sql`
     DELETE FROM active_sessions 
     WHERE last_activity < NOW() - INTERVAL '30 minute'
     RETURNING *
