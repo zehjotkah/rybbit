@@ -16,7 +16,7 @@ const buttonVariants = cva(
         accent:
           "bg-neutral-500 text-neutral-900 shadow-sm hover:bg-neutral-500/80 dark:bg-accent-600 dark:text-neutral-50 dark:hover:bg-accent-600/90",
         success:
-          "bg-green-500 text-neutral-50 shadow-sm hover:bg-green-500/90 dark:bg-green-900 dark:text-neutral-50 dark:hover:bg-green-900/90",
+          "bg-green-500 text-neutral-50 shadow-sm hover:bg-green-500/90 dark:bg-green-800 dark:text-neutral-50 dark:hover:bg-green-700/90",
         destructive:
           "bg-red-500 text-neutral-50 shadow-sm hover:bg-red-500/90 dark:bg-red-900 dark:text-neutral-50 dark:hover:bg-red-900/90",
         warning:

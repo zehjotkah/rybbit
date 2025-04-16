@@ -1,31 +1,31 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GithubLogo, GoogleLogo } from "@phosphor-icons/react/dist/ssr";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
-  Building2,
-  ArrowRight,
-  ArrowLeft,
-  Check,
   AppWindow,
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Check,
   Code,
   Sparkles,
   User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { addSite } from "../../api/admin/sites";
+import { CodeSnippet } from "../../components/CodeSnippet";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { authClient } from "../../lib/auth";
-import { userStore } from "../../lib/userStore";
 import { BACKEND_URL } from "../../lib/const";
-import { CodeSnippet } from "../../components/CodeSnippet";
-import { StandardPage } from "../../components/StandardPage";
-import { motion } from "framer-motion";
-import { addSite } from "../../api/admin/sites";
+import { userStore } from "../../lib/userStore";
 
 // Animation variants for step transitions
 const contentVariants = {
@@ -226,7 +226,7 @@ export default function SignupPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="password"
+                  placeholder="••••••••"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -248,7 +248,7 @@ export default function SignupPage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -260,6 +260,7 @@ export default function SignupPage() {
                   }}
                   className="transition-all duration-300 hover:bg-muted"
                 >
+                  <GoogleLogo weight="bold" />
                   Google
                 </Button>
                 <Button
@@ -273,23 +274,10 @@ export default function SignupPage() {
                   }}
                   className="transition-all duration-300 hover:bg-muted"
                 >
+                  <GithubLogo weight="bold" />
                   GitHub
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    authClient.signIn.social({
-                      provider: "twitter",
-                      callbackURL: "/",
-                    });
-                  }}
-                  className="transition-all duration-300 hover:bg-muted"
-                >
-                  X
-                </Button>
               </div>
-
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link
@@ -478,36 +466,35 @@ export default function SignupPage() {
   const progressPercentage = ((currentStep - 1) / 3) * 100;
 
   return (
-    <StandardPage>
-      <div className="flex justify-center items-center min-h-screen bg-background p-4">
-        <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-border">
-          <div className="flex flex-col md:flex-row h-full">
-            {/* Left sidebar with steps */}
-            <div className="bg-muted/70 md:w-80 p-6 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-muted-foreground/20 overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-500 ease-out"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </div>
-              <div className="relative z-10 flex flex-col space-y-4">
-                <h1 className="text-xl font-bold mb-6">
-                  Get Started with Frogstats
-                </h1>
+    <div className="flex justify-center items-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-border">
+        <div className="flex flex-col md:flex-row h-full">
+          {/* Left sidebar with steps */}
+          <div className="bg-muted/70 md:w-80 p-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-muted-foreground/20 overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-500 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+            <div className="relative z-10 flex flex-col space-y-4">
+              <h1 className="text-xl font-bold mb-6">
+                Get Started with Frogstats
+              </h1>
 
-                {[1, 2, 3, 4].map((step) => (
+              {[1, 2, 3, 4].map((step) => (
+                <div
+                  key={step}
+                  className={`flex items-center space-x-3 py-3 ${
+                    currentStep === step
+                      ? "text-primary font-medium"
+                      : currentStep > step
+                      ? "text-muted-foreground"
+                      : "text-muted-foreground/60"
+                  }`}
+                >
                   <div
-                    key={step}
-                    className={`flex items-center space-x-3 py-3 ${
-                      currentStep === step
-                        ? "text-primary font-medium"
-                        : currentStep > step
-                        ? "text-muted-foreground"
-                        : "text-muted-foreground/60"
-                    }`}
-                  >
-                    <div
-                      className={`
+                    className={`
                       flex items-center justify-center w-8 h-8 rounded-full 
                       ${
                         currentStep === step
@@ -518,41 +505,40 @@ export default function SignupPage() {
                       }
                       transition-all duration-300
                     `}
-                    >
-                      {currentStep > step ? (
-                        <Check className="h-4 w-4" />
-                      ) : (
-                        getStepIcon(step)
-                      )}
-                    </div>
-                    <span>
-                      {step === 1 && "Create account"}
-                      {step === 2 && "Create organization"}
-                      {step === 3 && "Add website"}
-                      {step === 4 && "Track your first pageview"}
-                    </span>
+                  >
+                    {currentStep > step ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      getStepIcon(step)
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right content area */}
-            <div className="p-6 md:p-8 flex-1 h-[600px] flex flex-col">
-              {error && (
-                <Alert variant="destructive" className="mb-6">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="flex-1 flex flex-col justify-between">
-                <div className="min-h-[400px]">{renderStepContent()}</div>
-              </div>
+                  <span>
+                    {step === 1 && "Create account"}
+                    {step === 2 && "Create organization"}
+                    {step === 3 && "Add website"}
+                    {step === 4 && "Track your first pageview"}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-        </Card>
-      </div>
-    </StandardPage>
+
+          {/* Right content area */}
+          <div className="p-6 md:p-8 flex-1 h-[600px] flex flex-col">
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex-1 flex flex-col justify-between">
+              <div className="min-h-[400px]">{renderStepContent()}</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

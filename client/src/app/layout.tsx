@@ -84,20 +84,14 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-background text-foreground`}>
-        <Toaster />
-        <TooltipProvider>
-          <QueryProvider>
-            {pathname === "/login" ? (
-              <div className="min-h-full flex items-center justify-center">
-                {children}
-              </div>
-            ) : (
-              children
-            )}
-          </QueryProvider>
-        </TooltipProvider>
-      </body>
+      <Toaster />
+      <TooltipProvider>
+        <body
+          className={`${inter.className} bg-background text-foreground h-full`}
+        >
+          <QueryProvider>{children}</QueryProvider>
+        </body>
+      </TooltipProvider>
     </html>
   );
 }
