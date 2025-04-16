@@ -15,7 +15,7 @@ import { authClient } from "@/lib/auth";
 import { STRIPE_PRICES } from "@/lib/stripe";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { StandardPage } from "../../components/StandardPage";
 import { BACKEND_URL } from "../../lib/const";
@@ -88,10 +88,6 @@ function findPriceForTier(
   eventLimit: number,
   interval: "month" | "year"
 ): StripePrice | null {
-  console.log(
-    `Finding price for tier: ${tier}, event limit: ${eventLimit}, interval: ${interval}`
-  );
-
   // Determine if we need to look for annual plans
   const isAnnual = interval === "year";
   const namePattern = isAnnual ? `${tier}-annual` : tier;
@@ -105,34 +101,9 @@ function findPriceForTier(
       plan.interval === interval
   );
 
-  console.log(
-    `Filtered plans for ${namePattern} with interval ${interval}:`,
-    plans.map((p) => ({
-      name: p.name,
-      interval: p.interval,
-      events: p.limits.events,
-      price: p.price,
-    }))
-  );
-
-  if (plans.length === 0) {
-    console.warn(`No plans found for ${namePattern} with interval ${interval}`);
-    return null;
-  }
-
   // Find a plan that matches or exceeds the event limit
   const matchingPlan = plans.find((plan) => plan.limits.events >= eventLimit);
   const selectedPlan = matchingPlan || plans[plans.length - 1] || null;
-
-  if (selectedPlan) {
-    console.log(
-      `Selected plan: ${selectedPlan.name} (${selectedPlan.interval}) - $${selectedPlan.price} - ${selectedPlan.limits.events} events`
-    );
-  } else {
-    console.log(
-      `No plan selected for ${namePattern} with interval ${interval}`
-    );
-  }
 
   // Return the matching plan or the highest tier available
   return selectedPlan;
@@ -219,7 +190,6 @@ export default function Subscribe() {
           throw new Error("Checkout URL not received.");
         }
       } catch (error: any) {
-        console.error("Subscription Error:", error);
         toast.error(`Subscription failed: ${error.message}`);
         setIsLoading(false); // Stop loading on error
       }

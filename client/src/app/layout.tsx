@@ -84,12 +84,12 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark">
-      <Toaster />
       <TooltipProvider>
         <body
           className={`${inter.className} bg-background text-foreground h-full`}
         >
           <QueryProvider>{children}</QueryProvider>
+          <Toaster />
         </body>
       </TooltipProvider>
     </html>

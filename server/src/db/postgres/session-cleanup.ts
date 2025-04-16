@@ -41,16 +41,5 @@ export async function cleanupOldSessions() {
     RETURNING *
   `;
 
-  // console.log(`Cleaned up ${deletedSessions.length} sessions`);
-
-  // disabled for now dubvious if we need sessions in clikchouse
-  // if (deletedSessions.length > 0) {
-  //   await insertSessions(
-  //     deletedSessions.map((e) => ({
-  //       ...e,
-  //       start_time: convertPostgresToClickhouse(e.start_time),
-  //       end_time: convertPostgresToClickhouse(e.end_time),
-  //     }))
-  //   );
-  // }
+  // console.log(`Cleaned up ${deletedSessions.length} sessions`)
 }

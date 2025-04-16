@@ -12,7 +12,6 @@ import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { authClient } from "../../lib/auth";
 import { IS_CLOUD } from "../../lib/const";
 import { userStore } from "../../lib/userStore";
-import { StandardPage } from "../../components/StandardPage";
 import { GithubLogo, GoogleLogo } from "@phosphor-icons/react/dist/ssr";
 
 export default function Page() {

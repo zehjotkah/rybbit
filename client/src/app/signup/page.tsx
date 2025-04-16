@@ -24,7 +24,7 @@ import { addSite } from "../../api/admin/sites";
 import { CodeSnippet } from "../../components/CodeSnippet";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { authClient } from "../../lib/auth";
-import { BACKEND_URL } from "../../lib/const";
+import { BACKEND_URL, IS_CLOUD } from "../../lib/const";
 import { userStore } from "../../lib/userStore";
 
 // Animation variants for step transitions
@@ -242,42 +242,45 @@ export default function SignupPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
 
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    authClient.signIn.social({
-                      provider: "google",
-                      callbackURL: "/",
-                    });
-                  }}
-                  className="transition-all duration-300 hover:bg-muted"
-                >
-                  <GoogleLogo weight="bold" />
-                  Google
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    authClient.signIn.social({
-                      provider: "github",
-                      callbackURL: "/",
-                    });
-                  }}
-                  className="transition-all duration-300 hover:bg-muted"
-                >
-                  <GithubLogo weight="bold" />
-                  GitHub
-                </Button>
-              </div>
+              {IS_CLOUD && (
+                <>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        authClient.signIn.social({
+                          provider: "google",
+                          callbackURL: "/",
+                        });
+                      }}
+                      className="transition-all duration-300 hover:bg-muted"
+                    >
+                      <GoogleLogo weight="bold" />
+                      Google
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        authClient.signIn.social({
+                          provider: "github",
+                          callbackURL: "/",
+                        });
+                      }}
+                      className="transition-all duration-300 hover:bg-muted"
+                    >
+                      <GithubLogo weight="bold" />
+                      GitHub
+                    </Button>
+                  </div>
+                </>
+              )}
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link
