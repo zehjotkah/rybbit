@@ -482,7 +482,7 @@ export default function SignupPage() {
             </div>
             <div className="relative z-10 flex flex-col space-y-4">
               <h1 className="text-xl font-bold mb-6">
-                Get Started with Frogstats
+                Get Started with Rybbit
               </h1>
 
               {[1, 2, 3, 4].map((step) => (
