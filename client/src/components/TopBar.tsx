@@ -23,7 +23,7 @@ export function TopBar() {
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-4">
           <Link href="/" className="text-base font-semibold">
-            🐸 Frogstats
+            🐸 Rybbit
           </Link>
         </div>
         {session.data ? (

@@ -29,7 +29,7 @@ export function MobileSidebar() {
         </SheetTrigger>
         <VisuallyHidden.Root>
           <SheetHeader>
-            <SheetTitle>Frogstats Sidebar</SheetTitle>
+            <SheetTitle>Rybbit Sidebar</SheetTitle>
           </SheetHeader>
         </VisuallyHidden.Root>
         <SheetContent side="left" className="p-0 w-[223px]" showClose={false}>

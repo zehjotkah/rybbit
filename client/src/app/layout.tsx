@@ -13,10 +13,6 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const metadata: Metadata = {
-  title: "Frogstats Analytics",
-  description: "Analytics dashboard for your web applications",
-};
 const publicRoutes = ["/login", "/signup"];
 
 // Helper function to check if a site is public

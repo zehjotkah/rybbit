@@ -1,9 +1,9 @@
 import { Steps } from 'nextra/components'
 import { Callout } from 'nextra/components'
 
-# Self Hosting Frogstats
+# Self Hosting 
 
-This guide will walk you through setting up your own instance of Frogstats.
+This guide will walk you through setting up your own instance of Rybbit.
 
 ## Prerequisites
 
@@ -21,29 +21,35 @@ Before you begin, ensure you have the following:
 ## Setup Steps
 
 <Steps>
-### 1. Install Docker and Git
+### 1. Point Your Domain to Your VPS
 
-First, connect to your VPS via SSH.
+Configure your domain's DNS settings to point to your VPS's public IP address. This usually involves:
 
-**Install Docker Engine:** Follow the official instructions for your Linux distribution:
+1.  Finding your VPS's public IPv4 address (from your hosting provider, e.g., Hetzner).
+2.  Logging into your domain registrar or DNS provider (e.g., GoDaddy, Namecheap, Cloudflare).
+3.  Adding an `A` record:
+    *   **Host/Name:** Your desired subdomain (e.g., `tracking`) or `@` for the root domain.
+    *   **Value:** Your VPS's IPv4 address.
+    *   **TTL:** Default or a low value (e.g., 300 seconds) for faster updates.
+
+DNS changes might take some time to propagate globally. Use [DNS Checker](https://dnschecker.org/) to verify.
+
+### 2. Install Docker Engine
+
+Connect to your VPS via SSH.
+
+Follow the official Docker Engine installation instructions for your Linux distribution:
 [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
-Make sure to complete the [post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/) as well, particularly adding your user to the `docker` group so you don't have to use `sudo` for every Docker command.
+### 3. Clone the Rybbit Repository
 
-**Install Git:** If Git is not already installed, install it using your distribution's package manager. For Debian/Ubuntu:
+Clone the project repository from GitHub (Git is usually pre-installed on most server distributions):
 ```bash
-sudo apt update && sudo apt install -y git
+git clone https://github.com/goldflag/rybbit.git
+cd Rybbit
 ```
 
-### 2. Clone the Frogstats Repository
-
-Clone the project repository from GitHub:
-```bash
-git clone https://github.com/goldflag/frogstats.git
-cd frogstats
-```
-
-### 3. Run the Setup Script
+### 4. Run the Setup Script
 
 The repository includes a setup script that configures the necessary environment variables (including generating a secure secret) and starts the application using Docker Compose.
 
@@ -55,9 +61,9 @@ chmod +x setup.sh
 
 The script will create a `.env` file and then build and start the containers. This might take a few minutes the first time.
 
-### 4. Sign Up
+### 5. Sign Up
 
-Once the services are running, Caddy (the webserver) will automatically obtain an SSL certificate for your domain.
+Once the services are running and DNS has propagated, Caddy (the webserver) will automatically obtain an SSL certificate for your domain.
 
 Open your browser and navigate to `https://your.domain.name/signup` (using the domain you provided to the setup script).
 
@@ -65,4 +71,6 @@ Create your admin account. You can then log in and start adding your websites!
 
 </Steps>
 
-Congratulations! You have successfully self-hosted Frogstats.
+Congratulations! You have successfully self-hosted Rybbit.
+
+If you run into any issues or need help, feel free to join our Discord community!

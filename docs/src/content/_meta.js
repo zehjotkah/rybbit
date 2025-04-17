@@ -4,4 +4,5 @@ export default {
   features: "",
   themes: "",
   advanced: "",
+  usage: "",
 };
