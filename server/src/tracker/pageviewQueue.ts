@@ -3,7 +3,7 @@ import clickhouse from "../db/clickhouse/clickhouse.js";
 import { TrackingPayload } from "../types.js";
 import { getDeviceType } from "../utils.js";
 import { getChannel } from "./getChannel.js";
-import { clearSelfReferrer } from "./trackingUtils.js";
+import { clearSelfReferrer, getUTMParams } from "./trackingUtils.js";
 
 type TotalPayload = TrackingPayload & {
   userId: string;
@@ -71,6 +71,9 @@ class PageviewQueue {
       // Check if referrer is from the same domain and clear it if so
       let referrer = clearSelfReferrer(pv.referrer || "", pv.hostname || "");
 
+      // Get UTM parameters
+      const utmParams = getUTMParams(pv.querystring || "");
+
       return {
         site_id: pv.site_id,
         timestamp: DateTime.fromISO(pv.timestamp).toFormat(
@@ -101,6 +104,11 @@ class PageviewQueue {
         type: pv.type || "pageview",
         event_name: pv.event_name || "",
         properties: pv.properties,
+        utm_source: utmParams["utm_source"] || "",
+        utm_medium: utmParams["utm_medium"] || "",
+        utm_campaign: utmParams["utm_campaign"] || "",
+        utm_term: utmParams["utm_term"] || "",
+        utm_content: utmParams["utm_content"] || "",
       };
     });
 

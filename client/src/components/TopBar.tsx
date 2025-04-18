@@ -12,7 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { User } from "lucide-react";
 import { Button } from "./ui/button";
-
+import Image from "next/image";
 export function TopBar() {
   const session = authClient.useSession();
   const router = useRouter();
@@ -22,8 +22,12 @@ export function TopBar() {
     <div className="flex py-2 px-3 items-center w-full  bg-neutral-950 justify-center border-b border-neutral-750">
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-4">
-          <Link href="/" className="text-base font-semibold">
-            🐸 Rybbit
+          <Link
+            href="/"
+            className="text-base font-semibold flex items-center gap-2"
+          >
+            <Image src="/frog.png" alt="Rybbit" width={24} height={24} />
+            Rybbit
           </Link>
         </div>
         {session.data ? (

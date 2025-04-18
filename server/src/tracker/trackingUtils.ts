@@ -45,6 +45,28 @@ export type ActiveSession = {
   referrer: string | null;
 };
 
+// UTM and URL parameter parsing utilities
+export function getUTMParams(querystring: string): Record<string, string> {
+  const params: Record<string, string> = {};
+
+  if (!querystring) return params;
+
+  try {
+    const searchParams = new URLSearchParams(querystring);
+
+    // Extract UTM parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (key.startsWith("utm_") || key === "gclid" || key === "gad_source") {
+        params[key.toLowerCase()] = value.toLowerCase();
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing query string:", e);
+  }
+
+  return params;
+}
+
 // Clear referrer if it's from the same domain
 export function clearSelfReferrer(referrer: string, hostname: string): string {
   if (!referrer || !hostname) return referrer;
