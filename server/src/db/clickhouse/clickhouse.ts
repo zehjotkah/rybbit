@@ -7,10 +7,10 @@ export const clickhouse = createClient({
 });
 
 export const initializeClickhouse = async () => {
-  // Create pageviews table
+  // Create events table
   await clickhouse.exec({
     query: `
-      CREATE TABLE IF NOT EXISTS pageviews (
+      CREATE TABLE IF NOT EXISTS events (
         site_id UInt16,
         timestamp DateTime,
         session_id String,
@@ -151,7 +151,7 @@ export const initializeClickhouse = async () => {
   //       any(device_type) AS device_type,
   //       -- Use the largest timestamp as the 'version'
   //       max(toUInt64(timestamp)) AS version
-  //   FROM pageviews
+  //   FROM events
   //   GROUP BY
   //       site_id,
   //       session_id;

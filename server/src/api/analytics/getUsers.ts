@@ -100,7 +100,7 @@ WITH AggregatedUsers AS (
         count(distinct session_id) AS sessions,
         max(timestamp) AS last_seen,
         min(timestamp) AS first_seen
-    FROM pageviews
+    FROM events
     WHERE
         site_id = ${site}
         ${timeStatement}
@@ -118,7 +118,7 @@ LIMIT ${pageSizeNum} OFFSET ${offset}
   const countQuery = `
 SELECT
     count(DISTINCT user_id) AS total_count
-FROM pageviews
+FROM events
 WHERE
     site_id = ${site}
     ${filterStatement}

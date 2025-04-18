@@ -106,7 +106,7 @@ LIMIT 1
     const countQuery = `
 SELECT
     COUNT(*) as total
-FROM pageviews
+FROM events
 WHERE
     site_id = ${site}
     AND session_id = '${sessionId}'
@@ -124,7 +124,7 @@ SELECT
     type,
     event_name,
     properties
-FROM pageviews
+FROM events
 WHERE
     site_id = ${site}
     AND session_id = '${sessionId}'

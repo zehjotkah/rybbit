@@ -80,7 +80,7 @@ SELECT
     device_type,
     country,
     iso_3166_2
-FROM pageviews
+FROM events
 WHERE
     site_id = ${site}
     AND user_id = '${userId}'

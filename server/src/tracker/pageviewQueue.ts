@@ -116,7 +116,7 @@ class PageviewQueue {
     // Bulk insert into database
     try {
       await clickhouse.insert({
-        table: "pageviews",
+        table: "events",
         values: processedPageviews,
         format: "JSONEachRow",
       });

@@ -134,7 +134,7 @@ async function getMonthlyPageviews(
     const result = await clickhouse.query({
       query: `
         SELECT COUNT(*) as count
-        FROM pageviews
+        FROM events
         WHERE site_id IN (${siteIds.join(",")})
         AND timestamp >= toDate('${periodStart}')
       `,

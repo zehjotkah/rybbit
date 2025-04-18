@@ -58,7 +58,7 @@ export async function getUserInfo(
             countIf(type = 'pageview') AS pageviews,
             countIf(type = 'custom_event') AS events
         FROM
-            pageviews
+            events
         WHERE
             user_id = {userId:String}
             AND site_id = {site:Int32}

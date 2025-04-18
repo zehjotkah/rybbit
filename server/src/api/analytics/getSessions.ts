@@ -81,7 +81,7 @@ export async function getSessions(
           argMaxIf(pathname, timestamp, type = 'pageview') AS exit_page,
           countIf(type = 'pageview') AS pageviews,
           countIf(type = 'custom_event') AS events
-      FROM pageviews
+      FROM events
       WHERE
           site_id = ${site}
           ${userId ? ` AND user_id = '${userId}'` : ""}
