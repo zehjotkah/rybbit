@@ -73,4 +73,22 @@ Create your admin account. You can then log in and start adding your websites!
 
 Congratulations! You have successfully self-hosted Rybbit.
 
+## Security Recommendation: Firewall Configuration
+
+For enhanced security, it is highly recommended to configure a firewall on your VPS. Allow incoming connections only on the ports necessary for the application to function externally. In most standard setups, this means allowing traffic only on port `443` (HTTPS).
+
+The exact commands depend on the firewall software used (e.g., `ufw` for Ubuntu, `firewalld` for CentOS).
+
+Example using `ufw` (Uncomplicated Firewall) on Ubuntu:
+```bash
+sudo ufw allow ssh   # Keep SSH access (usually port 22)
+sudo ufw allow 443/tcp # Allow HTTPS traffic
+sudo ufw enable     # Enable the firewall
+sudo ufw status     # Check the status
+```
+
+<Callout type="warning">
+Ensure you allow SSH access (typically port 22) before enabling the firewall, otherwise you might lock yourself out of your VPS!
+</Callout>
+
 If you run into any issues or need help, feel free to join our Discord community!
