@@ -11,31 +11,32 @@ export const trackingPayloadSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("pageview"),
     site_id: z.string().min(1),
-    hostname: z.string().optional(),
-    pathname: z.string().optional(),
-    querystring: z.string().optional(),
+    hostname: z.string().max(253).optional(),
+    pathname: z.string().max(2048).optional(),
+    querystring: z.string().max(2048).optional(),
     screenWidth: z.number().int().positive().optional(),
     screenHeight: z.number().int().positive().optional(),
-    language: z.string().optional(),
-    page_title: z.string().optional(),
-    referrer: z.string().optional(),
-    event_name: z.string().optional(),
-    properties: z.string().optional(),
+    language: z.string().max(35).optional(),
+    page_title: z.string().max(512).optional(),
+    referrer: z.string().max(2048).optional(),
+    event_name: z.string().max(256).optional(),
+    properties: z.string().max(2048).optional(),
   }),
   z.object({
     type: z.literal("custom_event"),
     site_id: z.string().min(1),
-    hostname: z.string().optional(),
-    pathname: z.string().optional(),
-    querystring: z.string().optional(),
+    hostname: z.string().max(253).optional(),
+    pathname: z.string().max(2048).optional(),
+    querystring: z.string().max(2048).optional(),
     screenWidth: z.number().int().positive().optional(),
     screenHeight: z.number().int().positive().optional(),
-    language: z.string().optional(),
-    page_title: z.string().optional(),
-    referrer: z.string().optional(),
-    event_name: z.string().min(1),
+    language: z.string().max(35).optional(),
+    page_title: z.string().max(512).optional(),
+    referrer: z.string().max(2048).optional(),
+    event_name: z.string().min(1).max(256),
     properties: z
       .string()
+      .max(2048)
       .refine(
         (val) => {
           try {
