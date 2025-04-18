@@ -22,6 +22,13 @@ Set to `"false"` to disable automatic pageview tracking for single page applicat
 -   **Default:** `"true"`
 -   **Example:** `data-track-spa="false"`
 
+### `data-track-query`
+
+Set to `"false"` to disable tracking of URL query strings. This enhances privacy by preventing potentially sensitive information in query parameters (such as session tokens, search queries, or UTM parameters) from being stored in your analytics data.
+
+-   **Default:** `"true"`
+-   **Example:** `data-track-query="false"`
+
 ### `data-skip-patterns`
 
 A JSON string array of URL path patterns to ignore. Pageviews matching these patterns won't be tracked. Use `*` as a wildcard for path segments (e.g., `/admin/*`).
@@ -55,6 +62,7 @@ The delay (in milliseconds) before tracking a pageview after URL changes via the
   data-auto-track="false"
   data-skip-patterns='["/admin"]'
   data-mask-patterns='["/user/*/dashboard"]'
+  data-track-query="false"
 ></script>
 ```
 

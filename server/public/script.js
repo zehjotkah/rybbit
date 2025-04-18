@@ -23,6 +23,8 @@
     : 500;
 
   const autoTrackSpa = scriptTag.getAttribute("data-track-spa") !== "false";
+  const trackQuerystring =
+    scriptTag.getAttribute("data-track-query") !== "false";
 
   let skipPatterns = [];
   try {
@@ -103,7 +105,7 @@
       site_id: SITE_ID,
       hostname: url.hostname,
       pathname: pathname,
-      querystring: url.search,
+      querystring: trackQuerystring ? url.search : "",
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
       language: navigator.language,
