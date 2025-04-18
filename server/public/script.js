@@ -150,7 +150,7 @@
     window.addEventListener("popstate", debouncedTrackPageview);
   }
 
-  window.frogstats = {
+  window.rybbit = {
     track,
     pageview: trackPageview,
     event: (name, properties = {}) => track("custom_event", name, properties),
