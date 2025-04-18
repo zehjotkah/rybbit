@@ -1,4 +1,4 @@
-// Frogstats Analytics Script
+// Rybbit Analytics Script
 (function () {
   // Get the script tag that loaded this script
   const scriptTag = document.currentScript;
