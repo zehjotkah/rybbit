@@ -15,19 +15,12 @@ If you are self-hosting Rybbit `api.ribbit.io` will be instead the base URL of y
 
 You can customize the script's behavior using `data-*` attributes on the `<script>` tag:
 
-### `data-debounce`
+### `data-track-spa`
 
-The delay (in milliseconds) before tracking a pageview after URL changes via the History API (`pushState`, `replaceState`). Set to `0` to disable debouncing.
-
--   **Default:** `"500"`
--   **Example:** `data-debounce="1000"`
-
-### `data-auto-track`
-
-Set to `"false"` to disable automatic pageview tracking on initial load and History API changes. You will need to manually call `window.rybbit.pageview()` or `window.rybbit.track()`.
+Set to `"false"` to disable automatic pageview tracking for single page applications (React, Vue, etc). You will need to manually call `window.rybbit.pageview()` or `window.rybbit.track()` for all but the initial pageview.
 
 -   **Default:** `"true"`
--   **Example:** `data-auto-track="false"`
+-   **Example:** `data-track-spa="false"`
 
 ### `data-skip-patterns`
 
@@ -42,6 +35,14 @@ A JSON string array of URL path patterns to mask. Pageviews matching these patte
 
 -   **Default:** `[]`
 -   **Example:** `data-mask-patterns='["/users/*/settings", "/order/*"]'`
+
+### `data-debounce`
+
+The delay (in milliseconds) before tracking a pageview after URL changes via the History API (`pushState`, `replaceState`). Set to `0` to disable debouncing.
+
+-   **Default:** `"500"`
+-   **Example:** `data-debounce="1000"`
+
 
 **Example with multiple options:**
 

@@ -3,7 +3,5 @@ export default {
   "self-hosting": "",
   tracker: "",
   features: "",
-  themes: "",
   advanced: "",
-  usage: "",
 };

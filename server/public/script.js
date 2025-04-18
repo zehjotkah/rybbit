@@ -22,7 +22,7 @@
     ? Math.max(0, parseInt(scriptTag.getAttribute("data-debounce")))
     : 500;
 
-  const autoTrackURLs = scriptTag.getAttribute("data-auto-track") !== "false";
+  const autoTrackSpa = scriptTag.getAttribute("data-track-spa") !== "false";
 
   let skipPatterns = [];
   try {
@@ -133,7 +133,7 @@
       ? debounce(trackPageview, debounceDuration)
       : trackPageview;
 
-  if (autoTrackURLs) {
+  if (autoTrackSpa) {
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
