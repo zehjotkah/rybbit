@@ -2,12 +2,14 @@ import crypto from "crypto";
 import { and, eq } from "drizzle-orm";
 import { FastifyRequest } from "fastify";
 import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
+import { z } from "zod";
 import { sitesOverLimit } from "../cron/monthly-usage-checker.js";
 import { db } from "../db/postgres/postgres.js";
 import { activeSessions } from "../db/postgres/schema.js";
 import { TrackingPayload } from "../types.js";
 import { getDeviceType, getIpAddress, getUserId } from "../utils.js";
 import { pageviewQueue } from "./pageviewQueue.js";
+import { trackingPayloadSchema } from "./trackEvent.js";
 
 // Define extended payload types
 export type BaseTrackingPayload = TrackingPayload & {
@@ -24,6 +26,9 @@ export type TotalTrackingPayload = BaseTrackingPayload & {
   referrer: string;
   ipAddress: string;
 };
+
+// Infer type from Zod schema
+export type ValidatedTrackingPayload = z.infer<typeof trackingPayloadSchema>;
 
 // UTM and URL parameter parsing utilities
 export function getUTMParams(querystring: string): Record<string, string> {
@@ -90,14 +95,23 @@ export async function getExistingSession(userId: string, siteId: string) {
 // Create base tracking payload from request
 export function createBasePayload(
   request: FastifyRequest,
-  eventType: "pageview" | "custom_event" = "pageview"
+  eventType: "pageview" | "custom_event" = "pageview",
+  validatedBody: ValidatedTrackingPayload
 ): TotalTrackingPayload {
   const userAgent = request.headers["user-agent"] || "";
   const ipAddress = getIpAddress(request);
   const userId = getUserId(ipAddress, userAgent);
 
   return {
-    ...(request.body as BaseTrackingPayload),
+    ...validatedBody,
+    hostname: validatedBody.hostname || "",
+    pathname: validatedBody.pathname || "",
+    querystring: validatedBody.querystring || "",
+    screenWidth: validatedBody.screenWidth || 0,
+    screenHeight: validatedBody.screenHeight || 0,
+    language: validatedBody.language || "",
+    page_title: validatedBody.page_title || "",
+    referrer: validatedBody.referrer || "",
     type: eventType,
     ipAddress: ipAddress,
     timestamp: new Date().toISOString(),
