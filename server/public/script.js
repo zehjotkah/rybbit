@@ -25,6 +25,8 @@
   const autoTrackSpa = scriptTag.getAttribute("data-track-spa") !== "false";
   const trackQuerystring =
     scriptTag.getAttribute("data-track-query") !== "false";
+  const trackOutbound =
+    scriptTag.getAttribute("data-track-outbound") !== "false";
 
   let skipPatterns = [];
   try {
@@ -50,10 +52,27 @@
 
   // Helper function to convert wildcard pattern to regex
   function patternToRegex(pattern) {
-    // Escape regex special characters, then replace * with [^/]+
-    const escaped = pattern.replace(/[\.\+\?\^\$\(\)\[\]\{\}]/g, "\\$&");
-    const regexString = escaped.replace(/\*/g, "[^/]+");
-    return new RegExp(`^${regexString}$`);
+    // Use a safer approach by replacing wildcards with unique tokens first
+    const DOUBLE_WILDCARD_TOKEN = "__DOUBLE_ASTERISK_TOKEN__";
+    const SINGLE_WILDCARD_TOKEN = "__SINGLE_ASTERISK_TOKEN__";
+
+    // Replace wildcards with tokens
+    let tokenized = pattern
+      .replace(/\*\*/g, DOUBLE_WILDCARD_TOKEN)
+      .replace(/\*/g, SINGLE_WILDCARD_TOKEN);
+
+    // Escape special regex characters
+    let escaped = tokenized.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+
+    // Escape forward slashes
+    escaped = escaped.replace(/\//g, "\\/");
+
+    // Replace tokens with appropriate regex patterns
+    let regexPattern = escaped
+      .replace(new RegExp(DOUBLE_WILDCARD_TOKEN, "g"), ".*")
+      .replace(new RegExp(SINGLE_WILDCARD_TOKEN, "g"), "[^/]+");
+
+    return new RegExp("^" + regexPattern + "$");
   }
 
   function findMatchingPattern(path, patterns) {
@@ -76,6 +95,17 @@
       clearTimeout(timeout);
       timeout = setTimeout(() => func.apply(this, args), wait);
     };
+  }
+
+  // Check if a URL is an outbound link
+  function isOutboundLink(url) {
+    try {
+      const currentHost = window.location.hostname;
+      const linkHost = new URL(url).hostname;
+      return linkHost !== currentHost && linkHost !== "";
+    } catch (e) {
+      return false;
+    }
   }
 
   const track = (eventType = "pageview", eventName = "", properties = {}) => {
@@ -114,7 +144,9 @@
       type: eventType,
       event_name: eventName,
       properties:
-        eventType === "custom_event" ? JSON.stringify(properties) : undefined,
+        eventType === "custom_event" || eventType === "outbound"
+          ? JSON.stringify(properties)
+          : undefined,
     };
 
     fetch(`${ANALYTICS_HOST}/track`, {
@@ -134,6 +166,22 @@
     debounceDuration > 0
       ? debounce(trackPageview, debounceDuration)
       : trackPageview;
+
+  // Track outbound link clicks
+  if (trackOutbound) {
+    document.addEventListener("click", function (e) {
+      const link = e.target.closest("a");
+      if (!link || !link.href) return;
+
+      if (isOutboundLink(link.href)) {
+        track("outbound", "", {
+          url: link.href,
+          text: link.innerText || link.textContent || "",
+          target: link.target || "_self",
+        });
+      }
+    });
+  }
 
   if (autoTrackSpa) {
     const originalPushState = history.pushState;
@@ -156,6 +204,8 @@
     track,
     pageview: trackPageview,
     event: (name, properties = {}) => track("custom_event", name, properties),
+    trackOutbound: (url, text = "", target = "_self") =>
+      track("outbound", "", { url, text, target }),
   };
 
   trackPageview();

@@ -29,19 +29,50 @@ Set to `"false"` to disable tracking of URL query strings. This enhances privacy
 -   **Default:** `"true"`
 -   **Example:** `data-track-query="false"`
 
+### `data-track-outbound`
+
+Set to `"false"` to disable automatic tracking of outbound link clicks. When enabled, the script automatically detects when a user clicks on a link to an external domain and tracks it with an event type of "outbound".
+
+-   **Default:** `"true"`
+-   **Example:** `data-track-outbound="false"`
+
 ### `data-skip-patterns`
 
-A JSON string array of URL path patterns to ignore. Pageviews matching these patterns won't be tracked. Use `*` as a wildcard for path segments (e.g., `/admin/*`).
+A JSON string array of URL path patterns to ignore. Pageviews matching these patterns won't be tracked. Supports two types of wildcards:
+
+- `*` - Matches any characters within a single path segment (doesn't match across `/`)
+- `**` - Matches any characters across multiple path segments (includes `/`)
+
+Examples of pattern matching:
+- `/admin/*` matches `/admin/dashboard` but not `/admin/users/list`
+- `/admin/**` matches both `/admin/dashboard` and `/admin/users/list`
+- `/blog/*/comments` matches `/blog/post-123/comments` but not `/blog/category/post/comments`
+- `/blog/**/comments` matches any comments page regardless of path depth
 
 -   **Default:** `[]`
--   **Example:** `data-skip-patterns='["/admin", "/blog/*/edit"]'`
+-   **Example configuration:**
+    ```html
+    data-skip-patterns='["/admin/**", "/blog/drafts/*", "/preview/**"]'
+    ```
 
 ### `data-mask-patterns`
 
-A JSON string array of URL path patterns to mask. Pageviews matching these patterns will be tracked, but the `pathname` sent will be replaced with the matching pattern string (e.g., `/users/*/profile`).
+A JSON string array of URL path patterns to mask for privacy. Pageviews matching these patterns will be tracked, but the actual URL path will be replaced with the pattern itself in analytics data.
+
+Supports the same wildcard patterns as `data-skip-patterns`:
+- `*` - Single path segment wildcard
+- `**` - Multi-segment wildcard
+
+Common use cases:
+- Mask user-specific pages: `/users/*/profile` will show as `/users/*/profile` instead of the actual username
+- Mask all product pages: `/products/**` will hide specific product paths
+- Mask order confirmation pages: `/checkout/*/confirmation` will hide order IDs
 
 -   **Default:** `[]`
--   **Example:** `data-mask-patterns='["/users/*/settings", "/order/*"]'`
+-   **Example configuration:**
+    ```html
+    data-mask-patterns='["/users/*/settings", "/accounts/**", "/orders/*/details"]'
+    ```
 
 ### `data-debounce`
 
@@ -58,11 +89,11 @@ The delay (in milliseconds) before tracking a pageview after URL changes via the
   src="https://api.rybbit.io/api/script.js"
   async
   data-site-id="456"
-  data-host="https://rybbit.mycompany.com"
-  data-auto-track="false"
-  data-skip-patterns='["/admin"]'
-  data-mask-patterns='["/user/*/dashboard"]'
+  data-skip-patterns='["/admin/**", "/preview/*"]'
+  data-mask-patterns='["/users/*/profile", "/orders/**"]'
   data-track-query="false"
+  data-track-outbound="true"
+  data-debounce="300"
 ></script>
 ```
 
@@ -74,7 +105,7 @@ The script exposes a global object `window.rybbit` with functions for manual tra
 
 The core function to send tracking data.
 
-*   `eventType` (String): The type of event. Defaults to `"pageview"`. Use `"custom_event"` for custom events.
+*   `eventType` (String): The type of event. Defaults to `"pageview"`. Other values include `"custom_event"` or `"outbound"`.
 *   `eventName` (String): The name of the custom event (max 255 characters). **Required** when `eventType` is `"custom_event"`.
 *   `properties` (Object, Optional): An object containing custom data (max 8192 characters / 8KB when stringified). This will be JSON-stringified before sending.
 
@@ -91,11 +122,18 @@ window.rybbit.track("custom_event", "Item Added To Cart", {
   price: 49.99,
   category: "Clothing"
 });
+
+// Track an outbound link click manually
+window.rybbit.track("outbound", "", {
+  url: "https://example.com",
+  text: "Visit Example Site",
+  target: "_blank"
+});
 ```
 
 ### `window.rybbit.pageview()`
 
-A convenience function for tracking a pageview. Equivalent to `window.rybbit.track('pageview')`. Useful when `data-auto-track` is set to `"false"`.
+A convenience function for tracking a pageview. Equivalent to `window.rybbit.track('pageview')`. Useful when `data-track-spa` is set to `"false"`.
 
 ```javascript
 window.rybbit.pageview();
@@ -106,8 +144,21 @@ window.rybbit.pageview();
 A convenience function for tracking custom events. Equivalent to `window.rybbit.track('custom_event', eventName, properties)`.
 
 *   `eventName` (String): The name of the custom event (max 255 characters).
-*   `properties` (Object, Optional): An object containing custom data (max 2048 characters / 2KB when stringified).
+*   `properties` (Object, Optional): An object containing custom data.
 
 ```javascript
 window.rybbit.event("Video Played", { videoId: "xyz789" });
+```
+
+### `window.rybbit.trackOutbound(url, text, target)`
+
+A convenience function for manually tracking outbound link clicks. Useful for programmatic navigation or custom link handling.
+
+*   `url` (String): The full URL of the outbound link.
+*   `text` (String, Optional): The text content of the link.
+*   `target` (String, Optional): The target attribute of the link (defaults to "_self").
+
+```javascript
+// Track a programmatic navigation to an external site
+window.rybbit.trackOutbound("https://example.com", "Example Site", "_blank");
 ```
