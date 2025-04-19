@@ -3,7 +3,7 @@
 import { BACKEND_URL } from "@/lib/const";
 import QueryProvider from "@/providers/QueryProvider";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Toaster } from "../components/ui/sonner";
@@ -12,6 +12,10 @@ import { userStore } from "../lib/userStore";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+
+// const manrope = Manrope({
+//   subsets: ["latin"],
+// });
 
 const publicRoutes = ["/login", "/signup"];
 

@@ -201,7 +201,6 @@
   }
 
   window.rybbit = {
-    track,
     pageview: trackPageview,
     event: (name, properties = {}) => track("custom_event", name, properties),
     trackOutbound: (url, text = "", target = "_self") =>

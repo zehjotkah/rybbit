@@ -1,7 +1,6 @@
 export default {
   index: "",
-  "self-hosting": "",
   tracker: "",
-  features: "",
-  advanced: "",
+  "track-events": "",
+  "self-hosting": "",
 };
