@@ -13,7 +13,13 @@ import {
 import { User } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { Manrope, Outfit, Urbanist } from "next/font/google";
+import {
+  Manrope,
+  Outfit,
+  Urbanist,
+  Paytone_One,
+  Tilt_Warp,
+} from "next/font/google";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -27,6 +33,16 @@ const urbanist = Urbanist({
   subsets: ["latin"],
 });
 
+const paytone = Paytone_One({
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const tilt_wrap = Tilt_Warp({
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export function TopBar() {
   const session = authClient.useSession();
   const router = useRouter();
@@ -38,15 +54,15 @@ export function TopBar() {
         <div className="flex items-center space-x-4">
           <Link
             href={session.data ? "/" : "https://rybbit.io"}
-            className={`text-base font-semibold flex items-center gap-1 ${urbanist.className}`}
+            className={`text-xl font-semibold flex items-center gap-1 ${tilt_wrap.className}`}
           >
             <Image
-              src="/rybbit-logo-3.png"
+              src="/rybbit-logo-2.png"
               alt="Rybbit"
               width={20}
               height={20}
             />
-            rybbit
+            rybbit.
           </Link>
         </div>
         {session.data ? (
