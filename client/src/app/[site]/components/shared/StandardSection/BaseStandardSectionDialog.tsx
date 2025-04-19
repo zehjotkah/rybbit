@@ -96,7 +96,7 @@ export function BaseStandardSectionDialog({
                     className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
                     style={{ width: `${Math.min(e.percentage * ratio, 100)}%` }}
                   ></div>
-                  <div className="z-5 ml-2 mr-2 md:mr-4 flex justify-between items-center text-xs w-full min-h-6 py-1">
+                  <div className="z-10 ml-2 mr-2 md:mr-4 flex justify-between items-center text-xs w-full min-h-6 py-1">
                     <div className="flex items-center gap-1 min-w-0 max-w-[65%]">
                       <div className="truncate">{getLabel(e)}</div>
                       {getLink && (

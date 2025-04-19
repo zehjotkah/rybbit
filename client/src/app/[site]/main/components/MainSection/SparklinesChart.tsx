@@ -1,6 +1,5 @@
 "use client";
 import { nivoTheme } from "@/lib/nivo";
-import { useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 
@@ -8,8 +7,10 @@ export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
 export function SparklinesChart({
   data,
+  isHovering,
 }: {
   data: { value: number; time: string }[] | undefined;
+  isHovering: boolean;
 }) {
   const formattedData = data
     ?.map((e, i) => {
@@ -61,7 +62,9 @@ export function SparklinesChart({
       useMesh={true}
       animate={false}
       enableSlices={"x"}
-      colors={["hsl(var(--accent-400))"]}
+      colors={[
+        isHovering ? "hsl(var(--accent-300))" : "hsl(var(--accent-400))",
+      ]}
       enableArea={false}
       areaBaselineValue={0}
       areaOpacity={0.3}

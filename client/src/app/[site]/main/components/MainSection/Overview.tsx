@@ -9,6 +9,7 @@ import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverv
 import { SparklinesChart } from "./SparklinesChart";
 import { TrendingDown } from "lucide-react";
 import { TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 const ChangePercentage = ({
   current,
@@ -67,6 +68,7 @@ const Stat = ({
   postfix?: string;
 }) => {
   const { selectedStat, setSelectedStat, site, bucket } = useStore();
+  const [isHovering, setIsHovering] = useState(false);
 
   const { data, isFetching, error } = useGetOverviewBucketed({ site, bucket });
 
@@ -79,10 +81,12 @@ const Stat = ({
   return (
     <div
       className={cn(
-        "flex flex-col hover:bg-neutral-800 cursor-pointer border-r border-neutral-800 last:border-r-0 text-nowrap",
+        "flex flex-col cursor-pointer border-r border-neutral-800 last:border-r-0 text-nowrap",
         selectedStat === id && "bg-neutral-850"
       )}
       onClick={() => setSelectedStat(id)}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
       <div className={cn("flex flex-col px-3 py-2")}>
         <div className="text-sm font-medium text-muted-foreground">{title}</div>
@@ -114,7 +118,7 @@ const Stat = ({
         </div>
       </div>
       <div className="h-[40px] mt-[-16]">
-        <SparklinesChart data={sparklinesData} />
+        <SparklinesChart data={sparklinesData} isHovering={isHovering} />
       </div>
     </div>
   );
