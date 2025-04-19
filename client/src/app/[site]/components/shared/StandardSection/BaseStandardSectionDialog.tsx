@@ -59,11 +59,11 @@ export function BaseStandardSectionDialog({
       <DialogTrigger asChild>
         <Button variant="outline">View All</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] max-w-[95vw] w-[600px]">
+      <DialogContent className="max-w-[700px] w-[calc(100vw-2rem)] p-2 sm:p-4">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-2 max-h-[85vh]">
+        <div className="flex flex-col gap-2 max-h-[calc(80vh-80px)] overflow-hidden ">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-400" />
             <Input
@@ -74,11 +74,11 @@ export function BaseStandardSectionDialog({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex flex-row gap-2 justify-between pr-20 text-sm text-neutral-400">
+          <div className="flex flex-row gap-2 justify-between text-sm text-neutral-400 pr-4 md:pr-20">
             <div>{title}</div>
             <div>{countLabel || "Sessions"}</div>
           </div>
-          <div className="flex flex-col gap-2 overflow-x-hidden">
+          <div className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden max-h-[calc(80vh-150px)]">
             {filteredData.length > 0 ? (
               filteredData.map((e) => (
                 <div
@@ -94,16 +94,17 @@ export function BaseStandardSectionDialog({
                 >
                   <div
                     className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
-                    style={{ width: `${e.percentage * ratio}%` }}
+                    style={{ width: `${Math.min(e.percentage * ratio, 100)}%` }}
                   ></div>
-                  <div className="z-5 ml-2 mr-4 flex justify-between items-center text-xs w-full h-6">
-                    <div className="flex items-center gap-1">
-                      {getLabel(e)}
+                  <div className="z-5 ml-2 mr-2 md:mr-4 flex justify-between items-center text-xs w-full min-h-6 py-1">
+                    <div className="flex items-center gap-1 min-w-0 max-w-[65%]">
+                      <div className="truncate">{getLabel(e)}</div>
                       {getLink && (
                         <a
                           href={getLink(e)}
                           target="_blank"
                           onClick={(e) => e.stopPropagation()}
+                          className="flex-shrink-0"
                         >
                           <SquareArrowOutUpRight
                             className="w-3 h-3 text-neutral-300 hover:text-neutral-100"
@@ -112,7 +113,7 @@ export function BaseStandardSectionDialog({
                         </a>
                       )}
                     </div>
-                    <div className="flex">
+                    <div className="flex flex-shrink-0">
                       <div>{e.count.toLocaleString()}</div>
                       <div className="mx-2 bg-neutral-400 w-[1px] rounded-full h-5"></div>
                       <div className="w-10 text-neutral-400">
