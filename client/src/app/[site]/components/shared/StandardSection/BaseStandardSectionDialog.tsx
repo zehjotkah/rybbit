@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -5,13 +6,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { round } from "lodash";
-import { SquareArrowOutUpRight, Search } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useDebounce } from "@uidotdev/usehooks";
+import { Search, SquareArrowOutUpRight } from "lucide-react";
+import { ReactNode, useMemo, useState } from "react";
 import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { addFilter, FilterParameter } from "../../../../../lib/store";
-import { Input } from "@/components/ui/input";
+import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 
 interface BaseStandardSectionDialogProps {
   title: string;
@@ -26,6 +34,8 @@ interface BaseStandardSectionDialogProps {
   filterParameter: FilterParameter;
 }
 
+const columnHelper = createColumnHelper<SingleColResponse>();
+
 export function BaseStandardSectionDialog({
   title,
   data,
@@ -39,19 +49,96 @@ export function BaseStandardSectionDialog({
   filterParameter,
 }: BaseStandardSectionDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 200);
 
   if (!data || data.length === 0) return null;
 
   const labelFnToUse = getFilterLabel || getValue;
 
   // Filter data based on search term
-  const filteredData = data.filter((item) => {
-    const label =
-      typeof labelFnToUse(item) === "string"
-        ? (labelFnToUse(item) as string)
-        : labelFnToUse(item);
+  const filteredData = useMemo(
+    () =>
+      data.filter((item) => {
+        const label =
+          typeof labelFnToUse(item) === "string"
+            ? (labelFnToUse(item) as string)
+            : labelFnToUse(item);
 
-    return String(label).toLowerCase().includes(searchTerm.toLowerCase());
+        return String(label)
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase());
+      }),
+    [data, labelFnToUse, debouncedSearchTerm]
+  );
+
+  const columns = useMemo(() => {
+    const cols = [
+      columnHelper.accessor("value", {
+        header: title,
+        cell: ({ row }) => (
+          <div className="flex flex-row gap-1 items-center text-left">
+            {getLabel(row.original)}
+            {getLink && (
+              <a
+                href={getLink(row.original)}
+                target="_blank"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <SquareArrowOutUpRight
+                  className="w-3 h-3 text-neutral-300 hover:text-neutral-100"
+                  strokeWidth={3}
+                />
+              </a>
+            )}
+          </div>
+        ),
+      }),
+      columnHelper.accessor("count", {
+        header: "Sessions",
+        cell: (info) => (
+          <div className="text-left">{info.getValue().toLocaleString()}</div>
+        ),
+      }),
+    ];
+
+    const hasPageviews = data?.[0]?.pageviews !== undefined;
+    if (hasPageviews) {
+      cols.push(
+        columnHelper.accessor("pageviews", {
+          header: "Pageviews",
+          cell: (info) => (
+            <div className="text-left">{info.getValue()?.toLocaleString()}</div>
+          ),
+        }) as any
+      );
+    }
+
+    const hasDuration = data?.[0]?.time_on_page_seconds !== undefined;
+    if (hasDuration) {
+      cols.push(
+        columnHelper.accessor("time_on_page_seconds", {
+          header: "Duration",
+          cell: (info) => (
+            <div className="text-left">
+              {formatSecondsAsMinutesAndSeconds(
+                Math.round(info.getValue() ?? 0)
+              )}
+            </div>
+          ),
+        }) as any
+      );
+    }
+    return cols;
+  }, []);
+
+  // Set up table instance
+  const table = useReactTable({
+    data: filteredData || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    manualSorting: true,
+    sortDescFirst: true,
   });
 
   return (
@@ -63,71 +150,71 @@ export function BaseStandardSectionDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-2 max-h-[calc(80vh-80px)] overflow-hidden ">
+        <div className="flex flex-col gap-2 ">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-400" />
             <Input
               type="text"
               placeholder={`Filter ${data.length} items...`}
-              className="pl-9 bg-neutral-900 border-neutral-700 focus-visible:ring-accent-400"
+              className="pl-9 bg-neutral-900 border-neutral-700 focus-visible:ring-accent-400 text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex flex-row gap-2 justify-between text-sm text-neutral-400 pr-4 md:pr-20">
-            <div>{title}</div>
-            <div>{countLabel || "Sessions"}</div>
-          </div>
-          <div className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden max-h-[calc(80vh-150px)]">
-            {filteredData.length > 0 ? (
-              filteredData.map((e) => (
-                <div
-                  key={getKey(e)}
-                  className="relative flex items-center mr-1 cursor-pointer hover:bg-neutral-850"
-                  onClick={() =>
-                    addFilter({
-                      parameter: filterParameter,
-                      value: [getValue(e)],
-                      type: "equals",
-                    })
-                  }
-                >
-                  <div
-                    className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md"
-                    style={{ width: `${Math.min(e.percentage * ratio, 100)}%` }}
-                  ></div>
-                  <div className="z-10 ml-2 mr-2 md:mr-4 flex justify-between items-center text-xs w-full min-h-6 py-1">
-                    <div className="flex items-center gap-1 min-w-0 max-w-[65%]">
-                      <div className="truncate">{getLabel(e)}</div>
-                      {getLink && (
-                        <a
-                          href={getLink(e)}
-                          target="_blank"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex-shrink-0"
-                        >
-                          <SquareArrowOutUpRight
-                            className="w-3 h-3 text-neutral-300 hover:text-neutral-100"
-                            strokeWidth={3}
-                          />
-                        </a>
-                      )}
-                    </div>
-                    <div className="flex flex-shrink-0">
-                      <div>{e.count.toLocaleString()}</div>
-                      <div className="mx-2 bg-neutral-400 w-[1px] rounded-full h-5"></div>
-                      <div className="w-10 text-neutral-400">
-                        {round(e.percentage, 2)}%
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-10 text-center text-neutral-400">
-                No results match your search
-              </div>
-            )}
+          <div className="max-h-[80vh] overflow-y-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-neutral-900 text-neutral-400 sticky top-0 z-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        scope="col"
+                        className="px-3 py-1 font-medium whitespace-nowrap"
+                        style={{
+                          minWidth: header.id === "user_id" ? "100px" : "auto",
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => {
+                  return (
+                    <tr
+                      key={row.id}
+                      className="border-b border-neutral-800 hover:bg-neutral-850 cursor-pointer group"
+                      onClick={() =>
+                        addFilter({
+                          parameter: filterParameter,
+                          value: [getValue(row.original)],
+                          type: "equals",
+                        })
+                      }
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="px-3 py-2 relative">
+                          <span className="relative z-0">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       </DialogContent>

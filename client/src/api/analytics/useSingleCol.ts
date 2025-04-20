@@ -10,13 +10,14 @@ export type SingleColResponse = {
   value: string;
   count: number;
   percentage: number;
-  avg_session_duration?: number;
-  bounce_rate?: number;
+  pageviews?: number;
+  pageviews_percentage?: number;
+  time_on_page_seconds?: number;
 };
 
 export function useSingleCol({
   parameter,
-  limit = 1000,
+  limit = 100,
   periodTime,
   useFilters = true,
 }: {

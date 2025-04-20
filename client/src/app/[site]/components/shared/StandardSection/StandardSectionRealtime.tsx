@@ -30,19 +30,18 @@ export function StandardSectionRealtime({
     parameter: filterParameter,
   });
 
-  return (
-    <BaseStandardSection
-      title={title}
-      data={data}
-      isFetching={isFetching}
-      error={error}
-      refetch={refetch}
-      getKey={getKey}
-      getLabel={getLabel}
-      getValue={getValue}
-      getLink={getLink}
-      countLabel={countLabel}
-      filterParameter={filterParameter}
-    />
-  );
+  return null;
+  // <BaseStandardSection
+  //   title={title}
+  //   data={data}
+  //   isFetching={isFetching}
+  //   error={error}
+  //   refetch={refetch}
+  //   getKey={getKey}
+  //   getLabel={getLabel}
+  //   getValue={getValue}
+  //   getLink={getLink}
+  //   countLabel={countLabel}
+  //   filterParameter={filterParameter}
+  // />
 }
