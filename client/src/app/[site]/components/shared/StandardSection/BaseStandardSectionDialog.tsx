@@ -106,13 +106,23 @@ export function BaseStandardSectionDialog({
         header: "Sessions",
         cell: (info) => (
           <div className="text-left flex flex-row gap-1 items-center">
-            {info.getValue().toLocaleString()} ({info.row.original.percentage}%)
+            {info.getValue().toLocaleString()}
+          </div>
+        ),
+      }),
+      columnHelper.accessor("percentage", {
+        header: "Session %",
+        cell: (info) => (
+          <div className="text-left flex flex-row gap-1 items-center">
+            {info.getValue().toFixed(1)}%
           </div>
         ),
       }),
     ];
 
-    const hasPageviews = data?.[0]?.pageviews !== undefined;
+    const hasPageviews =
+      data?.[0]?.pageviews !== undefined &&
+      data?.[0]?.pageviews_percentage !== undefined;
     if (hasPageviews) {
       cols.push(
         columnHelper.accessor("pageviews", {
@@ -120,9 +130,16 @@ export function BaseStandardSectionDialog({
           cell: (info) => (
             <div className="text-left flex flex-row gap-1 items-center">
               {info.getValue()?.toLocaleString()}
-              <span className="text-xs text-neutral-400">
-                ({info.row.original.pageviews_percentage}%)
-              </span>
+            </div>
+          ),
+        }) as any
+      );
+      cols.push(
+        columnHelper.accessor("pageviews_percentage", {
+          header: "Pageviews %",
+          cell: (info) => (
+            <div className="text-left flex flex-row gap-1 items-center">
+              {info.getValue()?.toFixed(1)}%
             </div>
           ),
         }) as any

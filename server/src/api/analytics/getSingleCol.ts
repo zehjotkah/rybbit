@@ -195,19 +195,29 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
   }
 
   return `
+    WITH PageStats AS (
+      SELECT
+        ${geSqlParam(parameter)} as value,
+        COUNT(distinct(session_id)) as unique_sessions,
+        COUNT() as pageviews
+      FROM events
+      WHERE
+          site_id = ${site}
+          AND ${geSqlParam(parameter)} IS NOT NULL
+          AND ${geSqlParam(parameter)} <> ''
+          ${filterStatement}
+          ${timeStatement}
+          // AND type = 'pageview'
+      GROUP BY value
+    )
     SELECT
-      ${geSqlParam(parameter)} as value,
-      COUNT(distinct(session_id)) as count,
-      ${percentageStatement}
-    FROM events
-    WHERE
-        site_id = ${site}
-        AND ${geSqlParam(parameter)} IS NOT NULL
-        AND ${geSqlParam(parameter)} <> ''
-        ${filterStatement}
-        ${timeStatement}
-        // AND type = 'pageview'
-    GROUP BY value ORDER BY count desc
+      value,
+      unique_sessions as count,
+      round((unique_sessions / sum(unique_sessions) OVER ()) * 100, 2) as percentage,
+      pageviews,
+      round((pageviews / sum(pageviews) OVER ()) * 100, 2) as pageviews_percentage
+    FROM PageStats
+    ORDER BY count desc
     ${limit ? `LIMIT ${limit}` : ""};
   `;
 };
