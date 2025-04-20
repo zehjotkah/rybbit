@@ -105,7 +105,7 @@ export function BaseStandardSectionDialog({
       columnHelper.accessor("count", {
         header: "Sessions",
         cell: (info) => (
-          <div className="text-left flex flex-row gap-1 items-center">
+          <div className="text-right flex flex-row gap-1 items-center justify-end">
             {info.getValue().toLocaleString()}
           </div>
         ),
@@ -113,7 +113,7 @@ export function BaseStandardSectionDialog({
       columnHelper.accessor("percentage", {
         header: "Session %",
         cell: (info) => (
-          <div className="text-left flex flex-row gap-1 items-center">
+          <div className="text-right flex flex-row gap-1 items-center justify-end">
             {info.getValue().toFixed(1)}%
           </div>
         ),
@@ -128,7 +128,7 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("pageviews", {
           header: "Pageviews",
           cell: (info) => (
-            <div className="text-left flex flex-row gap-1 items-center">
+            <div className="text-right flex flex-row gap-1 items-center justify-end">
               {info.getValue()?.toLocaleString()}
             </div>
           ),
@@ -138,7 +138,7 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("pageviews_percentage", {
           header: "Pageviews %",
           cell: (info) => (
-            <div className="text-left flex flex-row gap-1 items-center">
+            <div className="text-right flex flex-row gap-1 items-center justify-end">
               {info.getValue()?.toFixed(1)}%
             </div>
           ),
@@ -152,7 +152,7 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("time_on_page_seconds", {
           header: "Duration",
           cell: (info) => (
-            <div className="text-left">
+            <div className="text-right">
               {formatSecondsAsMinutesAndSeconds(
                 Math.round(info.getValue() ?? 0)
               )}
@@ -203,17 +203,23 @@ export function BaseStandardSectionDialog({
               <thead className="bg-neutral-900 text-neutral-400 sticky top-0 z-10">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
+                    {headerGroup.headers.map((header, index) => (
                       <th
                         key={header.id}
                         scope="col"
-                        className="px-3 py-1 font-medium whitespace-nowrap cursor-pointer select-none"
+                        className={`px-2 py-1 font-medium whitespace-nowrap cursor-pointer select-none ${
+                          index === 0 ? "text-left" : "text-right"
+                        }`}
                         style={{
                           minWidth: header.id === "user_id" ? "100px" : "auto",
                         }}
                         onClick={header.column.getToggleSortingHandler()}
                       >
-                        <div className="flex items-center gap-1">
+                        <div
+                          className={`flex items-center gap-1 ${
+                            index === 0 ? "" : "justify-end"
+                          }`}
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -231,11 +237,13 @@ export function BaseStandardSectionDialog({
                 ))}
               </thead>
               <tbody>
-                {table.getRowModel().rows.map((row) => {
+                {table.getRowModel().rows.map((row, rowIndex) => {
                   return (
                     <tr
                       key={row.id}
-                      className="border-b border-neutral-800 hover:bg-neutral-850 cursor-pointer group"
+                      className={`border-b border-neutral-800 hover:bg-neutral-850 cursor-pointer group ${
+                        rowIndex % 2 === 0 ? "bg-neutral-900" : "bg-neutral-950"
+                      }`}
                       onClick={() =>
                         addFilter({
                           parameter: filterParameter,
@@ -244,8 +252,22 @@ export function BaseStandardSectionDialog({
                         })
                       }
                     >
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-3 py-2 relative">
+                      {row.getVisibleCells().map((cell, cellIndex) => (
+                        <td
+                          key={cell.id}
+                          className={`px-2 py-2 relative ${
+                            cellIndex === 0 ? "" : "text-right"
+                          }`}
+                        >
+                          {cellIndex === 0 && (
+                            <div
+                              // className="absolute h-0.5 bottom-0 bg-accent-400 opacity-90"
+                              className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md h-6 mt-1"
+                              style={{
+                                width: `${row.original.percentage * ratio}%`,
+                              }}
+                            ></div>
+                          )}
                           <span className="relative z-0">
                             {flexRender(
                               cell.column.columnDef.cell,
