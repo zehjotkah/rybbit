@@ -46,3 +46,7 @@ export function formatDuration(seconds: number): string {
     return duration.toFormat("h'h' m'm'");
   }
 }
+
+export function truncateString(str: string, n = 50) {
+  return str.length > n ? str.substring(0, n) + "..." : str;
+}

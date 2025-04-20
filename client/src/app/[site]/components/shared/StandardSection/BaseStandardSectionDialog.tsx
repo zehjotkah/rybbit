@@ -183,7 +183,7 @@ export function BaseStandardSectionDialog({
       <DialogTrigger asChild>
         <Button variant="outline">View All</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[800px] w-[calc(100vw-2rem)] p-2 sm:p-4">
+      <DialogContent className="max-w-[1000px] w-[calc(100vw-2rem)] p-2 sm:p-4">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -261,11 +261,11 @@ export function BaseStandardSectionDialog({
                         >
                           {cellIndex === 0 && (
                             <div
-                              // className="absolute h-0.5 bottom-0 bg-accent-400 opacity-90"
-                              className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md h-6 mt-1"
-                              style={{
-                                width: `${row.original.percentage * ratio}%`,
-                              }}
+                            // className="absolute h-0.5 bottom-0 bg-accent-400 opacity-90"
+                            // className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md h-6 mt-1"
+                            // style={{
+                            //   width: `${row.original.percentage * ratio}%`,
+                            // }}
                             ></div>
                           )}
                           <span className="relative z-0">

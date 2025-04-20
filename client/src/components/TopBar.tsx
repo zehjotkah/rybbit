@@ -71,7 +71,7 @@ export function TopBar() {
               {session.data?.user.name}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Link href="/settings/account" legacyBehavior passHref>
+              <Link href="/settings/account" passHref>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
               </Link>
               <DropdownMenuItem
@@ -87,7 +87,7 @@ export function TopBar() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link href="/signup" legacyBehavior passHref>
+          <Link href="/signup" passHref>
             <Button variant="ghost" size="xs">
               Sign up
             </Button>

@@ -11,7 +11,7 @@ import { Card, CardContent } from "../../../../../components/ui/card";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { StandardSectionRealtime } from "../../../components/shared/StandardSection/StandardSectionRealtime";
 import { useGetSite } from "../../../../../api/admin/sites";
-
+import { truncateString } from "../../../../../lib/utils";
 type Tab = "pages" | "entry_pages" | "exit_pages";
 
 export function Pages({ isRealtime = false }: { isRealtime?: boolean }) {
@@ -39,7 +39,7 @@ export function Pages({ isRealtime = false }: { isRealtime?: boolean }) {
               title="Pages"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => e.value || "Other"}
+              getLabel={(e) => truncateString(e.value, 50) || "Other"}
               getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
             />
           </TabsContent>
