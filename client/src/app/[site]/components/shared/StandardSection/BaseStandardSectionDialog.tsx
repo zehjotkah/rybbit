@@ -13,9 +13,15 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
+  SortingState,
 } from "@tanstack/react-table";
 import { useDebounce } from "@uidotdev/usehooks";
-import { Search, SquareArrowOutUpRight } from "lucide-react";
+import {
+  Search,
+  SquareArrowOutUpRight,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { ReactNode, useMemo, useState } from "react";
 import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { addFilter, FilterParameter } from "../../../../../lib/store";
@@ -50,6 +56,9 @@ export function BaseStandardSectionDialog({
 }: BaseStandardSectionDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 200);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "count", desc: true },
+  ]);
 
   if (!data || data.length === 0) return null;
 
@@ -96,7 +105,9 @@ export function BaseStandardSectionDialog({
       columnHelper.accessor("count", {
         header: "Sessions",
         cell: (info) => (
-          <div className="text-left">{info.getValue().toLocaleString()}</div>
+          <div className="text-left flex flex-row gap-1 items-center">
+            {info.getValue().toLocaleString()} ({info.row.original.percentage}%)
+          </div>
         ),
       }),
     ];
@@ -107,7 +118,12 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("pageviews", {
           header: "Pageviews",
           cell: (info) => (
-            <div className="text-left">{info.getValue()?.toLocaleString()}</div>
+            <div className="text-left flex flex-row gap-1 items-center">
+              {info.getValue()?.toLocaleString()}
+              <span className="text-xs text-neutral-400">
+                ({info.row.original.pageviews_percentage}%)
+              </span>
+            </div>
           ),
         }) as any
       );
@@ -137,7 +153,11 @@ export function BaseStandardSectionDialog({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    manualSorting: true,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    manualSorting: false,
     sortDescFirst: true,
   });
 
@@ -146,7 +166,7 @@ export function BaseStandardSectionDialog({
       <DialogTrigger asChild>
         <Button variant="outline">View All</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[700px] w-[calc(100vw-2rem)] p-2 sm:p-4">
+      <DialogContent className="max-w-[800px] w-[calc(100vw-2rem)] p-2 sm:p-4">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -156,7 +176,7 @@ export function BaseStandardSectionDialog({
             <Input
               type="text"
               placeholder={`Filter ${data.length} items...`}
-              className="pl-9 bg-neutral-900 border-neutral-700 focus-visible:ring-accent-400 text-xs"
+              className="pl-9 bg-neutral-900 border-neutral-700  text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -170,17 +190,24 @@ export function BaseStandardSectionDialog({
                       <th
                         key={header.id}
                         scope="col"
-                        className="px-3 py-1 font-medium whitespace-nowrap"
+                        className="px-3 py-1 font-medium whitespace-nowrap cursor-pointer select-none"
                         style={{
                           minWidth: header.id === "user_id" ? "100px" : "auto",
                         }}
+                        onClick={header.column.getToggleSortingHandler()}
                       >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                        <div className="flex items-center gap-1">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                          {{
+                            asc: <ChevronUp className="h-3 w-3" />,
+                            desc: <ChevronDown className="h-3 w-3" />,
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
                       </th>
                     ))}
                   </tr>
