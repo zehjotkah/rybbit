@@ -39,7 +39,7 @@ export function UsageBanners() {
     site.monthlyEventCount > site.eventLimit
   ) {
     return (
-      <Alert variant="destructive" className="p-4">
+      <Alert variant="destructive" className="p-4 m-3">
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-5 w-5 mt-0.5" />
           <div className="flex-1">
@@ -78,7 +78,7 @@ export function UsageBanners() {
   // If approaching limit (>90%), show warning banner
   if (isNearLimit) {
     return (
-      <Alert className="p-4 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+      <Alert className="p-4 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800  m-3">
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-5 w-5 mt-0.5 text-amber-500" />
           <div className="flex-1">

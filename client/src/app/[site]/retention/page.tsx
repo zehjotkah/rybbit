@@ -1,6 +1,5 @@
 "use client";
 
-import { HelpCircle } from "lucide-react";
 import { DateTime } from "luxon"; // Import Luxon for date formatting
 import { Fragment, useMemo, useState } from "react";
 import {
@@ -8,13 +7,13 @@ import {
   useGetRetention,
 } from "../../../api/analytics/useGetRetention";
 import { ThreeDotLoader } from "../../../components/Loaders";
+import { MobileSidebar } from "../../../components/MobileSidebar";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import { Label } from "../../../components/ui/label";
 import {
   Select,
   SelectContent,
@@ -23,24 +22,17 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../../components/ui/tooltip";
 import { RetentionChart } from "./RetentionChart";
-import { MobileSidebar } from "../../../components/MobileSidebar";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
-  { value: "7", label: "7 days" },
-  { value: "14", label: "14 days" },
-  { value: "30", label: "30 days" },
-  { value: "60", label: "60 days" },
-  { value: "90", label: "90 days" },
-  { value: "180", label: "6 months" },
-  { value: "365", label: "1 year" },
+  { value: "7", label: "Last 7 days" },
+  { value: "14", label: "Last 14 days" },
+  { value: "30", label: "Last 30 days" },
+  { value: "60", label: "Last 60 days" },
+  { value: "90", label: "Last 90 days" },
+  { value: "180", label: "Last 6 months" },
+  { value: "365", label: "Last 1 year" },
 ];
 
 // Dynamic color function that creates a smooth gradient based on retention percentage
@@ -148,32 +140,15 @@ export default function RetentionPage() {
       </div>
       <div className="flex items-center gap-3 flex-wrap justify-end">
         <div className="flex items-center gap-2">
-          <Label htmlFor="time-range" className="text-sm whitespace-nowrap">
-            Time Range:
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 ml-1 inline-block text-neutral-400" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="w-[200px] text-xs">
-                    Amount of historical data to include in the retention
-                    calculation. All available periods within this timeframe
-                    will be shown.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </Label>
           <Select
             value={timeRange.toString()}
             onValueChange={handleRangeChange}
             disabled={isLoading}
           >
-            <SelectTrigger id="time-range" className="w-28" size="sm">
-              <SelectValue placeholder="90 days" />
+            <SelectTrigger id="time-range">
+              <SelectValue />
             </SelectTrigger>
-            <SelectContent size="sm">
+            <SelectContent>
               {RANGE_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}

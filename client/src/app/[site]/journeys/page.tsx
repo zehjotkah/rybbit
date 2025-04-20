@@ -386,42 +386,42 @@ export default function JourneysPage() {
 
   return (
     <div className="container mx-auto p-4">
+      <div className="flex justify-end items-center gap-2 mb-2">
+        <DateSelector time={time} setTime={setTime} />
+        <Select
+          value={steps.toString()}
+          onValueChange={(value) => setSteps(Number(value))}
+        >
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Number of steps" />
+          </SelectTrigger>
+          <SelectContent>
+            {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => (
+              <SelectItem key={step} value={step.toString()}>
+                {step} steps
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={maxJourneys.toString()}
+          onValueChange={(value) => setMaxJourneys(Number(value))}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Max journeys" />
+          </SelectTrigger>
+          <SelectContent>
+            {[10, 25, 50, 100].map((count) => (
+              <SelectItem key={count} value={count.toString()}>
+                {count} journeys
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <Card className="w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>User Journeys</CardTitle>
-          <div className="flex justify-end items-center gap-2 mb-2">
-            <DateSelector time={time} setTime={setTime} />
-            <Select
-              value={steps.toString()}
-              onValueChange={(value) => setSteps(Number(value))}
-            >
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Number of steps" />
-              </SelectTrigger>
-              <SelectContent>
-                {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => (
-                  <SelectItem key={step} value={step.toString()}>
-                    {step} steps
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={maxJourneys.toString()}
-              onValueChange={(value) => setMaxJourneys(Number(value))}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Max journeys" />
-              </SelectTrigger>
-              <SelectContent>
-                {[10, 25, 50, 100].map((count) => (
-                  <SelectItem key={count} value={count.toString()}>
-                    {count} journeys
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardHeader>
         <CardContent>
           {isLoading && (
