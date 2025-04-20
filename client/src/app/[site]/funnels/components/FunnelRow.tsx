@@ -104,92 +104,89 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
   return (
     <Card className="mb-4 overflow-hidden">
       {/* Header row (always visible) */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between py-2 px-5">
         <div
           className="flex items-center flex-grow cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
           onClick={handleExpand}
         >
-          <div className="hidden md:block bg-neutral-100 dark:bg-neutral-800 p-2 rounded-md mr-4">
-            <FunnelIcon className="h-5 w-5 text-neutral-500" />
-          </div>
-          <div className="flex-grow">
-            <h3 className="font-medium">{funnel.name}</h3>
-            <div className="mt-1 text-xs text-neutral-400 flex flex-col gap-1">
-              {/* Steps visualization */}
-              <div className="flex flex-wrap gap-1 max-w-[500px]">
-                {funnel.steps.map((step, index) => (
-                  <div key={index} className="flex items-center">
-                    {index > 0 && (
-                      <ArrowRight className="h-3 w-3 mx-1 text-neutral-400" />
-                    )}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
-                            {step.type === "page" ? (
-                              <Globe className="h-3 w-3 mr-1 text-blue-400" />
-                            ) : (
-                              <ZapIcon className="h-3 w-3 mr-1 text-amber-400" />
-                            )}
-                            <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
-                              {step.name || step.value}
-                            </span>
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="text-xs">
-                          <div>
-                            <span className="font-semibold">
-                              {step.type === "page" ? "Page" : "Event"}:
-                            </span>{" "}
-                            {step.value}
-                          </div>
-                          {step.name && (
-                            <div>
-                              <span className="font-semibold">Label:</span>{" "}
-                              {step.name}
-                            </div>
+          <div className="mt-1 text-xs text-neutral-400 flex flex-col gap-3">
+            {/* Steps visualization */}
+            <div className="flex flex-wrap gap-1 max-w-[500px]">
+              <h3 className="font-medium text-neutral-100 text-base mr-2">
+                {funnel.name}
+              </h3>
+              {funnel.steps.map((step, index) => (
+                <div key={index} className="flex items-center">
+                  {index > 0 && (
+                    <ArrowRight className="h-3 w-3 mx-1 text-neutral-400" />
+                  )}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
+                          {step.type === "page" ? (
+                            <Globe className="h-3 w-3 mr-1 text-blue-400" />
+                          ) : (
+                            <ZapIcon className="h-3 w-3 mr-1 text-amber-400" />
                           )}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                ))}
-              </div>
-
-              {/* Filters visualization */}
-              {hasFilters && (
-                <div className="flex items-center gap-1">
-                  <FilterIcon className="h-3 w-3 text-neutral-400" />
-                  <div className="flex flex-wrap gap-1">
-                    {funnel.filters?.map((filter, index) => (
-                      <span
-                        key={index}
-                        className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default"
-                      >
-                        <span className="text-neutral-300">
-                          {getParameterNameLabel(filter.parameter)}
+                          <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
+                            {step.name || step.value}
+                          </span>
                         </span>
-                        <span
-                          className={`mx-1 ${
-                            filter.type === "not_equals" ||
-                            filter.type === "not_contains"
-                              ? "text-red-400"
-                              : "text-emerald-400"
-                          }`}
-                        >
-                          {filterTypeToLabel(filter.type)}
-                        </span>
-                        <span className="text-neutral-100 max-w-[100px] overflow-hidden text-ellipsis inline-block">
-                          {filter.value.length > 0
-                            ? getParameterValueLabel(filter, getRegionName)
-                            : "empty"}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs">
+                        <div>
+                          <span className="font-semibold">
+                            {step.type === "page" ? "Page" : "Event"}:
+                          </span>{" "}
+                          {step.value}
+                        </div>
+                        {step.name && (
+                          <div>
+                            <span className="font-semibold">Label:</span>{" "}
+                            {step.name}
+                          </div>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-              )}
+              ))}
             </div>
+
+            {/* Filters visualization */}
+            {hasFilters && (
+              <div className="flex items-center gap-1">
+                <FilterIcon className="h-3 w-3 text-neutral-400" />
+                <div className="flex flex-wrap gap-1">
+                  {funnel.filters?.map((filter, index) => (
+                    <span
+                      key={index}
+                      className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default"
+                    >
+                      <span className="text-neutral-300">
+                        {getParameterNameLabel(filter.parameter)}
+                      </span>
+                      <span
+                        className={`mx-1 ${
+                          filter.type === "not_equals" ||
+                          filter.type === "not_contains"
+                            ? "text-red-400"
+                            : "text-emerald-400"
+                        }`}
+                      >
+                        {filterTypeToLabel(filter.type)}
+                      </span>
+                      <span className="text-neutral-100 max-w-[100px] overflow-hidden text-ellipsis inline-block">
+                        {filter.value.length > 0
+                          ? getParameterValueLabel(filter, getRegionName)
+                          : "empty"}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
