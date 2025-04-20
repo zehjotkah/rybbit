@@ -54,14 +54,9 @@ export function TopBar() {
         <div className="flex items-center space-x-4">
           <Link
             href={session.data ? "/" : "https://rybbit.io"}
-            className={`text-xl font-semibold flex items-center gap-1 ${tilt_wrap.className}`}
+            className={`text-xl font-semibold flex items-center gap-1.5 ${tilt_wrap.className}`}
           >
-            <Image
-              src="/rybbit-logo-2.png"
-              alt="Rybbit"
-              width={20}
-              height={20}
-            />
+            <Image src="/rybbit.png" alt="Rybbit" width={22} height={22} />
             rybbit.
           </Link>
         </div>
