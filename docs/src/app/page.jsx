@@ -34,9 +34,15 @@ export default function IndexPage() {
         </Link>
       </div>
 
-      <div className="relative w-[1200px] mb-10">
-        <img src="/main.jpg" alt="Analytics" className="object-cover w-full border-2 border-neutral-600 rounded-2xl" />
-        <div className="absolute bottom-0 left-0 right-0 h-50 bg-gradient-to-t from-[#111111] to-transparent rounded-b-2xl"></div>
+      <div className="w-[1300px] mb-10 rounded-xl overflow-hidden border-2 border-neutral-600">
+        <iframe 
+          src="https://tracking.tomato.gg/1" 
+          width="1300" 
+          height="750" 
+          className="w-full"
+          style={{ border: 'none' }}
+          title="Frogstats Analytics Demo"
+        ></iframe>
       </div>
 
       <section className="py-20 w-full max-w-7xl px-4">
