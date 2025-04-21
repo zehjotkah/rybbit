@@ -48,4 +48,5 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
+# Start Next.js
 CMD ["node", "server.js"] 
