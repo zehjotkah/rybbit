@@ -1,0 +1,16 @@
+import Image from 'next/image'
+import { Tilt_Warp } from "next/font/google"
+
+const tilt_wrap = Tilt_Warp({
+    subsets: ["latin"],
+    weight: "400",
+  });
+
+export function Logo() {
+  return (
+    <div className={`text-4xl flex items-center gap-3 ${tilt_wrap.className}`}>
+        <Image src="/rybbit.png" alt="Rybbit" width={40} height={40} />
+        rybbit.
+    </div>
+  );
+}
