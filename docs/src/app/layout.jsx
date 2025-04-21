@@ -38,13 +38,14 @@ export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
       logo={
-        <div className={`text-xl flex items-center gap-1.5 ${tilt_wrap.className}`}>
-          <Image src="/rybbit.png" alt="Rybbit" width={22} height={22} />
+        <div className={`text-2xl flex items-center gap-1.5 ${tilt_wrap.className}`}>
+          <Image src="/rybbit.png" alt="Rybbit" width={30} height={30} />
           rybbit.
         </div>
       }
       chatLink="https://discord.gg/DEhGb4hYBj"
       projectLink="https://github.com/goldflag/rybbit"
+
     />
   )
   const pageMap = await getPageMap()
