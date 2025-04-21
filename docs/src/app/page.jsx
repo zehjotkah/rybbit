@@ -13,7 +13,7 @@ import { Safari } from "@/components/magicui/safari";
 import { Integrations } from "./components/integrations";
 import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Logo } from "./components/Logo";
-
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ShineBorder } from "@/components/magicui/shine-border";
 
 
@@ -94,7 +94,101 @@ export default function IndexPage() {
         </div>
       </section>
 
+
+      {/* Testimonial Section */}
+      <section className="py-10 md:py-16 w-full">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="relative bg-neutral-800/20 backdrop-blur-sm border border-neutral-700 rounded-xl shadow-lg overflow-hidden">
+            {/* Background glow effects - toned down */}
+            <div className="absolute -right-40 -top-40 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            <div className="absolute -left-20 -bottom-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            
+            {/* Quote mark - smaller */}
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 text-6xl md:text-7xl leading-none font-serif text-emerald-600/25">"</div>
+            
+            {/* Testimonial content */}
+            <div className="relative z-10 p-6 md:p-10 text-center">
+              <p className="text-lg md:text-2xl font-medium mb-6 text-white mx-auto max-w-2xl leading-relaxed">
+                Rybbit has completely transformed how we understand our users. The real-time data is incredible, and I've finally ditched Google Analytics for something that respects privacy.
+              </p>
+              
+              <div className="inline-block relative">
+                <div className="absolute inset-0 bg-emerald-500/10 blur-sm rounded-full"></div>
+                <div className="relative bg-neutral-900/60 backdrop-blur-sm border border-neutral-700 rounded-full px-5 py-2">
+                  <p className="font-semibold text-white">Chris Weaver</p>
+                  <p className="text-sm text-neutral-400">CEO at Oynx AI</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Integrations />
+      
+      {/* FAQ Section */}
+      <section className="py-16 md:py-24 w-full">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded-full text-sm font-medium mb-4">
+              Common Questions
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold">Frequently Asked Questions</h2>
+            <p className="mt-4 text-neutral-300 max-w-2xl mx-auto">
+              Everything you need to know about Rybbit Analytics
+            </p>
+          </div>
+          
+          <div className="bg-neutral-800/20 backdrop-blur-sm border border-neutral-700 rounded-xl overflow-hidden">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1" className="border-b border-neutral-700/50">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  Is Rybbit GDPR and CCPA compliant?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Yes, Rybbit is fully compliant with GDPR, CCPA, and other privacy regulations. We don't use cookies or collect any personal data that could identify your users. We prioritize privacy by design while still giving you all the analytics you need.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-2" className="border-b border-neutral-700/50">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  How does Rybbit compare to Google Analytics?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Unlike Google Analytics, Rybbit provides a clean, intuitive interface that's easy to use. We focus on the metrics that matter most, without overwhelming you with too many options. Plus, we respect user privacy, don't slow down your site, and offer first-party data collection.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-3" className="border-b border-neutral-700/50">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  Can I self-host Rybbit?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Absolutely! Rybbit is available as a self-hosted option. You can install it on your own server and have complete control over your data. We also offer a cloud version if you prefer a managed solution.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-4" className="border-b border-neutral-700/50">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  How easy is it to set up Rybbit?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Setting up Rybbit is incredibly simple. Just add a small script to your website, and you're good to go. Most users are up and running in less than 5 minutes. We also provide comprehensive documentation and support if you need any help.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-5">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  What platforms does Rybbit support?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Rybbit works with virtually any website platform. Whether you're using WordPress, Shopify, Next.js, React, Vue, or any other framework, our simple tracking snippet integrates seamlessly. We also offer specialized plugins for popular platforms to make integration even easier.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
+      </section>
 
       {/* add CTA section here */}
       <section className="py-16 md:py-24 w-full bg-gradient-to-b from-neutral-900 to-neutral-950">
