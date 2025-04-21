@@ -5,15 +5,13 @@ services:
     restart: unless-stopped
     ports:
       - "8080:80"  # Using different port to avoid conflict with main app
-      - "8443:443"
-      - "8443:443/udp" # Needed for HTTP/3
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile # Mount Caddy config file
       - docs_caddy_data:/data # Mount persistent data volume for certs etc.
       - docs_caddy_config:/config # Mount persistent config volume
     environment:
-      # Pass domain name for use in Caddyfile (will need to be set when running)
-      - DOMAIN_NAME=rybbit.io
+      # Fallback to localhost if domain not set
+      - DOMAIN_NAME=${DOMAIN_NAME:-localhost}
     depends_on:
       - docs
 
