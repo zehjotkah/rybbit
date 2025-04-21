@@ -28,7 +28,9 @@
 
 Rybbit is the modern open source and privacy friendly alternative to Google Analytics. It takes only a couple minutes to setup and is super intuitive to use.
 
-View a <a href="https://demo.rybbit.io/1">live demo</a> of Rybbit running on a real-life production site with over a million visits a month. 
+<h3>
+View a <strong><a href="https://demo.rybbit.io/1">live demo</a></strong> of Rybbit running on a real-life production site with over a million visits a month. 
+</h3>
 
 <h2>Getting Started</h2>
 You can either sign up for our hosted service at https://rybbit.io or <a href="https://rybbit.io/docs/self-host">self host</a> Rybbit on your own VPS.
@@ -38,6 +40,7 @@ Learn more about Rybbit by reading our <a href="https://rybbit.io/docs">document
 <h2>Key Features</h2>
 
 - All key web analytics metrics including sessions, unique users, pageviews, bounce rate, session duration
+- No cookies = GDPR and CCPA compliant
 - Customizable retention, user journeys, and funnels dashboards
 - Advanced filtering across 15+ dimensions
 - Custom events
