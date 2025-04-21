@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img  src="https://github.com/user-attachments/assets/dba06664-c57d-4e61-921c-59033166369b">
+  <img  src="https://github.com/user-attachments/assets/1425302a-40b6-4d97-bf4b-89927ea93fb9" height="250">
     <h1 align="center">
         Rybbit Analytics 
     </h1>
