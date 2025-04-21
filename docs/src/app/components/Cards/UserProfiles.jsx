@@ -1,0 +1,91 @@
+import { CountryFlag } from "../Country";
+import { Browser } from "../Browser";
+import { OperatingSystem } from "../OperatingSystem";
+import { Laptop } from "lucide-react";
+
+export function UserProfiles() {
+  return (
+    <div className="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+      <h3 className="text-xl font-semibold mb-3">User Profiles</h3>
+      <p className="text-neutral-300">Know who your users are and exactly what they do.</p>
+      
+      <div className="mt-4 bg-neutral-900 p-4 rounded-md">
+        <div className="flex items-start gap-4">
+          {/* User basic info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">
+                JD
+              </div>
+              <div>
+                <div className="font-medium">User #8a4f3d7e</div>
+                <div className="flex items-center gap-2 text-sm text-neutral-400">
+                  <CountryFlag country="US" />
+                  <OperatingSystem os="macOS" />
+                  <Browser browser="Chrome" />
+                  <Laptop className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-neutral-800/50 p-2 rounded-md">
+                <div className="text-xs text-neutral-400">First seen</div>
+                <div className="text-sm">Jan 12, 2023</div>
+              </div>
+              <div className="bg-neutral-800/50 p-2 rounded-md">
+                <div className="text-xs text-neutral-400">Last seen</div>
+                <div className="text-sm">Today, 2:34 PM</div>
+              </div>
+              <div className="bg-neutral-800/50 p-2 rounded-md">
+                <div className="text-xs text-neutral-400">Sessions</div>
+                <div className="text-sm font-medium">48</div>
+              </div>
+              <div className="bg-neutral-800/50 p-2 rounded-md">
+                <div className="text-xs text-neutral-400">Pageviews</div>
+                <div className="text-sm font-medium">134</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Activity calendar grid */}
+        <div className="mt-4">
+          <div className="text-xs text-neutral-400 mb-2">Activity</div>
+          <div className="flex gap-1">
+            {/* Column labels (months) */}
+            <div className="flex flex-col gap-1 justify-end pr-1">
+              <div className="text-[9px] text-neutral-500">Jan</div>
+              <div className="text-[9px] text-neutral-500">Feb</div>
+              <div className="text-[9px] text-neutral-500">Mar</div>
+            </div>
+            
+            {/* Calendar grid */}
+            <div className="grid grid-cols-18 gap-1">
+              {Array(54).fill().map((_, i) => {
+                // Randomly determine activity level (0-4)
+                const activityLevel = Math.floor(Math.random() * 5);
+                
+                // Set color based on activity level
+                let bgColor = 'bg-neutral-800';
+                if (activityLevel === 1) bgColor = 'bg-emerald-900';
+                if (activityLevel === 2) bgColor = 'bg-emerald-800';
+                if (activityLevel === 3) bgColor = 'bg-emerald-700';
+                if (activityLevel === 4) bgColor = 'bg-emerald-600';
+                
+                return (
+                  <div 
+                    key={i} 
+                    className={`w-3 h-3 rounded-sm ${bgColor}`}
+                    title={`${activityLevel} visits`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 
