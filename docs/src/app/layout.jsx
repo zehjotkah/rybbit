@@ -1,13 +1,13 @@
 /* eslint-env node */
-import { Footer, Layout, Navbar } from 'nextra-theme-docs'
-import { Banner, Head } from 'nextra/components'
-import { getPageMap } from 'nextra/page-map'
-import Image from 'next/image'
-import 'nextra-theme-docs/style.css'
-import './globals.css'
 import {
   Tilt_Warp,
-} from "next/font/google";
+} from "next/font/google"
+import Image from 'next/image'
+import { Footer, Layout, Navbar } from 'nextra-theme-docs'
+import 'nextra-theme-docs/style.css'
+import { Head } from 'nextra/components'
+import { getPageMap } from 'nextra/page-map'
+import './globals.css'
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],
@@ -54,11 +54,11 @@ export default async function RootLayout({ children }) {
       <Head faviconGlyph="✦" />
       <body>
         <Layout
-          banner={<Banner storageKey="Rybbit">Rybbit Alpha</Banner>}
+          // banner={<Banner storageKey="Rybbit">Rybbit Alpha</Banner>}
           navbar={navbar}
           footer={<Footer>Copyright {new Date().getFullYear()} © Rybbit.</Footer>}
           editLink="Edit this page on GitHub"
-          docsRepositoryBase="https://github.com/shuding/nextra/blob/main/examples/docs"
+          docsRepositoryBase="https://github.com/goldflag/rybbit/blob/main/docs"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           pageMap={pageMap}
         >

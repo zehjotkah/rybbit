@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next --turbopack --port 3003",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
-    "start": "next start"
+    "start": "next start  --port 3003"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.4",
