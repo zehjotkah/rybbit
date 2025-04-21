@@ -182,31 +182,6 @@ export function UserSessions() {
               </div>
             </div>
           </div>
-
-          {/* Event 6 */}
-          <div className="flex mb-3">
-            <div className="relative flex-shrink-0">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-900/30 border border-blue-500/50">
-                <span className="text-sm font-medium">6</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col ml-3 flex-1">
-              <div className="flex items-center flex-1 py-1">
-                <FileText className="w-4 h-4 text-blue-500 mr-3" />
-                <div className="flex-1 min-w-0 mr-4">
-                  <div className="text-sm truncate">/thank-you</div>
-                </div>
-                <div className="text-xs text-neutral-400">14:30:42</div>
-              </div>
-              <div className="flex items-center pl-7 mt-1">
-                <div className="text-xs text-neutral-400">
-                  <Clock className="w-3 h-3 inline mr-1" />
-                  5m 18s
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

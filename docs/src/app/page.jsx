@@ -54,17 +54,17 @@ export default function IndexPage() {
           {/* Row 1 */}
           <RealTimeAnalytics />
           <AdvancedFilters />
-          <EventTracking />
+          <UserProfiles />
 
           {/* Row 2 */}
-          <UserProfiles />
+          <UserSessions />
           <UserFlowAnalysis />
-          <GoalConversion />
+          <Funnels />
 
           {/* Row 3 */}
           <UserBehaviorTrends />
-          <Funnels />
-          <UserSessions />
+          <EventTracking />
+          <GoalConversion />
         </div>
       </section>
     </div>
