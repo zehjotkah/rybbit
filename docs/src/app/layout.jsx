@@ -66,6 +66,10 @@ export default async function RootLayout({ children }) {
           docsRepositoryBase="https://github.com/goldflag/rybbit/blob/main/docs"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           pageMap={pageMap}
+          nextThemes={{
+            defaultTheme: "dark",
+            forcedTheme: "dark",
+          }}
         >
           {children}
         </Layout>
