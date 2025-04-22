@@ -24,6 +24,7 @@ RUN apk add --no-cache postgresql-client
 
 # Copy built application and dependencies
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/GeoLite2-City.mmdb ./GeoLite2-City.mmdb
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/docker-entrypoint.sh /docker-entrypoint.sh
