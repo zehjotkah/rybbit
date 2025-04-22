@@ -2,6 +2,9 @@ import { CountryFlag } from "../Country";
 import { Browser } from "../Browser";
 import { OperatingSystem } from "../OperatingSystem";
 import { Laptop } from "lucide-react";
+import Avatar from "boring-avatars";
+
+
 
 export function UserProfiles() {
   return (
@@ -14,11 +17,14 @@ export function UserProfiles() {
           {/* User basic info */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">
-                JD
-              </div>
+              <Avatar
+                size={32}
+                name={"bill"}
+                variant="marble"
+                colors={["#226756", "#6eaaa3", "#e8e8e8", "#bbc1e2", "#7182d6"]}
+              />
               <div>
-                <div className="font-medium">User #8a4f3d7e</div>
+                <div className="text-neutral-50">8a4f3d7e</div>
                 <div className="flex items-center gap-2 text-sm text-neutral-400">
                   <CountryFlag country="US" />
                   <OperatingSystem os="macOS" />

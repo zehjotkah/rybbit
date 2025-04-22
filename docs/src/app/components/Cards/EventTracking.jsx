@@ -25,6 +25,10 @@ export function EventTracking() {
             <span className="text-neutral-400 text-sm w-28">user_segment</span>
             <span className="text-white text-sm ml-2 font-medium">new_visitor</span>
           </div>
+          <div className="flex bg-neutral-800 p-2 rounded">
+            <span className="text-neutral-400 text-sm w-28">ab_test</span>
+            <span className="text-white text-sm ml-2 font-medium">version-a</span>
+          </div>
         </div>
       </div>
     </div>

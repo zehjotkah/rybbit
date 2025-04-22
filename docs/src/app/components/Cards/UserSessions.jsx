@@ -2,6 +2,7 @@ import { Clock, FileText, MousePointerClick, Laptop } from "lucide-react";
 import { CountryFlag } from "../Country";
 import { Browser } from "../Browser";
 import { OperatingSystem } from "../OperatingSystem";
+import Avatar from "boring-avatars";
 
 export function UserSessions() {
   return (
@@ -12,11 +13,14 @@ export function UserSessions() {
       <div className="mt-4 bg-neutral-900 p-4 rounded-md">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 bg-neutral-800 rounded-full flex items-center justify-center flex-shrink-0">
-              <div className="text-sm font-medium">JD</div>
-            </div>
+            <Avatar
+              size={32}
+              name={"billy"}
+              variant="marble"
+              colors={["#226756", "#6eaaa3", "#e8e8e8", "#bbc1e2", "#7182d6"]}
+            />
             <div>
-              <div className="text-sm">Session #2c49ae3</div>
+              <div className="text-sm">2c49ae3</div>
               <div className="text-xs text-neutral-400">Today, 14:22 - 14:36 (14m)</div>
             </div>
           </div>
@@ -27,7 +31,7 @@ export function UserSessions() {
             <Laptop className="w-4 h-4" />
           </div>
         </div>
-        
+{/*         
         <div className="flex gap-2 mb-3">
           <div className="flex items-center gap-1 text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
             <FileText className="w-3 h-3" />
@@ -37,7 +41,7 @@ export function UserSessions() {
             <MousePointerClick className="w-3 h-3" />
             <span>Events: 2</span>
           </div>
-        </div>
+        </div> */}
         
         {/* Timeline */}
         <div className="px-1 py-2">

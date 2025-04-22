@@ -105,7 +105,7 @@ export function AdvancedFilters() {
     <div className="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
       <h3 className="text-xl font-semibold mb-3">Advanced Filters</h3>
       <p className="text-neutral-300">Drill down into your data with advanced filters across over a dozen dimensions.</p>
-      <div className="flex flex-wrap justify-center gap-4 mt-4">  
+      <div className="flex flex-wrap justify-center gap-3.5 mt-8">  
         {FilterOptions.map((option) => (
           <div key={option.value} className="flex items-center gap-2 text-base bg-neutral-800 border border-neutral-700 py-1 px-2 rounded-md">
             {option.icon}

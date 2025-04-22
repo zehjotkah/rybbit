@@ -16,7 +16,7 @@ export function UserBehaviorTrends() {
         <div className="flex mt-2">
           {/* Hours column */}
           <div className="w-10 flex-shrink-0">
-            <div className="h-5"></div> {/* Empty space for top row with day labels */}
+            <div className="h-4"></div> {/* Empty space for top row with day labels */}
             {[0, 6, 12, 18].map(hour => (
               <div key={hour} className="h-4 text-xs flex items-center justify-end pr-2 text-neutral-400 my-2">
                 {hour === 0 ? '12am' : hour === 12 ? '12pm' : hour > 12 ? `${hour-12}pm` : `${hour}am`}
@@ -101,7 +101,7 @@ export function UserBehaviorTrends() {
         </div>
         
         {/* Legend */}
-        <div className="mt-5 flex items-center justify-center">
+        <div className="mt-3 flex items-center justify-center">
           <div className="flex items-center gap-1">
             <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)' }} className="w-3 h-3 rounded-sm"></div>
             <span className="text-xs text-neutral-400">Low</span>
