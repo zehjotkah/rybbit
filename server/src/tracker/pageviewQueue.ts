@@ -4,6 +4,7 @@ import { TrackingPayload } from "../types.js";
 import { getDeviceType } from "../utils.js";
 import { getChannel } from "./getChannel.js";
 import { clearSelfReferrer, getUTMParams } from "./trackingUtils.js";
+import { getLocation } from "../db/geolocation/geolocation.js";
 
 type TotalPayload = TrackingPayload & {
   userId: string;
@@ -40,20 +41,21 @@ class PageviewQueue {
     const batch = this.queue.splice(0, this.batchSize);
     const ips = [...new Set(batch.map((pv) => pv.ipAddress))];
 
-    let geoData: any;
+    let geoData: Record<string, { data: any }> = {};
 
     try {
-      // Get geo data for all IPs in batch
-      const geoResponse = await fetch("https://tracking.tomato.gg/geoip/bulk", {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          //   "Accept-Encoding": "gzip",
-        },
-        body: JSON.stringify({ ips }),
+      // Process each IP to get geo data using local implementation
+      const geoPromises = ips.map(async (ip) => {
+        const locationData = await getLocation(ip);
+        return { ip, locationData };
       });
-      geoData = await geoResponse.json();
+
+      const results = await Promise.all(geoPromises);
+
+      // Format results to match expected structure
+      results.forEach(({ ip, locationData }) => {
+        geoData[ip] = { data: locationData };
+      });
     } catch (error) {
       console.error("Error getting geo data:", error);
     }
