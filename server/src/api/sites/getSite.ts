@@ -43,6 +43,7 @@ export async function getSite(
       createdAt: site.createdAt,
       updatedAt: site.updatedAt,
       createdBy: site.createdBy,
+      saltUserIds: site.saltUserIds,
       public: site.public,
       isOwner: isOwner,
     });
