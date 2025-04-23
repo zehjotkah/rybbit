@@ -27,7 +27,8 @@ body {
     --ring: 240 5.9% 10%;
     --radius: 0.3rem;
 
-    --dataviz: 230 60% 85%;
+    --dataviz: 230 100% 85%;
+    --dataviz-2: 230 100% 92%;
     
     --accent-50: var(--emerald-50);
     --accent-100: var(--emerald-100);

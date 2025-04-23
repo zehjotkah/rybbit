@@ -62,7 +62,7 @@ export function SparklinesChart({
       useMesh={true}
       animate={false}
       enableSlices={"x"}
-      colors={[isHovering ? "hsl(var(--dataviz))" : "hsl(var(--dataviz))"]}
+      colors={[isHovering ? "hsl(var(--dataviz-2))" : "hsl(var(--dataviz))"]}
       enableArea={false}
       areaBaselineValue={0}
       areaOpacity={0.3}

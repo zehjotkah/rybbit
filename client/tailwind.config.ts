@@ -55,6 +55,7 @@ module.exports = {
         },
         dataviz: {
           DEFAULT: "hsl(var(--dataviz))",
+          "2": "hsl(var(--dataviz-2))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
