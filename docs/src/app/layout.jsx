@@ -39,17 +39,20 @@ export const metadata = {
 function Footer_() {
   return (
     <div className="max-w-[1300px] mx-auto">
-
-      <div className="flex items-center justify-between w-full px-6 py-4">
-        <SmallLogo />
-        <div className="text-sm text-neutral-400">Copyright {new Date().getFullYear()} © Rybbit.</div>
-        <div className="flex gap-4 text-sm">
-          <Link href="/privacy" className="text-neutral-400 hover:text-white transition-colors">
-            Privacy Policy
-          </Link>
-          <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors">
-            Contact
-          </Link>
+      <div className="flex flex-col md:flex-row items-center md:justify-between w-full px-6 py-4 space-y-4 md:space-y-0">
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-0 md:justify-between w-full">
+          <SmallLogo />
+          <div className="text-sm text-neutral-400 text-center md:text-left">
+            Copyright {new Date().getFullYear()} © Rybbit.
+          </div>
+          <div className="flex gap-4 text-sm">
+            <Link href="/privacy" className="text-neutral-400 hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors">
+              Contact
+            </Link>
+          </div>
         </div>
       </div>
     </div>

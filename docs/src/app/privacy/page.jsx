@@ -107,8 +107,8 @@ export default function PrivacyPolicy() {
         <h2 className="text-2xl font-semibold mt-8 mb-4">Contact Us</h2>
         <p>
           If you have questions about this privacy policy or Rybbit's data practices, please contact us at:
-          <a href="mailto:privacy@rybbit.io" className="text-emerald-400 hover:text-emerald-300 ml-1">
-            privacy@rybbit.io
+          <a href="mailto:founders@rybbit.io" className="text-emerald-400 hover:text-emerald-300 ml-1">
+            founders@rybbit.io
           </a>
         </p>
       </div>
