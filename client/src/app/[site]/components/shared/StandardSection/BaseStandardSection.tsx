@@ -38,8 +38,7 @@ export const Row = ({
       }
     >
       <div
-        // className="absolute h-0.5 bottom-0 bg-accent-400 opacity-90"
-        className="absolute inset-0 bg-accent-400 py-2 opacity-25 rounded-md"
+        className="absolute inset-0 bg-dataviz py-2 opacity-25 rounded-md"
         style={{ width: `${e.percentage * ratio}%` }}
       ></div>
       <div className="z-10 mx-2 flex justify-between items-center text-xs w-full">

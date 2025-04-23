@@ -53,6 +53,9 @@ module.exports = {
           900: "hsl(var(--accent-900))",
           950: "hsl(var(--accent-950))",
         },
+        dataviz: {
+          DEFAULT: "hsl(var(--dataviz))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

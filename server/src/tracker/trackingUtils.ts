@@ -174,7 +174,6 @@ function getUserId(
 ): string {
   // Only apply salt if the site has salting enabled
   if (siteId && siteConfig.shouldSaltUserIds(siteId)) {
-    console.info("salted");
     const dailySalt = getDailySalt(); // Get the salt for the current day
     return crypto
       .createHash("sha256")
@@ -182,7 +181,6 @@ function getUserId(
       .digest("hex");
   }
 
-  console.info("not salted");
   // Otherwise, just hash IP and user agent
   return crypto
     .createHash("sha256")

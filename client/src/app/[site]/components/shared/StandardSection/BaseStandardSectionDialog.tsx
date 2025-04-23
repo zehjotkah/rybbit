@@ -261,8 +261,8 @@ export function BaseStandardSectionDialog({
                         >
                           {cellIndex === 0 && (
                             <div
-                            // className="absolute h-0.5 bottom-0 bg-accent-400 opacity-90"
-                            // className="absolute inset-0 bg-accent-400 py-2 opacity-30 rounded-md h-6 mt-1"
+                            // className="absolute h-0.5 bottom-0 bg-dataviz opacity-90"
+                            // className="absolute inset-0 bg-dataviz py-2 opacity-30 rounded-md h-6 mt-1"
                             // style={{
                             //   width: `${row.original.percentage * ratio}%`,
                             // }}

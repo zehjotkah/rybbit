@@ -62,9 +62,7 @@ export function SparklinesChart({
       useMesh={true}
       animate={false}
       enableSlices={"x"}
-      colors={[
-        isHovering ? "hsl(var(--accent-300))" : "hsl(var(--accent-400))",
-      ]}
+      colors={[isHovering ? "hsl(var(--dataviz))" : "hsl(var(--dataviz))"]}
       enableArea={false}
       areaBaselineValue={0}
       areaOpacity={0.3}
@@ -73,8 +71,8 @@ export function SparklinesChart({
           id: "gradient",
           type: "linearGradient",
           colors: [
-            { offset: 0, color: "hsl(var(--accent-400))", opacity: 1 },
-            { offset: 100, color: "hsl(var(--accent-400))", opacity: 0 },
+            { offset: 0, color: "hsl(var(--dataviz))", opacity: 1 },
+            { offset: 100, color: "hsl(var(--dataviz))", opacity: 0 },
           ],
         },
       ]}

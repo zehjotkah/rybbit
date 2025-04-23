@@ -200,7 +200,7 @@ export function Chart({
       animate={false}
       // motionConfig="stiff"
       enableSlices={"x"}
-      colors={["hsl(var(--accent-400))"]}
+      colors={["hsl(var(--dataviz))"]}
       enableArea={true}
       areaBaselineValue={0}
       areaOpacity={0.3}
@@ -209,8 +209,8 @@ export function Chart({
           id: "gradient",
           type: "linearGradient",
           colors: [
-            { offset: 0, color: "hsl(var(--accent-400))", opacity: 1 },
-            { offset: 100, color: "hsl(var(--accent-400))", opacity: 0 },
+            { offset: 0, color: "hsl(var(--dataviz))", opacity: 1 },
+            { offset: 100, color: "hsl(var(--dataviz))", opacity: 0 },
           ],
         },
       ]}

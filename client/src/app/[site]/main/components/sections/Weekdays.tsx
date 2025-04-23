@@ -127,16 +127,16 @@ export function Weekdays() {
     const ratio = value / maxValue;
 
     // Use predefined opacity classes that are guaranteed to exist in Tailwind
-    if (ratio < 0.1) return "bg-indigo-500 bg-opacity-10";
-    if (ratio < 0.2) return "bg-indigo-500 bg-opacity-20";
-    if (ratio < 0.3) return "bg-indigo-500 bg-opacity-30";
-    if (ratio < 0.4) return "bg-indigo-500 bg-opacity-40";
-    if (ratio < 0.5) return "bg-indigo-500 bg-opacity-50";
-    if (ratio < 0.6) return "bg-indigo-500 bg-opacity-60";
-    if (ratio < 0.7) return "bg-indigo-500 bg-opacity-70";
-    if (ratio < 0.8) return "bg-indigo-500 bg-opacity-80";
-    if (ratio < 0.9) return "bg-indigo-500 bg-opacity-90";
-    return "bg-indigo-500";
+    if (ratio < 0.1) return "bg-emerald-500 bg-opacity-10";
+    if (ratio < 0.2) return "bg-emerald-500 bg-opacity-20";
+    if (ratio < 0.3) return "bg-emerald-500 bg-opacity-30";
+    if (ratio < 0.4) return "bg-emerald-500 bg-opacity-40";
+    if (ratio < 0.5) return "bg-emerald-500 bg-opacity-50";
+    if (ratio < 0.6) return "bg-emerald-500 bg-opacity-60";
+    if (ratio < 0.7) return "bg-emerald-500 bg-opacity-70";
+    if (ratio < 0.8) return "bg-emerald-500 bg-opacity-80";
+    if (ratio < 0.9) return "bg-emerald-500 bg-opacity-90";
+    return "bg-emerald-500";
   };
 
   // Format the metric value based on its type
@@ -263,7 +263,7 @@ export function Weekdays() {
                           <Tooltip key={day}>
                             <TooltipTrigger asChild>
                               <div
-                                className={`flex-1 mx-0.5 ${colorClass} hover:ring-1 hover:ring-indigo-300 transition-all rounded-sm my-0.5`}
+                                className={`flex-1 mx-0.5 ${colorClass} hover:ring-1 hover:ring-emerald-300 transition-all rounded-sm my-0.5`}
                               />
                             </TooltipTrigger>
                             <TooltipContent className="flex flex-col gap-1 p-2">
