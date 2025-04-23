@@ -43,12 +43,21 @@ export default function IndexPage() {
       </div>
 
       <div className="relative w-full max-w-[1300px] mb-10 px-4">
-        {/* Background gradients - adjusted to stay within container */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-600/30 rounded-full blur-3xl opacity-60"></div>
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-600/30 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute top-1/3 right-0 w-[250px] h-[250px] bg-purple-600/30 rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute bottom-1/3 left-0 w-[250px] h-[250px] bg-emerald-500/20 rounded-full blur-2xl opacity-50"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl opacity-40"></div>
+        {/* Background gradients - overlapping circles for organic feel */}
+        <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-emerald-500/40 rounded-full blur-[80px] opacity-70"></div>
+        <div className="absolute top-20 left-20 w-[400px] h-[400px] bg-emerald-600/30 rounded-full blur-[70px] opacity-50"></div>
+        
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/40 rounded-full blur-[80px] opacity-60"></div>
+        <div className="absolute bottom-40 right-20 w-[350px] h-[350px] bg-indigo-500/30 rounded-full blur-[75px] opacity-50"></div>
+        
+        <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-50"></div>
+        <div className="absolute top-1/3 right-20 w-[250px] h-[250px] bg-violet-500/30 rounded-full blur-[65px] opacity-40"></div>
+        
+        <div className="absolute bottom-1/3 left-0 w-[320px] h-[320px] bg-emerald-400/30 rounded-full blur-[70px] opacity-60"></div>
+        <div className="absolute bottom-1/4 left-20 w-[240px] h-[240px] bg-teal-400/25 rounded-full blur-[65px] opacity-50"></div>
+        
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-indigo-400/30 rounded-full blur-[80px] opacity-50"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/3 -translate-y-1/3 w-[350px] h-[350px] bg-sky-400/20 rounded-full blur-[75px] opacity-40"></div>
 
         {/* Iframe container with responsive visibility */}
         <div className="relative z-10 rounded-lg overflow-hidden border-4 border-neutral-100/5 shadow-2xl shadow-emerald-900/10">
