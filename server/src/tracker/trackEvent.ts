@@ -1,10 +1,16 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z, ZodError } from "zod";
 import {
+  clearSelfReferrer,
   createBasePayload,
   getExistingSession,
-  processTrackingEvent,
+  TotalTrackingPayload,
 } from "./trackingUtils.js";
+import { db } from "../db/postgres/postgres.js";
+import { activeSessions } from "../db/postgres/schema.js";
+import { eq } from "drizzle-orm";
+import { getDeviceType } from "../utils.js";
+import { pageviewQueue } from "./pageviewQueue.js";
 
 // Define Zod schema for validation
 export const trackingPayloadSchema = z.discriminatedUnion("type", [
@@ -51,6 +57,79 @@ export const trackingPayloadSchema = z.discriminatedUnion("type", [
       .optional(), // Optional but must be valid JSON if present
   }),
 ]);
+
+// Update session for both pageviews and events
+export async function updateSession(
+  payload: TotalTrackingPayload,
+  existingSession: any | null,
+  isPageview: boolean = true
+): Promise<void> {
+  if (existingSession) {
+    // Update session with Drizzle
+    const updateData: any = {
+      lastActivity: new Date(payload.timestamp),
+    };
+
+    // Only increment pageviews count for actual pageviews
+    if (isPageview) {
+      updateData.pageviews = (existingSession.pageviews || 0) + 1;
+    }
+
+    await db
+      .update(activeSessions)
+      .set(updateData)
+      .where(eq(activeSessions.userId, existingSession.userId));
+    return;
+  }
+
+  // Insert new session with Drizzle
+  const insertData = {
+    sessionId: payload.sessionId,
+    siteId:
+      typeof payload.site_id === "string"
+        ? parseInt(payload.site_id, 10)
+        : payload.site_id,
+    userId: payload.userId,
+    hostname: payload.hostname || null,
+    startTime: new Date(payload.timestamp || Date.now()),
+    lastActivity: new Date(payload.timestamp || Date.now()),
+    pageviews: isPageview ? 1 : 0,
+    entryPage: payload.pathname || null,
+    deviceType: getDeviceType(
+      payload.screenWidth,
+      payload.screenHeight,
+      payload.ua
+    ),
+    screenWidth: payload.screenWidth || null,
+    screenHeight: payload.screenHeight || null,
+    browser: payload.ua.browser.name || null,
+    operatingSystem: payload.ua.os.name || null,
+    language: payload.language || null,
+    referrer: payload.hostname
+      ? clearSelfReferrer(payload.referrer || "", payload.hostname)
+      : payload.referrer || null,
+  };
+
+  await db.insert(activeSessions).values(insertData);
+}
+
+// Process tracking event and add to queue
+export async function processTrackingEvent(
+  payload: TotalTrackingPayload,
+  existingSession: any | null,
+  isPageview: boolean = true
+): Promise<void> {
+  // If session exists, use its ID instead of generated one
+  if (existingSession) {
+    payload.sessionId = existingSession.sessionId;
+  }
+
+  // Add to queue for processing
+  await pageviewQueue.add(payload);
+
+  // Update session data
+  await updateSession(payload, existingSession, isPageview);
+}
 
 // Unified handler for all events (pageviews and custom events)
 export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
