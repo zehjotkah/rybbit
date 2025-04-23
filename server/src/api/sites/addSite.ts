@@ -7,11 +7,23 @@ import { siteConfig } from "../../lib/siteConfig.js";
 
 export async function addSite(
   request: FastifyRequest<{
-    Body: { domain: string; name: string; organizationId: string };
+    Body: {
+      domain: string;
+      name: string;
+      organizationId: string;
+      public?: boolean;
+      saltUserIds?: boolean;
+    };
   }>,
   reply: FastifyReply
 ) {
-  const { domain, name, organizationId } = request.body;
+  const {
+    domain,
+    name,
+    organizationId,
+    public: isPublic,
+    saltUserIds,
+  } = request.body;
 
   // Validate domain format using regex
   const domainRegex =
@@ -85,6 +97,8 @@ export async function addSite(
         name,
         createdBy: session.user.id,
         organizationId,
+        public: isPublic || false,
+        saltUserIds: saltUserIds || false,
       })
       .returning();
 

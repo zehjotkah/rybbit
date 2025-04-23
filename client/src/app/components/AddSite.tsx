@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import { Switch } from "../../components/ui/switch";
 import { authClient } from "../../lib/auth";
 
 /**
@@ -52,6 +53,8 @@ export function AddSite({
   const [domain, setDomain] = useState("");
   const [selectedOrganizationId, setSelectedOrganizationId] =
     useState<string>("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [saltUserIds, setSaltUserIds] = useState(false);
   const [error, setError] = useState("");
 
   // Set the first organization as the default selection when organizations are loaded
@@ -79,7 +82,10 @@ export function AddSite({
       return;
     }
 
-    const response = await addSite(domain, domain, selectedOrganizationId);
+    const response = await addSite(domain, domain, selectedOrganizationId, {
+      isPublic,
+      saltUserIds,
+    });
     if (!response.ok) {
       const errorData = await response.json();
       setError(errorData.error || "Failed to add site");
@@ -89,17 +95,25 @@ export function AddSite({
     refetch();
   };
 
+  const resetForm = () => {
+    setDomain("");
+    setError("");
+    setIsPublic(false);
+    setSaltUserIds(false);
+    // Reset organization to first one when opening dialog
+    if (organizations && organizations.length > 0) {
+      setSelectedOrganizationId(organizations[0].id);
+    }
+  };
+
   return (
     <div>
       <Dialog
         open={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
-          setDomain("");
-          setError("");
-          // Reset organization to first one when opening dialog
-          if (isOpen && organizations && organizations.length > 0) {
-            setSelectedOrganizationId(organizations[0].id);
+          if (isOpen) {
+            resetForm();
           }
         }}
       >
@@ -124,7 +138,12 @@ export function AddSite({
 
           <div className="grid gap-4 py-2">
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="domain">Domain</Label>
+              <Label
+                htmlFor="domain"
+                className="text-sm font-medium text-white"
+              >
+                Domain
+              </Label>
               <Input
                 id="domain"
                 value={domain}
@@ -133,7 +152,12 @@ export function AddSite({
               />
             </div>
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="organization">Organization</Label>
+              <Label
+                htmlFor="organization"
+                className="text-sm font-medium text-white"
+              >
+                Organization
+              </Label>
               <Select
                 value={selectedOrganizationId}
                 onValueChange={setSelectedOrganizationId}
@@ -158,6 +182,46 @@ export function AddSite({
                   )}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Public Analytics Setting */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label
+                  htmlFor="isPublic"
+                  className="text-sm font-medium text-white"
+                >
+                  Public Analytics
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  When enabled, anyone can view analytics without logging in
+                </p>
+              </div>
+              <Switch
+                id="isPublic"
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+              />
+            </div>
+
+            {/* User ID Salting Setting */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label
+                  htmlFor="saltUserIds"
+                  className="text-sm font-medium text-white"
+                >
+                  Enable User ID Salting
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enhance privacy with daily rotating salts for user IDs
+                </p>
+              </div>
+              <Switch
+                id="saltUserIds"
+                checked={saltUserIds}
+                onCheckedChange={setSaltUserIds}
+              />
             </div>
           </div>
 

@@ -38,13 +38,23 @@ export async function getSites() {
   return genericQuery<GetSitesResponse>("get-sites");
 }
 
-export function addSite(domain: string, name: string, organizationId: string) {
+export function addSite(
+  domain: string,
+  name: string,
+  organizationId: string,
+  settings?: {
+    isPublic?: boolean;
+    saltUserIds?: boolean;
+  }
+) {
   return authedFetch(`${BACKEND_URL}/add-site`, {
     method: "POST",
     body: JSON.stringify({
       domain,
       name,
       organizationId,
+      public: settings?.isPublic || false,
+      saltUserIds: settings?.saltUserIds || false,
     }),
     headers: {
       "Content-Type": "application/json",

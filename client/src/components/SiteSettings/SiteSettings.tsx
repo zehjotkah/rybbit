@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { CodeSnippet } from "@/components/CodeSnippet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   changeSiteDomain,
@@ -42,7 +42,7 @@ import {
   useGetSite,
   useGetSites,
 } from "@/api/admin/sites";
-import { BACKEND_URL } from "@/lib/const";
+import { ScriptBuilder } from "./ScriptBuilder";
 
 export function SiteSettings({
   siteId,
@@ -77,27 +77,7 @@ export function SiteSettingsInner({
   const [isChangingSalt, setIsChangingSalt] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  // Script configuration options
-  const [debounceValue, setDebounceValue] = useState(500);
-  const [autoTrack, setAutoTrack] = useState(true);
-
-  // Generate tracking script dynamically based on options
-  const trackingScript = `<script
-    src="${BACKEND_URL}/script.js"
-    data-site-id="${siteMetadata.siteId}"${
-    debounceValue !== 500
-      ? `
-    data-debounce="${debounceValue}"`
-      : ""
-  }${
-    !autoTrack
-      ? `
-    data-auto-track="false"`
-      : ""
-  }
-    defer
-/>`;
+  const [activeTab, setActiveTab] = useState("script");
 
   const handleDomainChange = async () => {
     if (!newDomain) {
@@ -192,180 +172,133 @@ export function SiteSettingsInner({
             Manage settings for {siteMetadata.domain}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto">
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-sm font-semibold text-foreground">
-                Tracking Script
-              </h4>
-              <p className="text-xs text-muted-foreground">
-                Add this script to the <code>&lt;head&gt;</code> of your website
-              </p>
-            </div>
-            <CodeSnippet language="HTML" code={trackingScript} />
-            {/* Script Options Section */}
-            <div className="space-y-3 pl-4">
-              <h4 className="text-sm font-semibold text-foreground">
-                Script Options
-              </h4>
-              <div className="space-y-2">
-                <div className="flex flex-col gap-1.5">
-                  <Label
-                    htmlFor="debounce"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    Debounce Duration (ms)
-                  </Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="debounce"
-                      type="number"
-                      min="0"
-                      max="5000"
-                      value={debounceValue}
-                      onChange={(e) =>
-                        setDebounceValue(parseInt(e.target.value) || 0)
-                      }
-                      className="max-w-[120px]"
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      Default: 500ms
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Time to wait before tracking a pageview after URL changes
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="pb-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="script">Tracking Script</TabsTrigger>
+            <TabsTrigger value="settings">Site Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent
+            value="script"
+            className="pt-4 space-y-4 max-h-[70vh] overflow-y-auto"
+          >
+            <ScriptBuilder siteId={siteMetadata.siteId} />
+          </TabsContent>
+
+          <TabsContent
+            value="settings"
+            className="pt-4 space-y-6 max-h-[70vh] overflow-y-auto"
+          >
+            {/* Public Analytics Section */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label
+                  htmlFor="publicAnalytics"
+                  className="text-sm font-medium text-foreground block"
+                >
+                  Public Analytics
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  When enabled, anyone can view your site analytics without
+                  logging in
                 </p>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label
-                      htmlFor="autoTrack"
-                      className="text-sm font-medium text-foreground block"
-                    >
-                      Automatically track URL changes
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      For SPAs: track page views when URL changes (using History
-                      API)
-                    </p>
-                  </div>
-                  <Switch
-                    id="autoTrack"
-                    checked={autoTrack}
-                    onCheckedChange={setAutoTrack}
-                  />
-                </div>
+              <Switch
+                id="publicAnalytics"
+                checked={isPublic}
+                disabled={isChangingPublic}
+                onCheckedChange={handlePublicToggle}
+              />
+            </div>
+
+            {/* User ID Salting Section */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label
+                  htmlFor="saltUserIds"
+                  className="text-sm font-medium text-foreground block"
+                >
+                  Enable User ID Salting
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  When enabled, user IDs will be salted with a daily rotating
+                  key for enhanced privacy
+                </p>
+              </div>
+              <Switch
+                id="saltUserIds"
+                checked={isSalting}
+                disabled={isChangingSalt}
+                onCheckedChange={handleSaltToggle}
+              />
+            </div>
+
+            {/* Domain Settings Section */}
+            <div className="space-y-3">
+              <div>
+                <h4 className="text-sm font-semibold text-foreground">
+                  Change Domain
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  Update the domain for this site
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Input
+                  value={newDomain}
+                  onChange={(e) => setNewDomain(e.target.value)}
+                  placeholder="example.com"
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleDomainChange}
+                  disabled={
+                    isChangingDomain || newDomain === siteMetadata.domain
+                  }
+                >
+                  {isChangingDomain ? "Updating..." : "Update"}
+                </Button>
               </div>
             </div>
-          </div>
 
-          {/* Public Analytics Section */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Label
-                htmlFor="publicAnalytics"
-                className="text-sm font-medium text-foreground block"
-              >
-                Public Analytics
-              </Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                When enabled, anyone can view your site analytics without
-                logging in
-              </p>
-            </div>
-            <Switch
-              id="publicAnalytics"
-              checked={isPublic}
-              disabled={isChangingPublic}
-              onCheckedChange={handlePublicToggle}
-            />
-          </div>
-
-          {/* User ID Salting Section */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Label
-                htmlFor="saltUserIds"
-                className="text-sm font-medium text-foreground block"
-              >
-                Enable User ID Salting
-              </Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                When enabled, user IDs will be salted with a daily rotating key
-                for enhanced privacy
-              </p>
-            </div>
-            <Switch
-              id="saltUserIds"
-              checked={isSalting}
-              disabled={isChangingSalt}
-              onCheckedChange={handleSaltToggle}
-            />
-          </div>
-
-          {/* Domain Settings Section */}
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-sm font-semibold text-foreground">
-                Change Domain
+            {/* Danger Zone Section */}
+            <div className="space-y-3 pt-3">
+              <h4 className="text-sm font-semibold text-destructive">
+                Danger Zone
               </h4>
-              <p className="text-xs text-muted-foreground">
-                Update the domain for this site
-              </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Delete Site
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      the site &quot;{siteMetadata.name}&quot; and all of its
+                      analytics data.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      variant="destructive"
+                    >
+                      {isDeleting ? "Deleting..." : "Yes, delete site"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
-            <div className="flex space-x-2">
-              <Input
-                value={newDomain}
-                onChange={(e) => setNewDomain(e.target.value)}
-                placeholder="example.com"
-              />
-              <Button
-                variant="outline"
-                onClick={handleDomainChange}
-                disabled={isChangingDomain || newDomain === siteMetadata.domain}
-              >
-                {isChangingDomain ? "Updating..." : "Update"}
-              </Button>
-            </div>
-          </div>
-
-          {/* Danger Zone Section */}
-          <div className="space-y-3 pt-3">
-            <h4 className="text-sm font-semibold text-destructive">
-              Danger Zone
-            </h4>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="w-full">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  Delete Site
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    the site &quot;{siteMetadata.name}&quot; and all of its
-                    analytics data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    variant="destructive"
-                  >
-                    {isDeleting ? "Deleting..." : "Yes, delete site"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
 
         <DialogFooter>
           <DialogClose asChild>
