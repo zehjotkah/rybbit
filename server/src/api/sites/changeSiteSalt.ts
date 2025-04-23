@@ -5,18 +5,18 @@ import { eq } from "drizzle-orm";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { siteConfig } from "../../lib/siteConfig.js";
 
-interface ChangeSitePublicRequest {
+interface ChangeSiteSaltRequest {
   Body: {
     siteId: number;
-    isPublic: boolean;
+    saltUserIds: boolean;
   };
 }
 
-export async function changeSitePublic(
-  request: FastifyRequest<ChangeSitePublicRequest>,
+export async function changeSiteSalt(
+  request: FastifyRequest<ChangeSiteSaltRequest>,
   reply: FastifyReply
 ) {
-  const { siteId, isPublic } = request.body;
+  const { siteId, saltUserIds } = request.body;
 
   const userHasAccessToSite = await getUserHasAccessToSite(
     request,
@@ -27,7 +27,7 @@ export async function changeSitePublic(
   }
 
   try {
-    // Fetch site to check ownership
+    // Fetch site to check it exists
     const site = await db.query.sites.findFirst({
       where: eq(sites.siteId, siteId),
     });
@@ -36,26 +36,21 @@ export async function changeSitePublic(
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Check if user is authorized to modify the site
-    // if (site.createdBy !== userId) {
-    //   return reply.status(403).send({ error: "Forbidden" });
-    // }
-
-    // Update site public status
+    // Update site salt setting
     await db
       .update(sites)
       .set({
-        public: isPublic,
+        saltUserIds: saltUserIds,
         updatedAt: new Date(),
       })
       .where(eq(sites.siteId, siteId));
 
-    // Update the public sites cache
-    siteConfig.updateSitePublicStatus(siteId, isPublic);
+    // Update the site config cache
+    siteConfig.updateSiteSaltSetting(siteId, saltUserIds);
 
     return reply.status(200).send({ success: true });
   } catch (error) {
-    console.error("Error changing site public status:", error);
+    console.error("Error changing site salt setting:", error);
     return reply.status(500).send({ error: "Internal server error" });
   }
 }

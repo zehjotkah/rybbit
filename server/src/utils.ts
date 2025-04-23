@@ -1,4 +1,4 @@
-import { publicSites } from "./lib/publicSites.js";
+import { siteConfig } from "./lib/siteConfig.js";
 
 export function getDeviceType(
   screenWidth: number,
@@ -48,11 +48,11 @@ export function getDeviceType(
 // Check if a site is public
 export const isSitePublic = async (siteId: string | number) => {
   try {
-    // Ensure the publicSites cache is initialized
-    await publicSites.ensureInitialized();
+    // Ensure the siteConfig cache is initialized
+    await siteConfig.ensureInitialized();
 
     // Use the cached value
-    return publicSites.isSitePublic(siteId);
+    return siteConfig.isSitePublic(siteId);
   } catch (err) {
     console.error("Error checking if site is public:", err);
     return false;

@@ -8,6 +8,7 @@ import { db } from "../db/postgres/postgres.js";
 import { activeSessions } from "../db/postgres/schema.js";
 import { TrackingPayload } from "../types.js";
 import { trackingPayloadSchema } from "./trackEvent.js";
+import { siteConfig } from "../lib/siteConfig.js";
 
 // Define extended payload types
 export type BaseTrackingPayload = TrackingPayload & {
@@ -98,7 +99,8 @@ export function createBasePayload(
 ): TotalTrackingPayload {
   const userAgent = request.headers["user-agent"] || "";
   const ipAddress = getIpAddress(request);
-  const userId = getUserId(ipAddress, userAgent);
+  const siteId = validatedBody.site_id;
+  const userId = getUserId(ipAddress, userAgent, siteId);
 
   return {
     ...validatedBody,
@@ -156,11 +158,35 @@ function getDailySalt(): string {
   return newSalt;
 }
 
-function getUserId(ip: string, userAgent: string): string {
-  const dailySalt = getDailySalt(); // Get the salt for the current day
+/**
+ * Generate a user ID based on IP and user agent
+ * If the site has salting enabled, also includes a daily rotating salt
+ *
+ * @param ip User's IP address
+ * @param userAgent User's user agent string
+ * @param siteId The site ID to check for salting configuration
+ * @returns A sha256 hash to identify the user
+ */
+function getUserId(
+  ip: string,
+  userAgent: string,
+  siteId?: string | number
+): string {
+  // Only apply salt if the site has salting enabled
+  if (siteId && siteConfig.shouldSaltUserIds(siteId)) {
+    console.info("salted");
+    const dailySalt = getDailySalt(); // Get the salt for the current day
+    return crypto
+      .createHash("sha256")
+      .update(ip + userAgent + dailySalt)
+      .digest("hex");
+  }
+
+  console.info("not salted");
+  // Otherwise, just hash IP and user agent
   return crypto
     .createHash("sha256")
-    .update(ip + userAgent + dailySalt)
+    .update(ip + userAgent)
     .digest("hex");
 }
 

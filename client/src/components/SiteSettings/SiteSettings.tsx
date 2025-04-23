@@ -35,6 +35,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   changeSiteDomain,
   changeSitePublic,
+  changeSiteSalt,
   deleteSite,
   GetSitesResponse,
   SiteResponse,
@@ -72,6 +73,8 @@ export function SiteSettingsInner({
   const [isChangingDomain, setIsChangingDomain] = useState(false);
   const [isPublic, setIsPublic] = useState(siteMetadata.public || false);
   const [isChangingPublic, setIsChangingPublic] = useState(false);
+  const [isSalting, setIsSalting] = useState(siteMetadata.saltUserIds || false);
+  const [isChangingSalt, setIsChangingSalt] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -148,6 +151,24 @@ export function SiteSettingsInner({
       setIsPublic(!checked); // Revert UI state on error
     } finally {
       setIsChangingPublic(false);
+    }
+  };
+
+  const handleSaltToggle = async (checked: boolean) => {
+    try {
+      setIsChangingSalt(true);
+      await changeSiteSalt(siteMetadata.siteId, checked);
+      setIsSalting(checked);
+      toast.success(
+        checked ? "User ID salting enabled" : "User ID salting disabled"
+      );
+      refetch();
+    } catch (error) {
+      console.error("Error changing salt setting:", error);
+      toast.error("Failed to update salting setting");
+      setIsSalting(!checked); // Revert UI state on error
+    } finally {
+      setIsChangingSalt(false);
     }
   };
 
@@ -259,6 +280,28 @@ export function SiteSettingsInner({
               checked={isPublic}
               disabled={isChangingPublic}
               onCheckedChange={handlePublicToggle}
+            />
+          </div>
+
+          {/* User ID Salting Section */}
+          <div className="flex items-center justify-between">
+            <div>
+              <Label
+                htmlFor="saltUserIds"
+                className="text-sm font-medium text-foreground block"
+              >
+                Enable User ID Salting
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                When enabled, user IDs will be salted with a daily rotating key
+                for enhanced privacy
+              </p>
+            </div>
+            <Switch
+              id="saltUserIds"
+              checked={isSalting}
+              disabled={isChangingSalt}
+              onCheckedChange={handleSaltToggle}
             />
           </div>
 

@@ -4,7 +4,7 @@ import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
 import { loadAllowedDomains } from "../../lib/allowedDomains.js";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
-import { publicSites } from "../../lib/publicSites.js";
+import { siteConfig } from "../../lib/siteConfig.js";
 import { clickhouse } from "../../db/clickhouse/clickhouse.js";
 
 export async function deleteSite(
@@ -24,8 +24,8 @@ export async function deleteSite(
   });
   await loadAllowedDomains();
 
-  // Remove the site from the publicSites cache
-  publicSites.removeSite(Number(id));
+  // Remove the site from the siteConfig cache
+  siteConfig.removeSite(Number(id));
 
   return reply.status(200).send();
 }

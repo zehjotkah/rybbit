@@ -26,6 +26,7 @@ import { getUsers } from "./api/analytics/getUsers.js";
 import { addSite } from "./api/sites/addSite.js";
 import { changeSiteDomain } from "./api/sites/changeSiteDomain.js";
 import { changeSitePublic } from "./api/sites/changeSitePublic.js";
+import { changeSiteSalt } from "./api/sites/changeSiteSalt.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
 import { getSite } from "./api/sites/getSite.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
@@ -39,7 +40,7 @@ import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
 import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
-import { publicSites } from "./lib/publicSites.js";
+import { siteConfig } from "./lib/siteConfig.js";
 import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic } from "./utils.js";
 
@@ -208,6 +209,7 @@ server.delete("/report/:reportId", deleteReport);
 server.post("/add-site", addSite);
 server.post("/change-site-domain", changeSiteDomain);
 server.post("/change-site-public", changeSitePublic);
+server.post("/change-site-salt", changeSiteSalt);
 server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/get-site/:id", getSite);
@@ -239,8 +241,8 @@ const start = async () => {
     await Promise.all([initializeClickhouse()]);
     await loadAllowedDomains();
 
-    // Load public sites cache
-    await publicSites.loadPublicSites();
+    // Load site configurations cache
+    await siteConfig.loadSiteConfigs();
 
     // Start the server
     await server.listen({ port: 3001, host: "0.0.0.0" });

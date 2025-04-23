@@ -11,6 +11,7 @@ export type SiteResponse = {
   updatedAt: string;
   createdBy: string;
   public: boolean;
+  saltUserIds: boolean;
   isOwner: boolean;
 };
 
@@ -22,6 +23,7 @@ export type GetSitesResponse = {
   updatedAt: string;
   createdBy: string;
   public: boolean;
+  saltUserIds: boolean;
   overMonthlyLimit?: boolean;
   monthlyEventCount?: number;
   eventLimit?: number;
@@ -125,5 +127,18 @@ export function useGetSite(siteId?: string | number) {
     },
     staleTime: 60000, // 1 minute
     enabled: !!siteId,
+  });
+}
+
+export function changeSiteSalt(siteId: number, saltUserIds: boolean) {
+  return authedFetch(`${BACKEND_URL}/change-site-salt`, {
+    method: "POST",
+    body: JSON.stringify({
+      siteId,
+      saltUserIds,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 }

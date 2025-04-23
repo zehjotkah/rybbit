@@ -1,10 +1,9 @@
-import { fromNodeHeaders } from "better-auth/node";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
 import { loadAllowedDomains } from "../../lib/allowedDomains.js";
 import { auth } from "../../lib/auth.js";
-import { publicSites } from "../../lib/publicSites.js";
+import { siteConfig } from "../../lib/siteConfig.js";
 
 export async function addSite(
   request: FastifyRequest<{
@@ -92,8 +91,11 @@ export async function addSite(
     // Update allowed domains
     await loadAllowedDomains();
 
-    // Update publicSites cache with the new site
-    publicSites.addSite(newSite[0].siteId, newSite[0].public || false);
+    // Update siteConfig cache with the new site
+    siteConfig.addSite(newSite[0].siteId, {
+      public: newSite[0].public || false,
+      saltUserIds: newSite[0].saltUserIds || false,
+    });
 
     return reply.status(201).send(newSite[0]);
   } catch (error) {
