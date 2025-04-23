@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { authedFetch } from "../utils";
 import { useStore, Filter } from "../../lib/store";
+import { useDebounce } from "@uidotdev/usehooks";
 
 export type FunnelStep = {
   value: string;
@@ -37,20 +38,32 @@ export type FunnelResponse = {
 /**
  * Hook for analyzing conversion funnels through a series of steps
  */
-export function useGetFunnel(config?: FunnelRequest) {
+export function useGetFunnel(config?: FunnelRequest, debounce?: boolean) {
   const { site } = useStore();
 
+  const debouncedConfig = useDebounce(config, 500);
+
+  const configToUse = debounce ? debouncedConfig : config;
+
   return useQuery<{ data: FunnelResponse[] }, Error>({
-    queryKey: ["funnel", site, config],
+    queryKey: [
+      "funnel",
+      site,
+      configToUse?.filters,
+      configToUse?.startDate,
+      configToUse?.endDate,
+      configToUse?.filters,
+      configToUse?.steps.map((s) => s.value + s.type),
+    ],
     queryFn: async () => {
-      if (!config) {
+      if (!configToUse) {
         throw new Error("Funnel configuration is required");
       }
 
       // Add timezone to the request
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const fullConfig = {
-        ...config,
+        ...configToUse,
         timezone,
       };
 
@@ -69,7 +82,7 @@ export function useGetFunnel(config?: FunnelRequest) {
 
       return response.json();
     },
-    enabled: !!site && !!config,
+    enabled: !!site && !!configToUse,
   });
 }
 

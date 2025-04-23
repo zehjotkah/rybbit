@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { FunnelStep } from "@/api/analytics/useGetFunnel";
+import { Time } from "@/components/DateSelector/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,16 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Search, Save, ListFilterPlus } from "lucide-react";
-import { Time } from "@/components/DateSelector/types";
-import { DateTime } from "luxon";
-import { FunnelStep, useGetFunnel } from "@/api/analytics/useGetFunnel";
-import { Funnel } from "./Funnel";
-import { useDebounce } from "@uidotdev/usehooks";
-import { getStartAndEndDate } from "../../../../api/utils";
-import { ReactNode } from "react";
+import { ListFilterPlus, Plus, Save, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ThreeDotLoader } from "../../../../components/Loaders";
 import { Filter } from "../../../../lib/store";
 import { FilterComponent } from "../../components/shared/Filters/FilterComponent";
+import { Funnel } from "./Funnel";
 
 interface FunnelFormProps {
   name: string;
@@ -61,19 +58,8 @@ export function FunnelForm({
   saveError,
   funnelData,
 }: FunnelFormProps) {
-  // Debounce steps and time changes
-  const debouncedSteps = useDebounce(steps, 300);
-  const debouncedTime = useDebounce(time, 300);
+  console.info(funnelData);
   const [showFilters, setShowFilters] = useState(filters.length > 0);
-
-  const { startDate, endDate } = getStartAndEndDate(debouncedTime);
-
-  // Get error message as string
-  const getErrorMessage = (err: unknown): string => {
-    if (err instanceof Error) return err.message;
-    if (typeof err === "string") return err;
-    return "An error occurred";
-  };
 
   // Handle adding a new step
   const addStep = () => {
@@ -131,9 +117,45 @@ export function FunnelForm({
     setShowFilters(true);
   };
 
+  let funnelArea = null;
+  if (funnelData?.data && funnelData.data.length) {
+    funnelArea = (
+      <Funnel
+        data={funnelData}
+        isError={isError}
+        error={error}
+        isPending={isPending}
+        time={time}
+        setTime={setTime}
+      />
+    );
+  }
+
+  if (steps.some((step) => !step.value)) {
+    funnelArea = (
+      <div className="flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-lg h-full">
+        <div className="text-center p-6">
+          <div className="text-lg font-medium mb-2">Funnel Preview</div>
+          <p className="text-sm text-neutral-500">
+            Configure your funnel steps and click "Query Funnel" to preview
+            results
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPending) {
+    funnelArea = (
+      <div className="flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-lg h-full">
+        <ThreeDotLoader />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="grid grid-cols-[600px_3fr] gap-6 my-4">
+      <div className="grid grid-cols-[550px_3fr] gap-6 my-4">
         {/* Left side: Funnel configuration form */}
         <div className="space-y-4">
           <div>
@@ -197,7 +219,7 @@ export function FunnelForm({
 
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => removeStep(index)}
                       disabled={steps.length <= 2}
                     >
@@ -250,40 +272,8 @@ export function FunnelForm({
               </CardContent>
             )}
           </Card>
-
-          {/* Query Funnel button on the left side */}
-          <Button
-            onClick={onQuery}
-            disabled={isPending}
-            className="w-full"
-            variant="accent"
-          >
-            <Search className="mr-2 h-4 w-4" />
-            {isPending ? "Querying..." : "Query Funnel"}
-          </Button>
         </div>
-
-        {/* Right side: Funnel visualization (if data exists) */}
-        {funnelData?.data && funnelData.data.length > 0 ? (
-          <Funnel
-            data={funnelData}
-            isError={isError}
-            error={error}
-            isPending={isPending}
-            time={time}
-            setTime={setTime}
-          />
-        ) : (
-          <div className="flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-lg h-full">
-            <div className="text-center p-6">
-              <div className="text-lg font-medium mb-2">Funnel Preview</div>
-              <p className="text-sm text-neutral-500">
-                Configure your funnel steps and click "Query Funnel" to preview
-                results
-              </p>
-            </div>
-          </div>
-        )}
+        {funnelArea}
       </div>
 
       <div className="flex justify-between items-center">

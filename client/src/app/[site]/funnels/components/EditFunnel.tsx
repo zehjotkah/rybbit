@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Time } from "@/components/DateSelector/types";
-import { DateTime } from "luxon";
 import {
-  useGetFunnel,
   FunnelStep,
+  useGetFunnel,
   useSaveFunnel,
 } from "@/api/analytics/useGetFunnel";
 import { SavedFunnel } from "@/api/analytics/useGetFunnels";
+import { Time } from "@/components/DateSelector/types";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DateTime } from "luxon";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getStartAndEndDate } from "../../../../api/utils";
-import { FunnelForm } from "./FunnelForm";
 import { Filter } from "../../../../lib/store";
+import { FunnelForm } from "./FunnelForm";
 
 interface EditFunnelDialogProps {
   funnel: SavedFunnel;
@@ -56,12 +56,15 @@ export function EditFunnelDialog({
     isError,
     error,
     isLoading: isPending,
-  } = useGetFunnel({
-    steps,
-    startDate,
-    endDate,
-    filters,
-  });
+  } = useGetFunnel(
+    {
+      steps,
+      startDate,
+      endDate,
+      filters,
+    },
+    true
+  );
 
   // Funnel save mutation
   const {
@@ -162,7 +165,7 @@ export function EditFunnelDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[80vw]">
+      <DialogContent className="max-w-[95vw]">
         <DialogHeader>
           <DialogTitle>Edit Funnel</DialogTitle>
         </DialogHeader>

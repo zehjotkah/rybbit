@@ -61,7 +61,8 @@ export function CreateFunnelDialog() {
           startDate,
           endDate,
           filters,
-        }
+        },
+    true
   );
 
   // Funnel save mutation
@@ -158,7 +159,12 @@ export function CreateFunnelDialog() {
   const handleOpenChange = (open: boolean) => {
     setOpen(open);
     if (!open) {
-      // Reset analysis
+      setSteps([
+        { type: "page", value: "/", name: "Homepage" },
+        { type: "page", value: "", name: "" },
+      ]);
+      setFilters([]);
+      setName("New Funnel");
     }
   };
 
@@ -169,7 +175,7 @@ export function CreateFunnelDialog() {
           <Plus className="w-4 h-4" /> Create Funnel
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[80vw]">
+      <DialogContent className="max-w-[95vw]">
         <DialogHeader>
           <DialogTitle>Create Funnel</DialogTitle>
         </DialogHeader>

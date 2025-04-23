@@ -13,22 +13,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useDebounce } from "@uidotdev/usehooks";
 import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
   Edit,
+  FileText,
   FilterIcon,
-  FunnelIcon,
-  Globe,
+  MousePointerClick,
   Trash2,
-  ZapIcon,
 } from "lucide-react";
 import { DateTime } from "luxon";
 import { useState } from "react";
 import { toast } from "sonner";
 import { getStartAndEndDate } from "../../../../api/utils";
+import { ThreeDotLoader } from "../../../../components/Loaders";
 import { useGetRegionName } from "../../../../lib/geo";
 import {
   filterTypeToLabel,
@@ -37,7 +36,6 @@ import {
 } from "../../components/shared/Filters/utils";
 import { EditFunnelDialog } from "./EditFunnel";
 import { Funnel } from "./Funnel";
-import { ThreeDotLoader } from "../../../../components/Loaders";
 
 interface FunnelRowProps {
   funnel: SavedFunnel;
@@ -57,9 +55,7 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
     wellKnown: "Last 7 days",
   } as DateRangeMode);
 
-  // Debounce time changes
-  const debouncedTime = useDebounce(time, 300);
-  const { startDate, endDate } = getStartAndEndDate(debouncedTime);
+  const { startDate, endDate } = getStartAndEndDate(time);
 
   // Funnel data fetching
   const {
@@ -111,7 +107,7 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
         >
           <div className="mt-1 text-xs text-neutral-400 flex flex-col gap-3">
             {/* Steps visualization */}
-            <div className="flex flex-wrap gap-1 max-w-[500px]">
+            <div className="flex flex-wrap gap-1">
               <h3 className="font-medium text-neutral-100 text-base mr-2">
                 {funnel.name}
               </h3>
@@ -125,9 +121,9 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
                       <TooltipTrigger asChild>
                         <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
                           {step.type === "page" ? (
-                            <Globe className="h-3 w-3 mr-1 text-blue-400" />
+                            <FileText className="h-3 w-3 mr-1 text-blue-400" />
                           ) : (
-                            <ZapIcon className="h-3 w-3 mr-1 text-amber-400" />
+                            <MousePointerClick className="h-3 w-3 mr-1 text-amber-400" />
                           )}
                           <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
                             {step.name || step.value}
