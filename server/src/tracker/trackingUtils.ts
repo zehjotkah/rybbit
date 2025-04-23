@@ -119,10 +119,48 @@ export function createBasePayload(
   };
 }
 
-function getUserId(ip: string, userAgent: string) {
+let cachedSalt: string | null = null;
+let cacheDate: string | null = null; // Store the date the salt was generated for (YYYY-MM-DD format)
+
+/**
+ * Generates a deterministic daily salt based on a secret environment variable.
+ * The salt remains the same for the entire UTC day and changes automatically
+ * when the UTC date changes. Caches the salt in memory for efficiency.
+ *
+ * @throws {Error} If the BETTER_AUTH_SECRET environment variable is not set.
+ * @returns {string} The daily salt as a hex string.
+ */
+function getDailySalt(): string {
+  const secretKey = process.env.BETTER_AUTH_SECRET;
+
+  if (!secretKey) {
+    console.error(
+      "FATAL: BETTER_AUTH_SECRET environment variable is not set. User ID generation will be insecure or fail."
+    );
+    throw new Error("BETTER_AUTH_SECRET environment variable is missing.");
+  }
+
+  // Use UTC date to ensure consistency across timezones and server restarts
+  const currentDate = new Date().toISOString().split("T")[0]; // Gets 'YYYY-MM-DD' in UTC
+
+  // Check if the cached salt is still valid for the current UTC date
+  if (cachedSalt && cacheDate === currentDate) {
+    return cachedSalt;
+  }
+
+  const input = secretKey + currentDate;
+  const newSalt = crypto.createHash("sha256").update(input).digest("hex");
+
+  cachedSalt = newSalt;
+  cacheDate = currentDate;
+  return newSalt;
+}
+
+function getUserId(ip: string, userAgent: string): string {
+  const dailySalt = getDailySalt(); // Get the salt for the current day
   return crypto
     .createHash("sha256")
-    .update(ip + userAgent)
+    .update(ip + userAgent + dailySalt)
     .digest("hex");
 }
 
