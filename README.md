@@ -7,6 +7,9 @@
 <p align="center">Open Source Web & Product Analytics</p>
 
 <p align="center">
+  <a href="https://rybbit.io" target="_blank">
+    <img src="https://img.shields.io/static/v1?label=website&message=view&color=green" alt="website">
+</a>
 <a href="https://demo.rybbit.io/1" target="_blank">
     <img src="https://img.shields.io/static/v1?label=demo&message=view&color=green" alt="Demo">
 </a>
