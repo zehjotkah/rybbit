@@ -8,6 +8,8 @@ import 'nextra-theme-docs/style.css'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import './globals.css'
+import { SmallLogo } from './components/Logo'
+import Link from 'next/link'
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],
@@ -34,6 +36,26 @@ export const metadata = {
   }
 }
 
+function Footer_() {
+  return (
+    <div className="max-w-[1300px] mx-auto">
+
+      <div className="flex items-center justify-between w-full px-6 py-4">
+        <SmallLogo />
+        <div className="text-sm text-neutral-400">Copyright {new Date().getFullYear()} © Rybbit.</div>
+        <div className="flex gap-4 text-sm">
+          <Link href="/privacy" className="text-neutral-400 hover:text-white transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors">
+            Contact
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
@@ -44,7 +66,7 @@ export default async function RootLayout({ children }) {
         </div>
       }
       chatLink="https://discord.gg/DEhGb4hYBj"
-      projectLink="https://github.com/goldflag/rybbit"
+      projectLink="https://github.com/rybbit-io/rybbit"
 
       children={<a href="https://tracking.tomato.gg">
         <button className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium px-3 py-1.5 rounded-md border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50">
@@ -61,9 +83,9 @@ export default async function RootLayout({ children }) {
         <Layout
           // banner={<Banner storageKey="Rybbit">Rybbit Alpha</Banner>}
           navbar={navbar}
-          footer={<Footer>Copyright {new Date().getFullYear()} © Rybbit.</Footer>}
+          footer={<Footer_ />}
           editLink="Edit this page on GitHub"
-          docsRepositoryBase="https://github.com/goldflag/rybbit/blob/main/docs"
+          docsRepositoryBase="https://github.com/rybbit-io/rybbit/blob/main/docs"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           pageMap={pageMap}
           nextThemes={{

@@ -1,4 +1,6 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tilt_Warp } from "next/font/google";
+import Link from "next/link";
 import { AdvancedFilters } from "./components/Cards/AdvancedFilters";
 import { EventTracking } from "./components/Cards/EventTracking";
 import { Funnels } from "./components/Cards/Funnels";
@@ -8,13 +10,8 @@ import { UserBehaviorTrends } from "./components/Cards/UserBehaviorTrends";
 import { UserFlowAnalysis } from "./components/Cards/UserFlowAnalysis";
 import { UserProfiles } from "./components/Cards/UserProfiles";
 import { UserSessions } from "./components/Cards/UserSessions";
-import Link from "next/link";
-import { Safari } from "@/components/magicui/safari";
 import { Integrations } from "./components/integrations";
-import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Logo } from "./components/Logo";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ShineBorder } from "@/components/magicui/shine-border";
 
 
 const tilt_wrap = Tilt_Warp({
@@ -26,7 +23,7 @@ export default function IndexPage() {
   return (
     <div className="flex flex-col items-center justify-center overflow-x-hidden">
 
-      <h1 className={`text-4xl md:text-5xl lg:text-7xl font-semibold pt-16 md:pt-24 px-4 tracking-tight max-w-3xl text-center text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-200 to-gray-500 ${tilt_wrap.className}`}>The Modern Google Analytics Alternative</h1>
+      <h1 className={`text-4xl md:text-5xl lg:text-7xl font-semibold pt-16 md:pt-24 px-4 tracking-tight max-w-3xl text-center text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400 ${tilt_wrap.className}`}>The Modern Google Analytics Alternative</h1>
       <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-3xl text-center text-neutral-300">Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.</h2>
 
       <div className="flex flex-col sm:flex-row my-8 md:my-10 items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">

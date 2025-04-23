@@ -1,5 +1,3 @@
-
-
 <p align="center">
   <img  src="https://github.com/user-attachments/assets/1425302a-40b6-4d97-bf4b-89927ea93fb9" height="250">
     <h1 align="center">
@@ -18,7 +16,7 @@
 <a href="https://discord.gg/DEhGb4hYBj" target="_blank">
     <img src="https://img.shields.io/badge/discord-join-green.svg?logo=discord&logoColor=white" alt="Discord">
 </a>
-<a href="https://github.com/goldflag/rybbit?tab=AGPL-3.0-1-ov-file" target="_blank">
+<a href="https://github.com/rybbit-io/rybbit?tab=AGPL-3.0-1-ov-file" target="_blank">
     <img src="https://img.shields.io/static/v1?label=license&message=AGPL-3&color=green" alt="License">
 </a>
 

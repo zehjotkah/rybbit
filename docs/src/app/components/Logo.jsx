@@ -14,3 +14,12 @@ export function Logo() {
     </div>
   );
 }
+
+export function SmallLogo() {
+  return (
+    <div className={`text-2xl flex items-center gap-1.5 ${tilt_wrap.className}`}>
+      <Image src="/rybbit.png" alt="Rybbit" width={32} height={32} />
+      rybbit.
+    </div>
+  );
+}
