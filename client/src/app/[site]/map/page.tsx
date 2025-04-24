@@ -1,10 +1,9 @@
 "use client";
 
+import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
-import { MobileSidebar } from "../../../components/MobileSidebar";
 import { MapComponent } from "../components/shared/Map";
 import { SubHeader } from "../components/SubHeader/SubHeader";
-import { Switch } from "@/components/ui/switch";
 
 export default function MapPage() {
   const [mapMode, setMapMode] = useState<"total" | "perCapita">("total");
@@ -17,11 +16,7 @@ export default function MapPage() {
       <div className="absolute bottom-4 left-4  z-10">
         <div className="flex items-center gap-3 bg-neutral-900 rounded-md px-3 py-2 text-sm">
           <span
-            className={
-              mapMode === "total"
-                ? "text-white font-medium"
-                : "text-neutral-400"
-            }
+            className={mapMode === "total" ? "text-white" : "text-neutral-400"}
           >
             Total Visits
           </span>
@@ -34,9 +29,7 @@ export default function MapPage() {
           />
           <span
             className={
-              mapMode === "perCapita"
-                ? "text-white font-medium"
-                : "text-neutral-400"
+              mapMode === "perCapita" ? "text-white" : "text-neutral-400"
             }
           >
             Per Capita
