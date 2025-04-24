@@ -25,13 +25,20 @@ interface TooltipPosition {
 }
 
 export function MapComponent({ height }: { height: string }) {
-  const { data: countryData, isLoading: isCountryLoading } = useSingleCol({
+  const {
+    data: countryData,
+    isLoading: isCountryLoading,
+    isFetching: isCountryFetching,
+  } = useSingleCol({
     parameter: "country",
   });
-  const { data: subdivisionData, isLoading: isSubdivisionLoading } =
-    useSingleCol({
-      parameter: "region",
-    });
+  const {
+    data: subdivisionData,
+    isLoading: isSubdivisionLoading,
+    isFetching: isSubdivisionFetching,
+  } = useSingleCol({
+    parameter: "region",
+  });
 
   const [dataVersion, setDataVersion] = useState<number>(0);
 
@@ -168,7 +175,11 @@ export function MapComponent({ height }: { height: string }) {
     return null;
   };
 
-  const isLoading = isCountryLoading || isSubdivisionLoading;
+  const isLoading =
+    isCountryLoading ||
+    isSubdivisionLoading ||
+    isCountryFetching ||
+    isSubdivisionFetching;
 
   const [ref, { height: resolvedHeight }] = useMeasure();
 
@@ -189,6 +200,16 @@ export function MapComponent({ height }: { height: string }) {
       }}
       ref={ref}
     >
+      {isLoading && (
+        <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-8 w-8 rounded-full border-2 border-accent-400 border-t-transparent animate-spin"></div>
+            <span className="text-sm text-neutral-300">
+              Loading map data...
+            </span>
+          </div>
+        </div>
+      )}
       {(countriesGeoData || subdivisionsGeoData) && (
         <MapContainer
           preferCanvas={true}
