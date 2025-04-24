@@ -97,8 +97,8 @@ SELECT
     exit_page
 FROM sessions
 WHERE 
-    site_id = ${site}
-    AND session_id = '${sessionId}'
+    site_id = {siteId:Int32}
+    AND session_id = {sessionId:String}
 LIMIT 1
     `;
 
@@ -108,8 +108,8 @@ SELECT
     COUNT(*) as total
 FROM events
 WHERE
-    site_id = ${site}
-    AND session_id = '${sessionId}'
+    site_id = {siteId:Int32}
+    AND session_id = {sessionId:String}
     `;
 
     // 3. Query to get paginated pageviews
@@ -126,11 +126,11 @@ SELECT
     properties
 FROM events
 WHERE
-    site_id = ${site}
-    AND session_id = '${sessionId}'
+    site_id = {siteId:Int32}
+    AND session_id = {sessionId:String}
 ORDER BY timestamp ASC
-LIMIT ${limit}
-OFFSET ${offset}
+LIMIT {limit:Int32}
+OFFSET {offset:Int32}
     `;
 
     // Execute queries in parallel
@@ -139,14 +139,28 @@ OFFSET ${offset}
         clickhouse.query({
           query: sessionQuery,
           format: "JSONEachRow",
+          query_params: {
+            siteId: Number(site),
+            sessionId,
+          },
         }),
         clickhouse.query({
           query: countQuery,
           format: "JSONEachRow",
+          query_params: {
+            siteId: Number(site),
+            sessionId,
+          },
         }),
         clickhouse.query({
           query: pageviewsQuery,
           format: "JSONEachRow",
+          query_params: {
+            siteId: Number(site),
+            sessionId,
+            limit,
+            offset,
+          },
         }),
       ]);
 

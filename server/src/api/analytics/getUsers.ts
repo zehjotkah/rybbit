@@ -102,7 +102,7 @@ WITH AggregatedUsers AS (
         min(timestamp) AS first_seen
     FROM events
     WHERE
-        site_id = ${site}
+        site_id = {siteId:Int32}
         ${timeStatement}
     GROUP BY
         user_id
@@ -110,8 +110,8 @@ WITH AggregatedUsers AS (
 SELECT *
 FROM AggregatedUsers
 WHERE 1 = 1 ${filterStatement}
-ORDER BY ${actualSortBy} ${actualSortOrder}
-LIMIT ${pageSizeNum} OFFSET ${offset}
+ORDER BY {sortBy:String} ${actualSortOrder}
+LIMIT {limit:Int32} OFFSET {offset:Int32}
   `;
 
   // Query to get total count
@@ -120,7 +120,7 @@ SELECT
     count(DISTINCT user_id) AS total_count
 FROM events
 WHERE
-    site_id = ${site}
+    site_id = {siteId:Int32}
     ${filterStatement}
     ${getTimeStatement({
       date: { startDate, endDate, timezone },
@@ -133,10 +133,20 @@ WHERE
       clickhouse.query({
         query,
         format: "JSONEachRow",
+        query_params: {
+          siteId: Number(site),
+          limit: pageSizeNum,
+          offset,
+          sortBy: actualSortBy,
+          sortOrder: actualSortOrder,
+        },
       }),
       clickhouse.query({
         query: countQuery,
         format: "JSONEachRow",
+        query_params: {
+          siteId: Number(site),
+        },
       }),
     ]);
 

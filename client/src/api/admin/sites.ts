@@ -105,6 +105,7 @@ export function useSiteHasData(siteId: string) {
         .then((res) => res.json())
         .then((data) => data.hasData as Boolean);
     },
+    refetchInterval: 5000,
     staleTime: Infinity,
   });
 }

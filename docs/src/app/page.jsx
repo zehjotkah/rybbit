@@ -152,7 +152,7 @@ export default function IndexPage() {
                   Is Rybbit GDPR and CCPA compliant?
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
-                  Yes, Rybbit is fully compliant with GDPR, CCPA, and other privacy regulations. We don't use cookies or collect any personal data that could identify your users. We prioritize privacy by design while still giving you all the analytics you need.
+                  Yes, Rybbit is fully compliant with GDPR, CCPA, and other privacy regulations. We don't use cookies or collect any personal data that could identify your users. We salt user IDs daily to ensure users are not fingerprinted. You will not need to display a cookie consent banner to your users.
                 </AccordionContent>
               </AccordionItem>
               
@@ -161,7 +161,28 @@ export default function IndexPage() {
                   How does Rybbit compare to Google Analytics?
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
-                  Unlike Google Analytics, Rybbit provides a clean, intuitive interface that's easy to use. We focus on the metrics that matter most, without overwhelming you with too many options. Plus, we respect user privacy, don't slow down your site, and offer first-party data collection.
+                  <p>
+                    Rybbit is much less bloated than Google Analytics, both in terms of our tracking script and the UX of the dashboard. We show you exactly what you need to see.
+                  </p>
+                  <br/>
+                  <p>
+                    You can see for yourself by checking out our <Link href="https://tracking.tomato.gg/1" className="text-emerald-400 hover:text-emerald-300">demo site</Link>. The difference in usability is night and day.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-7" className="border-b border-neutral-700/50">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  How does Rybbit compare to Plausible/Umami/Matomo/Simple Analytics?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  <p>
+                    Rybbit is similiar to these other analytics platforms, but we are raising the bar when it comes to UX and the quality and scope of our feature set.
+                  </p>
+                  <br/>
+                  <p>
+                    We don't want to just be a simple analytics tool, but we carefully craft every feature to be understandable without having to read pages of documentation.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
               
@@ -170,7 +191,7 @@ export default function IndexPage() {
                   Can I self-host Rybbit?
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
-                  Absolutely! Rybbit is available as a self-hosted option. You can install it on your own server and have complete control over your data. We also offer a cloud version if you prefer a managed solution.
+                  Absolutely! Rybbit is available as a self-hosted option. You can install it on your own server and have complete control over your data. <Link href="/docs/self-hosting" className="text-emerald-400 hover:text-emerald-300">Learn more here</Link>. We also offer a cloud version if you prefer a managed solution.
                 </AccordionContent>
               </AccordionItem>
               
@@ -179,7 +200,7 @@ export default function IndexPage() {
                   How easy is it to set up Rybbit?
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
-                  Setting up Rybbit is incredibly simple. Just add a small script to your website, and you're good to go. Most users are up and running in less than 5 minutes. We also provide comprehensive documentation and support if you need any help.
+                  <Link href="/docs/tracker" className="text-emerald-400 hover:text-emerald-300">Setting up Rybbit</Link> is incredibly simple. Just add a small script to your website or install @rybbit/js from npm, and you're good to go. Most users are up and running in less than 5 minutes. We also provide comprehensive documentation and support if you need any help.
                 </AccordionContent>
               </AccordionItem>
               
@@ -188,7 +209,15 @@ export default function IndexPage() {
                   What platforms does Rybbit support?
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
-                  Rybbit works with virtually any website platform. Whether you're using WordPress, Shopify, Next.js, React, Vue, or any other framework, our simple tracking snippet integrates seamlessly. We also offer specialized plugins for popular platforms to make integration even easier.
+                  Rybbit works with virtually any website platform. Whether you're using WordPress, Shopify, Next.js, React, Vue, or any other framework, our simple tracking snippet integrates seamlessly. You can also use @rybbit/js, our web SDK you can install from npm. 
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-6">
+                <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
+                  Is Rybbit truly open source?
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4 text-neutral-300">
+                  Yes, Rybbit is 100% open source. Every single line of code, including for our cloud/enterprise offerings, is available on GitHub under the AGPL 3.0 license.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

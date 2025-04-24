@@ -83,8 +83,8 @@ export async function getSessions(
           countIf(type = 'custom_event') AS events
       FROM events
       WHERE
-          site_id = ${site}
-          ${userId ? ` AND user_id = '${userId}'` : ""}
+          site_id = {siteId:Int32}
+          ${userId ? ` AND user_id = {userId:String}` : ""}
           ${timeStatement}
       GROUP BY
           session_id,
@@ -94,13 +94,19 @@ export async function getSessions(
   FROM AggregatedSessions
   WHERE 1 = 1 ${filterStatement}
   ORDER BY session_end DESC
-  LIMIT 100 OFFSET ${(page - 1) * 100}
+  LIMIT {limit:Int32} OFFSET {offset:Int32}
   `;
 
   try {
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+        userId,
+        limit: 100,
+        offset: (page - 1) * 100,
+      },
     });
 
     const data = await processResults<GetSessionsResponse[number]>(result);

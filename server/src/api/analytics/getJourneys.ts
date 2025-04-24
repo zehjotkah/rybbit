@@ -55,7 +55,7 @@ export const getJourneys = async (
               timestamp
             FROM events
             WHERE 
-              site_id = ${site}
+              site_id = {siteId:Int32}
               ${timeStatement || ""}
               AND type = 'pageview'
             ORDER BY session_id, timestamp
@@ -66,7 +66,7 @@ export const getJourneys = async (
         
         journey_segments AS (
           SELECT
-            arraySlice(path_sequence, 1, ${maxSteps}) AS journey,
+            arraySlice(path_sequence, 1, {maxSteps:Int32}) AS journey,
             count() AS sessions_count
           FROM user_paths
           GROUP BY journey
@@ -80,13 +80,15 @@ export const getJourneys = async (
           sessions_count * 100 / (
             SELECT count(DISTINCT session_id) 
             FROM events 
-            WHERE site_id = ${site} ${timeStatement || ""}
+            WHERE site_id = {siteId:Int32} 
+            ${timeStatement || ""}
           ) AS percentage
         FROM journey_segments
       `,
-      //   query_params: {
-      //     site: parseInt(site, 10),
-      //   },
+      query_params: {
+        siteId: parseInt(site, 10),
+        maxSteps: parseInt(steps, 10),
+      },
     });
 
     const data = await result.json();

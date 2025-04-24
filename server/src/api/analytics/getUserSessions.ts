@@ -82,8 +82,8 @@ SELECT
     region
 FROM events
 WHERE
-    site_id = ${site}
-    AND user_id = '${userId}'
+    site_id = {siteId:Int32}
+    AND user_id = {userId:String}
     ${filterStatement}
     ${getTimeStatement({
       date: { startDate, endDate, timezone },
@@ -95,6 +95,10 @@ ORDER BY timestamp ASC
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+        userId,
+      },
     });
 
     const pageviews = await processResults<Pageview>(result);

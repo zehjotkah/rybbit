@@ -40,8 +40,8 @@ export async function getUserSessionCount(
       count() as sessions
     FROM sessions
     WHERE
-      site_id = ${site}
-      AND user_id = '${userId}'
+      site_id = {siteId:Int32}
+      AND user_id = {userId:String} 
     GROUP BY date
     ORDER BY date ASC
   `;
@@ -50,6 +50,10 @@ export async function getUserSessionCount(
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+        userId,
+      },
     });
 
     const data = await processResults<GetUserSessionCountResponse[number]>(

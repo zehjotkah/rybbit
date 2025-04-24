@@ -112,7 +112,7 @@ FROM
             COUNT(*) AS pages_in_session
         FROM events
         WHERE 
-            site_id = ${site}
+            site_id = {siteId:Int32}
             ${filterStatement}
             ${getTimeStatement(
               pastMinutes
@@ -145,7 +145,7 @@ FULL JOIN
         COUNT(DISTINCT user_id) AS users
     FROM events
     WHERE
-        site_id = ${site}
+        site_id = {siteId:Int32}
         ${filterStatement}
         ${getTimeStatement(
           pastMinutes
@@ -215,6 +215,9 @@ export async function getOverviewBucketed(
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+      },
     });
 
     const data = await processResults<getOverviewBucketed[number]>(result);

@@ -11,8 +11,11 @@ export async function getSiteHasData(
     // Check if site has data using original method
     const pageviewsData: { count: number }[] = await clickhouse
       .query({
-        query: `SELECT count(*) as count FROM events WHERE site_id = ${site}`,
+        query: `SELECT count(*) as count FROM events WHERE site_id = {siteId:Int32}`,
         format: "JSONEachRow",
+        query_params: {
+          siteId: Number(site),
+        },
       })
       .then((res) => res.json());
 

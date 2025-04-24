@@ -12,6 +12,7 @@ import { useCountries, useSubdivisions } from "../../../../lib/geo";
 import { addFilter, FilterParameter } from "../../../../lib/store";
 import { CountryFlag } from "./icons/CountryFlag";
 import { getCountryPopulation } from "../../../../lib/countryPopulation";
+import { round } from "lodash";
 
 interface TooltipContent {
   name: string;
@@ -347,7 +348,7 @@ export function MapComponent({
           {mode === "perCapita" && mapView === "countries" && (
             <div className="text-sm text-neutral-300">
               <span className="font-bold text-accent-400">
-                {tooltipContent.perCapita?.toFixed(2)}
+                {round(tooltipContent.perCapita ?? 0, 2)}
               </span>{" "}
               per million people
             </div>

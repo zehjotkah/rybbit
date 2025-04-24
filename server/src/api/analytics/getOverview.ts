@@ -59,7 +59,7 @@ const getQuery = ({
                     COUNT(CASE WHEN type = 'pageview' THEN 1 END) AS pages_in_session
                 FROM events
                 WHERE
-                    site_id = ${site}
+                    site_id = {siteId:Int32}
                     ${filterStatement}
                     ${getTimeStatement(
                       pastMinutes
@@ -79,7 +79,7 @@ const getQuery = ({
                 COUNT(DISTINCT user_id)    AS users
             FROM events
             WHERE 
-                site_id = ${site}
+                site_id = {siteId:Int32}
                 ${filterStatement}
                 ${getTimeStatement(
                   pastMinutes
@@ -131,6 +131,9 @@ export async function getOverview(
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+      },
     });
 
     const data = await processResults<GetOverviewResponse>(result);

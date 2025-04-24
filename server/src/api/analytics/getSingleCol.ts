@@ -62,7 +62,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
       ${percentageStatement}
     FROM events
     WHERE
-      site_id = ${site}
+      site_id = {siteId:Int32}
       AND event_name IS NOT NULL 
       AND event_name <> ''
       ${filterStatement}
@@ -88,7 +88,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         SELECT *
         FROM events
         WHERE
-            site_id = ${site}
+            site_id = {siteId:Int32}
             AND type = 'pageview'
             ${filterStatement}
             ${timeStatement}
@@ -158,7 +158,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
             leadInFrame(timestamp) OVER (PARTITION BY session_id ORDER BY timestamp ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) as next_timestamp
         FROM events
         WHERE 
-          site_id = ${site}
+          site_id = {siteId:Int32}
           AND type = 'pageview'
           ${filterStatement}
           ${timeStatement}
@@ -202,7 +202,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         COUNT() as pageviews
       FROM events
       WHERE
-          site_id = ${site}
+          site_id = {siteId:Int32}
           AND ${geSqlParam(parameter)} IS NOT NULL
           AND ${geSqlParam(parameter)} <> ''
           ${filterStatement}
@@ -240,6 +240,9 @@ export async function getSingleCol(
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+      },
     });
 
     const data = await processResults<GetSingleColResponse[number]>(result);
