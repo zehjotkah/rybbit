@@ -1,16 +1,16 @@
 "use client";
 
-import * as CountryFlags from "country-flag-icons/react/3x2";
-import { scaleLinear } from "d3-scale";
-import React, { useEffect, useMemo, useState } from "react";
-import { GeoJSON, MapContainer, useMapEvent } from "react-leaflet";
-import { Layer } from "leaflet";
-import { Feature, GeoJsonObject } from "geojson";
-import "leaflet/dist/leaflet.css";
 import { useSingleCol } from "@/api/analytics/useSingleCol";
-import { addFilter, FilterParameter } from "../../../../lib/store";
-import { useCountries, useSubdivisions } from "../../../../lib/geo";
 import { useMeasure } from "@uidotdev/usehooks";
+import { scaleLinear } from "d3-scale";
+import { Feature, GeoJsonObject } from "geojson";
+import { Layer } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useMemo, useState } from "react";
+import { GeoJSON, MapContainer, useMapEvent } from "react-leaflet";
+import { useCountries, useSubdivisions } from "../../../../lib/geo";
+import { addFilter, FilterParameter } from "../../../../lib/store";
+import { CountryFlag } from "./icons/CountryFlag";
 
 interface TooltipContent {
   name: string;
@@ -59,6 +59,9 @@ export function MapComponent({ height }: { height: string }) {
     "countries"
   );
 
+  // Track which feature is currently hovered to control opacity without conflicts
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   const colorScale = useMemo(() => {
     if (mapView === "countries" && !countryData?.data) return () => "#eee";
     if (mapView === "subdivisions" && !subdivisionData?.data)
@@ -87,7 +90,7 @@ export function MapComponent({ height }: { height: string }) {
     const maxValue = Math.max(...(dataToUse?.map((d) => d.count) || [0]));
     return scaleLinear<string>()
       .domain([0, maxValue])
-      .range([`hsla(${h}, ${s}, ${l}, 0.15)`, `hsla(${h}, ${s}, ${l}, 0.8)`]);
+      .range([`hsla(${h}, ${s}, ${l}, 0.2)`, `hsla(${h}, ${s}, ${l}, 0.8)`]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
   const { data: subdivisionsGeoData } = useSubdivisions();
@@ -113,30 +116,30 @@ export function MapComponent({ height }: { height: string }) {
       : subdivisionData?.data.find(({ value }: any) => value === dataKey);
     const count = foundData?.count || 0;
     const color = count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)";
-    console.info(color);
     return {
-      color: isCountryView ? color : borderColors[borderKey],
+      color: color,
       weight: 1,
       fill: true,
       fillColor: color,
-      fillOpacity: 0.5,
+      // Increase opacity if this feature is currently hovered
+      fillOpacity: hoveredId === dataKey?.toString() ? 0.8 : 0.5,
     };
   };
 
   const handleEachFeature = (feature: Feature, layer: Layer) => {
     layer.on({
       mouseover: () => {
-        // @ts-ignore
-        layer.setStyle({
-          fillOpacity: 0.8,
-        });
         const isCountryView = mapView === "countries";
-        const name = isCountryView
-          ? feature.properties?.["ADMIN"]
-          : feature.properties?.["name"];
         const code = isCountryView
           ? feature.properties?.["ISO_A2"]
           : feature.properties?.["iso_3166_2"];
+
+        // Mark this feature as hovered so handleStyle increases opacity
+        setHoveredId(code);
+
+        const name = isCountryView
+          ? feature.properties?.["ADMIN"]
+          : feature.properties?.["name"];
         const foundData = isCountryView
           ? countryData?.data?.find(({ value }: any) => value === code)
           : subdivisionData?.data.find(({ value }: any) => value === code);
@@ -145,10 +148,8 @@ export function MapComponent({ height }: { height: string }) {
         setTooltipContent({ name, code, count, percentage });
       },
       mouseout: () => {
-        // @ts-ignore
-        layer.setStyle({
-          fillOpacity: 0.5,
-        });
+        // Clear hover state
+        setHoveredId(null);
         setTooltipContent(null);
       },
       click: () => {
@@ -191,6 +192,8 @@ export function MapComponent({ height }: { height: string }) {
   const [ref, { height: resolvedHeight }] = useMeasure();
 
   const zoom = resolvedHeight ? Math.log2(resolvedHeight / 400) + 1 : 1;
+
+  console.info(tooltipContent);
 
   return (
     <div
@@ -262,19 +265,9 @@ export function MapComponent({ height }: { height: string }) {
           }}
         >
           <div className="font-sm flex items-center gap-1">
-            {mapView === "countries" &&
-            tooltipContent.code &&
-            CountryFlags[tooltipContent.code as keyof typeof CountryFlags]
-              ? React.createElement(
-                  CountryFlags[
-                    tooltipContent.code as keyof typeof CountryFlags
-                  ],
-                  {
-                    title: tooltipContent.name,
-                    className: "w-4",
-                  }
-                )
-              : null}
+            {tooltipContent.code && (
+              <CountryFlag country={tooltipContent.code.slice(0, 2)} />
+            )}
             {tooltipContent.name}
           </div>
           <div>
