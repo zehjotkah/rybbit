@@ -2,7 +2,7 @@
 
 import { useSingleCol } from "@/api/analytics/useSingleCol";
 import { useMeasure } from "@uidotdev/usehooks";
-import { scaleLinear } from "d3-scale";
+import { scalePow } from "d3-scale";
 import { Feature, GeoJsonObject } from "geojson";
 import { Layer } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -87,10 +87,16 @@ export function MapComponent({ height }: { height: string }) {
     const hslValues = hslMatch ? hslMatch[1].split(" ") : ["0", "0%", "50%"];
     const [h, s, l] = hslValues;
 
-    const maxValue = Math.max(...(dataToUse?.map((d) => d.count) || [0]));
-    return scaleLinear<string>()
+    // Get the range of values
+    const counts = dataToUse?.map((d) => d.count) || [0];
+    const maxValue = Math.max(...counts);
+
+    // Use a power scale with exponent 0.4 (between linear=1.0 and logarithmic)
+    // This makes it somewhat logarithmic but not as extreme
+    return scalePow<string>()
+      .exponent(0.4) // Adjust this value between 0.1-0.5 to control logarithmic effect
       .domain([0, maxValue])
-      .range([`hsla(${h}, ${s}, ${l}, 0.2)`, `hsla(${h}, ${s}, ${l}, 0.8)`]);
+      .range([`hsla(${h}, ${s}, ${l}, 0.05)`, `hsla(${h}, ${s}, ${l}, 0.8)`]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
   const { data: subdivisionsGeoData } = useSubdivisions();
@@ -192,8 +198,6 @@ export function MapComponent({ height }: { height: string }) {
   const [ref, { height: resolvedHeight }] = useMeasure();
 
   const zoom = resolvedHeight ? Math.log2(resolvedHeight / 400) + 1 : 1;
-
-  console.info(tooltipContent);
 
   return (
     <div
