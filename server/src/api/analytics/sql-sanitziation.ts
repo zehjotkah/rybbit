@@ -1,16 +1,95 @@
 import { z } from "zod";
 import { Filter, FilterParameter, FilterType } from "./types.js";
 
-// Schemas for getTimeStatement()
+// =============================================================================
+// TIME RELATED SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for table parameter in time queries
+ */
 const tableSchema = z.enum(["events", "sessions"]).optional();
 
+/**
+ * Date validation regex for YYYY-MM-DD format
+ */
+const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Schema for date parameters with timezone
+ */
 const dateParamsSchema = z.object({
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  timezone: z.string(),
+  startDate: z
+    .string()
+    .regex(dateRegex, { message: "Invalid date format. Use YYYY-MM-DD" })
+    .optional()
+    .refine((date) => !date || !isNaN(Date.parse(date)), {
+      message: "Invalid date value",
+    }),
+  endDate: z
+    .string()
+    .regex(dateRegex, { message: "Invalid date format. Use YYYY-MM-DD" })
+    .optional()
+    .refine((date) => !date || !isNaN(Date.parse(date)), {
+      message: "Invalid date value",
+    }),
+  timezone: z
+    .string()
+    .min(1, { message: "Timezone cannot be empty" })
+    .refine(
+      (tz) => {
+        try {
+          // Test if timezone is valid by attempting to format a date with it
+          Intl.DateTimeFormat(undefined, { timeZone: tz });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      { message: "Invalid timezone" }
+    ),
   table: tableSchema,
 });
 
+/**
+ * Schema for simplified date parameters without table
+ */
+const fillDateParamsSchema = z.object({
+  startDate: z
+    .string()
+    .regex(dateRegex, { message: "Invalid date format. Use YYYY-MM-DD" })
+    .optional()
+    .refine((date) => !date || !isNaN(Date.parse(date)), {
+      message: "Invalid date value",
+    }),
+  endDate: z
+    .string()
+    .regex(dateRegex, { message: "Invalid date format. Use YYYY-MM-DD" })
+    .optional()
+    .refine((date) => !date || !isNaN(Date.parse(date)), {
+      message: "Invalid date value",
+    }),
+  timezone: z
+    .string()
+    .min(1, { message: "Timezone cannot be empty" })
+    .refine(
+      (tz) => {
+        try {
+          // Test if timezone is valid by attempting to format a date with it
+          Intl.DateTimeFormat(undefined, { timeZone: tz });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      { message: "Invalid timezone" }
+    ),
+});
+
+/**
+ * Schema for parameters to getTimeStatement() function
+ * Either date or pastMinutes must be provided
+ */
 const timeStatementParamsSchema = z
   .object({
     date: dateParamsSchema.optional(),
@@ -20,13 +99,10 @@ const timeStatementParamsSchema = z
     message: "Either date or pastMinutes must be provided",
   });
 
-// Schema for getTimeStatementFill()
-const fillDateParamsSchema = z.object({
-  startDate: z.string(),
-  endDate: z.string(),
-  timezone: z.string(),
-});
-
+/**
+ * Schema for parameters to getTimeStatementFill() function
+ * Either date or pastMinutes must be provided
+ */
 const timeStatementFillParamsSchema = z
   .object({
     date: fillDateParamsSchema.optional(),
@@ -36,6 +112,13 @@ const timeStatementFillParamsSchema = z
     message: "Either date or pastMinutes must be provided",
   });
 
+// =============================================================================
+// BUCKET RELATED SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for time bucket values
+ */
 const timeBucketSchema = z.enum([
   "minute",
   "five_minutes",
@@ -48,7 +131,13 @@ const timeBucketSchema = z.enum([
   "year",
 ]);
 
-// Schema for getFilterStatement()
+// =============================================================================
+// FILTER RELATED SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for filter type values
+ */
 const filterTypeSchema = z.enum([
   "equals",
   "not_equals",
@@ -56,6 +145,9 @@ const filterTypeSchema = z.enum([
   "not_contains",
 ]);
 
+/**
+ * Schema for filter parameter values
+ */
 const filterParamSchema = z.enum([
   "browser",
   "operating_system",
@@ -75,17 +167,34 @@ const filterParamSchema = z.enum([
   "dimensions",
 ]);
 
+/**
+ * Schema for filter objects
+ */
 const filterSchema = z.object({
   parameter: filterParamSchema,
   type: filterTypeSchema,
   value: z.array(z.string()),
 });
 
-// Validate and sanitize inputs
+// =============================================================================
+// SANITIZATION FUNCTIONS
+// =============================================================================
+
+/**
+ * Validates and sanitizes parameters for getTimeStatement()
+ * @param params Raw input parameters
+ * @returns Validated parameters
+ */
 export function sanitizeTimeStatementParams(params: unknown) {
   return timeStatementParamsSchema.parse(params);
 }
 
+/**
+ * Validates and sanitizes parameters for getTimeStatementFill()
+ * @param params Raw time parameters
+ * @param bucket Raw bucket parameter
+ * @returns Validated parameters and bucket
+ */
 export function sanitizeTimeStatementFillParams(
   params: unknown,
   bucket: unknown
@@ -99,6 +208,11 @@ export function sanitizeTimeStatementFillParams(
   };
 }
 
+/**
+ * Validates and sanitizes filters for getFilterStatement()
+ * @param filtersStr JSON string of filters
+ * @returns Validated array of filter objects
+ */
 export function sanitizeFilters(filtersStr: string) {
   // First validate it's proper JSON
   let parsed: unknown;
