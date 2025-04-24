@@ -76,13 +76,18 @@ export function MapComponent({ height }: { height: string }) {
       return `hsl(${hslValues})`;
     };
 
-    const startColor = getComputedColor("--accent-200");
-    const endColor = getComputedColor("--accent-500");
+    // Get only the accent-500 color
+    const accentColor = getComputedColor("--accent-400");
+
+    // Parse the HSL values to extract h, s, l components
+    const hslMatch = accentColor.match(/hsl\(([^)]+)\)/);
+    const hslValues = hslMatch ? hslMatch[1].split(" ") : ["0", "0%", "50%"];
+    const [h, s, l] = hslValues;
 
     const maxValue = Math.max(...(dataToUse?.map((d) => d.count) || [0]));
     return scaleLinear<string>()
       .domain([0, maxValue])
-      .range([startColor, endColor]);
+      .range([`hsla(${h}, ${s}, ${l}, 0.15)`, `hsla(${h}, ${s}, ${l}, 0.8)`]);
   }, [countryData?.data, subdivisionData?.data, mapView]);
 
   const { data: subdivisionsGeoData } = useSubdivisions();
@@ -108,11 +113,13 @@ export function MapComponent({ height }: { height: string }) {
       : subdivisionData?.data.find(({ value }: any) => value === dataKey);
     const count = foundData?.count || 0;
     const color = count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)";
+    console.info(color);
     return {
       color: isCountryView ? color : borderColors[borderKey],
-      weight: 0.5,
+      weight: 1,
       fill: true,
       fillColor: color,
+      fillOpacity: 0.5,
     };
   };
 
@@ -121,7 +128,7 @@ export function MapComponent({ height }: { height: string }) {
       mouseover: () => {
         // @ts-ignore
         layer.setStyle({
-          fillOpacity: 0.5,
+          fillOpacity: 0.8,
         });
         const isCountryView = mapView === "countries";
         const name = isCountryView
@@ -140,7 +147,7 @@ export function MapComponent({ height }: { height: string }) {
       mouseout: () => {
         // @ts-ignore
         layer.setStyle({
-          fillOpacity: 0.2,
+          fillOpacity: 0.5,
         });
         setTooltipContent(null);
       },
