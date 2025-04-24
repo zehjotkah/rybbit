@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useGetSessionsInfinite } from "../../api/analytics/userSessions";
 import { SessionCard, SessionCardSkeleton } from "./SessionCard";
+import { Button } from "../ui/button";
 
 export default function SessionsList({ userId }: { userId?: string }) {
   // Get sessions data with infinite loading
@@ -21,32 +22,6 @@ export default function SessionsList({ userId }: { userId?: string }) {
 
   // Reference for the scroll container
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Infinite scroll implementation
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-
-      const { scrollHeight, scrollTop, clientHeight } = containerRef.current;
-
-      // Load more when user scrolls to bottom (with a 200px buffer)
-      if (
-        scrollHeight - scrollTop - clientHeight < 200 &&
-        !isFetchingNextPage &&
-        hasNextPage
-      ) {
-        fetchNextPage();
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => {
-        container.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (error)
     return (
@@ -76,6 +51,18 @@ export default function SessionsList({ userId }: { userId?: string }) {
       {isFetchingNextPage && (
         <div className="">
           <SessionCardSkeleton key="loading-more" />
+        </div>
+      )}
+
+      {hasNextPage && (
+        <div className="flex justify-center py-2">
+          <Button
+            onClick={() => fetchNextPage()}
+            className="w-full"
+            variant="success"
+          >
+            Load more
+          </Button>
         </div>
       )}
     </div>

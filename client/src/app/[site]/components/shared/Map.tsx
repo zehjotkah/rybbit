@@ -8,8 +8,9 @@ import { Layer } from "leaflet";
 import { Feature, GeoJsonObject } from "geojson";
 import "leaflet/dist/leaflet.css";
 import { useSingleCol } from "@/api/analytics/useSingleCol";
-import { addFilter, FilterParameter } from "../../../../../lib/store";
-import { useCountries, useSubdivisions } from "../../../../../lib/geo";
+import { addFilter, FilterParameter } from "../../../../lib/store";
+import { useCountries, useSubdivisions } from "../../../../lib/geo";
+import { useMeasure } from "@uidotdev/usehooks";
 
 interface TooltipContent {
   name: string;
@@ -23,7 +24,7 @@ interface TooltipPosition {
   y: number;
 }
 
-export function MapComponent() {
+export function MapComponent({ height }: { height: string }) {
   const { data: countryData, isLoading: isCountryLoading } = useSingleCol({
     parameter: "country",
   });
@@ -169,6 +170,10 @@ export function MapComponent() {
 
   const isLoading = isCountryLoading || isSubdivisionLoading;
 
+  const [ref, { height: resolvedHeight }] = useMeasure();
+
+  const zoom = resolvedHeight ? Math.log2(resolvedHeight / 400) + 1 : 1;
+
   return (
     <div
       onMouseMove={(e) => {
@@ -179,6 +184,10 @@ export function MapComponent() {
           });
         }
       }}
+      style={{
+        height: height,
+      }}
+      ref={ref}
     >
       {(countriesGeoData || subdivisionsGeoData) && (
         <MapContainer
@@ -186,9 +195,10 @@ export function MapComponent() {
           attributionControl={false}
           zoomControl={false}
           center={[40, 3]}
-          zoom={1}
+          zoom={zoom}
           style={{
-            height: "380px",
+            // height: height,
+            height: "100%",
             background: "none",
             cursor: "default",
             outline: "none",

@@ -6,7 +6,6 @@ import { MainSection } from "./components/MainSection/MainSection";
 import { Countries } from "./components/sections/Countries";
 import { Devices } from "./components/sections/Devices";
 import { Events } from "./components/sections/Events";
-import { MapComponent } from "./components/sections/Map";
 import { Pages } from "./components/sections/Pages";
 import { Referrers } from "./components/sections/Referrers";
 import { Weekdays } from "./components/sections/Weekdays";

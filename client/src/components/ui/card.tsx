@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
-import { useMeasure } from "@uidotdev/usehooks";
 import { Zoomies } from "ldrs/react";
 import "ldrs/react/Zoomies.css";
+import * as React from "react";
 
 // Default values shown
 const Card = React.forwardRef<
@@ -26,10 +25,8 @@ const CardLoader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const [ref2, { width }] = useMeasure();
-
   return (
-    <div ref={ref2} className="mt-[-15px] absolute top-0 left-0 w-full">
+    <div className="mt-[-15px] absolute top-0 left-0 w-full">
       <Zoomies
         size={1400}
         stroke="3"
@@ -107,10 +104,10 @@ CardFooter.displayName = "CardFooter";
 
 export {
   Card,
-  CardLoader,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
   CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardLoader,
+  CardTitle,
 };

@@ -13,7 +13,7 @@ import { StandardSection } from "../../../components/shared/StandardSection/Stan
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
 import { useSubdivisions } from "../../../../../lib/geo";
 import { StandardSectionRealtime } from "../../../components/shared/StandardSection/StandardSectionRealtime";
-import { MapComponent } from "./Map";
+import { MapComponent } from "../../../components/shared/Map";
 
 type Tab = "countries" | "regions" | "languages" | "cities" | "map";
 
@@ -154,7 +154,7 @@ export function Countries({ isRealtime = false }: { isRealtime?: boolean }) {
             />
           </TabsContent>
           <TabsContent value="map">
-            <MapComponent />
+            <MapComponent height="380px" />
           </TabsContent>
         </Tabs>
       </CardContent>
