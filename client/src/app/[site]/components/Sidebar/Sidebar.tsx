@@ -53,18 +53,6 @@ export function Sidebar() {
           icon={<LayoutDashboard className="w-4 h-4" />}
         />
         <SidebarLink
-          label="Sessions"
-          active={isActiveTab("sessions")}
-          href={getTabPath("sessions")}
-          icon={<Rewind className="w-4 h-4" />}
-        />
-        <SidebarLink
-          label="Users"
-          active={isActiveTab("users")}
-          href={getTabPath("users")}
-          icon={<User className="w-4 h-4" />}
-        />
-        <SidebarLink
           label="Realtime"
           active={isActiveTab("realtime")}
           href={getTabPath("realtime")}
@@ -75,6 +63,18 @@ export function Sidebar() {
           active={isActiveTab("map")}
           href={getTabPath("map")}
           icon={<Map className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Sessions"
+          active={isActiveTab("sessions")}
+          href={getTabPath("sessions")}
+          icon={<Rewind className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Users"
+          active={isActiveTab("users")}
+          href={getTabPath("users")}
+          icon={<User className="w-4 h-4" />}
         />
         <SidebarLink
           label="Retention"
