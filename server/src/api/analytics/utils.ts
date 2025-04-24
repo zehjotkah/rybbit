@@ -1,20 +1,27 @@
 import { ResultSet } from "@clickhouse/client";
 import { Filter, FilterParameter, FilterType } from "./types.js";
+import {
+  sanitizeTimeStatementParams,
+  sanitizeFilters,
+} from "./sql-sanitziation.js";
 
 export function getTimeStatement({
   date,
   pastMinutes,
 }: {
   date?: {
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     timezone: string;
     table?: "events" | "sessions";
   };
   pastMinutes?: number;
 }) {
-  if (date) {
-    const { startDate, endDate, timezone, table } = date;
+  // Sanitize inputs with Zod
+  const sanitized = sanitizeTimeStatementParams({ date, pastMinutes });
+
+  if (sanitized.date) {
+    const { startDate, endDate, timezone, table } = sanitized.date;
     if (!startDate && !endDate) {
       return "";
     }
@@ -34,8 +41,8 @@ export function getTimeStatement({
         )
       )`;
   }
-  if (pastMinutes) {
-    return `AND timestamp > now() - interval '${pastMinutes} minute'`;
+  if (sanitized.pastMinutes) {
+    return `AND timestamp > now() - interval '${sanitized.pastMinutes} minute'`;
   }
 }
 
@@ -86,14 +93,18 @@ export function getFilterStatement(filters: string) {
   if (!filters) {
     return "";
   }
-  const filtersArray = JSON.parse(filters);
+
+  // Sanitize inputs with Zod
+  const filtersArray = sanitizeFilters(filters);
+
   if (filtersArray.length === 0) {
     return "";
   }
+
   return (
     "AND " +
     filtersArray
-      .map((filter: Filter) => {
+      .map((filter) => {
         const x =
           filter.type === "contains" || filter.type === "not_contains"
             ? "%"

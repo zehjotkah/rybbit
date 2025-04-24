@@ -6,6 +6,7 @@ import {
   processResults,
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import { sanitizeTimeStatementFillParams } from "./sql-sanitziation.js";
 
 const TimeBucketToFn = {
   minute: "toStartOfMinute",
@@ -41,23 +42,28 @@ function getTimeStatementFill(
   },
   bucket: TimeBucket
 ) {
-  if (date) {
-    const { startDate, endDate, timezone } = date;
+  const { params, bucket: validatedBucket } = sanitizeTimeStatementFillParams(
+    { date, pastMinutes },
+    bucket
+  );
+
+  if (params.date) {
+    const { startDate, endDate, timezone } = params.date;
     return `WITH FILL FROM toTimeZone(
-      toDateTime(${TimeBucketToFn[bucket]}(toDateTime('${startDate}', '${timezone}'))),
+      toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime('${startDate}', '${timezone}'))),
       'UTC'
       )
       TO if(
         toDate('${endDate}') = toDate(now(), '${timezone}'),
         now(),
         toTimeZone(
-          toDateTime(${TimeBucketToFn[bucket]}(toDateTime('${endDate}', '${timezone}'))) + INTERVAL 1 DAY,
+          toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime('${endDate}', '${timezone}'))) + INTERVAL 1 DAY,
           'UTC'
         )
-      ) STEP INTERVAL ${bucketIntervalMap[bucket]}`;
+      ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
-  if (pastMinutes) {
-    return `WITH FILL FROM now() - INTERVAL ${pastMinutes} MINUTE TO now() STEP INTERVAL ${bucketIntervalMap[bucket]}`;
+  if (params.pastMinutes) {
+    return `WITH FILL FROM now() - INTERVAL ${params.pastMinutes} MINUTE TO now() STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   return "";
 }
@@ -208,7 +214,7 @@ export async function getOverviewBucketed(
     bucket,
     site,
     filters,
-    pastMinutes,
+    pastMinutes: pastMinutes ? Number(pastMinutes) : undefined,
   });
 
   try {

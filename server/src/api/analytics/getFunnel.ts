@@ -96,7 +96,7 @@ export async function getFunnel(
         type
       FROM events
       WHERE
-        site_id = ${site}
+        site_id = {siteId:Int32}
         ${timeStatement}
         ${filterConditions}
         AND user_id != ''
@@ -161,7 +161,7 @@ export async function getFunnel(
     LEFT JOIN (
       SELECT step_number + 1 as next_step_number, visitors
       FROM StepCounts
-      WHERE step_number < ${steps.length}
+      WHERE step_number < {stepNumber:Int32}
     ) as prev_step ON s1.step_number = prev_step.next_step_number
     ORDER BY s1.step_number
     `;
@@ -170,6 +170,10 @@ export async function getFunnel(
     const result = await clickhouse.query({
       query,
       format: "JSONEachRow",
+      query_params: {
+        siteId: Number(site),
+        stepNumber: steps.length,
+      },
     });
 
     // Process the results
