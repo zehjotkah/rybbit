@@ -6,7 +6,7 @@ import {
   processResults,
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
-import { sanitizeTimeStatementFillParams } from "./sql-sanitziation.js";
+import { validateTimeStatementFillParams } from "./query-validation.js";
 
 const TimeBucketToFn = {
   minute: "toStartOfMinute",
@@ -42,7 +42,7 @@ function getTimeStatementFill(
   },
   bucket: TimeBucket
 ) {
-  const { params, bucket: validatedBucket } = sanitizeTimeStatementFillParams(
+  const { params, bucket: validatedBucket } = validateTimeStatementFillParams(
     { date, pastMinutes },
     bucket
   );

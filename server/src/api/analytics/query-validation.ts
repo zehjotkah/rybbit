@@ -148,7 +148,7 @@ const filterTypeSchema = z.enum([
 /**
  * Schema for filter parameter values
  */
-const filterParamSchema = z.enum([
+export const filterParamSchema = z.enum([
   "browser",
   "operating_system",
   "language",
@@ -185,7 +185,7 @@ const filterSchema = z.object({
  * @param params Raw input parameters
  * @returns Validated parameters
  */
-export function sanitizeTimeStatementParams(params: unknown) {
+export function validateTimeStatementParams(params: unknown) {
   return timeStatementParamsSchema.parse(params);
 }
 
@@ -195,7 +195,7 @@ export function sanitizeTimeStatementParams(params: unknown) {
  * @param bucket Raw bucket parameter
  * @returns Validated parameters and bucket
  */
-export function sanitizeTimeStatementFillParams(
+export function validateTimeStatementFillParams(
   params: unknown,
   bucket: unknown
 ) {
@@ -213,7 +213,7 @@ export function sanitizeTimeStatementFillParams(
  * @param filtersStr JSON string of filters
  * @returns Validated array of filter objects
  */
-export function sanitizeFilters(filtersStr: string) {
+export function validateFilters(filtersStr: string) {
   // First validate it's proper JSON
   let parsed: unknown;
   try {

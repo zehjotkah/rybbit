@@ -66,6 +66,9 @@ export async function getUserSessions(
   }
 
   const filterStatement = getFilterStatement(filters);
+  const timeStatement = getTimeStatement({
+    date: { startDate, endDate, timezone },
+  });
 
   const query = `
 SELECT
@@ -85,9 +88,7 @@ WHERE
     site_id = {siteId:Int32}
     AND user_id = {userId:String}
     ${filterStatement}
-    ${getTimeStatement({
-      date: { startDate, endDate, timezone },
-    })}
+    ${timeStatement}
 ORDER BY timestamp ASC
   `;
 

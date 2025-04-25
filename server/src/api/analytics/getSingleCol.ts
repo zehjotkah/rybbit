@@ -38,7 +38,6 @@ type GetSingleColResponse = {
 const getQuery = (request: FastifyRequest<GenericRequest>) => {
   const { startDate, endDate, timezone, filters, parameter, limit, minutes } =
     request.query;
-  const site = request.params.site;
 
   const filterStatement = getFilterStatement(filters);
   const timeStatement = getTimeStatement(
@@ -48,6 +47,10 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
           date: { startDate, endDate, timezone },
         }
   );
+
+  if (typeof limit !== "number") {
+    throw new Error("Limit must be a number");
+  }
 
   const percentageStatement = `ROUND(
           COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),

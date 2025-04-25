@@ -122,9 +122,7 @@ FROM events
 WHERE
     site_id = {siteId:Int32}
     ${filterStatement}
-    ${getTimeStatement({
-      date: { startDate, endDate, timezone },
-    })}
+    ${timeStatement}
   `;
 
   try {

@@ -1,9 +1,11 @@
 import { ResultSet } from "@clickhouse/client";
 import { Filter, FilterParameter, FilterType } from "./types.js";
 import {
-  sanitizeTimeStatementParams,
-  sanitizeFilters,
-} from "./sql-sanitziation.js";
+  validateTimeStatementParams,
+  validateFilters,
+  filterParamSchema,
+} from "./query-validation.js";
+import SqlString from "sqlstring";
 
 export function getTimeStatement({
   date,
@@ -18,7 +20,7 @@ export function getTimeStatement({
   pastMinutes?: number;
 }) {
   // Sanitize inputs with Zod
-  const sanitized = sanitizeTimeStatementParams({ date, pastMinutes });
+  const sanitized = validateTimeStatementParams({ date, pastMinutes });
 
   if (sanitized.date) {
     const { startDate, endDate, timezone, table } = sanitized.date;
@@ -28,21 +30,31 @@ export function getTimeStatement({
 
     const col = (table ?? "events") === "events" ? "timestamp" : "session_end";
 
+    // Use SqlString.escape for date and timezone values
     return `AND ${col} >= toTimeZone(
-      toStartOfDay(toDateTime('${startDate}', '${timezone}')),
+      toStartOfDay(toDateTime(${SqlString.escape(
+        startDate
+      )}, ${SqlString.escape(timezone)})),
       'UTC'
       )
       AND ${col} < if(
-        toDate('${endDate}') = toDate(now(), '${timezone}'),
+        toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
+      timezone
+    )}),
         now(),
         toTimeZone(
-          toStartOfDay(toDateTime('${endDate}', '${timezone}')) + INTERVAL 1 DAY,
+          toStartOfDay(toDateTime(${SqlString.escape(
+            endDate
+          )}, ${SqlString.escape(timezone)})) + INTERVAL 1 DAY,
           'UTC'
         )
       )`;
   }
   if (sanitized.pastMinutes) {
-    return `AND timestamp > now() - interval '${sanitized.pastMinutes} minute'`;
+    // Use SqlString.escape for pastMinutes (it handles numbers)
+    return `AND timestamp > now() - interval ${SqlString.escape(
+      sanitized.pastMinutes
+    )} minute`;
   }
 }
 
@@ -86,7 +98,7 @@ export const geSqlParam = (parameter: FilterParameter) => {
   if (parameter === "dimensions") {
     return "concat(toString(screen_width), 'x', toString(screen_height))";
   }
-  return parameter;
+  return filterParamSchema.parse(parameter);
 };
 
 export function getFilterStatement(filters: string) {
@@ -95,7 +107,7 @@ export function getFilterStatement(filters: string) {
   }
 
   // Sanitize inputs with Zod
-  const filtersArray = sanitizeFilters(filters);
+  const filtersArray = validateFilters(filters);
 
   if (filtersArray.length === 0) {
     return "";
@@ -121,9 +133,9 @@ export function getFilterStatement(filters: string) {
                 FROM events 
                 GROUP BY session_id
               ) 
-              WHERE entry_pathname ${filterTypeToOperator(filter.type)} '${x}${
-              filter.value[0]
-            }${x}'
+              WHERE entry_pathname ${filterTypeToOperator(
+                filter.type
+              )} ${SqlString.escape(x + filter.value[0] + x)}
             )`;
           }
 
@@ -131,7 +143,7 @@ export function getFilterStatement(filters: string) {
             (value) =>
               `entry_pathname ${filterTypeToOperator(
                 filter.type
-              )} '${x}${value}${x}'`
+              )} ${SqlString.escape(x + value + x)}`
           );
 
           return `session_id IN (
@@ -158,9 +170,9 @@ export function getFilterStatement(filters: string) {
                 FROM events 
                 GROUP BY session_id
               ) 
-              WHERE exit_pathname ${filterTypeToOperator(filter.type)} '${x}${
-              filter.value[0]
-            }${x}'
+              WHERE exit_pathname ${filterTypeToOperator(
+                filter.type
+              )} ${SqlString.escape(x + filter.value[0] + x)}
             )`;
           }
 
@@ -168,7 +180,7 @@ export function getFilterStatement(filters: string) {
             (value) =>
               `exit_pathname ${filterTypeToOperator(
                 filter.type
-              )} '${x}${value}${x}'`
+              )} ${SqlString.escape(x + value + x)}`
           );
 
           return `session_id IN (
@@ -187,14 +199,14 @@ export function getFilterStatement(filters: string) {
         if (filter.value.length === 1) {
           return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
             filter.type
-          )} '${x}${filter.value[0]}${x}'`;
+          )} ${SqlString.escape(x + filter.value[0] + x)}`;
         }
 
         const valuesWithOperator = filter.value.map(
           (value) =>
             `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
               filter.type
-            )} '${x}${value}${x}'`
+            )} ${SqlString.escape(x + value + x)}`
         );
 
         return `(${valuesWithOperator.join(" OR ")})`;

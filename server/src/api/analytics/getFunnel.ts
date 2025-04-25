@@ -7,6 +7,7 @@ import {
   getFilterStatement,
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import SqlString from "sqlstring";
 
 type FunnelStep = {
   value: string;
@@ -77,9 +78,11 @@ export async function getFunnel(
     // Build conditional statements for each step
     const stepConditions = steps.map((step) => {
       if (step.type === "page") {
-        return `pathname = '${step.value}'`;
+        return `pathname = ${SqlString.escape(step.value)}`;
       } else {
-        return `type = 'custom_event' AND event_name = '${step.value}'`;
+        return `type = 'custom_event' AND event_name = ${SqlString.escape(
+          step.value
+        )}`;
       }
     });
 
@@ -138,7 +141,7 @@ export async function getFunnel(
           (step, index) => `
           SELECT
             ${index + 1} as step_number,
-            '${step.name || step.value}' as step_name,
+            ${SqlString.escape(step.name || step.value)} as step_name,
             count(DISTINCT user_id) as visitors
           FROM Step${index + 1}
         `

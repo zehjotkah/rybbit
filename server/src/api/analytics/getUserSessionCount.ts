@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
 import { processResults } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import SqlString from "sqlstring";
 
 export interface GetUserSessionCountRequest {
   Params: {
@@ -36,7 +37,7 @@ export async function getUserSessionCount(
 
   const query = `
     SELECT
-      toDate(session_start, '${timezone}') as date,
+      toDate(session_start, '${SqlString.escape(timezone)}') as date,
       count() as sessions
     FROM sessions
     WHERE
