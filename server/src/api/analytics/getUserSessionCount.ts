@@ -37,7 +37,7 @@ export async function getUserSessionCount(
 
   const query = `
     SELECT
-      toDate(session_start, '${SqlString.escape(timezone)}') as date,
+      toDate(session_start, ${SqlString.escape(timezone)}) as date,
       count() as sessions
     FROM sessions
     WHERE

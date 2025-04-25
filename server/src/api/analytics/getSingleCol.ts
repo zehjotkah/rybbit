@@ -48,9 +48,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         }
   );
 
-  if (typeof limit !== "number") {
-    throw new Error("Limit must be a number");
-  }
+  const limitStatement = limit ? `LIMIT ${Number(limit)}` : "";
 
   const percentageStatement = `ROUND(
           COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),
@@ -72,7 +70,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
       ${timeStatement}
       AND type = 'custom_event'
     GROUP BY event_name ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};
+    ${limitStatement};
   `;
   }
 
@@ -148,7 +146,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         avg_time_on_page_seconds as time_on_page_seconds
     FROM PathStats
     ORDER BY unique_sessions DESC
-    ${limit ? `LIMIT ${limit}` : ""};`;
+    ${limitStatement};`;
   }
 
   if (parameter === "pathname") {
@@ -193,7 +191,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         avg_time_on_page_seconds as time_on_page_seconds
     FROM PathStats
     ORDER BY unique_sessions DESC
-    ${limit ? `LIMIT ${limit}` : ""};
+    ${limitStatement};
     `;
   }
 
@@ -221,7 +219,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
       round((pageviews / sum(pageviews) OVER ()) * 100, 2) as pageviews_percentage
     FROM PageStats
     ORDER BY count desc
-    ${limit ? `LIMIT ${limit}` : ""};
+    ${limitStatement};
   `;
 };
 
