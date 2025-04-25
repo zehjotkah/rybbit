@@ -7,6 +7,7 @@ import { addFilter, FilterParameter } from "../../../../../lib/store";
 import { formatter } from "../../../../../lib/utils";
 import { Skeleton } from "./Skeleton";
 import { BaseStandardSectionDialog } from "./BaseStandardSectionDialog";
+import NumberFlow from "@number-flow/react";
 
 export const Row = ({
   e,
@@ -61,7 +62,11 @@ export const Row = ({
           <div className="hidden group-hover:block text-neutral-400">
             {round(e.percentage, 1)}%
           </div>
-          <div>{formatter(e.count)}</div>
+          <NumberFlow
+            respectMotionPreference={false}
+            value={e.count}
+            format={{ notation: "compact" }}
+          />
         </div>
       </div>
     </div>
@@ -71,7 +76,7 @@ export const Row = ({
 interface BaseStandardSectionProps {
   title: string;
   data: { data?: SingleColResponse[] } | undefined;
-  isFetching: boolean;
+  isLoading: boolean;
   error: Error | null;
   refetch: () => void;
   getKey: (item: SingleColResponse) => string;
@@ -86,7 +91,7 @@ interface BaseStandardSectionProps {
 export function BaseStandardSection({
   title,
   data,
-  isFetching,
+  isLoading,
   error,
   refetch,
   getKey,
@@ -98,7 +103,6 @@ export function BaseStandardSection({
   filterParameter,
 }: BaseStandardSectionProps) {
   // Determine if we're in a loading state
-  const isLoading = isFetching;
 
   const ratio = data?.data?.[0]?.percentage
     ? 100 / data?.data?.[0]?.percentage

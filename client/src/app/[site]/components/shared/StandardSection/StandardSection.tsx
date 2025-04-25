@@ -20,7 +20,6 @@ export function StandardSection({
   filterParameter,
 }: {
   title: string;
-  isFetching?: boolean;
   getKey: (item: SingleColResponse) => string;
   getLabel: (item: SingleColResponse) => ReactNode;
   getValue: (item: SingleColResponse) => string;
@@ -29,17 +28,21 @@ export function StandardSection({
   countLabel?: string;
   filterParameter: FilterParameter;
 }) {
-  const { data, isFetching, error, refetch } = useSingleCol({
+  const { data, isLoading, isFetching, error, refetch } = useSingleCol({
     parameter: filterParameter,
   });
 
-  const { data: previousData, isFetching: previousIsFetching } = useSingleCol({
+  const {
+    data: previousData,
+    isLoading: previousIsLoading,
+    isFetching: previousIsFetching,
+  } = useSingleCol({
     parameter: filterParameter,
     periodTime: "previous",
   });
 
   // Create combined loading state
-  const isLoading = isFetching || previousIsFetching;
+  const loading = isLoading || previousIsLoading;
 
   // For potential additional features that use previous data
   const previousDataMap = useMemo(() => {
@@ -51,7 +54,7 @@ export function StandardSection({
 
   return (
     <>
-      {isLoading && (
+      {(isFetching || previousIsFetching) && (
         <div className="absolute top-[-8px] left-0 w-full h-full">
           <CardLoader />
         </div>
@@ -59,7 +62,7 @@ export function StandardSection({
       <BaseStandardSection
         title={title}
         data={data}
-        isFetching={isLoading}
+        isLoading={loading}
         error={error}
         refetch={refetch}
         getKey={getKey}

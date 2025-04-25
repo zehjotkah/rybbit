@@ -80,6 +80,10 @@ export default function RootLayout({
     ) {
       redirect("/login");
     }
+
+    if (user && publicRoutes.includes(pathname)) {
+      redirect("/");
+    }
   }, [isPending, user, pathname, isCheckingPublic, isPublicSite]);
 
   return (
