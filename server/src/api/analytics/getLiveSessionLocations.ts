@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
 import { processResults } from "./utils.js";
+import SqlString from "sqlstring";
 
 export async function getLiveSessionLocations(
   req: FastifyRequest<{
@@ -30,7 +31,9 @@ WITH stuff AS (
         events
     WHERE
         site_id = {site:Int32}
-        AND timestamp > now() - interval '${req.query.time} minute'
+        AND timestamp > now() - interval ${SqlString.escape(
+          Number(req.query.time)
+        )} minute
     GROUP BY
         session_id
 )

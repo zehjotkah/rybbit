@@ -8,6 +8,7 @@ import {
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { FilterParameter } from "./types.js";
+import SqlString from "sqlstring";
 
 interface GenericRequest {
   Params: {
@@ -48,7 +49,17 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         }
   );
 
-  const limitStatement = limit ? `LIMIT ${Number(limit)}` : "";
+  // Validate and sanitize the limit parameter
+  let validatedLimit: number | null = null;
+  if (limit !== undefined) {
+    const parsedLimit = parseInt(String(limit), 10);
+    if (!isNaN(parsedLimit) && parsedLimit > 0) {
+      validatedLimit = parsedLimit;
+    }
+  }
+  const limitStatement = validatedLimit
+    ? `LIMIT ${validatedLimit}`
+    : "LIMIT 100"; // Default limit
 
   const percentageStatement = `ROUND(
           COUNT(distinct(session_id)) * 100.0 / SUM(COUNT(distinct(session_id))) OVER (),

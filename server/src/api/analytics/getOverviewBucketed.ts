@@ -5,6 +5,7 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
+import SqlString from "sqlstring";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { validateTimeStatementFillParams } from "./query-validation.js";
 
@@ -50,20 +51,32 @@ function getTimeStatementFill(
   if (params.date) {
     const { startDate, endDate, timezone } = params.date;
     return `WITH FILL FROM toTimeZone(
-      toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime('${startDate}', '${timezone}'))),
+      toDateTime(${
+        TimeBucketToFn[validatedBucket]
+      }(toDateTime(${SqlString.escape(startDate)}, ${SqlString.escape(
+      timezone
+    )}))),
       'UTC'
       )
       TO if(
-        toDate('${endDate}') = toDate(now(), '${timezone}'),
+        toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
+      timezone
+    )}),
         now(),
         toTimeZone(
-          toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime('${endDate}', '${timezone}'))) + INTERVAL 1 DAY,
+          toDateTime(${
+            TimeBucketToFn[validatedBucket]
+          }(toDateTime(${SqlString.escape(endDate)}, ${SqlString.escape(
+      timezone
+    )}))) + INTERVAL 1 DAY,
           'UTC'
         )
       ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   if (params.pastMinutes) {
-    return `WITH FILL FROM now() - INTERVAL ${params.pastMinutes} MINUTE TO now() STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
+    return `WITH FILL FROM now() - INTERVAL ${SqlString.escape(
+      params.pastMinutes
+    )} MINUTE TO now() STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   return "";
 }
@@ -103,7 +116,7 @@ FROM
     SELECT
          toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(start_time, '${timezone}'))) AS time,
+         }(toTimeZone(start_time, ${SqlString.escape(timezone)}))) AS time,
         COUNT() AS sessions,
         AVG(pages_in_session) AS pages_per_session,
         sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
@@ -146,7 +159,7 @@ FULL JOIN
     SELECT
          toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(timestamp, '${timezone}'))) AS time,
+         }(toTimeZone(timestamp, ${SqlString.escape(timezone)}))) AS time,
         COUNT(*) AS pageviews,
         COUNT(DISTINCT user_id) AS users
     FROM events
