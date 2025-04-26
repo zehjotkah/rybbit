@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useStore } from "../../lib/store";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
+import { useStore } from "../../lib/store";
+import { authedFetchWithError } from "../utils";
 
 export type Event = {
   timestamp: string;
@@ -26,8 +26,8 @@ export function useGetEvents(count = 10) {
     queryKey: ["events", site, count],
     refetchInterval: 5000,
     queryFn: () =>
-      authedFetch(`${BACKEND_URL}/recent-events/${site}?count=${count}`).then(
-        (res) => res.json()
-      ),
+      authedFetchWithError<{ data: Event[] }>(
+        `${BACKEND_URL}/recent-events/${site}?count=${count}`
+      ).then((res) => res.data),
   });
 }

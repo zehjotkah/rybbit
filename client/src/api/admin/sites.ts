@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
-import { authedFetchWithError, genericQuery, useGenericQuery } from "../utils";
+import { authedFetchWithError } from "../utils";
 
 export type SiteResponse = {
   siteId: number;
@@ -31,11 +31,17 @@ export type GetSitesResponse = {
 }[];
 
 export function useGetSites() {
-  return useGenericQuery<GetSitesResponse>("get-sites");
+  return useQuery<GetSitesResponse>({
+    queryKey: ["get-sites"],
+    queryFn: () => {
+      return authedFetchWithError(`${BACKEND_URL}/get-sites`);
+    },
+    staleTime: Infinity,
+  });
 }
 
 export async function getSites() {
-  return genericQuery<GetSitesResponse>("get-sites");
+  return authedFetchWithError<GetSitesResponse>(`${BACKEND_URL}/get-sites`);
 }
 
 export function addSite(
@@ -47,7 +53,7 @@ export function addSite(
     saltUserIds?: boolean;
   }
 ) {
-  return authedFetchWithError(`${BACKEND_URL}/add-site`, {
+  return authedFetchWithError<{ siteId: number }>(`${BACKEND_URL}/add-site`, {
     method: "POST",
     body: JSON.stringify({
       domain,
@@ -101,9 +107,9 @@ export function useSiteHasData(siteId: string) {
       if (!siteId) {
         return Promise.resolve(false);
       }
-      return authedFetchWithError(
+      return authedFetchWithError<{ hasData: boolean }>(
         `${BACKEND_URL}/site-has-data/${siteId}`
-      ).then((data) => data.hasData as Boolean);
+      ).then((data) => data.hasData);
     },
     refetchInterval: 5000,
     staleTime: Infinity,
@@ -123,18 +129,10 @@ export function useGetSite(siteId?: string | number) {
       }
 
       // Use regular fetch instead of authedFetch to support public sites
-      return await authedFetchWithError(
+      const data = await authedFetchWithError<SiteResponse>(
         `${BACKEND_URL}/get-site/${siteIdToUse}`
       );
-
-      // if (!response.ok) {
-      //   if (response.status === 404) {
-      //     return null;
-      //   }
-      //   throw new Error("Failed to fetch site");
-      // }
-
-      // return response.json() as Promise<SiteResponse>;
+      return data;
     },
     staleTime: 60000, // 1 minute
     enabled: !!siteId,

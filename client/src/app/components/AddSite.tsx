@@ -82,15 +82,16 @@ export function AddSite({
       return;
     }
 
-    const response = await addSite(domain, domain, selectedOrganizationId, {
-      isPublic,
-      saltUserIds,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      setError(errorData.error || "Failed to add site");
+    try {
+      await addSite(domain, domain, selectedOrganizationId, {
+        isPublic,
+        saltUserIds,
+      });
+    } catch (error) {
+      setError("Failed to add site");
       return;
     }
+
     setOpen(false);
     refetch();
   };

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
-import { FunnelStep } from "./useGetFunnel";
 import { Filter } from "../../lib/store";
+import { FunnelStep } from "./useGetFunnel";
+import { authedFetchWithError } from "../utils";
 
 export interface SavedFunnel {
   id: number;
@@ -22,16 +22,14 @@ export function useGetFunnels(siteId?: string | number) {
       if (!siteId) {
         return [];
       }
-
-      const response = await authedFetch(`${BACKEND_URL}/funnels/${siteId}`);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch funnels");
+      try {
+        const response = await authedFetchWithError<{ data: SavedFunnel[] }>(
+          `${BACKEND_URL}/funnels/${siteId}`
+        );
+        return response.data;
+      } catch (error) {
+        throw new Error("Failed to fetch funnels");
       }
-
-      const result = await response.json();
-      return result.data;
     },
     enabled: !!siteId,
   });

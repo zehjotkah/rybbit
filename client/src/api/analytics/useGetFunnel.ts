@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
+import { authedFetch, authedFetchWithError } from "../utils";
 import { useStore, Filter } from "../../lib/store";
 import { useDebounce } from "@uidotdev/usehooks";
 
@@ -45,7 +45,7 @@ export function useGetFunnel(config?: FunnelRequest, debounce?: boolean) {
 
   const configToUse = debounce ? debouncedConfig : config;
 
-  return useQuery<{ data: FunnelResponse[] }, Error>({
+  return useQuery<FunnelResponse[], Error>({
     queryKey: [
       "funnel",
       site,
@@ -66,21 +66,22 @@ export function useGetFunnel(config?: FunnelRequest, debounce?: boolean) {
         ...configToUse,
         timezone,
       };
+      try {
+        const response = await authedFetchWithError<{ data: FunnelResponse[] }>(
+          `${BACKEND_URL}/funnel/${site}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(fullConfig),
+          }
+        );
 
-      const response = await authedFetch(`${BACKEND_URL}/funnel/${site}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(fullConfig),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to analyze funnel");
+        return response.data;
+      } catch (error) {
+        throw new Error("Failed to analyze funnel");
       }
-
-      return response.json();
     },
     enabled: !!site && !!configToUse,
   });
@@ -106,27 +107,26 @@ export function useSaveFunnel() {
         timezone,
       };
 
-      // Save the funnel configuration
-      const saveResponse = await authedFetch(
-        `${BACKEND_URL}/funnel/create/${site}`,
-        {
+      try {
+        // Save the funnel configuration
+        const saveResponse = await authedFetchWithError<{
+          success: boolean;
+          funnelId: number;
+        }>(`${BACKEND_URL}/funnel/create/${site}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(fullConfig),
-        }
-      );
+        });
 
-      if (!saveResponse.ok) {
-        const errorData = await saveResponse.json();
-        throw new Error(errorData.error || "Failed to save funnel");
+        // Invalidate the funnels query to refresh the list
+        queryClient.invalidateQueries({ queryKey: ["funnels", site] });
+
+        return saveResponse;
+      } catch (error) {
+        throw new Error("Failed to save funnel");
       }
-
-      // Invalidate the funnels query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["funnels", site] });
-
-      return saveResponse.json();
     },
   });
 }

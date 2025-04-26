@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import {
   getFilteredFilters,
@@ -6,7 +6,7 @@ import {
   useStore,
 } from "../../lib/store";
 import { APIResponse } from "../types";
-import { getStartAndEndDate, authedFetch } from "../utils";
+import { authedFetch, getStartAndEndDate } from "../utils";
 
 export type UserSessionsResponse = {
   session_id: string;
@@ -142,27 +142,6 @@ export interface SessionPageviewsAndEvents {
     offset: number;
     hasMore: boolean;
   };
-}
-
-export function useGetSessionDetails(
-  sessionId: string | null,
-  limit = 100,
-  offset = 0
-) {
-  const { site } = useStore();
-
-  return useQuery<APIResponse<SessionPageviewsAndEvents>>({
-    queryKey: ["session-details", sessionId, site, limit, offset],
-    queryFn: () => {
-      if (!sessionId) throw new Error("Session ID is required");
-
-      return authedFetch(
-        `${BACKEND_URL}/session/${sessionId}/${site}?limit=${limit}&offset=${offset}`
-      ).then((res) => res.json());
-    },
-    enabled: !!sessionId && !!site,
-    staleTime: Infinity,
-  });
 }
 
 export function useGetSessionDetailsInfinite(sessionId: string | null) {

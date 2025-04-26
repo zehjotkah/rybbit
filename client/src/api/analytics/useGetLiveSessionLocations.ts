@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "../../lib/store";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
+import { authedFetchWithError } from "../utils";
 
 export type LiveSessionLocation = {
   lat: number;
@@ -15,10 +15,8 @@ export function useGetLiveSessionLocations(minutes = 5) {
   return useQuery<LiveSessionLocation[]>({
     queryKey: ["live-session-locations", site, minutes],
     queryFn: () =>
-      authedFetch(
+      authedFetchWithError(
         `${BACKEND_URL}/live-session-locations/${site}?time=${minutes}`
-      )
-        .then((res) => res.json())
-        .then((data) => data.data),
+      ).then((res: any) => res.data),
   });
 }

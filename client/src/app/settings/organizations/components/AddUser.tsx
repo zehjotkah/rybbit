@@ -1,5 +1,4 @@
-import { AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { authedFetchWithError } from "@/api/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { authedFetch } from "@/api/utils";
 import { BACKEND_URL } from "@/lib/const";
+import { AlertCircle } from "lucide-react";
+import { useState } from "react";
 
 export function AddUser({ refetch }: { refetch: () => void }) {
   const [open, setOpen] = useState(false);
@@ -36,27 +36,22 @@ export function AddUser({ refetch }: { refetch: () => void }) {
       return;
     }
     try {
-      const response = await authedFetch(`${BACKEND_URL}/create-account`, {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          username,
-          name: username,
-          password,
-          isAdmin,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.status !== 201) {
-        const data = await response.json();
-        console.info(data);
-        setError(data.error);
-        return;
-      }
-
+      await authedFetchWithError<{ success: boolean }>(
+        `${BACKEND_URL}/create-account`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            username,
+            name: username,
+            password,
+            isAdmin,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       setOpen(false);
       refetch();
     } catch (error) {

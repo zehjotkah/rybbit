@@ -1,14 +1,12 @@
 "use client";
 
-import { CreateFunnelDialog } from "./components/CreateFunnel";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { useGetFunnels, SavedFunnel } from "@/api/analytics/useGetFunnels";
-import { PlusCircle } from "lucide-react";
+import { SavedFunnel, useGetFunnels } from "@/api/analytics/useGetFunnels";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStore } from "@/lib/store";
-import { FunnelRow } from "./components/FunnelRow";
+import { PlusCircle } from "lucide-react";
 import { MobileSidebar } from "../../../components/MobileSidebar";
+import { CreateFunnelDialog } from "./components/CreateFunnel";
+import { FunnelRow } from "./components/FunnelRow";
 
 export default function FunnelsPage() {
   const { site } = useStore();

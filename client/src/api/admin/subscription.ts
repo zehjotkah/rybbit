@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
+import { authedFetchWithError } from "../utils";
 
 export type Subscription = {
   id: string;
@@ -36,8 +36,10 @@ export function useSubscriptionWithUsage() {
   return useQuery<SubscriptionWithUsage>({
     queryKey: ["subscriptionWithUsage"],
     queryFn: async () => {
-      const res = await authedFetch(`${BACKEND_URL}/user/subscription`);
-      return res.json();
+      const res = await authedFetchWithError<SubscriptionWithUsage>(
+        `${BACKEND_URL}/user/subscription`
+      );
+      return res;
     },
   });
 }

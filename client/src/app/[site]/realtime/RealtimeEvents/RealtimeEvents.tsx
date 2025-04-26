@@ -169,7 +169,7 @@ export function RealtimeEvents() {
     return <EventCardSkeleton />;
   }
 
-  if (!data?.data || data.data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="text-sm text-gray-400 p-4 text-center">
         No events recorded yet
@@ -182,7 +182,7 @@ export function RealtimeEvents() {
       className="overflow-y-auto p-2"
       style={{ height: "calc(100vh - 50px)" }}
     >
-      {data.data.map((event: Event, index: number) => (
+      {data.map((event: Event, index: number) => (
         <EventCard key={`${event.timestamp}-${index}`} event={event} />
       ))}
     </div>

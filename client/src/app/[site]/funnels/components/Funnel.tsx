@@ -14,7 +14,7 @@ export type FunnelChartData = {
 };
 
 interface FunnelProps {
-  data?: { data: FunnelResponse[] };
+  data?: FunnelResponse[] | undefined;
   isError: boolean;
   error: unknown;
   isPending: boolean;
@@ -32,7 +32,7 @@ export function Funnel({
 }: FunnelProps) {
   // Prepare chart data
   const chartData =
-    data?.data.map((step) => ({
+    data?.map((step) => ({
       stepName: step.step_name,
       visitors: step.visitors,
       conversionRate: step.conversion_rate,
@@ -62,7 +62,7 @@ export function Funnel({
               : "Failed to analyze funnel"}
           </div>
         </div>
-      ) : data?.data && chartData.length > 0 ? (
+      ) : data && chartData.length > 0 ? (
         <div className="space-y-4">
           {/* Chart grid and background */}
           <div className="relative h-[350px]">

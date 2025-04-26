@@ -230,7 +230,7 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
                 Error loading funnel:{" "}
                 {error instanceof Error ? error.message : "Unknown error"}
               </div>
-            ) : data?.data && data.data.length > 0 ? (
+            ) : data && data.length > 0 ? (
               <Funnel
                 data={data}
                 isError={isError}

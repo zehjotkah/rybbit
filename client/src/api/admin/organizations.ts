@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch, authedFetchWithError } from "../utils";
-import { APIResponse } from "../types";
+import { authedFetchWithError } from "../utils";
 
 export type UserOrganization = {
   id: string;

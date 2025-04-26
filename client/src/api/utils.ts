@@ -85,10 +85,10 @@ export async function authedFetch(
   });
 }
 
-export async function authedFetchWithError(
+export async function authedFetchWithError<T>(
   url: string,
   opts: RequestInit = {}
-) {
+): Promise<T> {
   const res = await fetch(url, {
     credentials: "include",
     ...opts,
@@ -97,20 +97,4 @@ export async function authedFetchWithError(
     throw new Error(await res.text());
   }
   return res.json();
-}
-
-export function useGenericQuery<T>(endpoint: string): UseQueryResult<T> {
-  return useQuery({
-    queryKey: [endpoint],
-    queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/${endpoint}`).then((res) =>
-        res.json()
-      );
-    },
-    staleTime: Infinity,
-  });
-}
-
-export async function genericQuery<T>(endpoint: string): Promise<T> {
-  return authedFetch(`${BACKEND_URL}/${endpoint}`).then((res) => res.json());
 }

@@ -1,4 +1,4 @@
-import { FunnelStep } from "@/api/analytics/useGetFunnel";
+import { FunnelResponse, FunnelStep } from "@/api/analytics/useGetFunnel";
 import { Time } from "@/components/DateSelector/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { ThreeDotLoader } from "../../../../components/Loaders";
 import { Filter } from "../../../../lib/store";
 import { FilterComponent } from "../../components/shared/Filters/FilterComponent";
 import { Funnel } from "./Funnel";
+import { SavedFunnel } from "../../../../api/analytics/useGetFunnels";
 
 interface FunnelFormProps {
   name: string;
@@ -35,7 +36,7 @@ interface FunnelFormProps {
   isPending: boolean;
   error: unknown;
   saveError: unknown;
-  funnelData: any;
+  funnelData?: FunnelResponse[];
 }
 
 export function FunnelForm({
@@ -118,7 +119,7 @@ export function FunnelForm({
   };
 
   let funnelArea = null;
-  if (funnelData?.data && funnelData.data.length) {
+  if (funnelData && funnelData.length) {
     funnelArea = (
       <Funnel
         data={funnelData}

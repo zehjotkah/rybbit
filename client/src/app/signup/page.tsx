@@ -53,7 +53,7 @@ export default function SignupPage() {
   const [domain, setDomain] = useState("");
 
   // Step 4: Data for tracking code
-  const [siteId, setSiteId] = useState("");
+  const [siteId, setSiteId] = useState<number>();
 
   // Handle organization name change and generate slug
   const handleOrgNameChange = (value: string) => {
@@ -153,16 +153,13 @@ export default function SignupPage() {
         return;
       }
 
-      const response = await addSite(domain, domain, organizationId);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add site");
+      try {
+        const response = await addSite(domain, domain, organizationId);
+        setSiteId(response.siteId);
+        setCurrentStep(4);
+      } catch (error) {
+        setError(String(error));
       }
-
-      const data = await response.json();
-      setSiteId(data.siteId);
-      setCurrentStep(4);
     } catch (error) {
       setError(String(error));
     } finally {
