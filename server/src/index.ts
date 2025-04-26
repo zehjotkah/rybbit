@@ -50,6 +50,7 @@ import { createPortalSession } from "./api/stripe/createPortalSession.js";
 import { getSubscription } from "./api/stripe/getSubscription.js";
 import { handleWebhook } from "./api/stripe/webhook.js";
 import { IS_CLOUD } from "./lib/const.js";
+import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -219,6 +220,7 @@ server.get(
   listOrganizationMembers
 );
 server.get("/user/organizations", getUserOrganizations);
+server.post("/add-user-to-organization", addUserToOrganization);
 
 if (IS_CLOUD) {
   // Stripe Routes

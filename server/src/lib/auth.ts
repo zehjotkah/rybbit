@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, organization, username } from "better-auth/plugins";
+import { admin, organization } from "better-auth/plugins";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import pg from "pg";
@@ -12,26 +12,15 @@ dotenv.config();
 
 type AuthType = ReturnType<typeof betterAuth> | null;
 
-const pluginList = IS_CLOUD
-  ? [
-      admin(),
-      organization({
-        // Allow users to create organizations
-        allowUserToCreateOrganization: true,
-        // Set the creator role to owner
-        creatorRole: "owner",
-      }),
-    ]
-  : [
-      username(),
-      admin(),
-      organization({
-        // Allow users to create organizations
-        allowUserToCreateOrganization: true,
-        // Set the creator role to owner
-        creatorRole: "owner",
-      }),
-    ];
+const pluginList = [
+  admin(),
+  organization({
+    // Allow users to create organizations
+    allowUserToCreateOrganization: true,
+    // Set the creator role to owner
+    creatorRole: "owner",
+  }),
+];
 
 export let auth: AuthType | null = betterAuth({
   basePath: "/auth",
@@ -53,7 +42,7 @@ export let auth: AuthType | null = betterAuth({
       enabled: true,
     },
   },
-  plugins: pluginList as any,
+  plugins: pluginList,
   trustedOrigins: ["http://localhost:3002"],
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
@@ -140,7 +129,7 @@ export function initAuth(allowedOrigins: string[]) {
         },
       },
     },
-    plugins: pluginList as any,
+    plugins: pluginList,
     trustedOrigins: allowedOrigins,
     advanced: {
       useSecureCookies: process.env.NODE_ENV === "production",

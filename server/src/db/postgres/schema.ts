@@ -193,7 +193,6 @@ export const invitation = pgTable(
     role: text().notNull(),
     status: text().notNull(),
     expiresAt: timestamp({ mode: "string" }).notNull(),
-    createdAt: timestamp({ mode: "string" }).notNull(),
   },
   (table) => [
     foreignKey({

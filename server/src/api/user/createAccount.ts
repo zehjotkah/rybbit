@@ -4,10 +4,10 @@ import { auth } from "../../lib/auth.js";
 interface CreateAccountRequest {
   Body: {
     email: string;
-    username: string;
     name: string;
     password: string;
     isAdmin: boolean;
+    organizationId: string;
   };
 }
 
@@ -16,10 +16,10 @@ export async function createAccount(
   reply: FastifyReply
 ) {
   try {
-    const { email, name, username, password, isAdmin } = request.body;
+    const { email, name, password, isAdmin, organizationId } = request.body;
 
     // Validate input
-    if (!email || !username || !password) {
+    if (!email || !password || !organizationId || !name) {
       return reply.status(400).send({
         error:
           "Missing required fields: email,  name, and password are required",
@@ -35,10 +35,21 @@ export async function createAccount(
 
     // Create the account using auth.api.signUpEmail
     const result = await auth!.api.signUpEmail({
+      body: { email: "bill3@gmail.com", name: "billy3", password: "12345noob" },
+    });
+    // const result = await auth!.api.signUpEmail({
+    //   body: {
+    //     email,
+    //     name,
+    //     password,
+    //   },
+    // });
+
+    await (auth!.api as any).addMember({
       body: {
-        email,
-        name,
-        password,
+        userId: result.user.id,
+        organizationId: organizationId,
+        role: isAdmin ? "admin" : "member", // this can also be an array for multiple roles (e.g. ["admin", "sale"])
       },
     });
 
@@ -63,6 +74,6 @@ export async function createAccount(
       }
     }
 
-    return reply.status(500).send({ error: "Failed to create account" });
+    return reply.status(500).send({ error: String(error) });
   }
 }
