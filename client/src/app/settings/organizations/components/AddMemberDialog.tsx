@@ -35,7 +35,7 @@ export function AddMemberDialog({
   onSuccess,
 }: AddMemberDialogProps) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("member");
+  const [role, setRole] = useState("admin");
 
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -43,7 +43,7 @@ export function AddMemberDialog({
 
   const handleInvite = async () => {
     if (!email) {
-      toast.error("Email is required");
+      setError("Email is required");
       return;
     }
 
@@ -68,7 +68,7 @@ export function AddMemberDialog({
       setEmail("");
       setRole("member");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send invitation");
+      setError(error.message || "Failed to send invitation");
     } finally {
       setIsLoading(false);
     }

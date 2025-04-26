@@ -38,7 +38,6 @@ export async function addUserToOrganization(
       });
     }
 
-    // Check password strength
     if (role !== "admin" && role !== "member" && role !== "owner") {
       return reply.status(400).send({
         error: "Role must be either admin, member, or owner",
@@ -51,6 +50,16 @@ export async function addUserToOrganization(
 
     if (!foundUser) {
       return reply.status(404).send({ error: "User not found" });
+    }
+
+    const foundMember = await db.query.member.findMany({
+      where: eq(member.userId, foundUser.id),
+    });
+
+    if (foundMember.length > 0) {
+      return reply
+        .status(400)
+        .send({ error: "user is already in an organization" });
     }
 
     await db.insert(member).values([

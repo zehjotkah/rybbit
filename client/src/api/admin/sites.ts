@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
-import { authedFetch, genericQuery, useGenericQuery } from "../utils";
+import { authedFetchWithError, genericQuery, useGenericQuery } from "../utils";
 
 export type SiteResponse = {
   siteId: number;
@@ -47,7 +47,7 @@ export function addSite(
     saltUserIds?: boolean;
   }
 ) {
-  return authedFetch(`${BACKEND_URL}/add-site`, {
+  return authedFetchWithError(`${BACKEND_URL}/add-site`, {
     method: "POST",
     body: JSON.stringify({
       domain,
@@ -63,13 +63,13 @@ export function addSite(
 }
 
 export function deleteSite(siteId: number) {
-  return authedFetch(`${BACKEND_URL}/delete-site/${siteId}`, {
+  return authedFetchWithError(`${BACKEND_URL}/delete-site/${siteId}`, {
     method: "POST",
   });
 }
 
 export function changeSiteDomain(siteId: number, newDomain: string) {
-  return authedFetch(`${BACKEND_URL}/change-site-domain`, {
+  return authedFetchWithError(`${BACKEND_URL}/change-site-domain`, {
     method: "POST",
     body: JSON.stringify({
       siteId,
@@ -82,7 +82,7 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
 }
 
 export function changeSitePublic(siteId: number, isPublic: boolean) {
-  return authedFetch(`${BACKEND_URL}/change-site-public`, {
+  return authedFetchWithError(`${BACKEND_URL}/change-site-public`, {
     method: "POST",
     body: JSON.stringify({
       siteId,
@@ -101,9 +101,9 @@ export function useSiteHasData(siteId: string) {
       if (!siteId) {
         return Promise.resolve(false);
       }
-      return authedFetch(`${BACKEND_URL}/site-has-data/${siteId}`)
-        .then((res) => res.json())
-        .then((data) => data.hasData as Boolean);
+      return authedFetchWithError(
+        `${BACKEND_URL}/site-has-data/${siteId}`
+      ).then((data) => data.hasData as Boolean);
     },
     refetchInterval: 5000,
     staleTime: Infinity,
@@ -123,18 +123,18 @@ export function useGetSite(siteId?: string | number) {
       }
 
       // Use regular fetch instead of authedFetch to support public sites
-      const response = await authedFetch(
+      return await authedFetchWithError(
         `${BACKEND_URL}/get-site/${siteIdToUse}`
       );
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
-        }
-        throw new Error("Failed to fetch site");
-      }
+      // if (!response.ok) {
+      //   if (response.status === 404) {
+      //     return null;
+      //   }
+      //   throw new Error("Failed to fetch site");
+      // }
 
-      return response.json() as Promise<SiteResponse>;
+      // return response.json() as Promise<SiteResponse>;
     },
     staleTime: 60000, // 1 minute
     enabled: !!siteId,
@@ -142,7 +142,7 @@ export function useGetSite(siteId?: string | number) {
 }
 
 export function changeSiteSalt(siteId: number, saltUserIds: boolean) {
-  return authedFetch(`${BACKEND_URL}/change-site-salt`, {
+  return authedFetchWithError(`${BACKEND_URL}/change-site-salt`, {
     method: "POST",
     body: JSON.stringify({
       siteId,

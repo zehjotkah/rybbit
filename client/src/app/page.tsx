@@ -10,6 +10,7 @@ import { authClient } from "../lib/auth";
 import { AddSite } from "./components/AddSite";
 import { CreateOrganizationDialog } from "./components/CreateOrganizationDialog";
 import { StandardPage } from "../components/StandardPage";
+import { useUserOrganizations } from "../api/admin/organizations";
 
 export default function Home() {
   const {
@@ -18,6 +19,11 @@ export default function Home() {
     isLoading: isLoadingSites,
   } = useGetSites();
   const userOrganizations = authClient.useListOrganizations();
+  const { data: userOrganizationsData } = useUserOrganizations();
+
+  const disabled =
+    !userOrganizationsData?.[0] || userOrganizationsData?.[0].role === "member";
+
   const [createOrgDialogOpen, setCreateOrgDialogOpen] = useState(false);
 
   // Check if the user has no organizations and is not in a loading state
@@ -36,7 +42,7 @@ export default function Home() {
     <StandardPage>
       <div className="flex justify-between items-center mb-4">
         <div className="text-2xl font-bold">Websites</div>
-        <AddSite disabled={hasNoOrganizations} />
+        <AddSite disabled={hasNoOrganizations || disabled} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -63,16 +69,16 @@ export default function Home() {
         )}
 
         {/* Sites list */}
-        {!hasNoOrganizations &&
-          sites?.map((site) => {
-            return (
-              <SiteCard
-                key={site.siteId}
-                siteId={site.siteId}
-                domain={site.domain}
-              />
-            );
-          })}
+
+        {sites?.map((site) => {
+          return (
+            <SiteCard
+              key={site.siteId}
+              siteId={site.siteId}
+              domain={site.domain}
+            />
+          );
+        })}
 
         {/* No websites message */}
         {!hasNoOrganizations &&
@@ -86,7 +92,13 @@ export default function Home() {
               </CardDescription>
               <AddSite
                 trigger={
-                  <Button variant="success">
+                  <Button
+                    variant="success"
+                    disabled={
+                      !userOrganizationsData?.[0] ||
+                      userOrganizationsData?.[0].role === "member"
+                    }
+                  >
                     <Plus className="h-4 w-4" />
                     Add Website
                   </Button>

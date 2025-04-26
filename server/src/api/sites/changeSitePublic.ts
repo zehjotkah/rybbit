@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAdminAccessToSite } from "../../lib/auth-utils.js";
 import { siteConfig } from "../../lib/siteConfig.js";
 
 interface ChangeSitePublicRequest {
@@ -18,11 +18,11 @@ export async function changeSitePublic(
 ) {
   const { siteId, isPublic } = request.body;
 
-  const userHasAccessToSite = await getUserHasAccessToSite(
+  const userHasAdminAccessToSite = await getUserHasAdminAccessToSite(
     request,
     String(siteId)
   );
-  if (!userHasAccessToSite) {
+  if (!userHasAdminAccessToSite) {
     return reply.status(403).send({ error: "Forbidden" });
   }
 
@@ -35,11 +35,6 @@ export async function changeSitePublic(
     if (!site) {
       return reply.status(404).send({ error: "Site not found" });
     }
-
-    // Check if user is authorized to modify the site
-    // if (site.createdBy !== userId) {
-    //   return reply.status(403).send({ error: "Forbidden" });
-    // }
 
     // Update site public status
     await db

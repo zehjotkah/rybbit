@@ -1,8 +1,8 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { eq } from "drizzle-orm";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
-import { eq } from "drizzle-orm";
-import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
+import { getUserHasAdminAccessToSite } from "../../lib/auth-utils.js";
 import { siteConfig } from "../../lib/siteConfig.js";
 
 interface ChangeSiteSaltRequest {
@@ -18,11 +18,11 @@ export async function changeSiteSalt(
 ) {
   const { siteId, saltUserIds } = request.body;
 
-  const userHasAccessToSite = await getUserHasAccessToSite(
+  const userHasAdminAccessToSite = await getUserHasAdminAccessToSite(
     request,
     String(siteId)
   );
-  if (!userHasAccessToSite) {
+  if (!userHasAdminAccessToSite) {
     return reply.status(403).send({ error: "Forbidden" });
   }
 

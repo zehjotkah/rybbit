@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
-import { authedFetch } from "../utils";
+import { authedFetch, authedFetchWithError } from "../utils";
 import { APIResponse } from "../types";
 
 export type UserOrganization = {
@@ -14,9 +14,7 @@ export type UserOrganization = {
 };
 
 export function getUserOrganizations(): Promise<UserOrganization[]> {
-  return authedFetch(`${BACKEND_URL}/user/organizations`).then((res) =>
-    res.json()
-  );
+  return authedFetchWithError(`${BACKEND_URL}/user/organizations`);
 }
 
 export function useUserOrganizations() {

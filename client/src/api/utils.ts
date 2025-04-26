@@ -85,6 +85,20 @@ export async function authedFetch(
   });
 }
 
+export async function authedFetchWithError(
+  url: string,
+  opts: RequestInit = {}
+) {
+  const res = await fetch(url, {
+    credentials: "include",
+    ...opts,
+  });
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+  return res.json();
+}
+
 export function useGenericQuery<T>(endpoint: string): UseQueryResult<T> {
   return useQuery({
     queryKey: [endpoint],

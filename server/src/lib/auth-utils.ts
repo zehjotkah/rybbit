@@ -22,7 +22,10 @@ export async function getSession(req: FastifyRequest) {
   return session;
 }
 
-export async function getSitesUserHasAccessTo(req: FastifyRequest) {
+export async function getSitesUserHasAccessTo(
+  req: FastifyRequest,
+  adminOnly = false
+) {
   const headers = new Headers(req.headers as any);
   const session = await auth!.api.getSession({ headers });
 
@@ -35,7 +38,7 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest) {
   try {
     // Get the user's organization IDs directly from the database
     const memberRecords = await db
-      .select({ organizationId: member.organizationId })
+      .select({ organizationId: member.organizationId, role: member.role })
       .from(member)
       .where(eq(member.userId, userId));
 
@@ -44,9 +47,9 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest) {
     }
 
     // Extract organization IDs
-    const organizationIds = memberRecords.map(
-      (record) => record.organizationId
-    );
+    const organizationIds = memberRecords
+      .filter((record) => !adminOnly || record.role !== "member")
+      .map((record) => record.organizationId);
 
     // Get sites for these organizations
     const siteRecords = await db
@@ -78,5 +81,13 @@ export async function getUserHasAccessToSite(
   siteId: string | number
 ) {
   const sites = await getSitesUserHasAccessTo(req);
+  return sites.some((site) => site.siteId === Number(siteId));
+}
+
+export async function getUserHasAdminAccessToSite(
+  req: FastifyRequest,
+  siteId: string | number
+) {
+  const sites = await getSitesUserHasAccessTo(req, true);
   return sites.some((site) => site.siteId === Number(siteId));
 }
