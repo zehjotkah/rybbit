@@ -43,6 +43,7 @@ import {
   useGetSites,
 } from "@/api/admin/sites";
 import { ScriptBuilder } from "./ScriptBuilder";
+import { useUserOrganizations } from "../../api/admin/organizations";
 
 export function SiteSettings({
   siteId,
@@ -68,6 +69,11 @@ export function SiteSettingsInner({
   trigger?: React.ReactNode;
 }) {
   const { refetch } = useGetSites();
+  const { data: userOrganizationsData } = useUserOrganizations();
+  const disabled =
+    !userOrganizationsData?.[0]?.role ||
+    userOrganizationsData?.[0]?.role === "member";
+
   const router = useRouter();
   const [newDomain, setNewDomain] = useState(siteMetadata.domain);
   const [isChangingDomain, setIsChangingDomain] = useState(false);
@@ -206,7 +212,7 @@ export function SiteSettingsInner({
               <Switch
                 id="publicAnalytics"
                 checked={isPublic}
-                disabled={isChangingPublic}
+                disabled={isChangingPublic || disabled}
                 onCheckedChange={handlePublicToggle}
               />
             </div>
@@ -228,7 +234,7 @@ export function SiteSettingsInner({
               <Switch
                 id="saltUserIds"
                 checked={isSalting}
-                disabled={isChangingSalt}
+                disabled={isChangingSalt || disabled}
                 onCheckedChange={handleSaltToggle}
               />
             </div>
@@ -253,7 +259,9 @@ export function SiteSettingsInner({
                   variant="outline"
                   onClick={handleDomainChange}
                   disabled={
-                    isChangingDomain || newDomain === siteMetadata.domain
+                    isChangingDomain ||
+                    newDomain === siteMetadata.domain ||
+                    disabled
                   }
                 >
                   {isChangingDomain ? "Updating..." : "Update"}
@@ -268,7 +276,11 @@ export function SiteSettingsInner({
               </h4>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full">
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    disabled={disabled}
+                  >
                     <AlertTriangle className="h-4 w-4 mr-2" />
                     Delete Site
                   </Button>
