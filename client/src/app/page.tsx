@@ -47,11 +47,10 @@ export default function Home() {
         <div className="text-2xl font-bold">Websites</div>
         <AddSite disabled={hasNoOrganizations || disabled} />
       </div>
+      {/* Organization required message */}
+      {hasNoOrganizations && <NoOrganization />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Organization required message */}
-        {hasNoOrganizations && <NoOrganization />}
-
         {/* Sites list */}
 
         {sites?.map((site) => {

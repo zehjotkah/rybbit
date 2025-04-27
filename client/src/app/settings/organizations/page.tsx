@@ -29,6 +29,7 @@ import { AddMemberDialog } from "./components/AddMemberDialog";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+import { NoOrganization } from "../../../components/NoOrganization";
 
 // Types for our component
 export type Organization = {
@@ -258,9 +259,7 @@ export default function Organizations() {
 
   if (!data?.length) {
     return (
-      <Card className="p-6 text-center text-muted-foreground">
-        No organizations found
-      </Card>
+      <NoOrganization message="You need to create or be added to an organization before you can manage your organizations." />
     );
   }
 

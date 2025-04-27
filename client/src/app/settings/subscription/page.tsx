@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
         hasOrganization ? (
           <FreePlan />
         ) : (
-          <NoOrganization />
+          <NoOrganization message="You need to be part of an organization to manage your subscription." />
         )
       ) : (
         <ProPlan />

@@ -6,7 +6,11 @@ import { CreateOrganizationDialog } from "./CreateOrganizationDialog";
 import { Button } from "./ui/button";
 import { Card, CardDescription, CardTitle } from "./ui/card";
 
-export function NoOrganization() {
+export function NoOrganization({
+  message = "You need to create or be added to an organization before you can add a website.",
+}: {
+  message?: string;
+}) {
   const [createOrgDialogOpen, setCreateOrgDialogOpen] = useState(false);
   const { refetch: refetchSites } = useGetSites();
   const { refetch: refetchOrganizations } = useUserOrganizations();
@@ -16,15 +20,13 @@ export function NoOrganization() {
     refetchSites();
   };
   return (
-    <>
-      <Card className="col-span-full p-6 flex flex-col items-center text-center">
+    <div className="w-full ">
+      <Card className="p-6 flex flex-col items-center text-center w-full">
         <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
           <Building className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="mb-2 text-xl">Organization Required</CardTitle>
-        <CardDescription className="mb-6">
-          You need to create an organization before you add a website
-        </CardDescription>
+        <CardTitle className="mb-2 text-xl">No Organization</CardTitle>
+        <CardDescription className="mb-6">{message}</CardDescription>
         <Button
           onClick={() => setCreateOrgDialogOpen(true)}
           className="max-w-xs"
@@ -38,6 +40,6 @@ export function NoOrganization() {
         onOpenChange={setCreateOrgDialogOpen}
         onSuccess={handleOrganizationCreated}
       />
-    </>
+    </div>
   );
 }
