@@ -21,7 +21,7 @@ export const metadata = {
   title: {
     template: '%s - Rybbit'
   },
-  description: 'Rybbit - open source web analytics',
+  description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.',
   applicationName: 'Rybbit',
   generator: 'Next.js',
   appleWebApp: {
@@ -81,7 +81,11 @@ export default async function RootLayout({ children }) {
   const pageMap = await getPageMap()
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <Head faviconGlyph="✦" />
+      <Head color={{
+        hue: 158,
+        saturation: 64,
+        lightness: 51,
+      }} />
       <body>
         <Layout
           // banner={<Banner storageKey="Rybbit">Rybbit Alpha</Banner>}

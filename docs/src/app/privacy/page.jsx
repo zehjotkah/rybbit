@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Privacy Policy - Rybbit',
+  title: 'Privacy Policy',
   description: 'Rybbit privacy policy - how we protect your data',
 }
 

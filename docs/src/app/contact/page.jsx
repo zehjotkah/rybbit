@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: 'Contact - Rybbit',
+  title: 'Contact',
   description: 'Get in touch with the Rybbit team',
 }
 

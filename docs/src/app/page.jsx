@@ -19,6 +19,11 @@ const tilt_wrap = Tilt_Warp({
   weight: "400",
 });
 
+export const metadata = {
+  title: 'Rybbit Analytics',
+  description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.'
+}
+
 export default function IndexPage() {
   return (
     <div className="flex flex-col items-center justify-center overflow-x-hidden">

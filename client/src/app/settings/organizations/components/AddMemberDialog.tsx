@@ -109,7 +109,7 @@ export function AddMemberDialog({
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="owner">Owner</SelectItem>
+                {/* <SelectItem value="owner">Owner</SelectItem> */}
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
               </SelectContent>
