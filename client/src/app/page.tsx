@@ -1,16 +1,16 @@
 "use client";
 
-import { Building, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
+import { useUserOrganizations } from "../api/admin/organizations";
 import { useGetSites } from "../api/admin/sites";
+import { NoOrganization } from "../components/NoOrganization";
 import { SiteCard } from "../components/SiteCard";
+import { StandardPage } from "../components/StandardPage";
 import { Button } from "../components/ui/button";
 import { Card, CardDescription, CardTitle } from "../components/ui/card";
-import { authClient } from "../lib/auth";
 import { AddSite } from "./components/AddSite";
-import { CreateOrganizationDialog } from "./components/CreateOrganizationDialog";
-import { StandardPage } from "../components/StandardPage";
-import { useUserOrganizations } from "../api/admin/organizations";
+import { CreateOrganizationDialog } from "../components/CreateOrganizationDialog";
 
 export default function Home() {
   const {
@@ -18,8 +18,11 @@ export default function Home() {
     refetch: refetchSites,
     isLoading: isLoadingSites,
   } = useGetSites();
-  const userOrganizations = authClient.useListOrganizations();
-  const { data: userOrganizationsData } = useUserOrganizations();
+  const {
+    data: userOrganizationsData,
+    isLoading: isLoadingOrganizations,
+    refetch: refetchOrganizations,
+  } = useUserOrganizations();
 
   const disabled =
     !userOrganizationsData?.[0] || userOrganizationsData?.[0].role === "member";
@@ -28,13 +31,13 @@ export default function Home() {
 
   // Check if the user has no organizations and is not in a loading state
   const hasNoOrganizations =
-    !userOrganizations.isPending &&
-    Array.isArray(userOrganizations.data) &&
-    userOrganizations.data.length === 0;
+    !isLoadingOrganizations &&
+    Array.isArray(userOrganizationsData) &&
+    userOrganizationsData.length === 0;
 
   // Handle successful organization creation
   const handleOrganizationCreated = () => {
-    userOrganizations.refetch();
+    refetchOrganizations();
     refetchSites();
   };
 
@@ -47,26 +50,7 @@ export default function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Organization required message */}
-        {hasNoOrganizations && (
-          <Card className="col-span-full p-6 flex flex-col items-center text-center">
-            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Building className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle className="mb-2 text-xl">
-              Organization Required
-            </CardTitle>
-            <CardDescription className="mb-6">
-              You need to create an organization before you add a website
-            </CardDescription>
-            <Button
-              onClick={() => setCreateOrgDialogOpen(true)}
-              className="max-w-xs"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create an Organization
-            </Button>
-          </Card>
-        )}
+        {hasNoOrganizations && <NoOrganization />}
 
         {/* Sites list */}
 
@@ -83,7 +67,7 @@ export default function Home() {
         {/* No websites message */}
         {!hasNoOrganizations &&
           (!sites || sites.length === 0) &&
-          !userOrganizations.isPending &&
+          !isLoadingOrganizations &&
           !isLoadingSites && (
             <Card className="col-span-full p-6 flex flex-col items-center text-center">
               <CardTitle className="mb-2 text-xl">No websites yet</CardTitle>

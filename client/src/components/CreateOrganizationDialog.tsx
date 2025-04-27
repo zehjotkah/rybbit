@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../../components/ui/button";
-import { Dialog } from "../../components/ui/dialog";
-import { DialogContent } from "../../components/ui/dialog";
-import { DialogHeader } from "../../components/ui/dialog";
-import { DialogTitle } from "../../components/ui/dialog";
-import { DialogTrigger } from "../../components/ui/dialog";
-import { DialogFooter } from "../../components/ui/dialog";
-import { DialogDescription } from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Button } from "./ui/button";
+import { Dialog } from "./ui/dialog";
+import { DialogContent } from "./ui/dialog";
+import { DialogHeader } from "./ui/dialog";
+import { DialogTitle } from "./ui/dialog";
+import { DialogTrigger } from "./ui/dialog";
+import { DialogFooter } from "./ui/dialog";
+import { DialogDescription } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { Building2 } from "lucide-react";
-import { authClient } from "../../lib/auth";
+import { authClient } from "../lib/auth";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 

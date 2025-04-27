@@ -5,14 +5,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FreePlan } from "./components/FreePlan";
 import { ProPlan } from "./components/ProPlan";
 import { useStripeSubscription } from "./utils/useStripeSubscription";
+import { useUserOrganizations } from "../../../api/admin/organizations";
+import { NoOrganization } from "../../../components/NoOrganization";
 
 export default function SubscriptionPage() {
-  const {
-    data: activeSubscription,
-    isLoading,
-    error: subscriptionError,
-    refetch,
-  } = useStripeSubscription();
+  const { data: activeSubscription, isLoading: isLoadingSubscription } =
+    useStripeSubscription();
+
+  const { data: organizations, isLoading: isLoadingOrganizations } =
+    useUserOrganizations();
+
+  const hasOrganization = !!organizations?.length;
+
+  const isLoading = isLoadingSubscription || isLoadingOrganizations;
 
   return (
     <div className=" py-2">
@@ -36,7 +41,11 @@ export default function SubscriptionPage() {
           </CardContent>
         </Card>
       ) : !activeSubscription ? (
-        <FreePlan />
+        hasOrganization ? (
+          <FreePlan />
+        ) : (
+          <NoOrganization />
+        )
       ) : (
         <ProPlan />
       )}
