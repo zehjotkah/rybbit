@@ -234,6 +234,7 @@ export default function SignupPage() {
                 onClick={handleAccountSubmit}
                 className="w-full mt-6 transition-all duration-300 h-11"
                 disabled={isLoading || !email || !password}
+                variant="success"
               >
                 {isLoading ? "Creating account..." : "Continue"}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -335,14 +336,21 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="flex justify-between pt-4">
+              <div className="flex flex-col gap-4 pt-4">
                 <Button
                   className="w-full transition-all duration-300 h-11"
                   onClick={handleOrganizationSubmit}
                   disabled={isLoading || !orgName || !orgSlug}
+                  variant="success"
                 >
                   Continue
                   <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  className="w-full transition-all duration-300 h-11"
+                  onClick={() => router.push("/")}
+                >
+                  I'm joining someone else's organization
                 </Button>
               </div>
             </div>
@@ -381,6 +389,7 @@ export default function SignupPage() {
                   className="w-full transition-all duration-300 h-11"
                   onClick={handleWebsiteSubmit}
                   disabled={isLoading || !domain}
+                  variant="success"
                 >
                   Continue
                   <ArrowRight className="ml-2 h-4 w-4" />
