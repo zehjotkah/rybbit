@@ -122,7 +122,7 @@ export default function IndexPage() {
                 <div className="absolute inset-0 bg-emerald-500/10 blur-sm rounded-full"></div>
                 <div className="relative bg-neutral-900/60 backdrop-blur-sm border border-neutral-700 rounded-full px-5 py-2">
                   <p className="font-semibold text-white">Chris Weaver</p>
-                  <p className="text-sm text-neutral-400">CEO at Oynx AI</p>
+                  <p className="text-sm text-neutral-400">CEO at Onyx AI</p>
                 </div>
               </div>
             </div>
