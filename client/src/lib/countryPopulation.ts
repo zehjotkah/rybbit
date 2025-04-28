@@ -66,6 +66,7 @@ export const countryPopulations: Record<string, number> = {
   EC: 17.9, // Ecuador
   GT: 17.1, // Guatemala
   SN: 17.2, // Senegal
+  RS: 6.7, // Serbia
   NL: 17.5, // Netherlands
   KH: 16.7, // Cambodia
   TD: 17.4, // Chad
@@ -132,6 +133,7 @@ export const countryPopulations: Record<string, number> = {
   AM: 2.9, // Armenia
   AL: 2.8, // Albania
   QA: 2.9, // Qatar
+  RO: 19.1, // Romania
   LT: 2.8, // Lithuania
   BW: 2.4, // Botswana
   NA: 2.5, // Namibia
@@ -164,6 +166,7 @@ export const countryPopulations: Record<string, number> = {
   MV: 0.5, // Maldives
   MT: 0.5, // Malta
   BN: 0.4, // Brunei
+  BG: 6.8, // Bulgaria
   BZ: 0.4, // Belize
   BS: 0.4, // Bahamas
   IS: 0.4, // Iceland
