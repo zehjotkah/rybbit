@@ -8,9 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "../../../../components/ui/dropdown-menu";
 import { userStore } from "../../../../lib/userStore";
+import { resetStore, useStore } from "../../../../lib/store";
 
 function SiteSelectorContent() {
   const { data: sites } = useGetSites();
+  const stuff = useStore();
   const pathname = usePathname();
   const router = useRouter();
   const currentSiteId = Number(pathname.split("/")[1]);
@@ -23,6 +25,7 @@ function SiteSelectorContent() {
           <DropdownMenuItem
             key={site.siteId}
             onClick={() => {
+              resetStore();
               router.push(`/${site.siteId}`);
             }}
             className={`flex items-center justify-between ${

@@ -205,6 +205,16 @@ export const useStore = create<Store>((set) => ({
   setFilters: (filters) => set({ filters }),
 }));
 
+export const resetStore = () => {
+  const { setSite, setTime, setBucket, setSelectedStat, setFilters } =
+    useStore.getState();
+  setSite("");
+  setTime({ mode: "day", day: DateTime.now().toISODate() });
+  setBucket("hour");
+  setSelectedStat("users");
+  setFilters([]);
+};
+
 export const goBack = () => {
   const { time, setTime } = useStore.getState();
 
