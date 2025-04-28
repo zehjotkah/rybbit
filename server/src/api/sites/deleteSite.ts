@@ -30,5 +30,5 @@ export async function deleteSite(
   // Remove the site from the siteConfig cache
   siteConfig.removeSite(Number(id));
 
-  return reply.status(200).send();
+  return reply.status(200).send({ success: true });
 }
