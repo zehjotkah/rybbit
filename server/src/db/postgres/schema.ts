@@ -30,6 +30,8 @@ export const user = pgTable(
     stripeCustomerId: text(),
     overMonthlyLimit: boolean().default(false),
     monthlyEventCount: integer().default(0),
+    // can view all sites. for internal use only.
+    godMode: boolean().default(false),
   },
   (table) => [
     unique("user_username_unique").on(table.username),

@@ -1,8 +1,8 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { eq } from "drizzle-orm";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
-import { eq } from "drizzle-orm";
-import { isSitePublic } from "../../utils.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 
 interface GetSiteParams {
   Params: {
@@ -28,12 +28,15 @@ export async function getSite(
     }
 
     // Check if user is authorized to access this site
-    const isPublic = await isSitePublic(id);
     const isOwner = site.createdBy === userId;
 
-    // Only allow access if the site is public or the user is the owner
-    if (!isPublic && !isOwner) {
-      return reply.status(403).send({ error: "Access denied" });
+    // Check user access to site
+    const userHasAccessToSite = await getUserHasAccessToSitePublic(
+      request,
+      site.siteId
+    );
+    if (!userHasAccessToSite) {
+      return reply.status(403).send({ error: "Forbidden" });
     }
 
     return reply.status(200).send({

@@ -1,6 +1,6 @@
 import { FastifyRequest } from "fastify";
 import { auth } from "./auth.js";
-import { sites, member } from "../db/postgres/schema.js";
+import { sites, member, user } from "../db/postgres/schema.js";
 import { inArray, eq } from "drizzle-orm";
 import { db } from "../db/postgres/postgres.js";
 import { isSitePublic } from "../utils.js";
@@ -36,11 +36,26 @@ export async function getSitesUserHasAccessTo(
   }
 
   try {
-    // Get the user's organization IDs directly from the database
-    const memberRecords = await db
-      .select({ organizationId: member.organizationId, role: member.role })
-      .from(member)
-      .where(eq(member.userId, userId));
+    // Fetch user godMode status and member records in parallel
+    const [userRecord, memberRecords] = await Promise.all([
+      db
+        .select({ godMode: user.godMode })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1),
+      db
+        .select({ organizationId: member.organizationId, role: member.role })
+        .from(member)
+        .where(eq(member.userId, userId)),
+    ]);
+
+    const hasGodMode = userRecord.length > 0 && userRecord[0].godMode;
+
+    // If user has godMode, return all sites
+    if (hasGodMode) {
+      const allSites = await db.select().from(sites);
+      return allSites;
+    }
 
     if (!memberRecords || memberRecords.length === 0) {
       return [];
