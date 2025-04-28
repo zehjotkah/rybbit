@@ -18,13 +18,15 @@ import {
 import { DateRangeMode, Time } from "../../../components/DateSelector/types";
 import { DateTime } from "luxon";
 import { DateSelector } from "../../../components/DateSelector/DateSelector";
+import { useGetSite } from "../../../api/admin/sites";
 
 const MAX_LINK_HEIGHT = 100;
 
 export default function JourneysPage() {
-  const params = useParams<{ site: string }>();
   const [steps, setSteps] = useState<number>(3);
   const [maxJourneys, setMaxJourneys] = useState<number>(25);
+
+  const { data: siteMetadata } = useGetSite();
 
   const [time, setTime] = useState<Time>({
     mode: "range",
@@ -35,7 +37,7 @@ export default function JourneysPage() {
   } as DateRangeMode);
 
   const { data, isLoading, error } = useJourneys({
-    siteId: params.site,
+    siteId: siteMetadata?.siteId,
     steps,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     time,
@@ -44,7 +46,7 @@ export default function JourneysPage() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (!data?.journeys || !svgRef.current) return;
+    if (!data?.journeys || !svgRef.current || !siteMetadata?.domain) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -360,29 +362,39 @@ export default function JourneysPage() {
       .attr("ry", 2)
       .attr("opacity", 0.8);
 
-    // Path text (first line)
-    nodeGroups
+    // Path text (first line) - Now wrapped in a link
+    const pathLinks = nodeGroups
+      .append("a") // Append 'a' element for the link
+      // Construct the URL using the domain from siteMetadata and the path from the node name
+      .attr("xlink:href", (d) => `https://${siteMetadata.domain}${d.name}`)
+      .attr("target", "_blank") // Open link in a new tab
+      .attr("rel", "noopener noreferrer"); // Security best practice for target="_blank"
+
+    pathLinks // Append text inside the link element
       .append("text")
-      .attr("class", "node-text")
-      .attr("x", 23) // Add left padding inside card
-      .attr("y", (d) => d.height / 2 - 2) // Position for first line
+      .attr("class", "node-text node-link-text")
+      .attr("x", 23)
+      .attr("y", (d) => d.height / 2 - 2)
       .text((d) => d.name)
       .attr("font-size", "12px")
       .attr("fill", "white")
-      .attr("text-anchor", "start");
+      .attr("text-anchor", "start")
+      .style("text-decoration", "none");
 
-    // Count and percentage text (second line)
+    // Count text (second line) - Remains unchanged
     nodeGroups
       .append("text")
-      .attr("class", "node-text")
+      .attr("class", "node-text node-count-text")
       .attr("x", 23) // Same left padding
       .attr("y", (d) => d.height / 2 + 12) // Position for second line
       .text((d) => `${d.count.toLocaleString()}`)
-      //   .text((d) => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
       .attr("font-size", "11px") // Slightly smaller font
       .attr("fill", "hsl(var(--neutral-300))")
       .attr("text-anchor", "start");
-  }, [data, steps, maxJourneys]);
+
+    // Note: The percentage text is commented out in the original code, kept it that way.
+    //   .text((d) => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
+  }, [data, steps, maxJourneys, siteMetadata]);
 
   return (
     <div className="container mx-auto p-4">

@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../../lib/const";
 import { Time } from "../../components/DateSelector/types";
 
 export interface JourneyParams {
-  siteId: string;
+  siteId?: number;
   steps?: number;
   timezone?: string;
   time: Time;
@@ -45,5 +45,6 @@ export const useJourneys = ({
       const response = await authedFetch(url);
       return response.json();
     },
+    enabled: !!siteId,
   });
 };
