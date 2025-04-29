@@ -41,35 +41,36 @@ const getRetentionColor = (
 ): { backgroundColor: string; textColor: string } => {
   if (percentage === null || isNaN(percentage)) {
     return {
-      backgroundColor: "hsl(var(--neutral-900))",
+      backgroundColor: "rgb(38, 38, 38)", // bg-neutral-800
       textColor: "transparent",
     };
   }
 
   if (percentage === 0) {
     return {
-      backgroundColor: "hsl(var(--neutral-850))",
-      textColor: "var(--text-dark, #262626)",
+      backgroundColor: "rgb(38, 38, 38)", // bg-neutral-800
+      textColor: "white",
     };
   }
 
-  // Use a consistent blue hue
-  const hue = 210; // Fixed blue hue
+  // The base emerald-500 color in RGB
+  const emerald = "rgb(16, 185, 129)"; // emerald-500
 
-  // Use a consistent saturation
-  const saturation = 80; // Fixed high saturation
+  // Calculate both linear and logarithmic scales
+  const linearScale = percentage / 100;
+  const logScale = Math.log(percentage + 1) / Math.log(101);
 
-  // Only vary the lightness based on retention percentage
-  // High retention = darker (lower lightness), low retention = lighter
-  // Scale from 85% (low retention) to 30% (high retention)
-  const lightness = Math.max(30, Math.min(85, 85 - percentage * 0.55));
+  // Blend between logarithmic and linear (60% log, 40% linear)
+  // This creates a less extreme logarithmic effect
+  const blendedScale = logScale * 0.6 + linearScale * 0.4;
 
-  // Determine text color (white for dark backgrounds, dark for light backgrounds)
-  const textColor = lightness < 50 ? "white" : "var(--text-dark, #262626)";
+  // Scale the blended value to get appropriate opacity (min 0.1, max 1.0)
+  const scaledOpacity = 0.1 + blendedScale * 0.9;
 
+  // Use the scaled opacity for the background color
   return {
-    backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-    textColor,
+    backgroundColor: `rgba(16, 185, 129, ${scaledOpacity.toFixed(2)})`,
+    textColor: "white",
   };
 };
 

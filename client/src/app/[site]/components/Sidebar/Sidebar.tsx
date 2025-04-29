@@ -65,24 +65,6 @@ export function Sidebar() {
           icon={<Map className="w-4 h-4" />}
         />
         <SidebarLink
-          label="Sessions"
-          active={isActiveTab("sessions")}
-          href={getTabPath("sessions")}
-          icon={<Rewind className="w-4 h-4" />}
-        />
-        <SidebarLink
-          label="Users"
-          active={isActiveTab("users")}
-          href={getTabPath("users")}
-          icon={<User className="w-4 h-4" />}
-        />
-        <SidebarLink
-          label="Retention"
-          active={isActiveTab("retention")}
-          href={getTabPath("retention")}
-          icon={<LayoutGrid className="w-4 h-4" />}
-        />
-        <SidebarLink
           label="Funnels"
           active={isActiveTab("funnels")}
           href={getTabPath("funnels")}
@@ -99,6 +81,24 @@ export function Sidebar() {
           active={isActiveTab("journeys")}
           href={getTabPath("journeys")}
           icon={<Split className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Sessions"
+          active={isActiveTab("sessions")}
+          href={getTabPath("sessions")}
+          icon={<Rewind className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Users"
+          active={isActiveTab("users")}
+          href={getTabPath("users")}
+          icon={<User className="w-4 h-4" />}
+        />
+        <SidebarLink
+          label="Retention"
+          active={isActiveTab("retention")}
+          href={getTabPath("retention")}
+          icon={<LayoutGrid className="w-4 h-4" />}
         />
         {/* <SidebarLink
           label="Reports"
