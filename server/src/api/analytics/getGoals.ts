@@ -8,26 +8,9 @@ import {
   getFilterStatement,
   getTimeStatement,
   processResults,
+  patternToRegex,
 } from "./utils.js";
 import SqlString from "sqlstring";
-
-// Helper to convert wildcard patterns to ClickHouse regex
-function patternToRegex(pattern: string): string {
-  // Escape special regex characters except * which we'll handle specially
-  const escapedPattern = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-
-  // Replace ** with a temporary marker
-  const withDoubleStar = escapedPattern.replace(/\*\*/g, "{{DOUBLE_STAR}}");
-
-  // Replace * with [^/]+ (any characters except /)
-  const withSingleStar = withDoubleStar.replace(/\*/g, "[^/]+");
-
-  // Replace the double star marker with .* (any characters including /)
-  const finalRegex = withSingleStar.replace(/{{DOUBLE_STAR}}/g, ".*");
-
-  // Anchor the regex to start/end of string for exact matches
-  return `^${finalRegex}$`;
-}
 
 // Types for the response
 interface GoalWithConversions {

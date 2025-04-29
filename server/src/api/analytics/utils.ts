@@ -214,3 +214,27 @@ export function getFilterStatement(filters: string) {
       .join(" AND ")
   );
 }
+
+/**
+ * Converts wildcard path patterns to ClickHouse regex pattern
+ * - Supports * for matching a single path segment (not including /)
+ * - Supports ** for matching multiple path segments (including /)
+ * @param pattern Path pattern with wildcards
+ * @returns ClickHouse-compatible regex string
+ */
+export function patternToRegex(pattern: string): string {
+  // Escape special regex characters except * which we'll handle specially
+  const escapedPattern = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+
+  // Replace ** with a temporary marker
+  const withDoubleStar = escapedPattern.replace(/\*\*/g, "{{DOUBLE_STAR}}");
+
+  // Replace * with [^/]+ (any characters except /)
+  const withSingleStar = withDoubleStar.replace(/\*/g, "[^/]+");
+
+  // Replace the double star marker with .* (any characters including /)
+  const finalRegex = withSingleStar.replace(/{{DOUBLE_STAR}}/g, ".*");
+
+  // Anchor the regex to start/end of string for exact matches
+  return `^${finalRegex}$`;
+}

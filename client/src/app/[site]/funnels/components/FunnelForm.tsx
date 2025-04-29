@@ -156,7 +156,7 @@ export function FunnelForm({
 
   return (
     <>
-      <div className="grid grid-cols-[550px_3fr] gap-6 my-4">
+      <div className="grid grid-cols-[600px_3fr] gap-6 my-4">
         {/* Left side: Funnel configuration form */}
         <div className="space-y-4">
           <div>
@@ -172,14 +172,17 @@ export function FunnelForm({
 
           {/* Funnel Steps in a boxed container */}
           <Card className="border border-neutral-200 dark:border-neutral-800">
-            <CardHeader className="px-4 py-3">
+            <CardHeader className="p-3">
               <CardTitle className="text-base">Funnel Steps</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 py-3 space-y-4">
+            <CardContent className="p-3 space-y-4">
               {steps.map((step, index) => (
-                <div key={index} className="flex flex-col space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-xs">
+                <div
+                  key={index}
+                  className="flex flex-col space-y-2 border border-neutral-750 p-4 rounded-lg bg-neutral-850"
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full border border-neutral-400 bg-neutral-750 flex items-center justify-center text-xs mt-2">
                       {index + 1}
                     </div>
                     <Select
@@ -188,29 +191,40 @@ export function FunnelForm({
                         updateStepType(index, value as "page" | "event")
                       }
                     >
-                      <SelectTrigger className="w-[120px]">
+                      <SelectTrigger className="min-w-[80px] max-w-[80px] dark:border-neutral-700">
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="page">Page Path</SelectItem>
+                        <SelectItem value="page">Path</SelectItem>
                         <SelectItem value="event">Event</SelectItem>
                       </SelectContent>
                     </Select>
 
-                    <div className="flex-grow flex gap-2">
-                      <Input
-                        placeholder={
-                          step.type === "page"
-                            ? "Path (e.g. /pricing)"
-                            : "Event name"
-                        }
-                        value={step.value}
-                        onChange={(e) =>
-                          updateStep(index, "value", e.target.value)
-                        }
-                      />
+                    <div className="flex-grow space-y-2">
+                      <div>
+                        <Input
+                          placeholder={
+                            step.type === "page"
+                              ? "Path (e.g. /pricing)"
+                              : "Event name"
+                          }
+                          value={step.value}
+                          className="dark:border-neutral-700"
+                          onChange={(e) =>
+                            updateStep(index, "value", e.target.value)
+                          }
+                        />
+                        {step.type === "page" && (
+                          <div className="text-xs text-neutral-500 mt-1">
+                            Use * to match a single path segment (e.g., /blog/*)
+                            or ** to match multiple segments (e.g.,
+                            /docs/**/intro)
+                          </div>
+                        )}
+                      </div>
                       <Input
                         placeholder="Label (optional)"
+                        className="dark:border-neutral-700"
                         value={step.name || ""}
                         onChange={(e) =>
                           updateStep(index, "name", e.target.value)
@@ -230,7 +244,7 @@ export function FunnelForm({
                 </div>
               ))}
 
-              <Button variant="outline" onClick={addStep} className="w-full">
+              <Button onClick={addStep} className="w-full">
                 <Plus className="mr-2 h-4 w-4" /> Add Step
               </Button>
             </CardContent>
@@ -238,7 +252,7 @@ export function FunnelForm({
 
           {/* Filters Section */}
           <Card className="border border-neutral-200 dark:border-neutral-800">
-            <CardHeader className="px-4 py-3 flex flex-row justify-between items-center">
+            <CardHeader className="p-3 flex flex-row justify-between items-center">
               <CardTitle className="text-base">Funnel Filters</CardTitle>
               {!showFilters && (
                 <Button variant="outline" size="sm" onClick={addFilter}>
@@ -248,7 +262,7 @@ export function FunnelForm({
               )}
             </CardHeader>
             {showFilters && (
-              <CardContent className="px-4 py-3 space-y-4">
+              <CardContent className="p-3 space-y-4">
                 <div className="flex flex-col gap-2">
                   {filters.map((filter, index) => (
                     <FilterComponent

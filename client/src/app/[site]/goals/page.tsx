@@ -7,7 +7,6 @@ import { SESSION_PAGE_FILTERS, useStore } from "../../../lib/store";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import CreateGoalButton from "./components/CreateGoalButton";
 import GoalsList from "./components/GoalsList";
-import { ThreeDotLoader } from "../../../components/Loaders";
 
 export default function GoalsPage() {
   const { time, filters, site, setTime } = useStore();

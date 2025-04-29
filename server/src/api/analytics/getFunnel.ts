@@ -5,6 +5,7 @@ import {
   getTimeStatement,
   processResults,
   getFilterStatement,
+  patternToRegex,
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import SqlString from "sqlstring";
@@ -78,7 +79,10 @@ export async function getFunnel(
     // Build conditional statements for each step
     const stepConditions = steps.map((step) => {
       if (step.type === "page") {
-        return `pathname = ${SqlString.escape(step.value)}`;
+        // Use pattern matching for page paths to support wildcards
+        return `type = 'pageview' AND match(pathname, ${SqlString.escape(
+          patternToRegex(step.value)
+        )})`;
       } else {
         return `type = 'custom_event' AND event_name = ${SqlString.escape(
           step.value
