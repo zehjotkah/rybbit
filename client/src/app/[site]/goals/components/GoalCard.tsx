@@ -43,7 +43,7 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
   return (
     <>
       <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
-        <div className="p-4 flex items-center">
+        <div className="px-4 py-3 flex items-center">
           {/* Left section - Title and type */}
           <div className="flex-1 pr-4">
             <h3 className="font-medium text-base flex items-center gap-2">
@@ -127,6 +127,12 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
             </Button>
           </div>
         </div>
+        <div
+          style={{
+            width: goal.conversion_rate * 100 + "%",
+          }}
+          className="bg-accent-400 h-2 rounded-md"
+        ></div>
       </div>
 
       {/* Delete Confirmation Dialog */}
