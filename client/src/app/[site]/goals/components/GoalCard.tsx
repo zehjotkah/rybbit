@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, MousePointerClick, Pencil, Trash } from "lucide-react";
+import { FileText, MousePointerClick, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDeleteGoal } from "../../../../api/analytics/useDeleteGoal";
 import { Goal } from "../../../../api/analytics/useGetGoals";
@@ -15,14 +15,12 @@ import {
   AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
 import { Button } from "../../../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../../../../components/ui/card";
 import GoalFormModal from "./GoalFormModal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../components/ui/tooltip";
 
 interface GoalCardProps {
   goal: Goal;
@@ -30,7 +28,6 @@ interface GoalCardProps {
 }
 
 export default function GoalCard({ goal, siteId }: GoalCardProps) {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteGoalMutation = useDeleteGoal();
 
@@ -45,88 +42,92 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
 
   return (
     <>
-      <Card className="h-full flex flex-col">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-lg">
-              {goal.name || `Goal #${goal.goalId}`}
-            </CardTitle>
-
-            <div className="flex gap-1">
-              <GoalFormModal
-                siteId={siteId}
-                goal={goal}
-                trigger={
-                  <Button variant="ghost" size="smIcon">
-                    <Pencil />
-                  </Button>
-                }
-              />
-              <Button
-                onClick={() => setIsDeleteDialogOpen(true)}
-                className=""
-                variant="ghost"
-                size="smIcon"
-              >
-                <Trash />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pb-2 flex-grow">
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 mr-2">Type:</span>
+      <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
+        <div className="p-4 flex items-center">
+          {/* Left section - Title and type */}
+          <div className="flex-1 pr-4">
+            <h3 className="font-medium text-base flex items-center gap-2">
               {goal.goalType === "path" ? (
-                <div className="flex items-center gap-1">
-                  <FileText className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm">Page Goal</span>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <FileText className="w-4 h-4 text-blue-400" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Page Goal</p>
+                  </TooltipContent>
+                </Tooltip>
               ) : (
-                <div className="flex items-center gap-1">
-                  <MousePointerClick className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm">Event Goal</span>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <MousePointerClick className="w-4 h-4 text-amber-400" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Event Goal</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
-            </div>
-            <div>
-              <span className="text-sm text-gray-500">Pattern:</span>
-              <div className="mt-1 text-sm truncate">
-                {goal.goalType === "path" ? (
-                  <code className="bg-neutral-800/50 px-1 py-0.5 rounded">
-                    {goal.config.pathPattern}
-                  </code>
-                ) : (
-                  <code className="bg-neutral-800/50 px-1 py-0.5 rounded">
-                    {goal.config.eventName}
-                  </code>
-                )}
-              </div>
+              {goal.name || `Goal #${goal.goalId}`}
+            </h3>
+
+            <div className="mt-1">
+              <span className="text-xs text-neutral-400 mr-2">Pattern:</span>
+              <code className="text-xs bg-neutral-800 px-1 py-0.5 rounded">
+                {goal.goalType === "path"
+                  ? goal.config.pathPattern
+                  : goal.config.eventName}
+              </code>
+
               {goal.goalType === "event" && goal.config.eventPropertyKey && (
-                <div className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs text-neutral-400">
                   Property:{" "}
-                  <code className="bg-neutral-800/50 px-1 py-0.5 rounded">
-                    {goal.config.eventPropertyKey} ={" "}
+                  <code className="text-xs bg-neutral-800 px-1 py-0.5 rounded text-neutral-100">
+                    {goal.config.eventPropertyKey}:{" "}
                     {String(goal.config.eventPropertyValue)}
                   </code>
                 </div>
               )}
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="grid grid-cols-2 gap-2 p-4 mt-auto bg-neutral-800/20 rounded-b-lg">
-          <div className="text-center">
-            <div className="font-bold text-lg">{goal.total_conversions}</div>
-            <div className="text-xs text-gray-500">Conversions</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold text-lg">
-              {(goal.conversion_rate * 100).toFixed(2)}%
+
+          {/* Center section - Stats */}
+          <div className="flex-1 flex justify-center">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="font-bold text-base">
+                  {goal.total_conversions.toLocaleString()}
+                </div>
+                <div className="text-xs text-neutral-400">Conversions</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-base">
+                  {(goal.conversion_rate * 100).toFixed(2)}%
+                </div>
+                <div className="text-xs text-neutral-400">Conversion Rate</div>
+              </div>
             </div>
-            <div className="text-xs text-gray-500">Conversion Rate</div>
           </div>
-        </CardFooter>
-      </Card>
+
+          {/* Right section - Actions */}
+          <div className="flex flex-shrink-0 gap-1 pl-4">
+            <GoalFormModal
+              siteId={siteId}
+              goal={goal}
+              trigger={
+                <Button variant="ghost" size="smIcon">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <Button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              variant="ghost"
+              size="smIcon"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog
