@@ -42,8 +42,8 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
 
   return (
     <>
-      <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
-        <div className="px-4 py-3 flex items-center">
+      <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden relative">
+        <div className="px-4 py-3 flex items-center mb-1">
           {/* Left section - Title and type */}
           <div className="flex-1 pr-4">
             <h3 className="font-medium text-base flex items-center gap-2">
@@ -127,11 +127,12 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
             </Button>
           </div>
         </div>
+        <div className="bg-neutral-700 h-1.5 w-full absolute bottom-0 left-0"></div>
         <div
           style={{
             width: goal.conversion_rate * 100 + "%",
           }}
-          className="bg-accent-400 h-2 rounded-md"
+          className="bg-accent-400/75 h-1.5 absolute bottom-0 left-0"
         ></div>
       </div>
 
