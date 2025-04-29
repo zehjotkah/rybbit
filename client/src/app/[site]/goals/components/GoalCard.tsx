@@ -80,7 +80,7 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
               {goal.goalType === "path" ? (
                 <div className="flex items-center gap-1">
                   <FileText className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm">Path Goal</span>
+                  <span className="text-sm">Page Goal</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">

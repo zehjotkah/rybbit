@@ -34,6 +34,7 @@ import { useCreateGoal } from "../../../../api/analytics/useCreateGoal";
 import { useUpdateGoal } from "../../../../api/analytics/useUpdateGoal";
 import { Switch } from "../../../../components/ui/switch";
 import { Label } from "../../../../components/ui/label";
+import { FileText, MousePointerClick } from "lucide-react";
 
 // Define form schema
 const formSchema = z
@@ -203,21 +204,52 @@ export default function GoalFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Goal Type</FormLabel>
-                  <Select
-                    disabled={isEditMode} // Don't allow changing goal type in edit mode
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  {isEditMode ? (
+                    <div className="flex items-center gap-2 mt-1">
+                      {field.value === "path" ? (
+                        <div className="flex items-center gap-1 bg-neutral-800/50 py-2 px-3 rounded">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span>Page Goal</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 bg-neutral-800/50 py-2 px-3 rounded">
+                          <MousePointerClick className="w-4 h-4 text-amber-500" />
+                          <span>Event Goal</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a goal type" />
-                      </SelectTrigger>
+                      <div className="flex gap-3 mt-1">
+                        <Button
+                          type="button"
+                          variant={
+                            field.value === "path" ? "default" : "outline"
+                          }
+                          className={`flex-1 flex items-center justify-center gap-2 ${
+                            field.value === "path" ? "border-blue-500" : ""
+                          }`}
+                          onClick={() => field.onChange("path")}
+                        >
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span>Page Goal</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={
+                            field.value === "event" ? "default" : "outline"
+                          }
+                          className={`flex-1 flex items-center justify-center gap-2 ${
+                            field.value === "event" ? "border-amber-500" : ""
+                          }`}
+                          onClick={() => field.onChange("event")}
+                        >
+                          <MousePointerClick className="w-4 h-4 text-amber-500" />
+                          <span>Event Goal</span>
+                        </Button>
+                      </div>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="path">Path Goal</SelectItem>
-                      <SelectItem value="event">Event Goal</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
