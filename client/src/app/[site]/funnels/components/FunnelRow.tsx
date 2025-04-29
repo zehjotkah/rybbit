@@ -127,6 +127,11 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
                           )}
                           <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
                             {step.name || step.value}
+                            {step.type === "event" && step.eventPropertyKey && (
+                              <span className="text-xs text-yellow-400 ml-1">
+                                *
+                              </span>
+                            )}
                           </span>
                         </span>
                       </TooltipTrigger>
@@ -143,6 +148,15 @@ export function FunnelRow({ funnel }: FunnelRowProps) {
                             {step.name}
                           </div>
                         )}
+                        {step.type === "event" &&
+                          step.eventPropertyKey &&
+                          step.eventPropertyValue !== undefined && (
+                            <div>
+                              <span className="font-semibold">Property:</span>{" "}
+                              {step.eventPropertyKey} ={" "}
+                              {String(step.eventPropertyValue)}
+                            </div>
+                          )}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

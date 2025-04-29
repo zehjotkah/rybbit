@@ -8,6 +8,8 @@ export type FunnelStep = {
   value: string;
   name?: string;
   type: "page" | "event";
+  eventPropertyKey?: string;
+  eventPropertyValue?: string | number | boolean;
 };
 
 export type FunnelRequest = {

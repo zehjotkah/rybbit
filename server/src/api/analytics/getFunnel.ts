@@ -14,6 +14,8 @@ type FunnelStep = {
   value: string;
   name?: string;
   type: "page" | "event";
+  eventPropertyKey?: string;
+  eventPropertyValue?: string | number | boolean;
 };
 
 type Filter = {
@@ -84,9 +86,39 @@ export async function getFunnel(
           patternToRegex(step.value)
         )})`;
       } else {
-        return `type = 'custom_event' AND event_name = ${SqlString.escape(
+        // Start with the base event match condition
+        let eventClause = `type = 'custom_event' AND event_name = ${SqlString.escape(
           step.value
         )}`;
+
+        // Add property matching if both key and value are provided
+        if (step.eventPropertyKey && step.eventPropertyValue !== undefined) {
+          // Access the sub-column directly for native JSON type
+          const propValueAccessor = `props.${SqlString.escapeId(
+            step.eventPropertyKey
+          )}`;
+
+          // Comparison needs to handle the dynamic type returned
+          // Let ClickHouse handle the comparison based on the provided value type
+          if (typeof step.eventPropertyValue === "string") {
+            eventClause += ` AND toString(${propValueAccessor}) = ${SqlString.escape(
+              step.eventPropertyValue
+            )}`;
+          } else if (typeof step.eventPropertyValue === "number") {
+            // Use toFloat64 or toInt* depending on expected number type
+            eventClause += ` AND toFloat64OrNull(${propValueAccessor}) = ${SqlString.escape(
+              step.eventPropertyValue
+            )}`;
+          } else if (typeof step.eventPropertyValue === "boolean") {
+            // Booleans might be stored as 0/1 or true/false in JSON
+            // Comparing toUInt8 seems robust
+            eventClause += ` AND toUInt8OrNull(${propValueAccessor}) = ${
+              step.eventPropertyValue ? 1 : 0
+            }`;
+          }
+        }
+
+        return eventClause;
       }
     });
 
@@ -100,7 +132,8 @@ export async function getFunnel(
         timestamp,
         pathname,
         event_name,
-        type
+        type,
+        props
       FROM events
       WHERE
         site_id = {siteId:Int32}

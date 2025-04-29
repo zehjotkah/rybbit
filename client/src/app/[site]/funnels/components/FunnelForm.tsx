@@ -17,6 +17,8 @@ import { Filter } from "../../../../lib/store";
 import { FilterComponent } from "../../components/shared/Filters/FilterComponent";
 import { Funnel } from "./Funnel";
 import { SavedFunnel } from "../../../../api/analytics/useGetFunnels";
+import { Switch } from "../../../../components/ui/switch";
+import { Label } from "../../../../components/ui/label";
 
 interface FunnelFormProps {
   name: string;
@@ -61,10 +63,17 @@ export function FunnelForm({
 }: FunnelFormProps) {
   console.info(funnelData);
   const [showFilters, setShowFilters] = useState(filters.length > 0);
+  // State to track which event steps have property filtering enabled
+  const [useProperties, setUseProperties] = useState<boolean[]>(() =>
+    steps.map(
+      (step) => !!step.eventPropertyKey && step.eventPropertyValue !== undefined
+    )
+  );
 
   // Handle adding a new step
   const addStep = () => {
     setSteps([...steps, { type: "page", value: "", name: "" }]);
+    setUseProperties([...useProperties, false]);
   };
 
   // Handle removing a step
@@ -73,6 +82,10 @@ export function FunnelForm({
     const newSteps = [...steps];
     newSteps.splice(index, 1);
     setSteps(newSteps);
+
+    const newUseProperties = [...useProperties];
+    newUseProperties.splice(index, 1);
+    setUseProperties(newUseProperties);
   };
 
   // Handle step input changes
@@ -89,8 +102,40 @@ export function FunnelForm({
   // Handle step type changes
   const updateStepType = (index: number, type: "page" | "event") => {
     const newSteps = [...steps];
-    newSteps[index] = { ...newSteps[index], type };
+    newSteps[index] = {
+      ...newSteps[index],
+      type,
+      // Clear property fields if switching from event to page
+      ...(type === "page"
+        ? { eventPropertyKey: undefined, eventPropertyValue: undefined }
+        : {}),
+    };
     setSteps(newSteps);
+
+    // Disable property filtering if switching to page type
+    if (type === "page" && useProperties[index]) {
+      const newUseProperties = [...useProperties];
+      newUseProperties[index] = false;
+      setUseProperties(newUseProperties);
+    }
+  };
+
+  // Handle property filtering toggle
+  const togglePropertyFiltering = (index: number, enabled: boolean) => {
+    const newUseProperties = [...useProperties];
+    newUseProperties[index] = enabled;
+    setUseProperties(newUseProperties);
+
+    // Clear property fields if disabling
+    if (!enabled) {
+      const newSteps = [...steps];
+      newSteps[index] = {
+        ...newSteps[index],
+        eventPropertyKey: undefined,
+        eventPropertyValue: undefined,
+      };
+      setSteps(newSteps);
+    }
   };
 
   // Handle filter operations
@@ -230,6 +275,57 @@ export function FunnelForm({
                           updateStep(index, "name", e.target.value)
                         }
                       />
+
+                      {/* Property filtering for event steps */}
+                      {step.type === "event" && (
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              checked={useProperties[index]}
+                              onCheckedChange={(checked) =>
+                                togglePropertyFiltering(index, checked)
+                              }
+                              id={`use-properties-${index}`}
+                            />
+                            <Label htmlFor={`use-properties-${index}`}>
+                              Filter by event property
+                            </Label>
+                          </div>
+
+                          {useProperties[index] && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                              <Input
+                                placeholder="Property key"
+                                className="dark:border-neutral-700"
+                                value={step.eventPropertyKey || ""}
+                                onChange={(e) =>
+                                  updateStep(
+                                    index,
+                                    "eventPropertyKey",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <Input
+                                placeholder="Property value"
+                                className="dark:border-neutral-700"
+                                value={
+                                  step.eventPropertyValue !== undefined
+                                    ? String(step.eventPropertyValue)
+                                    : ""
+                                }
+                                onChange={(e) =>
+                                  updateStep(
+                                    index,
+                                    "eventPropertyValue",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <Button
