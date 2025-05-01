@@ -13,7 +13,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "relative rounded-lg border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50 overflow-hidden transition-all duration-300 animate-in fade-in-0 zoom-in-95",
+      "relative rounded-lg border border-neutral-200 bg-white text-neutral-950 dark:border-neutral-850 dark:bg-neutral-900 dark:text-neutral-50 overflow-hidden transition-all duration-300 ",
       className
     )}
     {...props}
@@ -81,10 +81,7 @@ const CardContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "relative p-4 pt-0 transition-all duration-300 animate-in fade-in-0 zoom-in-95",
-      className
-    )}
+    className={cn("relative p-4 pt-0 transition-all duration-300 ", className)}
     {...props}
   />
 ));
