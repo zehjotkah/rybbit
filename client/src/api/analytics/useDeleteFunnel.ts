@@ -12,7 +12,7 @@ export function useDeleteFunnel() {
     mutationFn: async (reportId) => {
       try {
         return await authedFetchWithError<{ success: boolean }>(
-          `${BACKEND_URL}/report/${reportId}`,
+          `${BACKEND_URL}/funnel/${reportId}`,
           {
             method: "DELETE",
           }

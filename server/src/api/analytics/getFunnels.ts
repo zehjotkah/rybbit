@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
-import { reports } from "../../db/postgres/schema.js";
+import { funnels as funnelsTable } from "../../db/postgres/schema.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { eq, and } from "drizzle-orm";
 
@@ -21,26 +21,24 @@ export async function getFunnels(
   }
 
   try {
-    // Fetch all funnel reports for the site
-    const funnelReports = await db
+    // Fetch all funnels for the site
+    const funnelRecords = await db
       .select()
-      .from(reports)
-      .where(
-        and(eq(reports.siteId, Number(site)), eq(reports.reportType, "funnel"))
-      )
-      .orderBy(reports.createdAt);
+      .from(funnelsTable)
+      .where(eq(funnelsTable.siteId, Number(site)))
+      .orderBy(funnelsTable.createdAt);
 
-    // Transform the reports to a more frontend-friendly structure
-    const funnels = funnelReports.map((report) => {
-      const data = report.data as any;
+    // Transform the records to a more frontend-friendly structure
+    const funnels = funnelRecords.map((record) => {
+      const data = record.data as any;
       return {
-        id: report.reportId,
+        id: record.reportId,
         name: data.name || "Unnamed Funnel",
         steps: data.steps || [],
         filters: data.filters || [],
         configuration: data.configuration || {},
-        createdAt: report.createdAt,
-        updatedAt: report.updatedAt,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
         // Include any additional analytics data that might be stored
         conversionRate: data.lastResult?.conversionRate || null,
         totalVisitors: data.lastResult?.totalVisitors || null,

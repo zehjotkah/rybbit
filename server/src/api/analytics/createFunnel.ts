@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
-import { reports } from "../../db/postgres/schema.js";
+import { funnels as funnelsTable } from "../../db/postgres/schema.js";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 
 type FunnelStep = {
@@ -57,24 +57,24 @@ export async function createFunnel(
     let result;
 
     if (reportId) {
-      // Check if the report exists and user has access to it
-      const existingReport = await db.query.reports.findFirst({
-        where: eq(reports.reportId, reportId),
+      // Check if the funnel exists and user has access to it
+      const existingFunnel = await db.query.funnels.findFirst({
+        where: eq(funnelsTable.reportId, reportId),
       });
 
-      if (!existingReport) {
-        return reply.status(404).send({ error: "Report not found" });
+      if (!existingFunnel) {
+        return reply.status(404).send({ error: "Funnel not found" });
       }
 
-      if (existingReport.siteId !== Number(site)) {
+      if (existingFunnel.siteId !== Number(site)) {
         return reply
           .status(403)
-          .send({ error: "Report does not belong to this site" });
+          .send({ error: "Funnel does not belong to this site" });
       }
 
       // Update existing funnel
       result = await db
-        .update(reports)
+        .update(funnelsTable)
         .set({
           data: {
             name,
@@ -83,8 +83,8 @@ export async function createFunnel(
           },
           updatedAt: new Date().toISOString(),
         })
-        .where(eq(reports.reportId, reportId))
-        .returning({ reportId: reports.reportId });
+        .where(eq(funnelsTable.reportId, reportId))
+        .returning({ reportId: funnelsTable.reportId });
 
       if (!result || result.length === 0) {
         return reply.status(500).send({ error: "Failed to update funnel" });
@@ -92,18 +92,17 @@ export async function createFunnel(
     } else {
       // Create new funnel
       result = await db
-        .insert(reports)
+        .insert(funnelsTable)
         .values({
           siteId: Number(site),
           userId,
-          reportType: "funnel",
           data: {
             name,
             steps,
             filters,
           },
         })
-        .returning({ reportId: reports.reportId });
+        .returning({ reportId: funnelsTable.reportId });
     }
 
     return reply.status(201).send({

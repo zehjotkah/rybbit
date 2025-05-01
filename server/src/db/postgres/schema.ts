@@ -98,13 +98,12 @@ export const activeSessions = pgTable("active_sessions", {
   referrer: text("referrer"),
 });
 
-export const reports = pgTable(
-  "reports",
+export const funnels = pgTable(
+  "funnels",
   {
     reportId: serial("report_id").primaryKey().notNull(),
     siteId: integer("site_id"),
     userId: text("user_id"),
-    reportType: text("report_type"),
     data: jsonb(),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
@@ -113,12 +112,12 @@ export const reports = pgTable(
     foreignKey({
       columns: [table.siteId],
       foreignColumns: [sites.siteId],
-      name: "reports_site_id_sites_site_id_fk",
+      name: "funnels_site_id_sites_site_id_fk",
     }),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [user.id],
-      name: "reports_user_id_user_id_fk",
+      name: "funnels_user_id_user_id_fk",
     }),
   ]
 );
