@@ -92,7 +92,7 @@ export default async function RootLayout({ children }) {
           navbar={navbar}
           footer={<Footer_ />}
           editLink="Edit this page on GitHub"
-          docsRepositoryBase="https://github.com/rybbit-io/rybbit/blob/main/docs"
+          docsRepositoryBase="https://github.com/rybbit-io/rybbit/tree/master/docs"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           pageMap={pageMap}
           nextThemes={{

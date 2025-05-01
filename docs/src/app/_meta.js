@@ -1,13 +1,13 @@
 export default {
   index: {
-    display: 'hidden'
+    display: "hidden",
   },
   docs: {
-    type: 'page',
-    title: 'Documentation'
+    type: "page",
+    title: "Documentation",
   },
-  blog: {
-    type: 'page',
-    title: 'Blog'
-  }
-}
+  // blog: {
+  //   type: 'page',
+  //   title: 'Blog'
+  // }
+};
