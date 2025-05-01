@@ -74,31 +74,34 @@ export async function getSession(
   }
 
   try {
-    // 1. First query: Get session data
+    // 1. First query: Get session data derived from events
     const sessionQuery = `
 SELECT
     session_id,
-    user_id,
-    country,
-    region,
-    language,
-    device_type,
-    browser,
-    browser_version,
-    operating_system,
-    operating_system_version,
-    screen_width,
-    screen_height,
-    referrer,
-    session_end,
-    session_start,
-    pageviews,
-    entry_page,
-    exit_page
-FROM sessions
+    any(user_id) as user_id,
+    any(country) as country,
+    any(region) as region,
+    any(language) as language,
+    any(device_type) as device_type,
+    any(browser) as browser,
+    any(browser_version) as browser_version,
+    any(operating_system) as operating_system,
+    any(operating_system_version) as operating_system_version,
+    any(screen_width) as screen_width,
+    any(screen_height) as screen_height,
+    any(referrer) as referrer,
+    min(timestamp) as session_start,
+    max(timestamp) as session_end,
+    dateDiff('second', min(timestamp), max(timestamp)) as session_duration,
+    countIf(type = 'pageview') as pageviews,
+    count() as events,
+    argMinIf(pathname, timestamp, type = 'pageview') as entry_page,
+    argMaxIf(pathname, timestamp, type = 'pageview') as exit_page
+FROM events
 WHERE 
     site_id = {siteId:Int32}
     AND session_id = {sessionId:String}
+GROUP BY session_id
 LIMIT 1
     `;
 

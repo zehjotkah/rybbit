@@ -37,9 +37,9 @@ export async function getUserSessionCount(
 
   const query = `
     SELECT
-      toDate(session_start, ${SqlString.escape(timezone)}) as date,
-      count() as sessions
-    FROM sessions
+      toDate(timestamp, ${SqlString.escape(timezone)}) as date,
+      count(DISTINCT session_id) as sessions
+    FROM events
     WHERE
       site_id = {siteId:Int32}
       AND user_id = {userId:String} 
