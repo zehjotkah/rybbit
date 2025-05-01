@@ -32,12 +32,12 @@ export default function IndexPage() {
       <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-3xl text-center text-neutral-300">Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.</h2>
 
       <div className="flex flex-col sm:flex-row my-8 md:my-10 items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">
-        <Link href="https://tracking.tomato.gg/signup" className="w-full sm:w-auto">
+        <Link href="https://demo.rybbit.io/signup" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
             Track your Site
           </button>
         </Link>
-        <Link href="https://tracking.tomato.gg/1" className="w-full sm:w-auto">
+        <Link href="https://demo.rybbit.io/1" className="w-full sm:w-auto">
           <button className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50">
             View Live Demo
           </button>
@@ -65,7 +65,7 @@ export default function IndexPage() {
         <div className="relative z-10 rounded-lg overflow-hidden border-4 border-neutral-100/5 shadow-2xl shadow-emerald-900/10">
           {/* Remove mobile message and show iframe on all devices */}
           <iframe 
-            src="https://tracking.tomato.gg/1" 
+            src="https://demo.rybbit.io/1" 
             width="1300" 
             height="750" 
             className="w-full h-[600px] md:h-[700px] lg:h-[750px]"
@@ -171,7 +171,7 @@ export default function IndexPage() {
                   </p>
                   <br/>
                   <p>
-                    You can see for yourself by checking out our <Link href="https://tracking.tomato.gg/1" className="text-emerald-400 hover:text-emerald-300">demo site</Link>. The difference in usability is night and day.
+                    You can see for yourself by checking out our <Link href="https://demo.rybbit.io/1" className="text-emerald-400 hover:text-emerald-300">demo site</Link>. The difference in usability is night and day.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -248,7 +248,7 @@ export default function IndexPage() {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
-                <Link href="https://tracking.tomato.gg/signup" className="w-full sm:w-auto">
+                <Link href="https://demo.rybbit.io/signup" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
                     Get Started for Free
                   </button>
