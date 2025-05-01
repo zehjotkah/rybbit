@@ -39,7 +39,7 @@ export function Pages({ isRealtime = false }: { isRealtime?: boolean }) {
               title="Pages"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => truncateString(e.value, 50) || "Other"}
+              getLabel={(e) => truncateString(e.value, 30) || "Other"}
               getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
             />
           </TabsContent>

@@ -54,7 +54,7 @@ export function PreviousChart({
         },
       ]}
       theme={nivoTheme}
-      margin={{ top: 10, right: 10, bottom: 20, left: 35 }}
+      margin={{ top: 10, right: 10, bottom: 25, left: 35 }}
       xScale={{
         type: "time",
         format: "%Y-%m-%d %H:%M:%S",

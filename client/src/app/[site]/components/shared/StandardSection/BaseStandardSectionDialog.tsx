@@ -105,7 +105,7 @@ export function BaseStandardSectionDialog({
       columnHelper.accessor("count", {
         header: "Sessions",
         cell: (info) => (
-          <div className="text-right flex flex-row gap-1 items-center justify-end">
+          <div className="flex flex-row gap-1 items-center sm:justify-end">
             {info.getValue().toLocaleString()}
           </div>
         ),
@@ -113,7 +113,7 @@ export function BaseStandardSectionDialog({
       columnHelper.accessor("percentage", {
         header: "Session %",
         cell: (info) => (
-          <div className="text-right flex flex-row gap-1 items-center justify-end">
+          <div className="flex flex-row gap-1 items-center sm:justify-end">
             {info.getValue().toFixed(1)}%
           </div>
         ),
@@ -128,7 +128,7 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("pageviews", {
           header: "Pageviews",
           cell: (info) => (
-            <div className="text-right flex flex-row gap-1 items-center justify-end">
+            <div className="flex flex-row gap-1 items-center sm:justify-end">
               {info.getValue()?.toLocaleString()}
             </div>
           ),
@@ -138,7 +138,7 @@ export function BaseStandardSectionDialog({
         columnHelper.accessor("pageviews_percentage", {
           header: "Pageviews %",
           cell: (info) => (
-            <div className="text-right flex flex-row gap-1 items-center justify-end">
+            <div className="flex flex-row gap-1 items-center sm:justify-end">
               {info.getValue()?.toFixed(1)}%
             </div>
           ),
@@ -187,7 +187,7 @@ export function BaseStandardSectionDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-2 ">
+        <div className="flex flex-col gap-2 overflow-x-auto">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-400" />
             <Input
@@ -199,7 +199,7 @@ export function BaseStandardSectionDialog({
             />
           </div>
           <div className="max-h-[80vh] overflow-y-auto">
-            <table className="w-full text-xs text-left">
+            <table className="w-full text-xs text-left min-w-max">
               <thead className="bg-neutral-900 text-neutral-400 sticky top-0 z-10">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>

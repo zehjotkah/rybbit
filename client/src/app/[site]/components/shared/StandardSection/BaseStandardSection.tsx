@@ -1,13 +1,17 @@
 import { Button } from "@/components/ui/button";
+import NumberFlow from "@number-flow/react";
 import { round } from "lodash";
-import { AlertCircle, RefreshCcw, SquareArrowOutUpRight } from "lucide-react";
+import {
+  AlertCircle,
+  Info,
+  RefreshCcw,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import { ReactNode } from "react";
 import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { addFilter, FilterParameter } from "../../../../../lib/store";
-import { formatter } from "../../../../../lib/utils";
-import { Skeleton } from "./Skeleton";
 import { BaseStandardSectionDialog } from "./BaseStandardSectionDialog";
-import NumberFlow from "@number-flow/react";
+import { Skeleton } from "./Skeleton";
 
 export const Row = ({
   e,
@@ -102,13 +106,10 @@ export function BaseStandardSection({
   countLabel,
   filterParameter,
 }: BaseStandardSectionProps) {
-  // Determine if we're in a loading state
-
   const ratio = data?.data?.[0]?.percentage
     ? 100 / data?.data?.[0]?.percentage
     : 1;
 
-  // Check for errors
   const hasError = error;
   const errorMessage =
     error?.message || "An error occurred while fetching data";
@@ -143,18 +144,27 @@ export function BaseStandardSection({
             <div>{title}</div>
             <div>{countLabel || "Sessions"}</div>
           </div>
-          {data?.data?.slice(0, 10).map((e) => (
-            <Row
-              key={getKey(e)}
-              e={e}
-              ratio={ratio}
-              getKey={getKey}
-              getLabel={getLabel}
-              getValue={getValue}
-              getLink={getLink}
-              filterParameter={filterParameter}
-            />
-          ))}
+          {data?.data?.length ? (
+            data?.data
+              ?.slice(0, 10)
+              .map((e) => (
+                <Row
+                  key={getKey(e)}
+                  e={e}
+                  ratio={ratio}
+                  getKey={getKey}
+                  getLabel={getLabel}
+                  getValue={getValue}
+                  getLink={getLink}
+                  filterParameter={filterParameter}
+                />
+              ))
+          ) : (
+            <div className="text-neutral-300 w-full text-center mt-6 flex flex-row gap-2 items-center justify-center">
+              <Info className="w-5 h-5" />
+              No Data
+            </div>
+          )}
         </>
       )}
       {isLoading ? (
