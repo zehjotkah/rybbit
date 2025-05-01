@@ -17,14 +17,10 @@ export const initializeClickhouse = async () => {
         user_id String,
         hostname String,
         pathname String,
-        querystring String,
+        querystring String, /* URL parameters stored in raw format */
+        url_parameters Map(String, String), /* Structured storage for all URL parameters */
         page_title String,
         referrer String,
-        utm_source LowCardinality(String),
-        utm_medium LowCardinality(String),
-        utm_campaign String,
-        utm_term String,
-        utm_content String,
         channel String,
         browser LowCardinality(String),
         browser_version LowCardinality(String),

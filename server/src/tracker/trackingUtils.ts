@@ -51,6 +51,30 @@ export function getUTMParams(querystring: string): Record<string, string> {
   return params;
 }
 
+// Parse all URL parameters from querystring
+export function getAllUrlParams(querystring: string): Record<string, string> {
+  const params: Record<string, string> = {};
+
+  if (!querystring) return params;
+
+  // If querystring starts with ?, remove it
+  const cleanQuerystring = querystring.startsWith("?")
+    ? querystring.substring(1)
+    : querystring;
+
+  try {
+    const searchParams = new URLSearchParams(cleanQuerystring);
+    // Extract all parameters
+    for (const [key, value] of searchParams.entries()) {
+      params[key.toLowerCase()] = value;
+    }
+  } catch (e) {
+    console.error("Error parsing query string for URL parameters:", e);
+  }
+
+  return params;
+}
+
 // Clear referrer if it's from the same domain
 export function clearSelfReferrer(referrer: string, hostname: string): string {
   if (!referrer || !hostname) return referrer;

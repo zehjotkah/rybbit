@@ -1,14 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import { FilterParameter } from "./types.js";
 import {
-  geSqlParam,
   getFilterStatement,
+  getSqlParam,
   getTimeStatement,
   processResults,
 } from "./utils.js";
-import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
-import { FilterParameter } from "./types.js";
-import SqlString from "sqlstring";
 
 interface GenericRequest {
   Params: {
@@ -209,14 +208,14 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
   return `
     WITH PageStats AS (
       SELECT
-        ${geSqlParam(parameter)} as value,
+        ${getSqlParam(parameter)} as value,
         COUNT(distinct(session_id)) as unique_sessions,
         COUNT() as pageviews
       FROM events
       WHERE
           site_id = {siteId:Int32}
-          AND ${geSqlParam(parameter)} IS NOT NULL
-          AND ${geSqlParam(parameter)} <> ''
+          AND ${getSqlParam(parameter)} IS NOT NULL
+          AND ${getSqlParam(parameter)} <> ''
           ${filterStatement}
           ${timeStatement}
           // AND type = 'pageview'

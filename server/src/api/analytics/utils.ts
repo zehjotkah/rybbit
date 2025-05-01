@@ -85,7 +85,19 @@ const filterTypeToOperator = (type: FilterType) => {
   }
 };
 
-export const geSqlParam = (parameter: FilterParameter) => {
+export const getSqlParam = (parameter: FilterParameter) => {
+  // Handle URL parameters through the url_parameters map
+  if (parameter.startsWith("utm_") || parameter.startsWith("url_param:")) {
+    // For explicit url_param: prefix (e.g., url_param:campaign_id)
+    if (parameter.startsWith("url_param:")) {
+      const paramName = parameter.substring("url_param:".length);
+      return `url_parameters['${paramName}']`;
+    }
+
+    const utm = parameter; // e.g., utm_source, utm_medium, etc.
+    return `url_parameters['${utm}']`;
+  }
+
   if (parameter === "referrer") {
     return "domainWithoutWWW(referrer)";
   }
@@ -197,14 +209,14 @@ export function getFilterStatement(filters: string) {
         }
 
         if (filter.value.length === 1) {
-          return `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
+          return `${getSqlParam(filter.parameter)} ${filterTypeToOperator(
             filter.type
           )} ${SqlString.escape(x + filter.value[0] + x)}`;
         }
 
         const valuesWithOperator = filter.value.map(
           (value) =>
-            `${geSqlParam(filter.parameter)} ${filterTypeToOperator(
+            `${getSqlParam(filter.parameter)} ${filterTypeToOperator(
               filter.type
             )} ${SqlString.escape(x + value + x)}`
         );
