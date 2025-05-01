@@ -7,6 +7,7 @@ export type UserInfo = {
   sessions: number;
   country: string;
   region: string;
+  city: string;
   language: string;
   device_type: string;
   browser: string;

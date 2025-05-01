@@ -2,7 +2,7 @@ import { DateTime } from "luxon";
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
-import { getCountryName } from "../../lib/utils";
+import { getCountryName, getLanguageName } from "../../lib/utils";
 import {
   MonitorSmartphone,
   Clock,
@@ -10,6 +10,9 @@ import {
   MousePointerClick,
   ArrowRight,
   Loader2,
+  Smartphone,
+  Monitor,
+  Tablet,
 } from "lucide-react";
 import Avatar from "boring-avatars";
 import {
@@ -415,7 +418,9 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                           Language:
                         </span>
                         <span className="text-gray-400">
-                          {sessionDetails.language}
+                          {sessionDetails.language
+                            ? getLanguageName(sessionDetails.language)
+                            : "N/A"}
                         </span>
                       </div>
                     )}
@@ -449,7 +454,15 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                       Device:
                     </span>
                     <div className="flex items-center gap-1.5 text-gray-400">
-                      <MonitorSmartphone className="w-4 h-4 text-gray-500" />
+                      {sessionDetails?.device_type === "Desktop" && (
+                        <Monitor className="w-4 h-4" />
+                      )}
+                      {sessionDetails?.device_type === "Mobile" && (
+                        <Smartphone className="w-4 h-4" />
+                      )}
+                      {sessionDetails?.device_type === "Tablet" && (
+                        <Tablet className="w-4 h-4" />
+                      )}
                       <span>{sessionDetails?.device_type || "Unknown"}</span>
                     </div>
                   </div>

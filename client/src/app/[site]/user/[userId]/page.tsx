@@ -19,7 +19,11 @@ import { useParams } from "next/navigation";
 import { useUserInfo } from "../../../../api/analytics/userInfo";
 import CopyText from "../../../../components/CopyText";
 import { useGetRegionName } from "../../../../lib/geo";
-import { formatDuration, getCountryName } from "../../../../lib/utils";
+import {
+  formatDuration,
+  getCountryName,
+  getLanguageName,
+} from "../../../../lib/utils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
@@ -55,14 +59,12 @@ export default function UserPage() {
         <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="grid grid-cols-[100px_auto] gap-2">
-              <span className=" text-neutral-100">User ID:</span>
+              {/* <span className=" text-neutral-100">User ID:</span>
               <CopyText
                 text={userId as string}
                 maxLength={24}
                 className="inline-flex text-neutral-300"
-              />
-              <span className=" text-neutral-100">Language:</span>
-              <div className="text-neutral-300">{data?.language}</div>
+              /> */}
               <span className="text-neutral-100">Country:</span>
               <div className="text-neutral-300 flex gap-1 items-center">
                 <CountryFlag country={data?.country || ""} />
@@ -71,6 +73,12 @@ export default function UserPage() {
               <span className=" text-neutral-100">Region:</span>
               <div className="text-neutral-300">
                 {data?.region ? getRegionName(data.region) : "N/A"}
+              </div>
+              <span className=" text-neutral-100">City:</span>
+              <div className="text-neutral-300">{data?.city ?? "N/A"}</div>
+              <span className=" text-neutral-100">Language:</span>
+              <div className="text-neutral-300">
+                {data?.language ? getLanguageName(data.language) : "N/A"}
               </div>
             </div>
             <div className="grid grid-cols-[110px_1fr] gap-2">

@@ -50,3 +50,24 @@ export function formatDuration(seconds: number): string {
 export function truncateString(str: string, n = 50) {
   return str.length > n ? str.substring(0, n) + "..." : str;
 }
+
+const regionNamesInEnglish = new Intl.DisplayNames(["en"], { type: "region" });
+const languageNamesInEnglish = new Intl.DisplayNames(["en"], {
+  type: "language",
+});
+
+export const getLanguageName = (languageCode: string) => {
+  try {
+    // Handle codes like "en-US" that have both language and region
+    if (languageCode.includes("-")) {
+      const [language, region] = languageCode.split("-");
+      const languageName = languageNamesInEnglish.of(language);
+      const regionName = regionNamesInEnglish.of(region);
+      return `${languageName} (${regionName})`;
+    }
+    // Just a language code
+    return languageNamesInEnglish.of(languageCode);
+  } catch (error) {
+    return languageCode;
+  }
+};

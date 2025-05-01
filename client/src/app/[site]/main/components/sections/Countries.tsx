@@ -8,7 +8,7 @@ import {
   TabsTrigger,
 } from "../../../../../components/ui/basic-tabs";
 import { Card, CardContent } from "../../../../../components/ui/card";
-import { getCountryName } from "../../../../../lib/utils";
+import { getCountryName, getLanguageName } from "../../../../../lib/utils";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
 import { useSubdivisions } from "../../../../../lib/geo";
@@ -16,27 +16,6 @@ import { StandardSectionRealtime } from "../../../components/shared/StandardSect
 import { MapComponent } from "../../../components/shared/Map";
 
 type Tab = "countries" | "regions" | "languages" | "cities" | "map";
-
-const regionNamesInEnglish = new Intl.DisplayNames(["en"], { type: "region" });
-const languageNamesInEnglish = new Intl.DisplayNames(["en"], {
-  type: "language",
-});
-
-const getLanguageName = (languageCode: string) => {
-  try {
-    // Handle codes like "en-US" that have both language and region
-    if (languageCode.includes("-")) {
-      const [language, region] = languageCode.split("-");
-      const languageName = languageNamesInEnglish.of(language);
-      const regionName = regionNamesInEnglish.of(region);
-      return `${languageName} (${regionName})`;
-    }
-    // Just a language code
-    return languageNamesInEnglish.of(languageCode);
-  } catch (error) {
-    return languageCode;
-  }
-};
 
 // Helper to extract country code from language code
 const getCountryFromLanguage = (languageCode: string): string | null => {

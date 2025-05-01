@@ -7,6 +7,7 @@ interface UserPageviewData {
   duration: number;
   country: string;
   region: string;
+  city: string;
   language: string;
   device_type: string;
   browser: string;
@@ -41,6 +42,7 @@ export async function getUserInfo(
             user_id,
             argMax(country, timestamp) AS country,
             argMax(region, timestamp) AS region,
+            argMax(city, timestamp) AS city,
             argMax(language, timestamp) AS language,
             argMax(device_type, timestamp) AS device_type,
             argMax(browser, timestamp) AS browser,
@@ -73,6 +75,7 @@ export async function getUserInfo(
         ROUND(avg(session_duration)) AS duration,
         any(country) as country,
         any(region) AS region,
+        any(city) AS city,
         any(language) AS language,
         any(device_type) AS device_type,
         any(browser) AS browser,
