@@ -2,19 +2,26 @@ import {
   AppWindow,
   Brain,
   FileText,
+  Flag,
   FolderInput,
   Globe,
   Languages,
+  Link,
   LogIn,
   LogOut,
+  MapPin,
   MapPinHouse,
   MapPinned,
   Maximize,
+  Megaphone,
   MousePointerClick,
+  Puzzle,
   Radio,
   Search,
   Share2,
   TabletSmartphone,
+  Tag,
+  Target,
 } from "lucide-react";
 import React from "react";
 import { FilterParameter } from "../../../../../lib/store";
@@ -47,7 +54,7 @@ export const FilterOptions: {
   {
     label: "Referrer",
     value: "referrer",
-    icon: <Share2 className="h-4 w-4" />,
+    icon: <Link className="h-4 w-4" />,
   },
   {
     label: "Channel",
@@ -103,6 +110,31 @@ export const FilterOptions: {
     label: "Screen Dimensions",
     value: "dimensions",
     icon: <Maximize className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Source",
+    value: "utm_source",
+    icon: <Target className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Medium",
+    value: "utm_medium",
+    icon: <Megaphone className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Campaign",
+    value: "utm_campaign",
+    icon: <Flag className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Content",
+    value: "utm_content",
+    icon: <Puzzle className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Term",
+    value: "utm_term",
+    icon: <Tag className="h-4 w-4" />,
   },
 ];
 

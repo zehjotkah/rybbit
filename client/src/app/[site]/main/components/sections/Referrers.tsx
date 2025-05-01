@@ -10,7 +10,14 @@ import { Card, CardContent } from "../../../../../components/ui/card";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { StandardSectionRealtime } from "../../../components/shared/StandardSection/StandardSectionRealtime";
 
-type Tab = "referrers" | "channels";
+type Tab =
+  | "referrers"
+  | "channels"
+  | "utm_source"
+  | "utm_medium"
+  | "utm_campaign"
+  | "utm_term"
+  | "utm_content";
 
 export function Referrers({ isRealtime = false }: { isRealtime?: boolean }) {
   const [tab, setTab] = useState<Tab>("referrers");
@@ -28,6 +35,11 @@ export function Referrers({ isRealtime = false }: { isRealtime?: boolean }) {
           <TabsList>
             <TabsTrigger value="referrers">Referrers</TabsTrigger>
             <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="utm_source">Source</TabsTrigger>
+            <TabsTrigger value="utm_medium">Medium</TabsTrigger>
+            <TabsTrigger value="utm_campaign">Campaign</TabsTrigger>
+            <TabsTrigger value="utm_term">Term</TabsTrigger>
+            <TabsTrigger value="utm_content">Content</TabsTrigger>
           </TabsList>
           <TabsContent value="referrers">
             <ComponentToUse
@@ -57,6 +69,51 @@ export function Referrers({ isRealtime = false }: { isRealtime?: boolean }) {
               getLabel={(e) => (
                 <div className="flex items-center">{e.value}</div>
               )}
+            />
+          </TabsContent>
+          <TabsContent value="utm_source">
+            <ComponentToUse
+              filterParameter="utm_source"
+              title="UTM Source"
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value}
+              getValue={(e) => e.value}
+            />
+          </TabsContent>
+          <TabsContent value="utm_medium">
+            <ComponentToUse
+              filterParameter="utm_medium"
+              title="UTM Medium"
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value}
+              getValue={(e) => e.value}
+            />
+          </TabsContent>
+          <TabsContent value="utm_campaign">
+            <ComponentToUse
+              filterParameter="utm_campaign"
+              title="UTM Campaign"
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value}
+              getValue={(e) => e.value}
+            />
+          </TabsContent>
+          <TabsContent value="utm_content">
+            <ComponentToUse
+              filterParameter="utm_content"
+              title="UTM Content"
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value}
+              getValue={(e) => e.value}
+            />
+          </TabsContent>
+          <TabsContent value="utm_term">
+            <ComponentToUse
+              filterParameter="utm_term"
+              title="UTM Term"
+              getKey={(e) => e.value}
+              getLabel={(e) => e.value}
+              getValue={(e) => e.value}
             />
           </TabsContent>
         </Tabs>

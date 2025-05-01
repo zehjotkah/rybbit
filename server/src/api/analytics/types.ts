@@ -14,6 +14,11 @@ export type FilterParameter =
   | "querystring"
   | "event_name"
   | "channel"
+  | "utm_source"
+  | "utm_medium"
+  | "utm_campaign"
+  | "utm_term"
+  | "utm_content"
   // derivative parameters
   | "entry_page"
   | "exit_page"

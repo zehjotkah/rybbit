@@ -19,6 +19,11 @@ export type GetSessionsResponse = {
   operating_system: string;
   referrer: string;
   channel: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_term: string;
+  utm_content: string;
   session_end: string;
   session_start: string;
   session_duration: number;
@@ -74,6 +79,11 @@ export async function getSessions(
           argMax(screen_height, timestamp) AS screen_height,
           argMin(referrer, timestamp) AS referrer,
           argMin(channel, timestamp) AS channel,
+          argMin(utm_source, timestamp) AS utm_source,
+          argMin(utm_medium, timestamp) AS utm_medium,
+          argMin(utm_campaign, timestamp) AS utm_campaign,
+          argMin(utm_term, timestamp) AS utm_term,
+          argMin(utm_content, timestamp) AS utm_content,
           MAX(timestamp) AS session_end,
           MIN(timestamp) AS session_start,
           dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration,

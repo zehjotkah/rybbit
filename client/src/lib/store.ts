@@ -37,12 +37,37 @@ export type FilterParameter =
   | "querystring"
   | "event_name"
   | "channel"
+  | "utm_source"
+  | "utm_medium"
+  | "utm_campaign"
+  | "utm_term"
+  | "utm_content"
   // derivative parameters
   | "entry_page"
   | "exit_page"
   | "dimensions";
 
 export const SESSION_PAGE_FILTERS: FilterParameter[] = [
+  "browser",
+  "operating_system",
+  "language",
+  "country",
+  "region",
+  "city",
+  "device_type",
+  "referrer",
+  "event_name",
+  "channel",
+  "entry_page",
+  "exit_page",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+];
+
+export const GOALS_PAGE_FILTERS: FilterParameter[] = [
   "browser",
   "operating_system",
   "language",

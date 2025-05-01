@@ -33,6 +33,16 @@ export function getParameterNameLabel(parameter: FilterParameter) {
       return "Dimension";
     case "event_name":
       return "Event Name";
+    case "utm_source":
+      return "UTM Source";
+    case "utm_medium":
+      return "UTM Medium";
+    case "utm_campaign":
+      return "UTM Campaign";
+    case "utm_term":
+      return "UTM Term";
+    case "utm_content":
+      return "UTM Content";
     default:
       return parameter;
   }

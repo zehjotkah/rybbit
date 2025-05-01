@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useGetGoals } from "../../../api/analytics/useGetGoals";
 import { getStartAndEndDate } from "../../../api/utils";
-import { SESSION_PAGE_FILTERS, useStore } from "../../../lib/store";
+import { GOALS_PAGE_FILTERS, useStore } from "../../../lib/store";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import CreateGoalButton from "./components/CreateGoalButton";
 import GoalsList from "./components/GoalsList";
 
 export default function GoalsPage() {
-  const { time, filters, site, setTime } = useStore();
+  const { time, site } = useStore();
   const { startDate, endDate } = getStartAndEndDate(time);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9; // Show 9 cards (3x3 grid)
@@ -22,7 +22,6 @@ export default function GoalsPage() {
   const { data: goalsData, isLoading } = useGetGoals({
     startDate: queryStartDate,
     endDate: queryEndDate,
-    filters,
     page: currentPage,
     pageSize,
   });
@@ -79,7 +78,7 @@ export default function GoalsPage() {
 
   return (
     <div className="p-2 md:p-4 max-w-[1400px] mx-auto space-y-3">
-      <SubHeader availableFilters={SESSION_PAGE_FILTERS} />
+      <SubHeader availableFilters={GOALS_PAGE_FILTERS} />
       <div className="flex items-center justify-between">
         <div />
         <CreateGoalButton siteId={Number(site)} />

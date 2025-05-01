@@ -7,6 +7,10 @@ import { PreviousChart } from "./PreviousChart";
 import { useStore } from "../../../../../lib/store";
 import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
 import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
+import { Tilt_Warp } from "next/font/google";
+import Link from "next/link";
+import Image from "next/image";
+import { authClient } from "../../../../../lib/auth";
 
 const SELECTED_STAT_MAP = {
   pageviews: "Pageviews",
@@ -17,7 +21,14 @@ const SELECTED_STAT_MAP = {
   users: "Users",
 };
 
+const tilt_wrap = Tilt_Warp({
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export function MainSection() {
+  const session = authClient.useSession();
+
   const { selectedStat, time, site, bucket } = useStore();
 
   const { data, isFetching, error } = useGetOverviewBucketed({ site, bucket });
@@ -49,7 +60,15 @@ export function MainSection() {
         {(isFetching || isPreviousFetching) && <CardLoader />}
         <CardContent className="p-2 md:p-4 py-3 w-full">
           <div className="flex items-center justify-between px-2 md:px-0">
-            <span className="w-24" />
+            <div className="flex items-center space-x-4">
+              <Link
+                href={session.data ? "/" : "https://rybbit.io"}
+                className={`text-lg font-semibold flex items-center gap-1.5 ${tilt_wrap.className} opacity-75`}
+              >
+                <Image src="/rybbit.png" alt="Rybbit" width={20} height={20} />
+                rybbit.io
+              </Link>
+            </div>
             <span className="text-sm text-neutral-200">
               {SELECTED_STAT_MAP[selectedStat]}
             </span>

@@ -5,6 +5,7 @@ import {
   FolderInput,
   Globe,
   Languages,
+  Link,
   LogIn,
   LogOut,
   MapPinHouse,
@@ -13,8 +14,11 @@ import {
   MousePointerClick,
   Radio,
   Search,
-  Share2,
+  Target,
   TabletSmartphone,
+  Megaphone,
+  Flag,
+  Puzzle,
 } from "lucide-react";
 
 const FilterOptions = [
@@ -41,7 +45,7 @@ const FilterOptions = [
   {
     label: "Referrer",
     value: "referrer",
-    icon: <Share2 className="h-4 w-4" />,
+    icon: <Link className="h-4 w-4" />,
   },
   {
     label: "Channel",
@@ -98,14 +102,24 @@ const FilterOptions = [
     value: "dimensions",
     icon: <Maximize className="h-4 w-4" />,
   },
+  {
+    label: "UTM Source",
+    value: "utm_source",
+    icon: <Target className="h-4 w-4" />,
+  },
+  {
+    label: "UTM Medium",
+    value: "utm_medium",
+    icon: <Megaphone className="h-4 w-4" />,
+  },
 ];
 
 export function AdvancedFilters() {
   return (
     <div className="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
       <h3 className="text-xl font-semibold mb-3">Advanced Filters</h3>
-      <p className="text-neutral-300">Drill down into your data with advanced filters across over a dozen dimensions.</p>
-      <div className="flex flex-wrap justify-center gap-3.5 mt-8">  
+      <p className="text-neutral-300">Drill down into your data with advanced filters across over numerous dimensions.</p>
+      <div className="flex flex-wrap justify-center gap-y-3 gap-x-3.5 mt-4">  
         {FilterOptions.map((option) => (
           <div key={option.value} className="flex items-center gap-2 text-base bg-neutral-800 border border-neutral-700 py-1 px-2 rounded-md">
             {option.icon}

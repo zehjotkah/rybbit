@@ -49,21 +49,26 @@ export type GetSessionsResponse = {
   session_id: string;
   user_id: string;
   country: string;
-  city: string;
   region: string;
+  city: string;
   language: string;
   device_type: string;
   browser: string;
   operating_system: string;
   referrer: string;
   channel: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_term: string;
+  utm_content: string;
   session_end: string;
   session_start: string;
   session_duration: number;
-  pageviews: number;
-  events: number;
   entry_page: string;
   exit_page: string;
+  pageviews: number;
+  events: number;
 }[];
 
 export function useGetSessionsInfinite(userId?: string) {

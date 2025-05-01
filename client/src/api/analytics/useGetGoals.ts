@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
+import {
+  getFilteredFilters,
+  GOALS_PAGE_FILTERS,
+  useStore,
+} from "../../lib/store";
 import { authedFetch } from "../utils";
-import { useStore, Filter } from "../../lib/store";
 
 export interface Goal {
   goalId: number;
@@ -34,7 +38,6 @@ interface GoalsResponse {
 export function useGetGoals({
   startDate,
   endDate,
-  filters,
   page = 1,
   pageSize = 10,
   sort = "createdAt",
@@ -43,7 +46,6 @@ export function useGetGoals({
 }: {
   startDate: string;
   endDate: string;
-  filters?: Filter[];
   page?: number;
   pageSize?: number;
   sort?: "goalId" | "name" | "goalType" | "createdAt";
@@ -53,6 +55,8 @@ export function useGetGoals({
   const { site } = useStore();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  const filteredFilters = getFilteredFilters(GOALS_PAGE_FILTERS);
+
   return useQuery({
     queryKey: [
       "goals",
@@ -60,7 +64,7 @@ export function useGetGoals({
       startDate,
       endDate,
       timezone,
-      filters,
+      filteredFilters,
       page,
       pageSize,
       sort,
@@ -71,7 +75,7 @@ export function useGetGoals({
         startDate,
         endDate,
         timezone,
-        filters,
+        filteredFilters,
         page,
         pageSize,
         sort,
