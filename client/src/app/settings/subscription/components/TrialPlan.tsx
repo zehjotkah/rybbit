@@ -1,4 +1,10 @@
 import { ArrowRight, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../../components/ui/alert";
 import { Button } from "../../../../components/ui/button";
 import {
   Card,
@@ -10,15 +16,8 @@ import {
 } from "../../../../components/ui/card";
 import { Progress } from "../../../../components/ui/progress";
 import { TRIAL_EVENT_LIMIT } from "../utils/constants";
-import { formatDate, getPlanDetails } from "../utils/planUtils";
+import { formatDate } from "../utils/planUtils";
 import { useStripeSubscription } from "../utils/useStripeSubscription";
-import { useRouter } from "next/navigation";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "../../../../components/ui/alert";
-import { PlanFeaturesCard } from "./PlanFeaturesCard";
 
 export function TrialPlan() {
   const {
@@ -37,8 +36,6 @@ export function TrialPlan() {
     ? new Date(activeSubscription.currentPeriodEnd)
     : null;
 
-  const trialPlanDetails = getPlanDetails("trial");
-
   return (
     <div className="space-y-6">
       <Card>
@@ -51,7 +48,7 @@ export function TrialPlan() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="space-y-6 p-2">
             <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
               <Clock className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <AlertTitle>Trial Status</AlertTitle>
@@ -98,8 +95,6 @@ export function TrialPlan() {
           </Button>
         </CardFooter>
       </Card>
-
-      {trialPlanDetails && <PlanFeaturesCard currentPlan={trialPlanDetails} />}
     </div>
   );
 }

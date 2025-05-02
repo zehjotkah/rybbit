@@ -1,13 +1,14 @@
+import { Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Alert } from "../../../../components/ui/alert";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Progress } from "../../../../components/ui/progress";
-import { formatDate, getPlanDetails, PlanTemplate } from "../utils/planUtils";
-import { useStripeSubscription } from "../utils/useStripeSubscription";
-import { PlanFeaturesCard } from "./PlanFeaturesCard";
-import { Alert } from "../../../../components/ui/alert";
 import { BACKEND_URL } from "../../../../lib/const";
+import { STRIPE_PRICES } from "../../../../lib/stripe";
+import { formatDate } from "../utils/planUtils";
+import { useStripeSubscription } from "../utils/useStripeSubscription";
 
 export function ProPlan() {
   const {
@@ -26,8 +27,22 @@ export function ProPlan() {
     eventLimit > 0 ? Math.min((currentUsage / eventLimit) * 100, 100) : 0;
   const isAnnualPlan = activeSubscription?.interval === "year";
 
-  const currentPlanDetails: PlanTemplate | null = activeSubscription
-    ? getPlanDetails(activeSubscription.planName)
+  const stripePlan = STRIPE_PRICES.find(
+    (p) => p.name === activeSubscription?.planName
+  );
+
+  const currentPlanDetails = activeSubscription
+    ? {
+        id: "pro",
+        name: "Pro",
+        price: `$${stripePlan?.price}`,
+        interval: stripePlan?.interval,
+        description: "Advanced analytics for growing projects",
+        features: ["5 year data retention", "Priority support"],
+        color:
+          "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
+        icon: <Shield className="h-5 w-5" />,
+      }
     : null;
 
   const handleManageSubscription = async () => {
@@ -99,7 +114,7 @@ export function ProPlan() {
       {actionError && <Alert variant="destructive">{actionError}</Alert>}
       <Card>
         <CardContent>
-          <div className="space-y-6 mt-3">
+          <div className="space-y-6 mt-3 p-2">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-3xl font-bold">
@@ -153,11 +168,6 @@ export function ProPlan() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Conditionally render PlanFeaturesCard only when details are available */}
-      {!isLoading && currentPlanDetails && (
-        <PlanFeaturesCard currentPlan={currentPlanDetails as any} />
-      )}
     </div>
   );
 }
