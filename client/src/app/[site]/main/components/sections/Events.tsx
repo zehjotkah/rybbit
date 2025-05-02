@@ -5,16 +5,20 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../../components/ui/basic-tabs";
-import { Card, CardContent } from "../../../../../components/ui/card";
-import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
-import { StandardSectionRealtime } from "../../../components/shared/StandardSection/StandardSectionRealtime";
+import {
+  Card,
+  CardContent,
+  CardLoader,
+} from "../../../../../components/ui/card";
+import { useGetEventNames } from "../../../../../api/analytics/useGetEventNames";
+import { EventList } from "../../../events/components/EventList";
 
 type Tab = "events";
 
-export function Events({ isRealtime = false }: { isRealtime?: boolean }) {
+export function Events() {
   const [tab, setTab] = useState<Tab>("events");
-
-  const ComponentToUse = isRealtime ? StandardSectionRealtime : StandardSection;
+  const { data: eventNamesData, isLoading: isLoadingEventNames } =
+    useGetEventNames();
 
   return (
     <Card>
@@ -28,14 +32,21 @@ export function Events({ isRealtime = false }: { isRealtime?: boolean }) {
             <TabsTrigger value="events">Custom Events</TabsTrigger>
           </TabsList>
           <TabsContent value="events">
-            <ComponentToUse
-              filterParameter="event_name"
-              title="Events"
-              countLabel="Count"
-              getValue={(e) => e.value}
-              getKey={(e) => e.value}
-              getLabel={(e) => e.value}
-            />
+            {isLoadingEventNames && (
+              <div className="absolute top-[-8px] left-0 w-full h-full">
+                <CardLoader />
+              </div>
+            )}
+            <div className="relative">
+              <div className="flex flex-row gap-2 justify-between pr-1 text-xs text-neutral-400 mb-2">
+                <div>Custom Events</div>
+                <div>Count</div>
+              </div>
+              <EventList
+                events={eventNamesData || []}
+                isLoading={isLoadingEventNames}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
