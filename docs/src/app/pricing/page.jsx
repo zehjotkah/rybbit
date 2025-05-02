@@ -53,7 +53,7 @@ export default function Pricing() {
   }
   
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center overflow-x-hidden">
       <div className="container mx-auto py-12 px-4">
         <div className="mb-10 text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight pb-4 text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-200 to-gray-400">
@@ -64,9 +64,23 @@ export default function Pricing() {
           </p>
         </div>
         
-        {/* Pricing card */}
-        <div className="max-w-lg mx-auto">
-          <div className="bg-neutral-800/50 rounded-xl border border-neutral-700 overflow-hidden">
+        {/* Pricing card with background gradients */}
+        <div className="relative max-w-lg mx-auto mb-10">
+          {/* Background gradients - overlapping circles for organic feel */}
+          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-emerald-500/30 rounded-full blur-[80px] opacity-60"></div>
+          <div className="absolute top-20 left-20 w-[300px] h-[300px] bg-emerald-600/20 rounded-full blur-[70px] opacity-40"></div>
+          
+          <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-blue-500/30 rounded-full blur-[80px] opacity-50"></div>
+          <div className="absolute bottom-40 right-20 w-[250px] h-[250px] bg-indigo-500/20 rounded-full blur-[75px] opacity-40"></div>
+          
+          <div className="absolute top-1/4 right-0 w-[200px] h-[200px] bg-purple-500/30 rounded-full blur-[70px] opacity-40"></div>
+          
+          <div className="absolute bottom-1/3 left-0 w-[220px] h-[220px] bg-emerald-400/20 rounded-full blur-[70px] opacity-50"></div>
+          
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-indigo-400/20 rounded-full blur-[80px] opacity-40"></div>
+        
+          {/* Card with relative positioning and higher z-index */}
+          <div className="relative z-10 bg-neutral-800/50 rounded-xl border border-neutral-700 overflow-hidden backdrop-blur-sm shadow-xl">
             <div className="p-6">
               {/* Slider section */}
               <div className="mb-6">
@@ -162,8 +176,10 @@ export default function Pricing() {
               </p>
             </div>
           </div>
+        </div>
           
-          {/* FAQ section */}
+        {/* FAQ section */}
+        <div className="max-w-lg mx-auto">
           <div className="mt-10 space-y-6">
             <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
             

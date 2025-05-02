@@ -250,7 +250,7 @@ export default function IndexPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
                 <Link href="https://demo.rybbit.io/signup" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
-                    Get Started for Free
+                    Start 14 day free trial
                   </button>
                 </Link>
                 <Link href="https://docs.tomato.gg" className="w-full sm:w-auto">
@@ -264,7 +264,7 @@ export default function IndexPage() {
                 <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                No credit card required. Free plan available for small projects.
+                No credit card required. 
               </p>
             </div>
           </div>

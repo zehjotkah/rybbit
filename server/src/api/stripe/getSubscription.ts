@@ -115,7 +115,6 @@ export async function getSubscriptionInner(userId: string) {
   }
 
   // User has no subscription and trial has ended - return null
-  // No free plan fallback
   return null;
 }
 
