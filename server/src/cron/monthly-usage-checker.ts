@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 // Default event limit for users without an active subscription
 const DEFAULT_EVENT_LIMIT = 0;
 
-const TRIAL_EVENT_LIMIT = 1_000_000;
+const TRIAL_EVENT_LIMIT = 100_000;
 
 // Global set to track site IDs that have exceeded their monthly limits
 export const sitesOverLimit = new Set<number>();
