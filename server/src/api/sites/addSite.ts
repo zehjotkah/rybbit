@@ -109,6 +109,7 @@ export async function addSite(
     siteConfig.addSite(newSite[0].siteId, {
       public: newSite[0].public || false,
       saltUserIds: newSite[0].saltUserIds || false,
+      domain: newSite[0].domain,
     });
 
     return reply.status(201).send(newSite[0]);

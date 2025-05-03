@@ -4,6 +4,7 @@ import {
   clearSelfReferrer,
   createBasePayload,
   getExistingSession,
+  isSiteOverLimit,
   TotalTrackingPayload,
 } from "./trackingUtils.js";
 import { db } from "../db/postgres/postgres.js";
@@ -11,6 +12,8 @@ import { activeSessions } from "../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
 import { getDeviceType } from "../utils.js";
 import { pageviewQueue } from "./pageviewQueue.js";
+import { siteConfig } from "../lib/siteConfig.js";
+import { DISABLE_ORIGIN_CHECK } from "./const.js";
 
 // Define Zod schema for validation
 export const trackingPayloadSchema = z.discriminatedUnion("type", [
@@ -131,6 +134,81 @@ export async function processTrackingEvent(
   await updateSession(payload, existingSession, isPageview);
 }
 
+/**
+ * Validates if the request's origin matches the registered domain for the site
+ * @param siteId The site ID from the tracking payload
+ * @param requestOrigin The origin header from the request
+ * @returns An object with success status and optional error message
+ */
+async function validateOrigin(siteId: string, requestOrigin?: string) {
+  try {
+    // If origin checking is disabled, return success
+    if (DISABLE_ORIGIN_CHECK) {
+      console.info(
+        `[Tracking] Origin check disabled. Allowing request for site ${siteId} from origin: ${
+          requestOrigin || "none"
+        }`
+      );
+      return { success: true };
+    }
+
+    // Ensure site config is initialized
+    await siteConfig.ensureInitialized();
+
+    // Convert siteId to number
+    const numericSiteId =
+      typeof siteId === "string" ? parseInt(siteId, 10) : siteId;
+
+    // Get the domain associated with this site
+    const siteDomain = siteConfig.getSiteDomain(numericSiteId);
+
+    if (!siteDomain) {
+      return {
+        success: false,
+        error: "Site not found or has no registered domain",
+      };
+    }
+
+    // If no origin header, reject the request
+    if (!requestOrigin) {
+      return {
+        success: false,
+        error: "Origin header required",
+      };
+    }
+
+    try {
+      // Parse the origin into URL components
+      const originUrl = new URL(requestOrigin);
+
+      // Normalize domains by removing 'www.' prefix if present
+      const normalizedOriginHost = originUrl.hostname.replace(/^www\./, "");
+      const normalizedSiteDomain = siteDomain.replace(/^www\./, "");
+
+      // Check if the normalized domains match
+      if (normalizedOriginHost !== normalizedSiteDomain) {
+        return {
+          success: false,
+          error: `Origin mismatch. Expected: ${siteDomain}, Received: ${requestOrigin}`,
+        };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Invalid origin format: ${requestOrigin}`,
+      };
+    }
+  } catch (error) {
+    console.error("Error validating origin:", error);
+    return {
+      success: false,
+      error: "Internal error validating origin",
+    };
+  }
+}
+
 // Unified handler for all events (pageviews and custom events)
 export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -148,23 +226,36 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
     // Use validated data
     const validatedPayload = validationResult.data;
 
-    // Access validated data using validatedPayload.propertyName
-    const eventType = validatedPayload.type;
+    // Validate that the request is coming from the expected origin
+    const originValidation = await validateOrigin(
+      validatedPayload.site_id,
+      request.headers.origin as string
+    );
+
+    if (!originValidation.success) {
+      console.warn(
+        `[Tracking] Request rejected for site ${validatedPayload.site_id}: ${originValidation.error}`
+      );
+      return reply.status(403).send({
+        success: false,
+        error: originValidation.error,
+      });
+    }
 
     // Check if the site has exceeded its monthly limit
-    // if (isSiteOverLimit(validatedPayload.site_id)) {
-    //   console.log(
-    //     `[Tracking] Skipping event for site ${validatedPayload.site_id} - over monthly limit`
-    //   );
-    //   return reply
-    //     .status(200)
-    //     .send("Site over monthly limit, event not tracked");
-    // }
+    if (isSiteOverLimit(validatedPayload.site_id)) {
+      console.log(
+        `[Tracking] Skipping event for site ${validatedPayload.site_id} - over monthly limit`
+      );
+      return reply
+        .status(200)
+        .send("Site over monthly limit, event not tracked");
+    }
 
     // Create base payload for the event using validated data
     const payload = createBasePayload(
       request, // Pass request for IP/UA
-      eventType,
+      validatedPayload.type,
       validatedPayload // Add validated payload back
     );
 
@@ -178,7 +269,7 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
     await processTrackingEvent(
       payload,
       existingSession,
-      eventType === "pageview"
+      validatedPayload.type === "pageview"
     );
 
     return reply.status(200).send({

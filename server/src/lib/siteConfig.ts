@@ -5,6 +5,7 @@ import { sites } from "../db/postgres/schema.js";
 interface SiteConfigData {
   public: boolean;
   saltUserIds: boolean;
+  domain: string;
 }
 
 class SiteConfig {
@@ -18,6 +19,7 @@ class SiteConfig {
           siteId: sites.siteId,
           public: sites.public,
           saltUserIds: sites.saltUserIds,
+          domain: sites.domain,
         })
         .from(sites);
 
@@ -29,6 +31,7 @@ class SiteConfig {
         this.siteConfigMap.set(site.siteId, {
           public: site.public || false,
           saltUserIds: site.saltUserIds || false,
+          domain: site.domain || "",
         });
       }
 
@@ -61,12 +64,22 @@ class SiteConfig {
   }
 
   /**
+   * Get the domain of a site
+   */
+  getSiteDomain(siteId: string | number): string {
+    const numericSiteId = Number(siteId);
+    const config = this.siteConfigMap.get(numericSiteId);
+    return config?.domain || "";
+  }
+
+  /**
    * Update the public status of a site in the cache
    */
   updateSitePublicStatus(siteId: number, isPublic: boolean): void {
     const config = this.siteConfigMap.get(siteId) || {
       public: false,
       saltUserIds: false,
+      domain: "",
     };
     config.public = isPublic;
     this.siteConfigMap.set(siteId, config);
@@ -79,8 +92,22 @@ class SiteConfig {
     const config = this.siteConfigMap.get(siteId) || {
       public: false,
       saltUserIds: false,
+      domain: "",
     };
     config.saltUserIds = saltUserIds;
+    this.siteConfigMap.set(siteId, config);
+  }
+
+  /**
+   * Update the domain of a site in the cache
+   */
+  updateSiteDomain(siteId: number, domain: string): void {
+    const config = this.siteConfigMap.get(siteId) || {
+      public: false,
+      saltUserIds: false,
+      domain: "",
+    };
+    config.domain = domain;
     this.siteConfigMap.set(siteId, config);
   }
 
