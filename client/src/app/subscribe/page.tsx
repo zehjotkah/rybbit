@@ -199,12 +199,9 @@ export default function Subscribe() {
                       {isAnnual ? (
                         <>
                           <span className="text-3xl font-bold">
-                            ${annualPrice}
+                            ${Math.round(annualPrice / 12)}
                           </span>
-                          <span className="ml-1 text-neutral-400">/year</span>
-                          <div className="text-sm text-neutral-400">
-                            ${Math.round(annualPrice / 12)}/mo
-                          </div>
+                          <span className="ml-1 text-neutral-400">/month</span>
                         </>
                       ) : (
                         <>

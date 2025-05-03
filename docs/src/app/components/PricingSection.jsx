@@ -116,13 +116,10 @@ export function PricingSection() {
                     <div className="text-right">
                       {isAnnual ? (
                         <>
-                          <span className="text-3xl font-bold">${prices.annual}</span>
+                          <span className="text-3xl font-bold">${Math.round(prices.annual / 12)}</span>
                           <span className="ml-1 text-neutral-400">
-                            /year
+                            /month
                           </span>
-                          <div className="text-sm text-neutral-400">
-                            ${Math.round(prices.annual / 12)}/mo
-                          </div>
                         </>
                       ) : (
                         <>

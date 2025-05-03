@@ -4,15 +4,7 @@ import { BACKEND_URL } from "../../../../lib/const";
 interface SubscriptionData {
   id: string;
   planName: string;
-  status:
-    | "incomplete"
-    | "incomplete_expired"
-    | "trialing"
-    | "active"
-    | "past_due"
-    | "canceled"
-    | "unpaid"
-    | "paused";
+  status: "expired" | "active" | "trialing";
   currentPeriodEnd: string;
   monthlyEventCount: number;
   eventLimit: number;
