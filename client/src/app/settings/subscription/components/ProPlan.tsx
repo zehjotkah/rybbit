@@ -45,7 +45,7 @@ export function ProPlan() {
       }
     : null;
 
-  const handleManageSubscription = async () => {
+  const createPortalSession = async (flowType?: string) => {
     setActionError(null);
     setIsProcessing(true);
     try {
@@ -59,6 +59,7 @@ export function ProPlan() {
           credentials: "include",
           body: JSON.stringify({
             returnUrl: window.location.href,
+            flowType,
           }),
         }
       );
@@ -82,6 +83,11 @@ export function ProPlan() {
       setIsProcessing(false);
     }
   };
+
+  const handleChangePlan = () => createPortalSession("subscription_update");
+  const handleViewSubscription = () => createPortalSession();
+  const handleCancelSubscription = () =>
+    createPortalSession("subscription_cancel");
 
   const getFormattedPrice = () => {
     if (!currentPlanDetails) return "$0/month";
@@ -130,13 +136,22 @@ export function ProPlan() {
                   {formatRenewalDate()}
                 </p>
               </div>
-              <Button
-                variant="outline"
-                onClick={handleManageSubscription}
-                disabled={isProcessing}
-              >
-                {isProcessing ? "Processing..." : "Change Plan"}
-              </Button>
+              <div className="space-x-2">
+                <Button
+                  variant="success"
+                  onClick={handleChangePlan}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Processing..." : "Change Plan"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleViewSubscription}
+                  disabled={isProcessing}
+                >
+                  View Details
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -165,6 +180,18 @@ export function ProPlan() {
                 </p>
               </div>
             )}
+
+            <div className="flex justify-end pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <Button
+                variant="ghost"
+                onClick={handleCancelSubscription}
+                disabled={isProcessing}
+                size="sm"
+                className="dark:hover:bg-red-700/60"
+              >
+                Cancel Subscription
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
