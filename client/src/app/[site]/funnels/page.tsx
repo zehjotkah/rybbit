@@ -3,17 +3,11 @@
 import { SavedFunnel, useGetFunnels } from "@/api/analytics/useGetFunnels";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStore } from "@/lib/store";
-import { PlusCircle } from "lucide-react";
+import { ArrowRight, FilterIcon } from "lucide-react";
 import { MobileSidebar } from "../../../components/MobileSidebar";
+import { NothingFound } from "../../../components/NothingFound";
 import { CreateFunnelDialog } from "./components/CreateFunnel";
 import { FunnelRow } from "./components/FunnelRow";
-import {
-  ArrowRight,
-  ChevronDown,
-  FileText,
-  FilterIcon,
-  MousePointerClick,
-} from "lucide-react";
 
 // Skeleton for the funnel row component
 const FunnelRowSkeleton = () => (
@@ -105,17 +99,13 @@ export default function FunnelsPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-10 text-center">
-          <div className="bg-neutral-100 dark:bg-neutral-800 rounded-full p-3 mb-4">
-            <PlusCircle className="h-6 w-6" />
-          </div>
-          <h3 className="text-lg font-medium mb-2">No funnels yet</h3>
-          <p className="text-neutral-500 max-w-md mb-6">
-            Create your first funnel to track conversions through your site's
-            user journey
-          </p>
-          <CreateFunnelDialog />
-        </div>
+        <NothingFound
+          title={"No funnels yet"}
+          description={
+            "Create your first funnel to track conversions through your site's user journey"
+          }
+          action={<CreateFunnelDialog />}
+        />
       )}
     </div>
   );

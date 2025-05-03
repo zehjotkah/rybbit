@@ -23,6 +23,7 @@ import {
 } from "../../../components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { RetentionChart } from "./RetentionChart";
+import { NothingFound } from "../../../components/NothingFound";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
@@ -196,20 +197,13 @@ export default function RetentionPage() {
   // Render empty state
   if (data && (!data.cohorts || cohortKeys.length === 0)) {
     return (
-      <div className="pt-4">
-        <Card>
-          <CardContent>
-            <div className="p-8 text-center">
-              <div className="text-neutral-300 mb-2 font-medium">
-                No retention data available
-              </div>
-              <p className="text-neutral-500 text-sm">
-                Try selecting a different time range or make sure you have
-                tracking data in the system.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="p-2 md:p-4 max-w-[1300px] mx-auto flex flex-col gap-3">
+        <NothingFound
+          title={"No retention data available"}
+          description={
+            "Try selecting a different time range or make sure you have tracking data in the system."
+          }
+        />
       </div>
     );
   }

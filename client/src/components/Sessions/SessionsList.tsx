@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useGetSessionsInfinite } from "../../api/analytics/userSessions";
 import { SessionCard, SessionCardSkeleton } from "./SessionCard";
 import { Button } from "../ui/button";
+import { NothingFound } from "../NothingFound";
 
 export default function SessionsList({ userId }: { userId?: string }) {
   // Get sessions data with infinite loading
@@ -34,9 +35,10 @@ export default function SessionsList({ userId }: { userId?: string }) {
         // Show skeleton cards while loading
         <SessionCardSkeleton />
       ) : flattenedData.length === 0 ? (
-        <div className="flex justify-center py-8 text-gray-400">
-          No sessions found
-        </div>
+        <NothingFound
+          title={"No sessions found"}
+          description={"Try a different date range or filter"}
+        />
       ) : (
         // Render session cards with more robust key generation
         flattenedData.map((session, index) => (

@@ -185,7 +185,7 @@ export function ScriptBuilder({ siteId }: ScriptBuilderProps) {
           </div>
 
           {/* Track Outbound Links Option */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div>
                 <Label
@@ -204,7 +204,7 @@ export function ScriptBuilder({ siteId }: ScriptBuilderProps) {
                 onCheckedChange={setTrackOutbound}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Skip Patterns Option */}
           <div className="space-y-2">

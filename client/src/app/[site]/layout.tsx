@@ -41,14 +41,15 @@ export default function SiteLayout({
     return null;
   }
 
-  if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
-    return <NoData siteMetadata={siteMetadata} />;
-  }
+  // if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
+  //   return <NoData siteMetadata={siteMetadata} />;
+  // }
 
   if (width && width < 768) {
     return (
       <div className="">
         <TopBar />
+        <Header />
         <div>{children}</div>
       </div>
       // <div className="flex flex-col h-screen relative">

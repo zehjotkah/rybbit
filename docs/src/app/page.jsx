@@ -29,7 +29,7 @@ export default function IndexPage() {
     <div className="flex flex-col items-center justify-center overflow-x-hidden">
 
       <h1 className={`text-4xl md:text-5xl lg:text-7xl font-semibold pt-16 md:pt-24 px-4 tracking-tight max-w-3xl text-center text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400 ${tilt_wrap.className}`}>The Modern Google Analytics Alternative</h1>
-      <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-3xl text-center text-neutral-300">Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.</h2>
+      <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-3xl text-center text-neutral-300">Next-gen, open source, lightweight, cookieless web & product analytics for everyone.</h2>
 
       <div className="flex flex-col sm:flex-row my-8 md:my-10 items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">
         <Link href="https://app.rybbit.io/signup" className="w-full sm:w-auto">

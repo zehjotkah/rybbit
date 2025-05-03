@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGetGoals } from "../../../api/analytics/useGetGoals";
 import { getStartAndEndDate } from "../../../api/utils";
+import { NothingFound } from "../../../components/NothingFound";
 import { GOALS_PAGE_FILTERS, useStore } from "../../../lib/store";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import CreateGoalButton from "./components/CreateGoalButton";
@@ -93,13 +94,13 @@ export default function GoalsPage() {
             ))}
         </div>
       ) : !goalsData || goalsData.data.length === 0 ? (
-        <div className="py-10 text-center">
-          <h3 className="text-lg font-medium">No goals configured yet</h3>
-          <p className="text-sm text-gray-500 mt-2">
-            Create your first conversion goal to start tracking important user
-            actions.
-          </p>
-        </div>
+        <NothingFound
+          title={"No goals found"}
+          description={
+            "Create your first conversion goal to start tracking important user actions."
+          }
+          action={<CreateGoalButton siteId={Number(site)} />}
+        />
       ) : (
         <GoalsList
           goals={goalsData.data}

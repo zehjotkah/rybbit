@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useGetEventsInfinite } from "../../../../api/analytics/useGetEvents";
 import { formatter } from "../../../../lib/utils";
 import { EventLogItem, EventLogItemSkeleton } from "./EventLogItem";
+import { NothingFound } from "../../../../components/NothingFound";
 
 export function EventLog() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,9 +80,10 @@ export function EventLog() {
 
   if (allEvents.length === 0) {
     return (
-      <div className="text-center py-8 text-neutral-400">
-        No events found in the selected time period.
-      </div>
+      <NothingFound
+        title={"No events found"}
+        description={"Try a different date range or filter"}
+      />
     );
   }
 

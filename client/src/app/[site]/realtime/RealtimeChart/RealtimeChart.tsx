@@ -33,18 +33,7 @@ export function RealtimeChart() {
   }
 
   if (!chartData || chartData.length === 0) {
-    return (
-      <div
-        style={{
-          height: 300,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        No data available for this period.
-      </div>
-    );
+    return null;
   }
 
   return (

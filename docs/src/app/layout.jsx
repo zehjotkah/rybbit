@@ -21,7 +21,8 @@ export const metadata = {
   title: {
     template: '%s - Rybbit'
   },
-  description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.',
+  description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone.',
+  // description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.',
   applicationName: 'Rybbit',
   generator: 'Next.js',
   appleWebApp: {

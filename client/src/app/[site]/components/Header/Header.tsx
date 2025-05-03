@@ -2,6 +2,7 @@
 
 import { FreeTrialBanner } from "../../../../components/FreeTrialBanner";
 import { userStore } from "../../../../lib/userStore";
+import { NoData } from "./NoData";
 import { UsageBanners } from "./UsageBanners";
 
 export function Header() {
@@ -13,6 +14,7 @@ export function Header() {
         <>
           <FreeTrialBanner />
           <UsageBanners />
+          <NoData />
         </>
       )}
     </div>

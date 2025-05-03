@@ -462,11 +462,11 @@ export default function JourneysPage() {
             </Alert>
           )}
 
-          {data?.journeys?.length && data?.journeys?.length > 0 && (
+          {data?.journeys?.length && data?.journeys?.length > 0 ? (
             <div className="overflow-x-auto">
               <svg ref={svgRef} className="w-full h-[1000px]" />
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>
