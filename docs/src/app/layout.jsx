@@ -87,6 +87,11 @@ export default async function RootLayout({ children }) {
         saturation: 64,
         lightness: 51,
       }} />
+      <script
+          src="https://app.rybbit.io/api/script.js"
+          site-id="2"
+          defer
+      />
       <body>
         <Layout
           // banner={<Banner storageKey="Rybbit">Rybbit Alpha</Banner>}
