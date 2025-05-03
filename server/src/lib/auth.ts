@@ -34,6 +34,16 @@ export let auth: AuthType | null = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+  },
   deleteUser: {
     enabled: true,
   },
@@ -78,6 +88,7 @@ export function initAuth(allowedOrigins: string[]) {
       // Disable email verification for now
       requireEmailVerification: false,
     },
+
     socialProviders: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID!,
