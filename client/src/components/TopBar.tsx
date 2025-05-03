@@ -1,47 +1,18 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "../lib/auth";
+import { Logo } from "./Logo";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { User } from "lucide-react";
-import { Button } from "./ui/button";
-import Image from "next/image";
-import {
-  Manrope,
-  Outfit,
-  Urbanist,
-  Paytone_One,
-  Tilt_Warp,
-} from "next/font/google";
-
-const manrope = Manrope({
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-});
-
-const urbanist = Urbanist({
-  subsets: ["latin"],
-});
-
-const paytone = Paytone_One({
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const tilt_wrap = Tilt_Warp({
-  subsets: ["latin"],
-  weight: "400",
-});
 
 export function TopBar() {
   const session = authClient.useSession();
@@ -52,12 +23,8 @@ export function TopBar() {
     <div className="flex py-2 pr-3 pl-6 items-center w-full  bg-neutral-950 justify-center border-b border-neutral-750">
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-4">
-          <Link
-            href={session.data ? "/" : "https://rybbit.io"}
-            className={`text-xl font-semibold flex items-center gap-1.5 ${tilt_wrap.className}`}
-          >
-            <Image src="/rybbit.png" alt="Rybbit" width={22} height={22} />
-            rybbit.
+          <Link href={session.data ? "/" : "https://rybbit.io"}>
+            <Logo size="small" />
           </Link>
         </div>
         {session.data ? (

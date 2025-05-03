@@ -13,6 +13,7 @@ import { authClient } from "../../lib/auth";
 import { IS_CLOUD } from "../../lib/const";
 import { userStore } from "../../lib/userStore";
 import { GithubLogo, GoogleLogo } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
 
 export default function Page() {
   const [email, setEmail] = useState("");
@@ -64,6 +65,7 @@ export default function Page() {
     <div className="flex justify-center items-center h-screen w-full">
       <Card className="w-full max-w-sm p-1">
         <CardHeader>
+          <Image src="/rybbit.png" alt="Rybbit" width={32} height={32} />
           <CardTitle className="text-2xl flex justify-center">
             Sign in
           </CardTitle>

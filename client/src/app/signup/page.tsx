@@ -26,6 +26,7 @@ import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { authClient } from "../../lib/auth";
 import { BACKEND_URL, IS_CLOUD } from "../../lib/const";
 import { userStore } from "../../lib/userStore";
+import { Logo } from "../../components/Logo";
 
 // Animation variants for step transitions
 const contentVariants = {
@@ -203,7 +204,7 @@ export default function SignupPage() {
                   placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
               </div>
               <div className="grid gap-2">
@@ -215,7 +216,7 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
               </div>
               <div className="grid gap-2">
@@ -227,12 +228,12 @@ export default function SignupPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
               </div>
               <Button
                 onClick={handleAccountSubmit}
-                className="w-full mt-6 transition-all duration-300 h-11"
+                className="w-full mt-6 transition-all duration-300 h-11 bg-emerald-600 hover:bg-emerald-500 text-white"
                 disabled={isLoading || !email || !password}
                 variant="success"
               >
@@ -257,7 +258,7 @@ export default function SignupPage() {
                           callbackURL: "/",
                         });
                       }}
-                      className="transition-all duration-300 hover:bg-muted"
+                      className="transition-all duration-300 hover:bg-muted bg-neutral-800/50 border-neutral-700"
                     >
                       <GoogleLogo weight="bold" />
                       Google
@@ -271,7 +272,7 @@ export default function SignupPage() {
                           callbackURL: "/",
                         });
                       }}
-                      className="transition-all duration-300 hover:bg-muted"
+                      className="transition-all duration-300 hover:bg-muted bg-neutral-800/50 border-neutral-700"
                     >
                       <GithubLogo weight="bold" />
                       GitHub
@@ -283,7 +284,7 @@ export default function SignupPage() {
                 Already have an account?{" "}
                 <Link
                   href="/login"
-                  className="underline underline-offset-4 hover:text-primary transition-colors duration-300"
+                  className="underline underline-offset-4 hover:text-emerald-400 transition-colors duration-300"
                 >
                   Log in
                 </Link>
@@ -299,7 +300,7 @@ export default function SignupPage() {
             variants={contentVariants}
           >
             <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Building2 className="h-6 w-6 text-primary" />
+              <Building2 className="h-6 w-6 text-emerald-500" />
               Create your organization
             </h2>
             <div className="space-y-4">
@@ -312,7 +313,7 @@ export default function SignupPage() {
                   value={orgName}
                   onChange={(e) => handleOrgNameChange(e.target.value)}
                   required
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
               </div>
 
@@ -332,13 +333,13 @@ export default function SignupPage() {
                     )
                   }
                   required
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
               </div>
 
               <div className="flex flex-col gap-4 pt-4">
                 <Button
-                  className="w-full transition-all duration-300 h-11"
+                  className="w-full transition-all duration-300 h-11 bg-emerald-600 hover:bg-emerald-500 text-white"
                   onClick={handleOrganizationSubmit}
                   disabled={isLoading || !orgName || !orgSlug}
                   variant="success"
@@ -364,7 +365,7 @@ export default function SignupPage() {
             variants={contentVariants}
           >
             <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <AppWindow className="h-6 w-6 text-primary" />
+              <AppWindow className="h-6 w-6 text-emerald-500" />
               Add your first website
             </h2>
             <div className="space-y-4">
@@ -377,7 +378,7 @@ export default function SignupPage() {
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
                   required
-                  className="h-10 transition-all"
+                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
                 <p className="text-xs text-muted-foreground">
                   Enter the domain of the website you want to track
@@ -386,7 +387,7 @@ export default function SignupPage() {
 
               <div className="flex justify-between pt-4">
                 <Button
-                  className="w-full transition-all duration-300 h-11"
+                  className="w-full transition-all duration-300 h-11 bg-emerald-600 hover:bg-emerald-500 text-white"
                   onClick={handleWebsiteSubmit}
                   disabled={isLoading || !domain}
                   variant="success"
@@ -406,13 +407,13 @@ export default function SignupPage() {
             variants={contentVariants}
           >
             <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Code className="h-6 w-6 text-primary" />
+              <Code className="h-6 w-6 text-emerald-500" />
               Add tracking code to your website
             </h2>
             <div className="space-y-6">
-              <div className="rounded-lg bg-muted p-5 border border-border">
+              <div className="rounded-lg bg-muted p-5 border border-neutral-700 backdrop-blur-sm bg-neutral-800/20">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 text-primary-foreground">
                     <Check className="h-4 w-4" />
                   </div>
                   <p className="text-base font-medium">
@@ -429,7 +430,7 @@ export default function SignupPage() {
                 <Label>
                   Place this snippet in the &lt;head&gt; of your website
                 </Label>
-                <div className="border border-border rounded-lg overflow-hidden">
+                <div className="border border-neutral-700 rounded-lg overflow-hidden">
                   <CodeSnippet
                     language="HTML"
                     code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n/>`}
@@ -437,7 +438,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-muted p-4 border border-border">
+              <div className="rounded-lg bg-muted p-4 border border-neutral-700 backdrop-blur-sm bg-neutral-800/20">
                 <p className="text-sm text-muted-foreground">
                   Once you've added the tracking code, it may take a few minutes
                   for data to appear in your dashboard.
@@ -449,7 +450,7 @@ export default function SignupPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentStep(3)}
-                  className="transition-all duration-300 h-11"
+                  className="transition-all duration-300 h-11 bg-neutral-800/50 border-neutral-700"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
@@ -457,7 +458,7 @@ export default function SignupPage() {
                 <Button
                   onClick={() => router.push(`/${siteId}`)}
                   variant="success"
-                  className="flex-1 transition-all duration-300 h-11"
+                  className="flex-1 transition-all duration-300 h-11 bg-emerald-600 hover:bg-emerald-500 text-white"
                 >
                   Go to Dashboard
                   <Check className="ml-2 h-4 w-4" />
@@ -475,28 +476,35 @@ export default function SignupPage() {
   const progressPercentage = ((currentStep - 1) / 3) * 100;
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-lg border-border">
+    <div className="flex justify-center items-center min-h-screen bg-background p-4 relative overflow-hidden">
+      {/* Background gradients similar to docs page */}
+      <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-emerald-500/40 rounded-full blur-[80px] opacity-40"></div>
+      <div className="absolute top-20 left-20 w-[400px] h-[400px] bg-emerald-600/30 rounded-full blur-[70px] opacity-30"></div>
+
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/40 rounded-full blur-[80px] opacity-30"></div>
+      <div className="absolute bottom-40 right-20 w-[350px] h-[350px] bg-indigo-500/30 rounded-full blur-[75px] opacity-30"></div>
+
+      <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-20"></div>
+
+      <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-2xl border-neutral-700/50 backdrop-blur-sm bg-neutral-800/20 relative z-10">
         <div className="flex flex-col md:flex-row h-full">
           {/* Left sidebar with steps */}
-          <div className="bg-muted/70 md:w-80 p-6 relative overflow-hidden">
+          <div className="md:w-80 p-6 relative overflow-hidden border-r border-neutral-700/50 backdrop-blur-sm bg-neutral-800/30">
             <div className="absolute top-0 left-0 right-0 h-1 bg-muted-foreground/20 overflow-hidden">
               <div
-                className="h-full bg-primary transition-all duration-500 ease-out"
+                className="h-full bg-emerald-500 transition-all duration-500 ease-out"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
             <div className="relative z-10 flex flex-col space-y-4">
-              <h1 className="text-xl font-bold mb-6">
-                Get Started with Rybbit
-              </h1>
+              <Logo size="xlarge" />
 
               {[1, 2, 3, 4].map((step) => (
                 <div
                   key={step}
                   className={`flex items-center space-x-3 py-3 ${
                     currentStep === step
-                      ? "text-primary font-medium"
+                      ? "text-emerald-400 font-medium"
                       : currentStep > step
                       ? "text-muted-foreground"
                       : "text-muted-foreground/60"
@@ -507,9 +515,9 @@ export default function SignupPage() {
                       flex items-center justify-center w-8 h-8 rounded-full 
                       ${
                         currentStep === step
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-emerald-600 text-primary-foreground"
                           : currentStep > step
-                          ? "bg-primary/20 text-primary"
+                          ? "bg-emerald-600/20 text-emerald-400"
                           : "bg-muted-foreground/20 text-muted-foreground"
                       }
                       transition-all duration-300
@@ -533,7 +541,7 @@ export default function SignupPage() {
           </div>
 
           {/* Right content area */}
-          <div className="p-6 md:p-8 flex-1 h-[600px] flex flex-col">
+          <div className="p-6 md:p-8 flex-1 h-[600px] flex flex-col backdrop-blur-sm bg-neutral-900/50">
             {error && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
