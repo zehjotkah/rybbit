@@ -8,6 +8,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { StandardPage } from "../../components/StandardPage";
 import { BACKEND_URL } from "../../lib/const";
+import { useStripeSubscription } from "../settings/subscription/utils/useStripeSubscription";
+import { useRouter } from "next/navigation";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [
@@ -132,9 +134,14 @@ export default function Subscribe() {
   }
 
   // Get pricing information
-  const proPricing = findPriceForTier(eventLimit, isAnnual ? "year" : "month");
   const monthlyPrice = findPriceForTier(eventLimit, "month")?.price || 0;
   const annualPrice = findPriceForTier(eventLimit, "year")?.price || 0;
+
+  const { data: subscription } = useStripeSubscription();
+  const router = useRouter();
+  if (subscription?.status === "active") {
+    router.push("/settings/subscription");
+  }
 
   return (
     <StandardPage>
@@ -292,8 +299,7 @@ export default function Subscribe() {
               <p className="text-neutral-300">
                 We'll notify you when you're approaching your limit. You can
                 either upgrade to a higher plan or continue with your current
-                plan (events beyond the limit won't be tracked). Remember, an
-                event is either a pageview or a custom event you've defined.
+                plan (events beyond the limit won't be tracked).
               </p>
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function Pricing() {
           <div className="bg-neutral-800/20 p-5 rounded-lg border border-neutral-700">
             <h4 className="font-medium mb-2">What happens if I go over my event limit?</h4>
             <p className="text-neutral-300">
-              We'll notify you when you're approaching your limit. You can either upgrade to a higher plan or continue with your current plan (events beyond the limit won't be tracked). Remember, an event is either a pageview or a custom event you've defined.
+              We'll notify you when you're approaching your limit. You can either upgrade to a higher plan or continue with your current plan (events beyond the limit won't be tracked). 
             </p>
           </div>
         </div>
