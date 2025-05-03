@@ -2,8 +2,7 @@
 
 import { BACKEND_URL } from "@/lib/const";
 import QueryProvider from "@/providers/QueryProvider";
-import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Toaster } from "../components/ui/sonner";
