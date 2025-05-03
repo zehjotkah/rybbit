@@ -163,7 +163,7 @@ export function PricingSection() {
                 ))}
               </div>
               
-              <Link href="https://demo.rybbit.io/signup" className="w-full block">
+              <Link href="https://app.rybbit.io/signup" className="w-full block">
                 <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
                   Start your 14 day free trial
                 </button>
