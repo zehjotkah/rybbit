@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import pg from "pg";
 import { db } from "../db/postgres/postgres.js";
 import * as schema from "../db/postgres/schema.js";
-import { IS_CLOUD } from "./const.js";
+import { DISABLE_SIGNUP } from "./const.js";
 
 dotenv.config();
 
@@ -33,6 +33,7 @@ export let auth: AuthType | null = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    disableSignUp: DISABLE_SIGNUP,
   },
   socialProviders: {
     google: {
@@ -87,8 +88,8 @@ export function initAuth(allowedOrigins: string[]) {
       enabled: true,
       // Disable email verification for now
       requireEmailVerification: false,
+      disableSignUp: DISABLE_SIGNUP,
     },
-
     socialProviders: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID!,

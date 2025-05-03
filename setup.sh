@@ -31,6 +31,7 @@ cat > .env << EOL
 DOMAIN_NAME=${DOMAIN_NAME}
 BASE_URL=${BASE_URL}
 BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+DISABLE_SIGNUP=false
 EOL
 
 echo ".env file created successfully with domain ${DOMAIN_NAME}."

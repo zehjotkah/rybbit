@@ -68,6 +68,7 @@ services:
       - POSTGRES_PASSWORD=frog
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BASE_URL=${BASE_URL}
+      - DISABLE_SIGNUP=${DISABLE_SIGNUP}
     depends_on:
       clickhouse:
         condition: service_healthy
