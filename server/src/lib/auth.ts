@@ -78,22 +78,20 @@ export function initAuth(allowedOrigins: string[]) {
       // Disable email verification for now
       requireEmailVerification: false,
     },
-    socialProviders: IS_CLOUD
-      ? {
-          google: {
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-          },
-          github: {
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-          },
-          // twitter: {
-          //   clientId: process.env.TWITTER_CLIENT_ID!,
-          //   clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-          // },
-        }
-      : {},
+    socialProviders: {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      },
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      },
+      // twitter: {
+      //   clientId: process.env.TWITTER_CLIENT_ID!,
+      //   clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+      // },
+    },
     deleteUser: {
       enabled: true,
     },
