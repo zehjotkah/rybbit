@@ -253,29 +253,29 @@ export default function IndexPage() {
               <div className="mb-6 md:mb-8">
                 <Logo />
               </div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">Ready to take control of your analytics?</h2>
+              <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">It's time to switch to analytics that's made for you</h2>
               <p className="text-base md:text-xl text-neutral-300 mb-6 md:mb-10 max-w-3xl mx-auto">
-                Join thousands of businesses that use Rybbit to make data-driven decisions without compromising on privacy or performance.
+                Try out 14 day free trial. We won't even ask for your credit card at all.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
                 <Link href="https://demo.rybbit.io/signup" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
-                    Start your 14 day free trial
+                    Track your site now
                   </button>
                 </Link>
-                <Link href="https://docs.tomato.gg" className="w-full sm:w-auto">
+                {/* <Link href="https://docs.tomato.gg" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50">
                     View Documentation
                   </button>
-                </Link>
+                </Link> */}
               </div>
               
               <p className="text-neutral-400 text-xs md:text-sm flex items-center justify-center gap-2">
                 <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                No credit card required. Cancel anytime.
+                We don't ask for your credit card
               </p>
             </div>
           </div>

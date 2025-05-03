@@ -170,7 +170,7 @@ export function PricingSection() {
               </Link>
               
               <p className="text-center text-sm text-neutral-400 mt-4">
-                No credit card required. Cancel anytime.
+              We don't ask for your credit card
               </p>
             </div>
           </div>

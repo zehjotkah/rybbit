@@ -260,7 +260,7 @@ export default function Subscribe() {
               </button>
 
               <p className="text-center text-sm text-neutral-400 mt-4">
-                Secure checkout powered by Stripe. Cancel anytime.
+                Secure checkout powered by Stripe.
               </p>
             </div>
           </div>
