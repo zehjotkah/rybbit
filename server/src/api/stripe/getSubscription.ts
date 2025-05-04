@@ -1,19 +1,19 @@
+import { eq } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { stripe } from "../../lib/stripe.js";
+import Stripe from "stripe";
 import { db } from "../../db/postgres/postgres.js";
 import { user as userSchema } from "../../db/postgres/schema.js";
-import { eq } from "drizzle-orm";
 import {
-  STRIPE_PRICES,
+  getStripePrices,
   StripePlan,
   TRIAL_DURATION_DAYS,
   TRIAL_EVENT_LIMIT,
 } from "../../lib/const.js";
-import Stripe from "stripe";
+import { stripe } from "../../lib/stripe.js";
 
 // Function to find plan details by price ID
 function findPlanDetails(priceId: string): StripePlan | undefined {
-  return STRIPE_PRICES.find(
+  return getStripePrices().find(
     (plan: StripePlan) =>
       plan.priceId === priceId ||
       (plan.annualDiscountPriceId && plan.annualDiscountPriceId === priceId)

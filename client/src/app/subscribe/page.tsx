@@ -2,14 +2,14 @@
 
 import { Slider } from "@/components/ui/slider";
 import { authClient } from "@/lib/auth";
-import { STRIPE_PRICES } from "@/lib/stripe";
+import { getStripePrices } from "@/lib/stripe";
 import { Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StandardPage } from "../../components/StandardPage";
 import { BACKEND_URL } from "../../lib/const";
 import { useStripeSubscription } from "../settings/subscription/utils/useStripeSubscription";
-import { useRouter } from "next/navigation";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [
@@ -43,10 +43,9 @@ function findPriceForTier(
 ): StripePrice | null {
   // Determine if we need to look for annual plans
   const isAnnual = interval === "year";
-  const namePattern = isAnnual ? "pro-annual" : "pro";
 
   // Filter plans by name pattern (with or without -annual suffix) and interval
-  const plans = STRIPE_PRICES.filter(
+  const plans = getStripePrices().filter(
     (plan) =>
       (isAnnual
         ? plan.name.startsWith("pro") && plan.name.includes("-annual")

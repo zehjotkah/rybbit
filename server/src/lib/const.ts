@@ -20,9 +20,9 @@ export interface StripePlan {
   annualDiscountPriceId?: string; // Make this optional
 }
 
-export const STRIPE_PRICES: StripePlan[] = [
+const STRIPE_PRICES: StripePlan[] = [
   {
-    priceId: "price_1R1fIVDFVprnAny2yJtRRPBm",
+    priceId: "price_1RKuxUDFVprnAny2xyyWvXNr",
     name: "pro100k",
     interval: "month",
     limits: {
@@ -30,7 +30,7 @@ export const STRIPE_PRICES: StripePlan[] = [
     },
   },
   {
-    priceId: "price_1R2l2KDFVprnAny2iZr5gFLe",
+    priceId: "price_1RKuxUDFVprnAny2RkoZyxev",
     name: "pro100k-annual",
     interval: "year",
     limits: {
@@ -38,7 +38,7 @@ export const STRIPE_PRICES: StripePlan[] = [
     },
   },
   {
-    priceId: "price_1R1fKJDFVprnAny2mfiBjkAQ",
+    priceId: "price_1RKuxTDFVprnAny2TS4Qz0Hi",
     name: "pro250k",
     interval: "month",
     limits: {
@@ -46,7 +46,7 @@ export const STRIPE_PRICES: StripePlan[] = [
     },
   },
   {
-    priceId: "price_1R2lJIDFVprnAny22zUvjg5o",
+    priceId: "price_1RKuxTDFVprnAny2rDcJOwHn",
     name: "pro250k-annual",
     interval: "year",
     limits: {
@@ -55,7 +55,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro500k",
-    priceId: "price_1R1fQlDFVprnAny2WwNdiRgT",
+    priceId: "price_1RKuxSDFVprnAny2L7hbJSmO",
     interval: "month",
     limits: {
       events: 500_000,
@@ -63,7 +63,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro500k-annual",
-    priceId: "price_1R2lKIDFVprnAny27wXUAy2D",
+    priceId: "price_1RKuxSDFVprnAny2APD1EsL4",
     interval: "year",
     limits: {
       events: 500_000,
@@ -71,7 +71,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro1m",
-    priceId: "price_1R1fR2DFVprnAny28tPEQAwh",
+    priceId: "price_1RKuxRDFVprnAny2UnTeUnYl",
     interval: "month",
     limits: {
       events: 1_000_000,
@@ -79,7 +79,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro1m-annual",
-    priceId: "price_1R2lKtDFVprnAny2Xl98rgu4",
+    priceId: "price_1RKuxRDFVprnAny2f67uFcwC",
     interval: "year",
     limits: {
       events: 1_000_000,
@@ -87,7 +87,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro2m",
-    priceId: "price_1R1fRMDFVprnAny24AMo0Vuu",
+    priceId: "price_1RKuxPDFVprnAny2pvdhKxSL",
     interval: "month",
     limits: {
       events: 2_000_000,
@@ -95,7 +95,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro2m-annual",
-    priceId: "price_1RE1bQDFVprnAny2ELKQS79d",
+    priceId: "price_1RKuxPDFVprnAny2NCYgKQf5",
     interval: "year",
     limits: {
       events: 2_000_000,
@@ -103,7 +103,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro5m",
-    priceId: "price_1RKuYJDFVprnAny2apEXvkde",
+    priceId: "price_1RKuxKDFVprnAny2pytTqnzP",
     interval: "month",
     limits: {
       events: 5_000_000,
@@ -111,7 +111,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro5m-annual",
-    priceId: "price_1RKuYaDFVprnAny2xEoejLRR",
+    priceId: "price_1RKuxKDFVprnAny2UjJFcvHQ",
     interval: "year",
     limits: {
       events: 5_000_000,
@@ -119,7 +119,7 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro10m",
-    priceId: "price_1RKuX5DFVprnAny20UMfh10N",
+    priceId: "price_1RKuxNDFVprnAny2HkZXUcZN",
     interval: "month",
     limits: {
       events: 10_000_000,
@@ -127,10 +127,37 @@ export const STRIPE_PRICES: StripePlan[] = [
   },
   {
     name: "pro10m-annual",
-    priceId: "price_1RKuXODFVprnAny2JUjrCSyY",
+    priceId: "price_1RKuxNDFVprnAny2mjFH5swO",
     interval: "year",
     limits: {
       events: 10_000_000,
     },
   },
 ];
+
+const TEST_TO_PRICE_ID = {
+  pro100k: "price_1R1fIVDFVprnAny2yJtRRPBm",
+  "pro100k-annual": "price_1R2l2KDFVprnAny2iZr5gFLe",
+  pro250k: "price_1R1fKJDFVprnAny2mfiBjkAQ",
+  "pro250k-annual": "price_1R2lJIDFVprnAny22zUvjg5o",
+  pro500k: "price_1R1fQlDFVprnAny2WwNdiRgT",
+  "pro500k-annual": "price_1R2lKIDFVprnAny27wXUAy2D",
+  pro1m: "price_1R1fR2DFVprnAny28tPEQAwh",
+  "pro1m-annual": "price_1R2lKtDFVprnAny2Xl98rgu4",
+  pro2m: "price_1R1fRMDFVprnAny24AMo0Vuu",
+  "pro2m-annual": "price_1RE1bQDFVprnAny2ELKQS79d",
+  pro5m: "price_1RKuYJDFVprnAny2apEXvkde",
+  "pro5m-annual": "price_1RKuYaDFVprnAny2xEoejLRR",
+  pro10m: "price_1RKuX5DFVprnAny20UMfh10N",
+  "pro10m-annual": "price_1RKuXODFVprnAny2JUjrCSyY",
+};
+
+export const getStripePrices = () => {
+  if (process.env.STRIPE_SECRET_KEY?.startsWith("sk_live")) {
+    return STRIPE_PRICES;
+  }
+  return STRIPE_PRICES.map((price) => ({
+    ...price,
+    priceId: TEST_TO_PRICE_ID[price.name as keyof typeof TEST_TO_PRICE_ID],
+  }));
+};

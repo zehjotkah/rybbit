@@ -37,7 +37,7 @@ export default function IndexPage() {
             Track your Site
           </button>
         </Link>
-        <Link href="https://app.rybbit.io/1" className="w-full sm:w-auto">
+        <Link href="https://demo.rybbit.io/1" className="w-full sm:w-auto">
           <button className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50">
             View Live Demo
           </button>

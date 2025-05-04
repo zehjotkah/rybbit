@@ -1,12 +1,12 @@
-import { user, member, sites } from "../db/postgres/schema.js";
-import { clickhouse } from "../db/clickhouse/clickhouse.js";
-import { STRIPE_PRICES, StripePlan } from "../lib/const.js";
-import { eq, inArray, and } from "drizzle-orm";
-import { db } from "../db/postgres/postgres.js";
-import { processResults } from "../api/analytics/utils.js";
-import { stripe } from "../lib/stripe.js";
-import Stripe from "stripe";
+import { and, eq, inArray } from "drizzle-orm";
 import { DateTime } from "luxon";
+import Stripe from "stripe";
+import { processResults } from "../api/analytics/utils.js";
+import { clickhouse } from "../db/clickhouse/clickhouse.js";
+import { db } from "../db/postgres/postgres.js";
+import { member, sites, user } from "../db/postgres/schema.js";
+import { getStripePrices, StripePlan } from "../lib/const.js";
+import { stripe } from "../lib/stripe.js";
 
 // Default event limit for users without an active subscription
 const DEFAULT_EVENT_LIMIT = 0;
@@ -102,7 +102,7 @@ async function getUserSubscriptionInfo(userData: {
     }
 
     // Find corresponding plan details from constants
-    const planDetails = STRIPE_PRICES.find(
+    const planDetails = getStripePrices().find(
       (plan: StripePlan) =>
         plan.priceId === priceId ||
         (plan.annualDiscountPriceId && plan.annualDiscountPriceId === priceId)

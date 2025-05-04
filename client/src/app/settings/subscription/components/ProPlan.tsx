@@ -6,7 +6,7 @@ import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Progress } from "../../../../components/ui/progress";
 import { BACKEND_URL } from "../../../../lib/const";
-import { STRIPE_PRICES } from "../../../../lib/stripe";
+import { getStripePrices } from "../../../../lib/stripe";
 import { formatDate } from "../utils/planUtils";
 import { useStripeSubscription } from "../utils/useStripeSubscription";
 
@@ -27,7 +27,7 @@ export function ProPlan() {
     eventLimit > 0 ? Math.min((currentUsage / eventLimit) * 100, 100) : 0;
   const isAnnualPlan = activeSubscription?.interval === "year";
 
-  const stripePlan = STRIPE_PRICES.find(
+  const stripePlan = getStripePrices().find(
     (p) => p.name === activeSubscription?.planName
   );
 
