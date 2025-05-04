@@ -19,6 +19,7 @@ import { DateRangeMode, Time } from "../../../components/DateSelector/types";
 import { DateTime } from "luxon";
 import { DateSelector } from "../../../components/DateSelector/DateSelector";
 import { useGetSite } from "../../../api/admin/sites";
+import { MobileSidebar } from "../../../components/MobileSidebar";
 
 const MAX_LINK_HEIGHT = 100;
 
@@ -397,7 +398,10 @@ export default function JourneysPage() {
   }, [data, steps, maxJourneys, siteMetadata]);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-2 md:p-4">
+      <div className="md:hidden mb-2">
+        <MobileSidebar />
+      </div>
       <div className="flex justify-end items-center gap-2 mb-2">
         <DateSelector time={time} setTime={setTime} />
         <Select

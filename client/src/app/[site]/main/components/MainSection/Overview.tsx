@@ -14,9 +14,11 @@ import { useState } from "react";
 const ChangePercentage = ({
   current,
   previous,
+  reverseColor,
 }: {
   current: number;
   previous: number;
+  reverseColor?: boolean;
 }) => {
   const change = ((current - previous) / previous) * 100;
 
@@ -35,7 +37,8 @@ const ChangePercentage = ({
     <div
       className={cn(
         "text-xs flex items-center gap-1",
-        change > 0 ? "text-green-400" : "text-red-400"
+        change > 0 ? "text-green-400" : "text-red-400",
+        reverseColor && change > 0 ? "text-red-400" : "text-green-400"
       )}
     >
       {change > 0 ? (
@@ -57,6 +60,7 @@ const Stat = ({
   isLoading,
   decimals,
   postfix,
+  reverseColor,
 }: {
   title: string;
   id: StatType;
@@ -66,6 +70,7 @@ const Stat = ({
   isLoading: boolean;
   decimals?: number;
   postfix?: string;
+  reverseColor?: boolean;
 }) => {
   const { selectedStat, setSelectedStat, site, bucket } = useStore();
   const [isHovering, setIsHovering] = useState(false);
@@ -112,7 +117,11 @@ const Stat = ({
                   {postfix && <span>{postfix}</span>}
                 </span>
               )}
-              <ChangePercentage current={value} previous={previous} />
+              <ChangePercentage
+                current={value}
+                previous={previous}
+                reverseColor={reverseColor}
+              />
             </>
           )}
         </div>
@@ -196,6 +205,7 @@ export function Overview() {
         isLoading={isLoading}
         postfix="%"
         decimals={1}
+        reverseColor={true}
       />
       <Stat
         title="Session Duration"
