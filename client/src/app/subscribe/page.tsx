@@ -90,8 +90,7 @@ export default function Subscribe() {
   async function handleSubscribe(): Promise<void> {
     // Handle custom tier by redirecting to email contact
     if (eventLimit === "Custom") {
-      window.location.href =
-        "mailto:hello@rybbit.io?subject=Custom%20Pricing%20Plan";
+      window.location.href = "https://www.rybbit.io/contact";
       return;
     }
 
@@ -163,9 +162,9 @@ export default function Subscribe() {
 
   const { data: subscription } = useStripeSubscription();
   const router = useRouter();
-  // if (subscription?.status === "active") {
-  //   router.push("/settings/subscription");
-  // }
+  if (subscription?.status === "active") {
+    router.push("/settings/subscription");
+  }
 
   return (
     <StandardPage>
