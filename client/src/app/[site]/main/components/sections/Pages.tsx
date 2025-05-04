@@ -64,7 +64,7 @@ export function Pages() {
               title="Entry Pages"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => e.value || "Other"}
+              getLabel={(e) => truncateString(e.value, 30) || "Other"}
               getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
               expanded={expanded}
               close={close}
@@ -76,7 +76,7 @@ export function Pages() {
               title="Exit Pages"
               getValue={(e) => e.value}
               getKey={(e) => e.value}
-              getLabel={(e) => e.value || "Other"}
+              getLabel={(e) => truncateString(e.value, 30) || "Other"}
               getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
               expanded={expanded}
               close={close}

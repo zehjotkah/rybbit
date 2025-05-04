@@ -36,7 +36,7 @@ export default function RealtimePage() {
     >
       <World width={width ?? 0} />
 
-      <div className="absolute top-2 left-2 md:top-4 md:left-4 flex flex-row gap-2">
+      <div className="absolute top-2 left-2 md:top-4 md:left-4 flex flex-row gap-2 items-start">
         <MobileSidebar />
         <div className="flex flex-col p-2 md:p-3 bg-neutral-900 rounded-lg shadow-lg border border-neutral-750 w-[300px] md:w-[400px]">
           <div className="p-2">
