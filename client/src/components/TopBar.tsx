@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { IS_DEMO } from "../lib/const";
 
 export function TopBar() {
   const session = authClient.useSession();
@@ -53,6 +54,12 @@ export function TopBar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        ) : IS_DEMO ? (
+          <Link href="https://app.rybbit.io/signup" passHref>
+            <Button variant="ghost" size="xs">
+              Sign up
+            </Button>
+          </Link>
         ) : (
           <Link href="/signup" passHref>
             <Button variant="ghost" size="xs">

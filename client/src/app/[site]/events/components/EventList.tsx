@@ -5,8 +5,8 @@ import { ChevronDown, ChevronRight, Info } from "lucide-react";
 import { memo, useState } from "react";
 import { EventName } from "../../../../api/analytics/useGetEventNames";
 import { useGetEventProperties } from "../../../../api/analytics/useGetEventProperties";
-import { EventProperties } from "./EventProperties";
 import { NothingFound } from "../../../../components/NothingFound";
+import { EventProperties } from "./EventProperties";
 
 // Skeleton component for EventList
 const EventListSkeleton = memo(
@@ -105,7 +105,12 @@ export function EventList({
   }
 
   if (!events || events.length === 0) {
-    return (
+    return size === "small" ? (
+      <div className="text-neutral-300 w-full text-center mt-6 flex flex-row gap-2 items-center justify-center">
+        <Info className="w-5 h-5" />
+        No Data
+      </div>
+    ) : (
       <NothingFound
         title={"No custom events found"}
         description={"Try a different date range or filter"}
