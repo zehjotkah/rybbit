@@ -101,7 +101,7 @@ export function ProPlan() {
     const formattedDate = formatDate(activeSubscription.currentPeriodEnd);
 
     if (activeSubscription.cancelAtPeriodEnd) {
-      return `Ends on ${formattedDate}`;
+      return `Cancels on ${formattedDate}`;
     }
     if (activeSubscription.status === "active") {
       return isAnnualPlan

@@ -7,7 +7,7 @@ import { getSubscriptionInner } from "../stripe/getSubscription.js";
 import { IS_CLOUD } from "../../lib/const.js";
 
 // Default event limit for users without an active subscription
-const DEFAULT_EVENT_LIMIT = 10_000;
+const DEFAULT_EVENT_LIMIT = 100_000;
 
 export async function getSites(req: FastifyRequest, reply: FastifyReply) {
   try {

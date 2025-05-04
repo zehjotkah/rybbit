@@ -9,7 +9,7 @@ interface SubscriptionData {
   monthlyEventCount: number;
   eventLimit: number;
   interval: string;
-  cancelAtPeriodEnd?: boolean;
+  cancelAtPeriodEnd: boolean;
   isTrial?: boolean;
   trialDaysRemaining?: number;
   message?: string; // For expired trial message

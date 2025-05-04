@@ -67,6 +67,7 @@ export async function getSubscriptionInner(userId: string) {
           planName: "Unknown Plan", // Indicate missing details
           status: sub.status,
           currentPeriodEnd: new Date(sub.current_period_end * 1000),
+          cancelAtPeriodEnd: sub.cancel_at_period_end,
           eventLimit: 0, // Unknown limit
           monthlyEventCount: user.monthlyEventCount,
           interval: sub.items.data[0]?.price.recurring?.interval ?? "unknown",
@@ -78,7 +79,8 @@ export async function getSubscriptionInner(userId: string) {
         id: sub.id,
         planName: planDetails.name,
         status: sub.status,
-        currentPeriodEnd: new Date(sub.current_period_end * 1000), // Convert Unix timestamp to Date
+        currentPeriodEnd: new Date(sub.current_period_end * 1000),
+        cancelAtPeriodEnd: sub.cancel_at_period_end,
         eventLimit: planDetails.limits.events,
         monthlyEventCount: user.monthlyEventCount,
         interval: sub.items.data[0]?.price.recurring?.interval ?? "unknown",

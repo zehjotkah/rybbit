@@ -29,8 +29,8 @@ function getFormattedPrice(eventLimit, isAnnual) {
   else if (eventLimit <= 500_000) monthlyPrice = 49;
   else if (eventLimit <= 1_000_000) monthlyPrice = 69;
   else if (eventLimit <= 2_000_000) monthlyPrice = 99;
-  else if (eventLimit <= 5_000_000) monthlyPrice = 129;
-  else monthlyPrice = 169; // 10M events
+  else if (eventLimit <= 5_000_000) monthlyPrice = 149;
+  else monthlyPrice = 249; // 10M events
   
   // Annual prices are 10x monthly (2 months free)
   const annualPrice = monthlyPrice * 10;

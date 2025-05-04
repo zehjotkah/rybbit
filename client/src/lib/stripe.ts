@@ -91,8 +91,8 @@ export const STRIPE_PRICES = [
   },
   {
     name: "pro5m",
-    priceId: "price_1R2kybDFVprnAny21Mo1Wjuz",
-    price: 129,
+    priceId: "price_1RKuYJDFVprnAny2apEXvkde",
+    price: 149,
     interval: "month",
     limits: {
       events: 5_000_000,
@@ -100,8 +100,8 @@ export const STRIPE_PRICES = [
   },
   {
     name: "pro5m-annual",
-    priceId: "price_1RE1ebDFVprnAny2BbHtnuko",
-    price: 1290,
+    priceId: "price_1RKuYaDFVprnAny2xEoejLRR",
+    price: 1490,
     interval: "year",
     limits: {
       events: 5_000_000,
@@ -109,8 +109,8 @@ export const STRIPE_PRICES = [
   },
   {
     name: "pro10m",
-    priceId: "price_1R2kzxDFVprnAny2wdMx2Npp",
-    price: 169,
+    priceId: "price_1RKuX5DFVprnAny20UMfh10N",
+    price: 249,
     interval: "month",
     limits: {
       events: 10_000_000,
@@ -118,8 +118,8 @@ export const STRIPE_PRICES = [
   },
   {
     name: "pro10m-annual",
-    priceId: "price_1RE1fHDFVprnAny2SKY4gFCA",
-    price: 1690,
+    priceId: "price_1RKuXODFVprnAny2JUjrCSyY",
+    price: 2490,
     interval: "year",
     limits: {
       events: 10_000_000,
