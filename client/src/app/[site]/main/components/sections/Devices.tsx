@@ -1,6 +1,6 @@
 "use client";
 
-import { Monitor, Smartphone, Tablet } from "lucide-react";
+import { Expand, Monitor, Smartphone, Tablet } from "lucide-react";
 import { useState } from "react";
 import {
   Tabs,
@@ -12,26 +12,41 @@ import { Card, CardContent } from "../../../../../components/ui/card";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { Browser } from "../../../components/shared/icons/Browser";
 import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
+import { Button } from "../../../../../components/ui/button";
 
 type Tab = "devices" | "browsers" | "os" | "dimensions";
 
 export function Devices() {
   const [tab, setTab] = useState<Tab>("browsers");
+  const [expanded, setExpanded] = useState(false);
+  const close = () => {
+    setExpanded(false);
+  };
+
   return (
-    <Card className="h-[445px]">
+    <Card className="h-[405px]">
       <CardContent className="mt-2">
         <Tabs
           defaultValue="browsers"
           value={tab}
           onValueChange={(value) => setTab(value as Tab)}
         >
-          <div className="overflow-x-auto pb-1">
-            <TabsList>
-              <TabsTrigger value="browsers">Browsers</TabsTrigger>
-              <TabsTrigger value="devices">Devices</TabsTrigger>
-              <TabsTrigger value="os">Operating Systems</TabsTrigger>
-              <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
-            </TabsList>
+          <div className="flex flex-row gap-2 justify-between items-start">
+            <div className="overflow-x-auto pb-1">
+              <TabsList>
+                <TabsTrigger value="browsers">Browsers</TabsTrigger>
+                <TabsTrigger value="devices">Devices</TabsTrigger>
+                <TabsTrigger value="os">Operating Systems</TabsTrigger>
+                <TabsTrigger value="dimensions">Screen Dimensions</TabsTrigger>
+              </TabsList>
+            </div>
+            <Button
+              variant="outline"
+              size="smIcon"
+              onClick={() => setExpanded(!expanded)}
+            >
+              <Expand />
+            </Button>
           </div>
           <TabsContent value="devices">
             <StandardSection
@@ -47,6 +62,8 @@ export function Devices() {
                   {e.value || "Other"}
                 </div>
               )}
+              expanded={expanded}
+              close={close}
             />
           </TabsContent>
           <TabsContent value="browsers">
@@ -61,6 +78,8 @@ export function Devices() {
                   {e.value || "Other"}
                 </div>
               )}
+              expanded={expanded}
+              close={close}
             />
           </TabsContent>
           <TabsContent value="os">
@@ -75,6 +94,8 @@ export function Devices() {
                 </div>
               )}
               filterParameter="operating_system"
+              expanded={expanded}
+              close={close}
             />
           </TabsContent>
           <TabsContent value="dimensions">
@@ -88,6 +109,8 @@ export function Devices() {
                 </div>
               )}
               filterParameter="dimensions"
+              expanded={expanded}
+              close={close}
             />
           </TabsContent>
         </Tabs>

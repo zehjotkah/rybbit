@@ -18,6 +18,8 @@ export function StandardSection({
   getLink,
   countLabel,
   filterParameter,
+  expanded,
+  close,
 }: {
   title: string;
   getKey: (item: SingleColResponse) => string;
@@ -27,6 +29,8 @@ export function StandardSection({
   getLink?: (item: SingleColResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
+  expanded: boolean;
+  close: () => void;
 }) {
   const { data, isLoading, isFetching, error, refetch } = useSingleCol({
     parameter: filterParameter,
@@ -72,6 +76,8 @@ export function StandardSection({
         getLink={getLink}
         countLabel={countLabel}
         filterParameter={filterParameter}
+        expanded={expanded}
+        close={close}
       />
     </>
   );

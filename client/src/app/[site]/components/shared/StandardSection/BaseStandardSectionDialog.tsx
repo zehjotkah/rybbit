@@ -21,6 +21,7 @@ import {
   SquareArrowOutUpRight,
   ChevronUp,
   ChevronDown,
+  Expand,
 } from "lucide-react";
 import { ReactNode, useMemo, useState } from "react";
 import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
@@ -38,6 +39,8 @@ interface BaseStandardSectionDialogProps {
   getLink?: (item: SingleColResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
+  expanded?: boolean;
+  close: () => void;
 }
 
 const columnHelper = createColumnHelper<SingleColResponse>();
@@ -53,6 +56,8 @@ export function BaseStandardSectionDialog({
   getLink,
   countLabel,
   filterParameter,
+  expanded,
+  close,
 }: BaseStandardSectionDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 200);
@@ -179,10 +184,12 @@ export function BaseStandardSectionDialog({
   });
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">View All</Button>
-      </DialogTrigger>
+    <Dialog open={expanded} onOpenChange={close}>
+      {/* <DialogTrigger asChild>
+        <Button variant="default" size="sm">
+          <Expand className="w-4 h-4" /> Expand
+        </Button>
+      </DialogTrigger> */}
       <DialogContent className="max-w-[1000px] w-[calc(100vw-2rem)] p-2 sm:p-4">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

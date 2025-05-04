@@ -3,6 +3,7 @@ import NumberFlow from "@number-flow/react";
 import { round } from "lodash";
 import {
   AlertCircle,
+  Expand,
   Info,
   RefreshCcw,
   SquareArrowOutUpRight,
@@ -90,6 +91,8 @@ interface BaseStandardSectionProps {
   getLink?: (item: SingleColResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
+  expanded: boolean;
+  close: () => void;
 }
 
 export function BaseStandardSection({
@@ -105,6 +108,8 @@ export function BaseStandardSection({
   getLink,
   countLabel,
   filterParameter,
+  expanded,
+  close,
 }: BaseStandardSectionProps) {
   const ratio = data?.data?.[0]?.percentage
     ? 100 / data?.data?.[0]?.percentage
@@ -139,7 +144,7 @@ export function BaseStandardSection({
           </Button>
         </div>
       ) : (
-        <>
+        <div className="flex flex-col gap-2">
           <div className="flex flex-row gap-2 justify-between pr-1 text-xs text-neutral-400">
             <div>{title}</div>
             <div>{countLabel || "Sessions"}</div>
@@ -165,27 +170,26 @@ export function BaseStandardSection({
               No Data
             </div>
           )}
-        </>
+        </div>
       )}
-      {isLoading ? (
-        // Skeleton for "View All" button when loading
-        <Button variant="outline" disabled className="opacity-50">
-          View All
-        </Button>
-      ) : !hasError && data?.data?.length && data?.data?.length > 10 ? (
-        <BaseStandardSectionDialog
-          title={title}
-          data={data.data}
-          ratio={ratio}
-          getKey={getKey}
-          getLabel={getLabel}
-          getValue={getValue}
-          getFilterLabel={getFilterLabel}
-          getLink={getLink}
-          countLabel={countLabel}
-          filterParameter={filterParameter}
-        />
-      ) : null}
+      {!isLoading && !hasError && data?.data?.length && (
+        <div className="flex flex-row gap-2 justify-between items-center">
+          <BaseStandardSectionDialog
+            title={title}
+            data={data.data}
+            ratio={ratio}
+            getKey={getKey}
+            getLabel={getLabel}
+            getValue={getValue}
+            getFilterLabel={getFilterLabel}
+            getLink={getLink}
+            countLabel={countLabel}
+            filterParameter={filterParameter}
+            expanded={expanded}
+            close={close}
+          />
+        </div>
+      )}
     </div>
   );
 }
