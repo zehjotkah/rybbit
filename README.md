@@ -34,15 +34,15 @@ View a <strong><a href="https://demo.rybbit.io/1">live demo</a></strong> of Rybb
 </h3>
 
 <h2>Getting Started</h2>
-You can either sign up for our hosted service at https://rybbit.io or <a href="https://rybbit.io/docs/self-host">self host</a> Rybbit on your own VPS.
+You can either sign up for our hosted service at https://rybbit.io or <a href="https://rybbit.io/docs/self-hosting">self host</a> Rybbit on your own VPS.
 
 Learn more about Rybbit by reading our <a href="https://rybbit.io/docs">documentation</a> .
 
 <h2>Key Features</h2>
 
 - All key web analytics metrics including sessions, unique users, pageviews, bounce rate, session duration
-- No cookies = GDPR and CCPA compliant
-- Customizable retention, user journeys, and funnels dashboards
+- No cookies or user tracking - GDPR & CCPA compliant
+- Customizable goals. retention, user journeys, and funnels dashboards
 - Advanced filtering across 15+ dimensions
 - Custom events
 - Live sessions dashboard
@@ -54,20 +54,29 @@ Learn more about Rybbit by reading our <a href="https://rybbit.io/docs">document
 
 <h3>Main</h3>
 
-![image](https://github.com/user-attachments/assets/d4892c19-da4f-4359-b902-b7bd465a5d67)
+![image](https://github.com/user-attachments/assets/7f2d3b79-90b6-496b-9b47-373ba1c62a7e)
 
 <h3>Realtime</h3>
 
-![image](https://github.com/user-attachments/assets/b84704f2-57b7-481d-8b33-f5bf6fa2c8e1)
+![image](https://github.com/user-attachments/assets/54996620-4eff-4ecc-9135-10ce21483f6a)
 
 <h3>Sessions</h3>
 
-![image](https://github.com/user-attachments/assets/b3abde27-422e-4dc2-b08c-74931d27abc4)
+![image](https://github.com/user-attachments/assets/b87769f3-650d-4069-9e18-5d59e41a175b)
 
 <h3>Journeys</h3>
 
-![image](https://github.com/user-attachments/assets/3285d721-f049-4183-bc20-c598be2265ff)
+![image](https://github.com/user-attachments/assets/890f9de8-3025-4962-91c5-5a1b2ddf0d82)
+
+<h3>Map</h3>
+
+![image](https://github.com/user-attachments/assets/b1f7be89-ec8d-4ccc-9a87-45b0fb31d3a1)
 
 <h3>Funnels</h3>
 
-![image](https://github.com/user-attachments/assets/98e4fda4-c3eb-4d8a-aa66-9dcbb3aa92bf)
+![image](https://github.com/user-attachments/assets/bad9e37c-1ff6-49b4-9285-6dde7f90051f)
+
+<h3>Goals</h3>
+
+![image](https://github.com/user-attachments/assets/60503585-5daf-4cfe-927e-4e149749f538)
+
