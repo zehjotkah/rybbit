@@ -25,8 +25,8 @@ export default function Contact() {
             </div>
             <div>
               <h2 className="text-xl font-medium mb-1">Email</h2>
-              <a href="mailto:founders@rybbit.io" className="text-neutral-300 hover:text-white transition-colors">
-                founders@rybbit.io
+              <a href="mailto:hello@rybbit.io" className="text-neutral-300 hover:text-white transition-colors">
+                hello@rybbit.io
               </a>
             </div>
           </div>

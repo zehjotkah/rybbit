@@ -13,7 +13,14 @@ import { useStripeSubscription } from "../settings/subscription/utils/useStripeS
 
 // Available event tiers for the slider
 const EVENT_TIERS = [
-  100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000,
+  100_000,
+  250_000,
+  500_000,
+  1_000_000,
+  2_000_000,
+  5_000_000,
+  10_000_000,
+  "Custom",
 ];
 
 // Define plan features
@@ -38,9 +45,17 @@ interface StripePrice {
 
 // Find the appropriate price for a tier at current event limit
 function findPriceForTier(
-  eventLimit: number,
+  eventLimit: number | string,
   interval: "month" | "year"
 ): StripePrice | null {
+  // Check if we have a custom tier
+  if (eventLimit === "Custom") {
+    return null;
+  }
+
+  // Convert eventLimit to number to ensure type safety
+  const eventLimitValue = Number(eventLimit);
+
   // Determine if we need to look for annual plans
   const isAnnual = interval === "year";
 
@@ -54,7 +69,9 @@ function findPriceForTier(
   );
 
   // Find a plan that matches or exceeds the event limit
-  const matchingPlan = plans.find((plan) => plan.limits.events >= eventLimit);
+  const matchingPlan = plans.find(
+    (plan) => plan.limits.events >= eventLimitValue
+  );
   const selectedPlan = matchingPlan || plans[plans.length - 1] || null;
 
   // Return the matching plan or the highest tier available
@@ -71,6 +88,13 @@ export default function Subscribe() {
 
   // Handle subscription
   async function handleSubscribe(): Promise<void> {
+    // Handle custom tier by redirecting to email contact
+    if (eventLimit === "Custom") {
+      window.location.href =
+        "mailto:hello@rybbit.io?subject=Custom%20Pricing%20Plan";
+      return;
+    }
+
     // Check if user is logged in directly
     if (!sessionData?.user) {
       toast.error("Please log in to subscribe.");
@@ -135,12 +159,13 @@ export default function Subscribe() {
   // Get pricing information
   const monthlyPrice = findPriceForTier(eventLimit, "month")?.price || 0;
   const annualPrice = findPriceForTier(eventLimit, "year")?.price || 0;
+  const isCustomTier = eventLimit === "Custom";
 
   const { data: subscription } = useStripeSubscription();
   const router = useRouter();
-  if (subscription?.status === "active") {
-    router.push("/settings/subscription");
-  }
+  // if (subscription?.status === "active") {
+  //   router.push("/settings/subscription");
+  // }
 
   return (
     <StandardPage>
@@ -164,7 +189,9 @@ export default function Subscribe() {
                   <div>
                     <h3 className="font-semibold mb-2">Events per month</h3>
                     <div className="text-3xl font-bold text-emerald-400">
-                      {eventLimit.toLocaleString()}
+                      {typeof eventLimit === "number"
+                        ? eventLimit.toLocaleString()
+                        : eventLimit}
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
@@ -194,18 +221,16 @@ export default function Subscribe() {
                         </span>
                       </button>
                     </div>
-                    <div className="text-right">
-                      {isAnnual ? (
-                        <>
-                          <span className="text-3xl font-bold">
-                            ${Math.round(annualPrice / 12)}
-                          </span>
-                          <span className="ml-1 text-neutral-400">/month</span>
-                        </>
+                    <div className="text-right h-10">
+                      {isCustomTier ? (
+                        <></>
                       ) : (
                         <>
                           <span className="text-3xl font-bold">
-                            ${monthlyPrice}
+                            $
+                            {isAnnual
+                              ? Math.round(annualPrice / 12)
+                              : monthlyPrice}
                           </span>
                           <span className="ml-1 text-neutral-400">/month</span>
                         </>
@@ -233,7 +258,9 @@ export default function Subscribe() {
                           : ""
                       }
                     >
-                      {tier >= 1_000_000
+                      {typeof tier === "string"
+                        ? tier
+                        : tier >= 1_000_000
                         ? `${tier / 1_000_000}M`
                         : `${tier / 1_000}K`}
                     </span>
@@ -255,11 +282,17 @@ export default function Subscribe() {
                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-xl shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:opacity-50 disabled:pointer-events-none"
                 disabled={isLoading}
               >
-                {isLoading ? "Processing..." : "Subscribe Now"}
+                {isLoading
+                  ? "Processing..."
+                  : isCustomTier
+                  ? "Contact us"
+                  : "Subscribe Now"}
               </button>
 
               <p className="text-center text-sm text-neutral-400 mt-4">
-                Secure checkout powered by Stripe.
+                {isCustomTier
+                  ? "Email us at hello@rybbit.io for custom pricing"
+                  : "Secure checkout powered by Stripe."}
               </p>
             </div>
           </div>

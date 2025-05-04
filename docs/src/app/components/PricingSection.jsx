@@ -7,7 +7,7 @@ import { useState } from "react";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [
-  100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000,
+  100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, "Custom",
 ];
 
 // Define plan features
@@ -30,7 +30,8 @@ function getFormattedPrice(eventLimit, isAnnual) {
   else if (eventLimit <= 1_000_000) monthlyPrice = 69;
   else if (eventLimit <= 2_000_000) monthlyPrice = 99;
   else if (eventLimit <= 5_000_000) monthlyPrice = 149;
-  else monthlyPrice = 249; // 10M events
+  else if (eventLimit <= 10_000_000) monthlyPrice = 249; // 10M events
+  else return { custom: true }; // 10M+ events - custom pricing
   
   // Annual prices are 10x monthly (2 months free)
   const annualPrice = monthlyPrice * 10;
@@ -113,22 +114,11 @@ export function PricingSection() {
                         <span className="ml-1 text-xs text-emerald-500">-17%</span>
                       </button>
                     </div>
-                    <div className="text-right">
-                      {isAnnual ? (
-                        <>
-                          <span className="text-3xl font-bold">${Math.round(prices.annual / 12)}</span>
-                          <span className="ml-1 text-neutral-400">
-                            /month
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-3xl font-bold">${prices.monthly}</span>
-                          <span className="ml-1 text-neutral-400">
-                            /month
-                          </span>
-                        </>
-                      )}
+                    <div className="text-right h-10">
+                      {prices.custom ? <></> : <><span className="text-3xl font-bold">${isAnnual ? Math.round(prices.annual / 12) : prices.monthly}</span>
+                      <span className="ml-1 text-neutral-400">
+                        /month
+                      </span></> }
                     </div>
                   </div>
                 </div>
@@ -148,7 +138,7 @@ export function PricingSection() {
                       key={index}
                       className={eventLimitIndex === index ? "font-bold text-emerald-400" : ""}
                     >
-                      {tier >= 1_000_000 ? `${tier / 1_000_000}M` : `${tier / 1_000}K`}
+                      {index === EVENT_TIERS.length - 1 ? "10M+" : tier >= 1_000_000 ? `${tier / 1_000_000}M` : `${tier / 1_000}K`}
                     </span>
                   ))}
                 </div>
@@ -163,14 +153,22 @@ export function PricingSection() {
                 ))}
               </div>
               
-              <Link href="https://app.rybbit.io/signup" className="w-full block">
-                <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
-                  Start your 14 day free trial
-                </button>
-              </Link>
+              {prices.custom ? (
+                <Link href="mailto:hello@rybbit.io" className="w-full block">
+                  <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
+                    Contact us
+                  </button>
+                </Link>
+              ) : (
+                <Link href="https://app.rybbit.io/signup" className="w-full block">
+                  <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
+                    Start your 14 day free trial
+                  </button>
+                </Link>
+              )}
               
               <p className="text-center text-sm text-neutral-400 mt-4">
-              We don't ask for your credit card
+              {prices.custom ? "Email us at hello@rybbit.io for custom pricing" : "We don't ask for your credit card"}
               </p>
             </div>
           </div>
