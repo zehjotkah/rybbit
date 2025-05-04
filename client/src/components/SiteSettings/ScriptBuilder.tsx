@@ -121,7 +121,7 @@ export function ScriptBuilder({ siteId }: ScriptBuilderProps) {
       : ""
   }
     defer
-/>`;
+></script>`;
 
   return (
     <div className="space-y-6">
