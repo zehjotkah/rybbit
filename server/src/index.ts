@@ -49,7 +49,7 @@ import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { siteConfig } from "./lib/siteConfig.js";
 import { trackEvent } from "./tracker/trackEvent.js";
-import { extractSiteId, isSitePublic } from "./utils.js";
+import { extractSiteId, isSitePublic, normalizeOrigin } from "./utils.js";
 
 // Import Stripe handlers
 import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
@@ -74,7 +74,7 @@ const server = Fastify({
 
 server.register(cors, {
   origin: (origin, callback) => {
-    if (!origin || allowList.includes(origin)) {
+    if (!origin || allowList.includes(normalizeOrigin(origin))) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"), false);

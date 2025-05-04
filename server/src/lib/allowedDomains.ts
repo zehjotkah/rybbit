@@ -29,7 +29,7 @@ export const loadAllowedDomains = async () => {
     allowList = [
       "http://localhost:3002",
       process.env.BASE_URL || "",
-      ...domains.map(({ domain }) => `https://${domain}`),
+      ...domains.map(({ domain }) => domain),
     ];
     initAuth(allowList);
   } catch (error) {

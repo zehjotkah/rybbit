@@ -74,3 +74,12 @@ export const extractSiteId = (path: string) => {
   }
   return null;
 };
+
+export const normalizeOrigin = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+};
