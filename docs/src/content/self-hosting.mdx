@@ -9,9 +9,8 @@ This guide will walk you through setting up your own instance of Rybbit.
 
 Before you begin, ensure you have the following:
 
--   **A Linux VPS:** We use [Hetzner Cloud](https://hetzner.cloud/?ref=QEdVqVpTLBDP) for everything (referral link - but Hetzner is legitimately the best value). CX11 for ~$4/month will be fine for small-medium sized projects.
+-   **A Linux VPS:** We use [Hetzner Cloud](https://hetzner.cloud/?ref=QEdVqVpTLBDP) for everything (referral link - but Hetzner is legitimately the best value). CX11 for ~$4/month will be fine for small-medium sized projects. we recommend choosing a VPS with at least 2GB of RAM.
 -   **A Domain Name:** You'll need a domain or subdomain (e.g., `tracking.yourdomain.com`) pointed to your VPS's IP address. HTTPS is required because browsers block tracking scripts served over insecure HTTP.
--   **Docker Engine:** Docker is used to run the application stack. Installation instructions are in Step 1.
 -   **Git:** Needed to clone the repository.
 
 <Callout type="info">
@@ -69,9 +68,15 @@ Open your browser and navigate to `https://your.domain.name/signup` (using the d
 
 Create your admin account. You can then log in and start adding your websites!
 
+
+
 </Steps>
 
 Congratulations! You have successfully self-hosted Rybbit.
+
+<Callout>
+If you are using your self-hosted Rybbit without anyone else, you can disable new user signups by setting `DISABLE_SIGNUP=true` in the `.env` file at the root of the repository.
+</Callout>
 {/* 
 ## Security Recommendation: Firewall Configuration
 
