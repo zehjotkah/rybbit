@@ -32,17 +32,13 @@ export function Pages() {
           value={tab}
           onValueChange={(value) => setTab(value as Tab)}
         >
-          <div className="flex flex-row gap-2 justify-between items-start">
+          <div className="flex flex-row gap-2 justify-between items-center">
             <TabsList>
               <TabsTrigger value="pages">Pages</TabsTrigger>
               <TabsTrigger value="entry_pages">Entry Pages</TabsTrigger>
               <TabsTrigger value="exit_pages">Exit Pages</TabsTrigger>
             </TabsList>
-            <Button
-              variant="outline"
-              size="smIcon"
-              onClick={() => setExpanded(!expanded)}
-            >
+            <Button size="smIcon" onClick={() => setExpanded(!expanded)}>
               <Expand className="w-4 h-4" />
             </Button>
           </div>

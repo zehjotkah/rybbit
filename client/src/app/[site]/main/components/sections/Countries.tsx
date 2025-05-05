@@ -42,7 +42,7 @@ export function Countries() {
           value={tab}
           onValueChange={(value) => setTab(value as Tab)}
         >
-          <div className="flex flex-row gap-2 justify-between items-start">
+          <div className="flex flex-row gap-2 justify-between items-center">
             <TabsList>
               <TabsTrigger value="countries">Countries</TabsTrigger>
               <TabsTrigger value="regions">Regions</TabsTrigger>
@@ -51,13 +51,11 @@ export function Countries() {
               <TabsTrigger value="map">Map</TabsTrigger>
             </TabsList>
             {tab !== "map" && (
-              <Button
-                variant="outline"
-                size="smIcon"
-                onClick={() => setExpanded(!expanded)}
-              >
-                <Expand className="w-4 h-4" />
-              </Button>
+              <div>
+                <Button size="smIcon" onClick={() => setExpanded(!expanded)}>
+                  <Expand className="w-4 h-4" />
+                </Button>
+              </div>
             )}
           </div>
           <TabsContent value="countries">

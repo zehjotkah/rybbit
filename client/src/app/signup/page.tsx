@@ -447,7 +447,7 @@ export default function SignupPage() {
                 <div className="border border-neutral-700 rounded-lg overflow-hidden">
                   <CodeSnippet
                     language="HTML"
-                    code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n/>`}
+                    code={`<script\n    src="${BACKEND_URL}/script.js"\n    site-id="${siteId}"\n    defer\n></script>`}
                   />
                 </div>
               </div>

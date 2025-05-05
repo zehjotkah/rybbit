@@ -172,7 +172,7 @@ export function BaseStandardSection({
           )}
         </div>
       )}
-      {!isLoading && !hasError && data?.data?.length && (
+      {!isLoading && !hasError && data?.data?.length ? (
         <div className="flex flex-row gap-2 justify-between items-center">
           <BaseStandardSectionDialog
             title={title}
@@ -189,7 +189,7 @@ export function BaseStandardSection({
             close={close}
           />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
