@@ -20,6 +20,10 @@ const PRO_FEATURES = [
   "All features"
 ];
 
+export const formatter = Intl.NumberFormat("en", {
+  notation: "compact",
+}).format;
+
 // Format price with dollar sign
 function getFormattedPrice(eventLimit, isAnnual) {
   // Monthly prices from stripe.ts
@@ -89,8 +93,11 @@ export function PricingSection() {
                 <div className="flex justify-between mb-3 items-center">
                   <div>
                     <h3 className="font-semibold mb-2">Events per month</h3>
-                    <div className="text-3xl font-bold text-emerald-400">
+                    <div className="text-3xl font-bold text-emerald-400 hidden md:block">
                       {eventLimit.toLocaleString()}
+                    </div>
+                    <div className="text-3xl font-bold text-emerald-400 md:hidden">
+                      {isNaN(eventLimit) ? "10M+" : formatter(eventLimit)}
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
