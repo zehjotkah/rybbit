@@ -129,10 +129,10 @@ fi
 echo "Building and starting Docker services..."
 if [ "$USE_WEBSERVER" = "false" ]; then
   # Start without the caddy service when using --no-webserver
-  docker compose up --build -d backend client clickhouse postgres
+  docker compose up -d backend client clickhouse postgres
 else
   # Start all services including caddy
-  docker compose up --build -d
+  docker compose up -d
 fi
 
 echo "Setup complete. Services are starting in the background."

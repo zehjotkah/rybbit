@@ -12,7 +12,6 @@ export default {
     title: "Self-hosting",
   },
   "self-hosting": "",
-  "self-hosting-upgrading": "",
   _5: {
     type: "separator",
     title: "Settings",
