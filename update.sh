@@ -20,6 +20,10 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+# Pull latest Docker images
+echo "Pulling latest Docker images..."
+docker compose pull
+
 # Rebuild and start containers
 echo "Rebuilding and starting updated services..."
 
