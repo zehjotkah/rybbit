@@ -7,8 +7,6 @@ set -e
 USE_WEBSERVER="true"
 BACKEND_PORT="3001"
 CLIENT_PORT="3002"
-HOST_BACKEND_PORT="127.0.0.1:3001"
-HOST_CLIENT_PORT="127.0.0.1:3002"
 
 # Help function
 show_help() {
@@ -70,17 +68,6 @@ while [[ "$#" -gt 0 ]]; do
   esac
 done
 
-# Update port mappings after all args are parsed
-if [ "$USE_WEBSERVER" = "false" ]; then
-  # When not using the built-in webserver, expose ports to host
-  HOST_BACKEND_PORT="${BACKEND_PORT}:3001"
-  HOST_CLIENT_PORT="${CLIENT_PORT}:3002"
-else
-  # Keep ports only accessible via localhost when using Caddy
-  HOST_BACKEND_PORT="127.0.0.1:3001"
-  HOST_CLIENT_PORT="127.0.0.1:3002"
-fi
-
 # Check if domain name argument is provided
 if [ -z "$DOMAIN_NAME" ]; then
   echo "Error: Domain name is required"
@@ -103,6 +90,18 @@ fi
 
 # Create or overwrite the .env file
 echo "Creating .env file..."
+
+# Update port mappings based on webserver choice
+if [ "$USE_WEBSERVER" = "false" ]; then
+  # When not using the built-in webserver, expose ports to all interfaces
+  HOST_BACKEND_PORT="${BACKEND_PORT}:3001"
+  HOST_CLIENT_PORT="${CLIENT_PORT}:3002"
+else
+  # Keep ports only accessible via localhost when using Caddy
+  HOST_BACKEND_PORT="127.0.0.1:${BACKEND_PORT}:3001"
+  HOST_CLIENT_PORT="127.0.0.1:${CLIENT_PORT}:3002"
+fi
+
 cat > .env << EOL
 # Variables configured by setup.sh
 DOMAIN_NAME=${DOMAIN_NAME}
