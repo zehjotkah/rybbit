@@ -1,3 +1,4 @@
+import { Steps } from 'nextra/components'
 import { Callout } from 'nextra/components'
 
 # Custom Nginx Setup
@@ -8,11 +9,19 @@ Rybbit comes with a built-in webserver (Caddy), but you can use your own web ser
 
 - A domain name pointing to your server
 - A Linux-based server (these instructions use apt-based systems like Ubuntu/Debian)
-- Rybbit installed with the `--no-webserver` flag
 
-## Installation
+## Setup Process
 
-First, install Nginx and Certbot:
+<Steps>
+### 1. Run the Setup Script
+
+```bash
+./setup.sh your.domain.name --no-webserver
+```
+
+### 2. Install Nginx and Certbot
+
+First, install Nginx and Certbot on your server:
 
 ```bash
 # Update package lists
@@ -25,7 +34,7 @@ sudo apt install nginx
 sudo apt install certbot python3-certbot-nginx
 ```
 
-## Configure Nginx
+### 3. Configure Nginx
 
 Create a new Nginx server configuration file:
 
@@ -65,6 +74,8 @@ server {
   Note the trailing slash in the proxy_pass for the API location. This is important to correctly strip the `/api/` prefix when forwarding requests to the backend service.
 </Callout>
 
+### 4. Enable the Site Configuration
+
 Enable the site by creating a symbolic link and test the configuration:
 
 ```bash
@@ -78,15 +89,26 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## Set Up SSL with Certbot
+### 5. Set Up SSL with Certbot
 
 Certbot can automatically configure Nginx to use HTTPS:
 
 ```bash
 sudo certbot --nginx -d your.domain.name
 ```
+
 Certbot will automatically modify your Nginx configuration to include SSL certificate settings and HTTPS server blocks.
 
+### 6. Verify the Setup
+
+Your final Nginx configuration (in `/etc/nginx/sites-available/rybbit`) should now include HTTPS settings. You can check it with:
+
+```bash
+sudo cat /etc/nginx/sites-available/rybbit
+```
+
+It should include SSL certificate paths and a server block for HTTPS.
+</Steps>
 
 ## Certificate Renewal
 
