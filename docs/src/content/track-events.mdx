@@ -32,7 +32,7 @@ Tracks a pageview. Useful when `data-track-spa` is set to `"false"` or when you 
 window.rybbit.pageview();
 ```
 
-### `window.rybbit.trackOutbound(url, text, target)`
+{/* ### `window.rybbit.trackOutbound(url, text, target)`
 
 Manually tracks outbound link clicks. Useful for programmatic navigation or custom link handling.
 
@@ -42,7 +42,7 @@ Manually tracks outbound link clicks. Useful for programmatic navigation or cust
 
 ```javascript
 // Track a programmatic navigation to an external site
-window.rybbit.trackOutbound("https://example.com", "Example Site", "_blank");
+window.rybbit.trackOutbound("https://example.com", "Example Site", "_blank"); */}
 ```
 
 ## Typescript Support
@@ -62,14 +62,6 @@ interface Rybbit {
      * @param properties Optional properties for the event
      */
     event: (name: string, properties?: Record<string, any>) => void;
-
-    /**
-     * Tracks an outbound link click
-     * @param url The URL of the outbound link
-     * @param text The link text
-     * @param target The link target
-     */
-    trackOutbound: (url: string, text?: string, target?: string) => void;
 }
 
 declare global {
