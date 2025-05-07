@@ -32,6 +32,16 @@ export function NoData() {
               code={`<script\n    src="${globalThis.location.origin}/api/script.js"\n    data-site-id="${siteMetadata?.siteId}"\n    defer\n></script>`}
               className="text-xs"
             />
+            <span className="text-xs text-muted-foreground">
+              See our{" "}
+              <a
+                href="https://rybbit.io/docs"
+                className="text-blue-500 hover:underline"
+              >
+                docs
+              </a>{" "}
+              for more information.
+            </span>
           </div>
         </Alert>
       </div>
