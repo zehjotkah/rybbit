@@ -107,13 +107,11 @@ export default async function RootLayout({ children }) {
               </div>
               <a
                 class="github-button"
-                href="https://github.com/buttons/github-buttons"
+                href="https://github.com/rybbit-io/rybbit"
                 data-color-scheme="no-preference: light; light: light; dark: light;"
                 data-show-count="true"
-                aria-label="Star buttons/github-buttons on GitHub"
-              >
-                Star
-              </a>
+                aria-label="Star rybbit-io/rybbit on GitHub"
+              ></a>
             </div>
           }
           navbar={navbar}
