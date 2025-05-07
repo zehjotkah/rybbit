@@ -29,7 +29,7 @@ export function NoData() {
             </div>
             <CodeSnippet
               language="HTML"
-              code={`<script\n    src="${globalThis.location.origin}/script.js"\n    data-site-id="${siteMetadata?.siteId}"\n    defer\n></script>`}
+              code={`<script\n    src="${globalThis.location.origin}/api/script.js"\n    data-site-id="${siteMetadata?.siteId}"\n    defer\n></script>`}
               className="text-xs"
             />
           </div>

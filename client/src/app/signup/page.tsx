@@ -450,7 +450,7 @@ export default function SignupPage() {
                 <div className="border border-neutral-700 rounded-lg overflow-hidden">
                   <CodeSnippet
                     language="HTML"
-                    code={`<script\n    src="${globalThis.location.origin}/script.js"\n    data-site-id="${siteId}"\n    defer\n></script>`}
+                    code={`<script\n    src="${globalThis.location.origin}/api/script.js"\n    data-site-id="${siteId}"\n    defer\n></script>`}
                   />
                 </div>
               </div>
