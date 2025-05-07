@@ -88,7 +88,7 @@ export function ScriptBuilder({ siteId }: ScriptBuilderProps) {
 
   // Generate tracking script dynamically based on options
   const trackingScript = `<script
-    src="${BACKEND_URL}/script.js"
+    src="${globalThis.location.origin}/script.js"
     data-site-id="${siteId}"${
     debounceValue !== 500
       ? `
