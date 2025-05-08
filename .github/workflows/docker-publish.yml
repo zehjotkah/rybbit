@@ -2,8 +2,6 @@ name: Docker Publish
 
 on:
   push:
-    branches:
-      - master
     tags:
       - "v*"
 
@@ -41,9 +39,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/rybbit-backend
           tags: |
-            type=ref,event=branch
+            type=raw,value=${{ github.ref_name }}
+            type=raw,value=latest
             type=sha
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
 
       - name: Build and push Backend Docker image (multi-arch)
         uses: docker/build-push-action@v6
@@ -64,9 +62,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/rybbit-client
           tags: |
-            type=ref,event=branch
+            type=raw,value=${{ github.ref_name }}
+            type=raw,value=latest
             type=sha
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
 
       - name: Build and push Client Docker image (multi-arch)
         uses: docker/build-push-action@v6
