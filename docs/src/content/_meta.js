@@ -7,6 +7,7 @@ export default {
   },
   tracker: "",
   "track-events": "",
+  integrations: "",
   _4: {
     type: "separator",
     title: "Self-hosting",
@@ -18,12 +19,7 @@ export default {
     type: "separator",
     title: "SDKs",
   },
-  "web": "",
-  _6: {
-    type: "separator",
-    title: "Integrations",
-  },
-  "google-tag-manager": "",
+  web: "",
   _7: {
     type: "separator",
     title: "Settings",
