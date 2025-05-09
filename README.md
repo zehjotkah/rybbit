@@ -33,7 +33,7 @@ Learn more about Rybbit by reading our <a href="https://rybbit.io/docs">document
 - No cookies or user tracking - GDPR & CCPA compliant
 - Customizable goals. retention, user journeys, and funnels dashboards
 - Advanced filtering across 15+ dimensions
-- Custom events
+- Custom events with JSON properties
 - Live sessions dashboard
 - 3 level location tracking (country -> region -> city) + advanced map visualizations
 - Real time dashboard
@@ -69,3 +69,7 @@ Learn more about Rybbit by reading our <a href="https://rybbit.io/docs">document
 
 ![image](https://github.com/user-attachments/assets/60503585-5daf-4cfe-927e-4e149749f538)
 
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rybbit-io/rybbit&type=Date)](https://www.star-history.com/#rybbit-io/rybbit&Date)
