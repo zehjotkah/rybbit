@@ -185,6 +185,10 @@ jobs:
       - backend  # Wait for client before running the merge job
       - client  # Wait for client before running the merge job
 
+    permissions:
+      contents: read  # Allows reading repository contents
+      packages: write  # Required to push images to GitHub Container Registry (GHCR)
+
     steps:
 
       - name: Download digests
