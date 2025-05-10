@@ -136,10 +136,17 @@ export function Chart({
     })
     .filter((e) => e !== null) || [];
 
-  const displayDashed = time.mode === "day" && // display dashed only if current mode it DAY
-    time.day === DateTime.now().toISODate() && // display dashed only if day its TODAY
-    bucket === "hour" && // display dashed only if its by hours representation
-    formattedData.length > 1; // display dashed only if there two and more datapoints
+  const currentDayStr = DateTime.now().toISODate();
+  const currentMonthStr = DateTime.now().toFormat('yyyy-MM-01');
+  const shouldNotDisplay = (
+    time.mode === 'all-time' || // do not display in all-time mode
+    time.mode === 'year' || // do not display in year mode
+    (time.mode === 'month' && time.month !== currentMonthStr) || // do not display in month mode if month is not current
+    (time.mode === 'day' && time.day !== currentDayStr) || // do not display in day mode if day is not current
+    (time.mode === 'range' && time.endDate !== currentDayStr) || // do not display in range mode if end date is not current day
+    (time.mode === 'day' && (bucket === 'minute' || bucket === 'five_minutes')) // do not display in day mode if bucket is minute or five_minutes
+  );
+  const displayDashed = formattedData.length >= 2 && !shouldNotDisplay;
 
   const baseGradient = {
     offset: 0,
