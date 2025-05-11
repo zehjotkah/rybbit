@@ -71,7 +71,10 @@ export default async function RootLayout({ children }) {
     <Navbar
       logo={
         <div
-          className={cn("text-2xl flex items-center gap-1.5", tilt_wrap.className)}
+          className={cn(
+            "text-2xl flex items-center gap-1.5",
+            tilt_wrap.className
+          )}
         >
           <Image src="/rybbit.png" alt="Rybbit" width={30} height={30} />
           rybbit.
@@ -99,6 +102,11 @@ export default async function RootLayout({ children }) {
         }}
       />
       <script src="https://app.rybbit.io/api/script.js" site-id="2" defer />
+      <script
+        src="https://demo.rybbit.io/api/script.js"
+        data-site-id="21"
+        defer
+      ></script>
       <body>
         <Layout
           banner={
