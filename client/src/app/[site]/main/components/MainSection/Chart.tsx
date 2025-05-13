@@ -20,7 +20,7 @@ export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
   if (time.mode === "last-24-hours") {
-    return DateTime.now().setZone("UTC").startOf("hour").toJSDate();
+    return DateTime.now().setZone("UTC").toJSDate();
   } else if (time.mode === "day") {
     const dayDate = DateTime.fromISO(time.day)
       .endOf("day")
