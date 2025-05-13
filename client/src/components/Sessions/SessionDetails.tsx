@@ -29,6 +29,11 @@ import { OperatingSystem } from "../../app/[site]/components/shared/icons/Operat
 import { cn, getCountryName, getLanguageName, formatDurationHuman } from "../../lib/utils";
 import { Button } from "../ui/button";
 
+// Detect user locale and 12h/24h preference
+const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+
 // Component to display a single pageview or event
 function PageviewItem({
   item,
@@ -43,7 +48,8 @@ function PageviewItem({
 }) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
-  const formattedTime = timestamp.toFormat("h:mm:ss a");
+  const formattedTime = timestamp.setLocale(userLocale)
+    .toFormat(is24Hour? "HH:mm:ss" : "h:mm:ss a");
 
   console.info(item);
 

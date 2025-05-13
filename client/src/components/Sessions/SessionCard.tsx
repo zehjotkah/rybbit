@@ -49,6 +49,11 @@ function truncatePath(path: string, maxLength: number = 32) {
   return `${path.substring(0, maxLength)}...`;
 }
 
+// Detect user locale and 12h/24h preference
+const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+
 export function SessionCard({ session, onClick, userId }: SessionCardProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -190,9 +195,10 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
             <span className="text-gray-400">
               {DateTime.fromSQL(session.session_start, {
                 zone: "utc",
-              })
+              }).setLocale(userLocale)
                 .toLocal()
-                .toFormat("MMM d, h:mm a")}
+                .toFormat(is24Hour ? 'dd MMM, HH:mm' : 'MMM d, h:mm a')
+              }
             </span>
             <span className="hidden md:block">{durationFormatted}</span>
           </div>

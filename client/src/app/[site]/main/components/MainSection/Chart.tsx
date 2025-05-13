@@ -9,7 +9,12 @@ import { APIResponse } from "../../../../../api/types";
 import { Time } from "../../../../../components/DateSelector/types";
 import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 
-export const formatter = Intl.NumberFormat("en", { notation: "compact" });
+// Detect user locale and 12h/24h preference
+const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+
+export const formatter = Intl.NumberFormat(userLocale, { notation: "compact" });
 
 const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
@@ -289,23 +294,11 @@ export function Chart({
             : Math.min(12, data?.data?.length ?? 0)
         ),
         format: (value) => {
-          // Convert UTC date to local timezone for display
-          const localTime = DateTime.fromJSDate(value).toLocal();
-
-          if (time.mode === "last-24-hours" || time.mode === "day") {
-            return localTime.toFormat("ha");
-          } else if (time.mode === "range") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "week") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "month") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "year") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "all-time") {
-            return localTime.toFormat("MMM d");
+          const dt = DateTime.fromJSDate(value).setLocale(userLocale);
+          if (time.mode === "day" || time.mode === "last-24-hours" ) {
+            return dt.toFormat(is24Hour ? 'HH:mm' : 'ha');
           }
-          return "";
+          return dt.toFormat(is24Hour ? 'dd MMM' : 'MMM d');
         },
       }}
       axisLeft={{
@@ -354,12 +347,12 @@ export function Chart({
               </div>
             ) : null}
             <div className="flex justify-between text-sm w-36">
-              <div>{formatTime(currentTime, bucket)}</div>
+              <div>{formatDateTime(currentTime, bucket)}</div>
               <div>{formatTooltipValue(currentY, selectedStat)}</div>
             </div>
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
-                <div>{formatTime(previousTime, bucket)}</div>
+                <div>{formatDateTime(previousTime, bucket)}</div>
                 <div>{formatTooltipValue(previousY, selectedStat)}</div>
               </div>
             )}
@@ -383,20 +376,16 @@ export function Chart({
   );
 }
 
-const formatTime = (time: DateTime<boolean>, bucket: TimeBucket) => {
-  // Ensure time is in local timezone
-  const localTime = time.toLocal();
-
-  if (
-    bucket === "minute" ||
-    bucket === "five_minutes" ||
-    bucket === "ten_minutes" ||
-    bucket === "fifteen_minutes"
-  ) {
-    return localTime.toFormat("M/d h:mm a");
-  } else if (bucket === "hour") {
-    return localTime.toFormat("M/d h a");
-  } else {
-    return localTime.toLocaleString();
+const formatDateTime = (dt: DateTime, bucket: TimeBucket) => {
+  const showMinutes = ["minute", "five_minutes", "ten_minutes", "fifteen_minutes", "hour"].includes(bucket);
+  const options: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    hour12: !is24Hour,
+  };
+  if (showMinutes && is24Hour) {
+    options.minute = 'numeric';
   }
+  return new Intl.DateTimeFormat(userLocale, options).format(dt.toJSDate());
 };

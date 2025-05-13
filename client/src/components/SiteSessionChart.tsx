@@ -10,6 +10,11 @@ interface SiteSessionChartProps {
   height?: number | string;
 }
 
+// Detect user locale and 12h/24h preference
+const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+
 export function SiteSessionChart({
   data,
   height = 100,
@@ -59,7 +64,9 @@ export function SiteSessionChart({
           tickRotation: 0,
           tickValues: 3,
           format: (value) => {
-            return DateTime.fromJSDate(value).toFormat("ha");
+            return DateTime.fromJSDate(value)
+                          .setLocale(userLocale)
+                          .toFormat(is24Hour ? 'HH:mm' : 'ha');
           },
         }}
         axisLeft={{
@@ -96,7 +103,10 @@ export function SiteSessionChart({
               <div className="text-xs mb-1">Sessions</div>
               <div className="flex justify-between text-xs w-20">
                 <div className="text-muted-foreground">
-                  {currentTime.toFormat("ha")}
+                  {currentTime
+                          .setLocale(userLocale)
+                          .toFormat(is24Hour ? 'HH:mm' : 'ha')
+                  }
                 </div>
                 <div className="font-medium">{currentY.toLocaleString()}</div>
               </div>
