@@ -26,7 +26,7 @@ import {
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
-import { cn, getCountryName, getLanguageName } from "../../lib/utils";
+import { cn, getCountryName, getLanguageName, formatDurationHuman } from "../../lib/utils";
 import { Button } from "../ui/button";
 
 // Component to display a single pageview or event
@@ -56,7 +56,7 @@ function PageviewItem({
     const seconds = Math.floor(diff.seconds);
 
     if (minutes > 0 || seconds > 0) {
-      duration = `${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+      duration = formatDurationHuman(minutes, seconds);
     }
   }
 

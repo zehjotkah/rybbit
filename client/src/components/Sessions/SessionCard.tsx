@@ -19,7 +19,7 @@ import { GetSessionsResponse } from "../../api/analytics/userSessions";
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
-import { cn, formatter, getCountryName } from "../../lib/utils";
+import { cn, formatter, getCountryName, formatDurationHuman } from "../../lib/utils";
 import { Badge } from "../ui/badge";
 import { SessionDetails } from "./SessionDetails";
 
@@ -56,9 +56,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
   const start = DateTime.fromSQL(session.session_start);
   const end = DateTime.fromSQL(session.session_end);
   const duration = end.diff(start, ["minutes", "seconds"]);
-  const durationFormatted = `${Math.floor(duration.minutes)}m ${Math.floor(
-    duration.seconds
-  )}s`;
+  const durationFormatted = formatDurationHuman(duration.minutes, duration.seconds);
 
   // Truncate user ID to first 8 characters
   const truncatedUserId = session.user_id.substring(0, 8);

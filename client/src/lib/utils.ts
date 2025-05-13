@@ -47,6 +47,25 @@ export function formatDuration(seconds: number): string {
   }
 }
 
+export function formatDurationHuman(minutes: number, seconds: number) {
+  const units: Record<string, number> = {};
+  if (minutes > 0) {
+    units.minutes = minutes;
+  }
+  if (seconds > 0 || minutes === 0) {
+    units.seconds = seconds;
+  }
+
+  const duration = Duration.fromObject(units)
+    .shiftTo('minutes', 'seconds')
+    .normalize();
+
+  return duration.toHuman({
+    listStyle: 'narrow',
+    unitDisplay: 'short'
+  });
+}
+
 export function truncateString(str: string, n = 50) {
   return str.length > n ? str.substring(0, n) + "..." : str;
 }
