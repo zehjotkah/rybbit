@@ -78,17 +78,43 @@ function getTimeStatementFill(
   // For specific past minutes range
   if (params.pastMinutesRange) {
     const { start, end } = params.pastMinutesRange;
-    return `WITH FILL FROM now() - INTERVAL ${SqlString.escape(
-      start
-    )} MINUTE TO now() - INTERVAL ${SqlString.escape(
+    return ` WITH FILL 
+      FROM ${
+        TimeBucketToFn[validatedBucket]
+      }(toDateTime(now() - INTERVAL ${SqlString.escape(start)} MINUTE))
+      TO ${
+        TimeBucketToFn[validatedBucket]
+      }(toDateTime(now() - INTERVAL ${SqlString.escape(
       end
-    )} MINUTE STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
+    )} MINUTE)) + INTERVAL 1 ${
+      validatedBucket === "month"
+        ? "MONTH"
+        : validatedBucket === "week"
+        ? "WEEK"
+        : validatedBucket === "day"
+        ? "DAY"
+        : "HOUR"
+    }
+      STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   // For regular past minutes
   if (params.pastMinutes) {
-    return `WITH FILL FROM now() - INTERVAL ${SqlString.escape(
+    return ` WITH FILL 
+      FROM ${
+        TimeBucketToFn[validatedBucket]
+      }(toDateTime(now() - INTERVAL ${SqlString.escape(
       params.pastMinutes
-    )} MINUTE TO now() STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
+    )} MINUTE))
+      TO ${TimeBucketToFn[validatedBucket]}(toDateTime(now())) + INTERVAL 1 ${
+      validatedBucket === "month"
+        ? "MONTH"
+        : validatedBucket === "week"
+        ? "WEEK"
+        : validatedBucket === "day"
+        ? "DAY"
+        : "HOUR"
+    }
+      STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   return "";
 }
@@ -114,7 +140,7 @@ const getQuery = ({
 }) => {
   const filterStatement = getFilterStatement(filters);
 
-  const isAllTime = !startDate && !endDate;
+  const isAllTime = !startDate && !endDate && !pastMinutes && !pastMinutesRange;
 
   const timeParams = pastMinutesRange
     ? { pastMinutesRange }
@@ -185,7 +211,16 @@ ORDER BY time`;
   return query;
 };
 
-type TimeBucket = "hour" | "day" | "week" | "month";
+type TimeBucket =
+  | "minute"
+  | "five_minutes"
+  | "ten_minutes"
+  | "fifteen_minutes"
+  | "hour"
+  | "day"
+  | "week"
+  | "month"
+  | "year";
 
 type getOverviewBucketed = { time: string; pageviews: number }[];
 
