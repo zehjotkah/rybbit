@@ -43,12 +43,11 @@ export async function getEventProperties(
     return res.status(400).send({ error: "Event name is required" });
   }
 
-  const timeStatement = getTimeStatement({
-    startDate,
-    endDate,
-    timezone,
-    minutes,
-  });
+  const timeStatement = getTimeStatement(
+    minutes
+      ? { pastMinutes: Number(minutes) }
+      : { date: { startDate, endDate, timezone } }
+  );
 
   const filterStatement = filters ? getFilterStatement(filters) : "";
 

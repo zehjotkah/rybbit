@@ -101,8 +101,7 @@ const getQuery = ({
   site,
   filters,
   pastMinutes,
-  pastMinutesStart,
-  pastMinutesEnd,
+  pastMinutesRange,
 }: {
   startDate: string;
   endDate: string;
@@ -111,20 +110,14 @@ const getQuery = ({
   site: string;
   filters: string;
   pastMinutes?: number;
-  pastMinutesStart?: number;
-  pastMinutesEnd?: number;
+  pastMinutesRange?: { start: number; end: number };
 }) => {
   const filterStatement = getFilterStatement(filters);
 
   const isAllTime = !startDate && !endDate;
 
-  const timeParams = pastMinutesEnd
-    ? {
-        pastMinutesRange: {
-          start: Number(pastMinutesStart),
-          end: Number(pastMinutesEnd),
-        },
-      }
+  const timeParams = pastMinutesRange
+    ? { pastMinutesRange }
     : pastMinutes
     ? { pastMinutes }
     : { date: { startDate, endDate, timezone } };
@@ -231,6 +224,12 @@ export async function getOverviewBucketed(
     return res.status(403).send({ error: "Forbidden" });
   }
 
+  // Handle specific past minutes range if provided
+  const pastMinutesRange =
+    pastMinutesStart && pastMinutesEnd
+      ? { start: Number(pastMinutesStart), end: Number(pastMinutesEnd) }
+      : undefined;
+
   const query = getQuery({
     startDate,
     endDate,
@@ -238,9 +237,8 @@ export async function getOverviewBucketed(
     bucket,
     site,
     filters,
-    pastMinutes,
-    pastMinutesStart,
-    pastMinutesEnd,
+    pastMinutes: pastMinutes ? Number(pastMinutes) : undefined,
+    pastMinutesRange,
   });
 
   try {

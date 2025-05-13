@@ -36,12 +36,11 @@ export async function getEventNames(
     return res.status(403).send({ error: "Forbidden" });
   }
 
-  const timeStatement = getTimeStatement({
-    startDate,
-    endDate,
-    timezone,
-    minutes,
-  });
+  const timeStatement = getTimeStatement(
+    minutes
+      ? { pastMinutes: Number(minutes) }
+      : { date: { startDate, endDate, timezone } }
+  );
 
   const filterStatement = filters ? getFilterStatement(filters) : "";
 

@@ -155,14 +155,23 @@ export async function getGoals(
 
     // Build filter and time clauses for ClickHouse queries
     const filterStatement = filters ? getFilterStatement(filters) : "";
-    const timeStatement = getTimeStatement({
-      startDate,
-      endDate,
-      timezone,
-      minutes,
-      pastMinutesStart,
-      pastMinutesEnd,
-    });
+
+    // Handle specific past minutes range if provided
+    const pastMinutesRange =
+      pastMinutesStart && pastMinutesEnd
+        ? { start: Number(pastMinutesStart), end: Number(pastMinutesEnd) }
+        : undefined;
+
+    // Set up time parameters
+    const timeParams = pastMinutesRange
+      ? { pastMinutesRange }
+      : minutes
+      ? { pastMinutes: Number(minutes) }
+      : startDate || endDate
+      ? { date: { startDate, endDate, timezone } }
+      : {};
+
+    const timeStatement = getTimeStatement(timeParams);
 
     // First, get the total number of unique sessions (denominator for conversion rate)
     const totalSessionsQuery = `

@@ -40,12 +40,13 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
     request.query;
 
   const filterStatement = getFilterStatement(filters);
-  const timeStatement = getTimeStatement({
-    startDate,
-    endDate,
-    timezone,
-    minutes,
-  });
+  const timeStatement = getTimeStatement(
+    minutes
+      ? { pastMinutes: Number(minutes) }
+      : {
+          date: { startDate, endDate, timezone },
+        }
+  );
 
   // Validate and sanitize the limit parameter
   let validatedLimit: number | null = null;
