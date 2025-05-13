@@ -181,7 +181,8 @@ export function Chart({
     (time.mode === "month" && time.month !== currentMonthStr) || // do not display in month mode if month is not current
     (time.mode === "day" && time.day !== currentDayStr) || // do not display in day mode if day is not current
     (time.mode === "range" && time.endDate !== currentDayStr) || // do not display in range mode if end date is not current day
-    (time.mode === "day" && (bucket === "minute" || bucket === "five_minutes")); // do not display in day mode if bucket is minute or five_minutes
+    (time.mode === "day" && (bucket === "minute" || bucket === "five_minutes")) || // do not display in day mode if bucket is minute or five_minutes
+    (time.mode === "last-24-hours" && (bucket === "minute" || bucket === "five_minutes")); // do not display in last-24-hours mode if bucket is minute or five_minutes
   const displayDashed = formattedData.length >= 2 && !shouldNotDisplay;
 
   const baseGradient = {
