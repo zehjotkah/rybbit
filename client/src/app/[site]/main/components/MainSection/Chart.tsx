@@ -19,48 +19,62 @@ export const formatter = Intl.NumberFormat("en", { notation: "compact" });
 
 const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
+
+  // Helper function to get bucket-specific minute adjustment
+  const getMinuteAdjustment = (bucket: TimeBucket) => {
+    switch (bucket) {
+      case "hour":
+        return 59;
+      case "fifteen_minutes":
+        return 14;
+      case "ten_minutes":
+        return 9;
+      case "five_minutes":
+        return 4;
+      default:
+        return 0;
+    }
+  };
+
+  // Helper to apply end of period with bucket adjustment
+  const getAdjustedEndDate = (dateTime: DateTime) => {
+    return dateTime
+      .endOf(
+        time.mode === "day" || time.mode === "range"
+          ? "day"
+          : time.mode === "week"
+          ? "week"
+          : time.mode === "month"
+          ? "month"
+          : time.mode === "year"
+          ? "year"
+          : "day"
+      )
+      .minus({ minutes: getMinuteAdjustment(bucket) });
+  };
+
   if (time.mode === "last-24-hours") {
     return DateTime.now().setZone("UTC").startOf("hour").toJSDate();
-  } else if (time.mode === "day") {
-    const dayDate = DateTime.fromISO(time.day)
-      .endOf("day")
-      .minus({
-        minutes:
-          bucket === "hour"
-            ? 59
-            : bucket === "fifteen_minutes"
-            ? 14
-            : bucket === "ten_minutes"
-            ? 9
-            : bucket === "five_minutes"
-            ? 4
-            : 0,
-      });
-    return now < dayDate ? dayDate.toJSDate() : undefined;
-  } else if (time.mode === "range") {
-    if (bucket === "hour") {
-      const endDate = DateTime.fromISO(time.endDate).endOf("day").minus({
-        minutes: 59,
-      });
-      return now < endDate ? endDate.toJSDate() : undefined;
-    }
-    return undefined;
-  } else if (time.mode === "week") {
-    if (bucket === "hour") {
-      const endDate = DateTime.fromISO(time.week).endOf("week").minus({
-        minutes: 59,
-      });
-      return now < endDate ? endDate.toJSDate() : undefined;
-    }
-    return undefined;
-  } else if (time.mode === "month") {
-    const monthDate = DateTime.fromISO(time.month).endOf("month");
-    return now < monthDate ? monthDate.toJSDate() : undefined;
-  } else if (time.mode === "year") {
-    const yearDate = DateTime.fromISO(time.year).endOf("year");
-    return now < yearDate ? yearDate.toJSDate() : undefined;
   }
-  return undefined;
+
+  let endDate: DateTime | undefined;
+
+  if (time.mode === "day") {
+    endDate = getAdjustedEndDate(DateTime.fromISO(time.day));
+  } else if (time.mode === "range") {
+    endDate = getAdjustedEndDate(DateTime.fromISO(time.endDate));
+  } else if (time.mode === "week") {
+    // Only apply for hour and fifteen_minutes buckets
+    if (bucket === "hour" || bucket === "fifteen_minutes") {
+      endDate = getAdjustedEndDate(DateTime.fromISO(time.week));
+    }
+  } else if (time.mode === "month") {
+    endDate = getAdjustedEndDate(DateTime.fromISO(time.month));
+  } else if (time.mode === "year") {
+    endDate = getAdjustedEndDate(DateTime.fromISO(time.year));
+  }
+
+  return endDate && now < endDate ? endDate.toJSDate() : undefined;
 };
 
 const getMin = (time: Time, bucket: TimeBucket) => {
