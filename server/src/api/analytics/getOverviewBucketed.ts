@@ -87,7 +87,15 @@ function getTimeStatementFill(
       }(toDateTime(now() - INTERVAL ${SqlString.escape(
       end
     )} MINUTE)) + INTERVAL 1 ${
-      validatedBucket === "month"
+      validatedBucket === "minute"
+        ? "MINUTE"
+        : validatedBucket === "five_minutes"
+        ? "MINUTE"
+        : validatedBucket === "ten_minutes"
+        ? "MINUTE"
+        : validatedBucket === "fifteen_minutes"
+        ? "MINUTE"
+        : validatedBucket === "month"
         ? "MONTH"
         : validatedBucket === "week"
         ? "WEEK"
@@ -106,7 +114,15 @@ function getTimeStatementFill(
       params.pastMinutes
     )} MINUTE))
       TO ${TimeBucketToFn[validatedBucket]}(toDateTime(now())) + INTERVAL 1 ${
-      validatedBucket === "month"
+      validatedBucket === "minute"
+        ? "MINUTE"
+        : validatedBucket === "five_minutes"
+        ? "MINUTE"
+        : validatedBucket === "ten_minutes"
+        ? "MINUTE"
+        : validatedBucket === "fifteen_minutes"
+        ? "MINUTE"
+        : validatedBucket === "month"
         ? "MONTH"
         : validatedBucket === "week"
         ? "WEEK"
