@@ -28,14 +28,17 @@ export interface GetUsersRequest {
     site: string;
   };
   Querystring: {
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     timezone: string;
     filters: string;
     page?: string;
     pageSize?: string;
     sortBy?: string;
     sortOrder?: string;
+    minutes?: string;
+    pastMinutesStart?: string;
+    pastMinutesEnd?: string;
   };
 }
 
@@ -52,6 +55,9 @@ export async function getUsers(
     pageSize = "20",
     sortBy = "last_seen",
     sortOrder = "desc",
+    minutes,
+    pastMinutesStart,
+    pastMinutesEnd,
   } = req.query;
   const site = req.params.site;
 
@@ -78,7 +84,12 @@ export async function getUsers(
   // Generate filter statement and time statement
   const filterStatement = getFilterStatement(filters);
   const timeStatement = getTimeStatement({
-    date: { startDate, endDate, timezone },
+    startDate,
+    endDate,
+    timezone,
+    minutes,
+    pastMinutesStart,
+    pastMinutesEnd,
   });
 
   const query = `

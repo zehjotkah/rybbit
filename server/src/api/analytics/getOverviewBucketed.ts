@@ -37,14 +37,16 @@ function getTimeStatementFill(
   {
     date,
     pastMinutes,
+    pastMinutesRange,
   }: {
     date?: { startDate: string; endDate: string; timezone: string };
     pastMinutes?: number;
+    pastMinutesRange?: { start: number; end: number };
   },
   bucket: TimeBucket
 ) {
   const { params, bucket: validatedBucket } = validateTimeStatementFillParams(
-    { date, pastMinutes },
+    { date, pastMinutes, pastMinutesRange },
     bucket
   );
 
@@ -73,6 +75,16 @@ function getTimeStatementFill(
         )
       ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
+  // For specific past minutes range
+  if (params.pastMinutesRange) {
+    const { start, end } = params.pastMinutesRange;
+    return `WITH FILL FROM now() - INTERVAL ${SqlString.escape(
+      start
+    )} MINUTE TO now() - INTERVAL ${SqlString.escape(
+      end
+    )} MINUTE STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
+  }
+  // For regular past minutes
   if (params.pastMinutes) {
     return `WITH FILL FROM now() - INTERVAL ${SqlString.escape(
       params.pastMinutes
@@ -89,6 +101,8 @@ const getQuery = ({
   site,
   filters,
   pastMinutes,
+  pastMinutesStart,
+  pastMinutesEnd,
 }: {
   startDate: string;
   endDate: string;
@@ -97,10 +111,23 @@ const getQuery = ({
   site: string;
   filters: string;
   pastMinutes?: number;
+  pastMinutesStart?: number;
+  pastMinutesEnd?: number;
 }) => {
   const filterStatement = getFilterStatement(filters);
 
   const isAllTime = !startDate && !endDate;
+
+  const timeParams = pastMinutesEnd
+    ? {
+        pastMinutesRange: {
+          start: Number(pastMinutesStart),
+          end: Number(pastMinutesEnd),
+        },
+      }
+    : pastMinutes
+    ? { pastMinutes }
+    : { date: { startDate, endDate, timezone } };
 
   const query = `
 SELECT
@@ -133,25 +160,12 @@ FROM
         WHERE 
             site_id = {siteId:Int32}
             ${filterStatement}
-            ${getTimeStatement(
-              pastMinutes
-                ? { pastMinutes }
-                : {
-                    date: { startDate, endDate, timezone },
-                  }
-            )}
+            ${getTimeStatement(timeParams)}
             AND type = 'pageview'
         GROUP BY session_id
     )
     GROUP BY time ORDER BY time ${
-      isAllTime
-        ? ""
-        : getTimeStatementFill(
-            pastMinutes
-              ? { pastMinutes }
-              : { date: { startDate, endDate, timezone } },
-            bucket
-          )
+      isAllTime ? "" : getTimeStatementFill(timeParams, bucket)
     }
 ) AS session_stats
 FULL JOIN
@@ -166,23 +180,10 @@ FULL JOIN
     WHERE
         site_id = {siteId:Int32}
         ${filterStatement}
-        ${getTimeStatement(
-          pastMinutes
-            ? { pastMinutes }
-            : {
-                date: { startDate, endDate, timezone },
-              }
-        )}
+        ${getTimeStatement(timeParams)}
         AND type = 'pageview'
     GROUP BY time ORDER BY time ${
-      isAllTime
-        ? ""
-        : getTimeStatementFill(
-            pastMinutes
-              ? { pastMinutes }
-              : { date: { startDate, endDate, timezone } },
-            bucket
-          )
+      isAllTime ? "" : getTimeStatementFill(timeParams, bucket)
     }
 ) AS page_stats
 USING time
@@ -207,12 +208,22 @@ export async function getOverviewBucketed(
       bucket: TimeBucket;
       filters: string;
       pastMinutes?: number;
+      pastMinutesStart?: number;
+      pastMinutesEnd?: number;
     };
   }>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, bucket, filters, pastMinutes } =
-    req.query;
+  const {
+    startDate,
+    endDate,
+    timezone,
+    bucket,
+    filters,
+    pastMinutes,
+    pastMinutesStart,
+    pastMinutesEnd,
+  } = req.query;
   const site = req.params.site;
 
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
@@ -227,7 +238,9 @@ export async function getOverviewBucketed(
     bucket,
     site,
     filters,
-    pastMinutes: pastMinutes ? Number(pastMinutes) : undefined,
+    pastMinutes,
+    pastMinutesStart,
+    pastMinutesEnd,
   });
 
   try {

@@ -38,12 +38,15 @@ export interface GetSessionsRequest {
     site: string;
   };
   Querystring: {
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     timezone: string;
     filters: string;
     page: number;
     userId?: string;
+    minutes?: string;
+    pastMinutesStart?: string;
+    pastMinutesEnd?: string;
   };
 }
 
@@ -51,7 +54,17 @@ export async function getSessions(
   req: FastifyRequest<GetSessionsRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, filters, page, userId } = req.query;
+  const {
+    startDate,
+    endDate,
+    timezone,
+    filters,
+    page,
+    userId,
+    minutes,
+    pastMinutesStart,
+    pastMinutesEnd,
+  } = req.query;
   const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
@@ -60,7 +73,12 @@ export async function getSessions(
 
   const filterStatement = getFilterStatement(filters);
   const timeStatement = getTimeStatement({
-    date: { startDate, endDate, timezone },
+    startDate,
+    endDate,
+    timezone,
+    minutes,
+    pastMinutesStart,
+    pastMinutesEnd,
   });
 
   const query = `

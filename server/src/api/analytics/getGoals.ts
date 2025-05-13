@@ -40,14 +40,17 @@ export async function getGoals(
       site: string;
     };
     Querystring: {
-      startDate: string;
-      endDate: string;
+      startDate?: string;
+      endDate?: string;
       timezone: string;
       filters?: string;
       page?: string;
       pageSize?: string;
       sort?: string;
       order?: "asc" | "desc";
+      minutes?: string;
+      pastMinutesStart?: string;
+      pastMinutesEnd?: string;
     };
   }>,
   reply: FastifyReply
@@ -62,6 +65,9 @@ export async function getGoals(
     pageSize = "10",
     sort = "createdAt",
     order = "desc",
+    minutes,
+    pastMinutesStart,
+    pastMinutesEnd,
   } = request.query;
 
   const pageNumber = parseInt(page, 10);
@@ -150,7 +156,12 @@ export async function getGoals(
     // Build filter and time clauses for ClickHouse queries
     const filterStatement = filters ? getFilterStatement(filters) : "";
     const timeStatement = getTimeStatement({
-      date: { startDate, endDate, timezone },
+      startDate,
+      endDate,
+      timezone,
+      minutes,
+      pastMinutesStart,
+      pastMinutesEnd,
     });
 
     // First, get the total number of unique sessions (denominator for conversion rate)

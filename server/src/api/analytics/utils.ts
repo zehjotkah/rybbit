@@ -7,37 +7,77 @@ import {
 } from "./query-validation.js";
 import SqlString from "sqlstring";
 
-export function getTimeStatement({
-  date,
-  pastMinutes,
-}: {
-  date?: {
-    startDate?: string;
-    endDate?: string;
-    timezone?: string;
-    table?: "events" | "sessions";
-  };
-  pastMinutes?: number;
-}) {
-  // Sanitize inputs with Zod
-  const sanitized = validateTimeStatementParams({ date, pastMinutes });
+export function getTimeStatement(
+  params:
+    | {
+        date?: {
+          startDate?: string;
+          endDate?: string;
+          timezone?: string;
+          table?: "events" | "sessions";
+        };
+        pastMinutes?: number;
+        pastMinutesRange?: { start: number; end: number };
+      }
+    | {
+        startDate?: string;
+        endDate?: string;
+        timezone?: string;
+        minutes?: string | number;
+        pastMinutesStart?: string | number;
+        pastMinutesEnd?: string | number;
+      }
+) {
+  // Handle if raw query parameters are passed
+  if ("pastMinutesStart" in params || "minutes" in params) {
+    // Extract and normalize raw parameters
+    const {
+      startDate,
+      endDate,
+      timezone,
+      minutes,
+      pastMinutesStart,
+      pastMinutesEnd,
+    } = params;
+
+    // Convert to the internal format
+    const pastMinutesRange =
+      pastMinutesStart && pastMinutesEnd
+        ? {
+            start: Number(pastMinutesStart),
+            end: Number(pastMinutesEnd),
+          }
+        : undefined;
+
+    const normalizedParams = pastMinutesRange
+      ? { pastMinutesRange }
+      : minutes
+      ? { pastMinutes: Number(minutes) }
+      : startDate && endDate
+      ? { date: { startDate, endDate, timezone } }
+      : {};
+
+    // Call self with normalized parameters
+    return getTimeStatement(normalizedParams);
+  }
+
+  // Original function implementation with sanitized parameters
+  const sanitized = validateTimeStatementParams(params);
 
   if (sanitized.date) {
-    const { startDate, endDate, timezone, table } = sanitized.date;
+    const { startDate, endDate, timezone } = sanitized.date;
     if (!startDate && !endDate) {
       return "";
     }
 
-    const col = (table ?? "events") === "events" ? "timestamp" : "session_end";
-
     // Use SqlString.escape for date and timezone values
-    return `AND ${col} >= toTimeZone(
+    return `AND timestamp >= toTimeZone(
       toStartOfDay(toDateTime(${SqlString.escape(
         startDate
       )}, ${SqlString.escape(timezone)})),
       'UTC'
       )
-      AND ${col} < if(
+      AND timestamp < if(
         toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
       timezone
     )}),
@@ -50,12 +90,27 @@ export function getTimeStatement({
         )
       )`;
   }
+
+  // Handle specific range of past minutes
+  if (sanitized.pastMinutesRange) {
+    const { start, end } = sanitized.pastMinutesRange;
+    return `AND timestamp > now() - interval ${SqlString.escape(
+      start
+    )} minute AND timestamp <= now() - interval ${SqlString.escape(
+      end
+    )} minute`;
+  }
+
+  // Handle standard past minutes
   if (sanitized.pastMinutes) {
     // Use SqlString.escape for pastMinutes (it handles numbers)
     return `AND timestamp > now() - interval ${SqlString.escape(
       sanitized.pastMinutes
     )} minute`;
   }
+
+  // If no valid time parameters were provided, return empty string
+  return "";
 }
 
 export async function processResults<T>(
