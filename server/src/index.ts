@@ -1,5 +1,4 @@
 import cors from "@fastify/cors";
-import rateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import { toNodeHandler } from "better-auth/node";
 import Fastify from "fastify";
@@ -8,8 +7,8 @@ import { Headers, HeadersInit } from "undici";
 import { fileURLToPath } from "url";
 import { createFunnel } from "./api/analytics/createFunnel.js";
 import { createGoal } from "./api/analytics/createGoal.js";
-import { deleteFunnel } from "./api/analytics/deleteFunnel.js";
 import { deleteGoal } from "./api/analytics/deleteGoal.js";
+import { deleteFunnel } from "./api/analytics/deleteFunnel.js";
 import { getEventNames } from "./api/analytics/getEventNames.js";
 import { getEventProperties } from "./api/analytics/getEventProperties.js";
 import { getEvents } from "./api/analytics/getEvents.js";
@@ -56,8 +55,9 @@ import { extractSiteId, isSitePublic, normalizeOrigin } from "./utils.js";
 import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
 import { createPortalSession } from "./api/stripe/createPortalSession.js";
 import { getSubscription } from "./api/stripe/getSubscription.js";
-import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
+import { handleWebhook } from "./api/stripe/webhook.js";
 import { IS_CLOUD } from "./lib/const.js";
+import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -71,22 +71,6 @@ const server = Fastify({
   maxParamLength: 1500,
   trustProxy: true,
 });
-
-if (IS_CLOUD) {
-  server.register(rateLimit, {
-    max: 100,
-    timeWindow: "1 minute",
-    allowList: (req) => {
-      const url = req.raw.url || "";
-      return (
-        url.startsWith("/api/auth") ||
-        url.startsWith("/auth") ||
-        req.ip === "127.0.0.1" ||
-        req.ip === "::1"
-      );
-    },
-  });
-}
 
 server.register(cors, {
   origin: (origin, callback) => {
@@ -265,11 +249,11 @@ if (IS_CLOUD) {
   server.post("/stripe/create-checkout-session", createCheckoutSession);
   server.post("/stripe/create-portal-session", createPortalSession);
   server.get("/stripe/subscription", getSubscription);
-  // server.post(
-  //   "/api/stripe/webhook",
-  //   { config: { rawBody: true } },
-  //   handleWebhook
-  // ); // Use rawBody parser config for webhook
+  server.post(
+    "/api/stripe/webhook",
+    { config: { rawBody: true } },
+    handleWebhook
+  ); // Use rawBody parser config for webhook
 }
 
 server.post("/track", trackEvent);
