@@ -8,9 +8,8 @@ export async function initializeCronJobs() {
 
   if (IS_CLOUD) {
     // Schedule the monthly usage checker to run every 5 minutes
-    const task = cron.schedule("*/5 * * * *", updateUsersMonthlyUsage);
-    
-    await task.execute()
+    cron.schedule("*/5 * * * *", updateUsersMonthlyUsage);
+    updateUsersMonthlyUsage();
   }
   cron.schedule("*/60 * * * * *", cleanupOldSessions);
 
