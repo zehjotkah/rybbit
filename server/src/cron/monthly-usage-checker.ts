@@ -92,7 +92,7 @@ async function getUserSubscriptionInfo(userData: {
       // No active subscription, use default limit and start of current month
       return [DEFAULT_EVENT_LIMIT, getStartOfMonth()];
     }
-
+    
     const subscription = subscriptions.data[0];
     const subscriptionItem = subscription.items.data[0];
 
@@ -121,10 +121,10 @@ async function getUserSubscriptionInfo(userData: {
     const currentMonthStart = getStartOfMonth();
     let periodStart = currentMonthStart;
 
-    if (subscription.current_period_start) {
+    if (subscriptionItem.current_period_start) {
       // Convert subscription start timestamp to DateTime
       const subscriptionStartDate = DateTime.fromSeconds(
-        subscription.current_period_start
+        subscriptionItem.current_period_start
       );
       const currentMonth = DateTime.now().startOf("month");
 
