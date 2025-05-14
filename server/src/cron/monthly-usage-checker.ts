@@ -11,7 +11,7 @@ import { stripe } from "../lib/stripe.js";
 // Default event limit for users without an active subscription
 const DEFAULT_EVENT_LIMIT = 0;
 
-const TRIAL_EVENT_LIMIT = 100_000;
+const TRIAL_EVENT_LIMIT = 1_000_000;
 
 // Global set to track site IDs that have exceeded their monthly limits
 export const sitesOverLimit = new Set<number>();
@@ -92,7 +92,7 @@ async function getUserSubscriptionInfo(userData: {
       // No active subscription, use default limit and start of current month
       return [DEFAULT_EVENT_LIMIT, getStartOfMonth()];
     }
-    
+
     const subscription = subscriptions.data[0];
     const subscriptionItem = subscription.items.data[0];
 
