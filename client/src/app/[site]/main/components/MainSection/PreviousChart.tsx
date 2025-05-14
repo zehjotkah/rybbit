@@ -4,8 +4,8 @@ import { useStore } from "@/lib/store";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
 import { useMemo } from "react";
-import { APIResponse } from "../../../../../api/types";
 import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGetOverviewBucketed";
+import { APIResponse } from "../../../../../api/types";
 import { Time } from "../../../../../components/DateSelector/types";
 
 const getMin = (time: Time) => {
