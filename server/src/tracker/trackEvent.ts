@@ -1,5 +1,12 @@
+import { eq } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z, ZodError } from "zod";
+import { db } from "../db/postgres/postgres.js";
+import { activeSessions } from "../db/postgres/schema.js";
+import { siteConfig } from "../lib/siteConfig.js";
+import { getDeviceType } from "../utils.js";
+import { DISABLE_ORIGIN_CHECK } from "./const.js";
+import { pageviewQueue } from "./pageviewQueue.js";
 import {
   clearSelfReferrer,
   createBasePayload,
@@ -7,13 +14,6 @@ import {
   isSiteOverLimit,
   TotalTrackingPayload,
 } from "./trackingUtils.js";
-import { db } from "../db/postgres/postgres.js";
-import { activeSessions } from "../db/postgres/schema.js";
-import { eq } from "drizzle-orm";
-import { getDeviceType } from "../utils.js";
-import { pageviewQueue } from "./pageviewQueue.js";
-import { siteConfig } from "../lib/siteConfig.js";
-import { DISABLE_ORIGIN_CHECK } from "./const.js";
 
 // Define Zod schema for validation
 export const trackingPayloadSchema = z.discriminatedUnion("type", [
@@ -164,8 +164,7 @@ async function validateOrigin(siteId: string, requestOrigin?: string) {
 
     if (!siteDomain) {
       return {
-        success: false,
-        error: "Site not found or has no registered domain",
+        success: true,
       };
     }
 
@@ -226,21 +225,21 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
     // Use validated data
     const validatedPayload = validationResult.data;
 
-    // Validate that the request is coming from the expected origin
-    const originValidation = await validateOrigin(
-      validatedPayload.site_id,
-      request.headers.origin as string
-    );
+    // Validate that the request is coming from the expected origin. I removed this because people can just spoof the header
+    // const originValidation = await validateOrigin(
+    //   validatedPayload.site_id,
+    //   request.headers.origin as string
+    // );
 
-    if (!originValidation.success) {
-      console.warn(
-        `[Tracking] Request rejected for site ${validatedPayload.site_id}: ${originValidation.error}`
-      );
-      return reply.status(403).send({
-        success: false,
-        error: originValidation.error,
-      });
-    }
+    // if (!originValidation.success) {
+    //   console.warn(
+    //     `[Tracking] Request rejected for site ${validatedPayload.site_id}: ${originValidation.error}`
+    //   );
+    //   return reply.status(403).send({
+    //     success: false,
+    //     error: originValidation.error,
+    //   });
+    // }
 
     // Check if the site has exceeded its monthly limit
     if (isSiteOverLimit(validatedPayload.site_id)) {
