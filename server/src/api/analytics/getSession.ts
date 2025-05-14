@@ -26,7 +26,7 @@ export interface SessionDetails {
   exit_page: string;
 }
 
-export interface PageviewEvent {
+export interface Event {
   timestamp: string;
   pathname: string;
   hostname: string;
@@ -40,7 +40,7 @@ export interface PageviewEvent {
 
 export interface SessionPageviewsAndEvents {
   session: SessionDetails;
-  pageviews: PageviewEvent[];
+  events: Event[];
   pagination: {
     total: number;
     limit: number;
@@ -128,7 +128,7 @@ WHERE
     `;
 
     // 3. Query to get paginated pageviews
-    const pageviewsQuery = `
+    const eventsQuery = `
 SELECT
     timestamp,
     pathname,
@@ -150,7 +150,7 @@ OFFSET {offset:Int32}
     `;
 
     // Execute queries in parallel
-    const [sessionResultSettled, countResultSettled, pageviewsResultSettled] =
+    const [sessionResultSettled, countResultSettled, eventsResultSettled] =
       await Promise.allSettled([
         clickhouse.query({
           query: sessionQuery,
@@ -169,7 +169,7 @@ OFFSET {offset:Int32}
           },
         }),
         clickhouse.query({
-          query: pageviewsQuery,
+          query: eventsQuery,
           format: "JSONEachRow",
           query_params: {
             siteId: Number(site),
@@ -187,17 +187,17 @@ OFFSET {offset:Int32}
     if (countResultSettled.status === "rejected") {
       throw countResultSettled.reason;
     }
-    if (pageviewsResultSettled.status === "rejected") {
-      throw pageviewsResultSettled.reason;
+    if (eventsResultSettled.status === "rejected") {
+      throw eventsResultSettled.reason;
     }
 
     const sessionResult = sessionResultSettled.value;
     const countResult = countResultSettled.value;
-    const pageviewsResult = pageviewsResultSettled.value;
+    const eventsResult = eventsResultSettled.value;
 
     const sessionData = await processResults<SessionDetails>(sessionResult);
     const countData = await processResults<{ total: number }>(countResult);
-    const pageviewsData = await processResults<PageviewEvent>(pageviewsResult);
+    const eventsData = await processResults<Event>(eventsResult);
 
     if (!sessionData || sessionData.length === 0) {
       return res.status(404).send({ error: "Session not found" });
@@ -206,12 +206,12 @@ OFFSET {offset:Int32}
     // Combine results
     const response: SessionPageviewsAndEvents = {
       session: sessionData[0],
-      pageviews: pageviewsData,
+      events: eventsData,
       pagination: {
         total: countData[0].total,
         limit,
         offset,
-        hasMore: offset + pageviewsData.length < countData[0].total,
+        hasMore: offset + eventsData.length < countData[0].total,
       },
     };
 

@@ -150,7 +150,7 @@ export interface SessionDetails {
   exit_page: string;
 }
 
-export interface PageviewEvent {
+export interface SessionEvent {
   timestamp: string;
   pathname: string;
   hostname: string;
@@ -159,12 +159,12 @@ export interface PageviewEvent {
   referrer: string;
   type: string;
   event_name?: string;
-  properties?: string;
+  props?: string;
 }
 
 export interface SessionPageviewsAndEvents {
   session: SessionDetails;
-  pageviews: PageviewEvent[];
+  events: SessionEvent[];
   pagination: {
     total: number;
     limit: number;
