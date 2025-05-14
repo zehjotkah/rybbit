@@ -16,6 +16,9 @@ interface RetentionChartProps {
   mode: RetentionMode;
 }
 
+// Detect user locale and 12h/24h preference
+const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+
 // Vibrant color palette for different cohorts using Tailwind CSS HSL variables
 const cohortColors = [
   "hsl(var(--accent-500))", // Primary accent color
@@ -77,7 +80,7 @@ export function RetentionChart({ data, isLoading, mode }: RetentionChartProps) {
       // Format the date label based on mode
       let formattedDate: string;
       if (mode === "day") {
-        formattedDate = DateTime.fromISO(cohortKey).toFormat("MMM dd");
+        formattedDate = DateTime.fromISO(cohortKey).setLocale(userLocale).toFormat("MMM dd");
       } else {
         // For weekly mode
         const startDate = DateTime.fromISO(cohortKey);
@@ -85,11 +88,11 @@ export function RetentionChart({ data, isLoading, mode }: RetentionChartProps) {
 
         // If same month, don't repeat month
         if (startDate.month === endDate.month) {
-          formattedDate = `${startDate.toFormat("MMM dd")}-${endDate.toFormat(
+          formattedDate = `${startDate.setLocale(userLocale).toFormat("MMM dd")}-${endDate.setLocale(userLocale).toFormat(
             "dd"
           )}`;
         } else {
-          formattedDate = `${startDate.toFormat("MMM dd")}-${endDate.toFormat(
+          formattedDate = `${startDate.setLocale(userLocale).toFormat("MMM dd")}-${endDate.setLocale(userLocale).toFormat(
             "MMM dd"
           )}`;
         }
@@ -213,23 +216,23 @@ export function RetentionChart({ data, isLoading, mode }: RetentionChartProps) {
           if (originalCohortKey) {
             if (mode === "day") {
               cohortDateDisplay =
-                DateTime.fromISO(originalCohortKey).toFormat("MMM dd, yyyy");
+                DateTime.fromISO(originalCohortKey).setLocale(userLocale).toFormat("MMM dd, yyyy");
             } else {
               const startDate = DateTime.fromISO(originalCohortKey);
               const endDate = startDate.plus({ days: 6 });
 
               if (startDate.month === endDate.month) {
-                cohortDateDisplay = `${startDate.toFormat(
+                cohortDateDisplay = `${startDate.setLocale(userLocale).toFormat(
                   "MMM dd"
-                )} - ${endDate.toFormat("dd, yyyy")}`;
+                )} - ${endDate.setLocale(userLocale).toFormat("dd, yyyy")}`;
               } else if (startDate.year === endDate.year) {
-                cohortDateDisplay = `${startDate.toFormat(
+                cohortDateDisplay = `${startDate.setLocale(userLocale).toFormat(
                   "MMM dd"
-                )} - ${endDate.toFormat("MMM dd, yyyy")}`;
+                )} - ${endDate.setLocale(userLocale).toFormat("MMM dd, yyyy")}`;
               } else {
-                cohortDateDisplay = `${startDate.toFormat(
+                cohortDateDisplay = `${startDate.setLocale(userLocale).toFormat(
                   "MMM dd, yyyy"
-                )} - ${endDate.toFormat("MMM dd, yyyy")}`;
+                )} - ${endDate.setLocale(userLocale).toFormat("MMM dd, yyyy")}`;
               }
             }
           }
