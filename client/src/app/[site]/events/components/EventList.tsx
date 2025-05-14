@@ -1,7 +1,7 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { ChevronDown, ChevronRight, Info } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronRight, Info } from "lucide-react";
 import { memo, useState } from "react";
 import { EventName } from "../../../../api/analytics/useGetEventNames";
 import { useGetEventProperties } from "../../../../api/analytics/useGetEventProperties";
@@ -43,14 +43,20 @@ const EventListSkeleton = memo(
         {Array.from({ length: 10 }).map((_, index) => (
           <div
             key={index}
-            className={cn("relative flex items-center", size === "small" ? "h-6" : "h-9")}
+            className={cn(
+              "relative flex items-center",
+              size === "small" ? "h-6" : "h-9"
+            )}
           >
             <div
               className="absolute inset-0 bg-neutral-800 py-2 rounded-md animate-pulse"
               style={{ width: `${widths[index]}%` }}
             ></div>
             <div
-              className={cn("z-5 mx-2 flex justify-between items-center w-full", size === "small" ? "text-xs" : "text-sm")}
+              className={cn(
+                "z-5 mx-2 flex justify-between items-center w-full",
+                size === "small" ? "text-xs" : "text-sm"
+              )}
             >
               <div className="flex items-center gap-1">
                 <div className="h-4 w-4 bg-neutral-800 rounded animate-pulse mr-1"></div>
@@ -60,7 +66,10 @@ const EventListSkeleton = memo(
                 ></div>
               </div>
               <div
-                className={cn("flex gap-2", size === "small" ? "text-xs" : "text-sm")}
+                className={cn(
+                  "flex gap-2",
+                  size === "small" ? "text-xs" : "text-sm"
+                )}
               >
                 <div
                   className="h-4 bg-neutral-800 rounded animate-pulse"
@@ -101,9 +110,20 @@ export function EventList({
 
   if (!events || events.length === 0) {
     return size === "small" ? (
-      <div className="text-neutral-300 w-full text-center mt-6 flex flex-row gap-2 items-center justify-center">
-        <Info className="w-5 h-5" />
-        No Data
+      <div className="flex flex-col gap-2">
+        <div className="text-neutral-100 w-full text-center mt-6 flex flex-row gap-2 items-center justify-center">
+          <Info className="w-5 h-5" />
+          No Data
+        </div>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.rybbit.io/docs/track-events"
+          className="text-neutral-400 w-full text-center mt-2 flex flex-row gap-1 items-center justify-center text-sm hover:underline hover:text-neutral-300"
+        >
+          <BookOpen className="w-4 h-4" />
+          Learn how to track events
+        </a>
       </div>
     ) : (
       <NothingFound
@@ -126,7 +146,10 @@ export function EventList({
           <div key={event.eventName} className="flex flex-col">
             {/* Event Row */}
             <div
-              className={cn("relative flex items-center cursor-pointer hover:bg-neutral-850 group px-2 rounded-md", size === "small" ? "h-6" : "h-9")}
+              className={cn(
+                "relative flex items-center cursor-pointer hover:bg-neutral-850 group px-2 rounded-md",
+                size === "small" ? "h-6" : "h-9"
+              )}
               onClick={() => handleEventClick(event.eventName)}
             >
               <div
@@ -134,7 +157,10 @@ export function EventList({
                 style={{ width: `${percentage}%` }}
               ></div>
               <div
-                className={cn("z-10 flex justify-between items-center w-full", size === "small" ? "text-xs" : "text-sm")}
+                className={cn(
+                  "z-10 flex justify-between items-center w-full",
+                  size === "small" ? "text-xs" : "text-sm"
+                )}
               >
                 <div className="font-medium truncate max-w-[70%] flex items-center gap-1">
                   {isExpanded ? (
@@ -145,7 +171,10 @@ export function EventList({
                   {event.eventName}
                 </div>
                 <div
-                  className={cn("text-sm flex gap-2", size === "small" ? "text-xs" : "text-sm")}
+                  className={cn(
+                    "text-sm flex gap-2",
+                    size === "small" ? "text-xs" : "text-sm"
+                  )}
                 >
                   <div className="hidden group-hover:block text-neutral-400">
                     {Math.round(percentage * 10) / 10}%
