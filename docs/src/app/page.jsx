@@ -141,21 +141,55 @@ export default function IndexPage() {
               See what others think about Rybbit Analytics
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
-            <TweetCard id="1920470706761929048" />
-            <TweetCard id="1920379817113088341" />
-            <TweetCard id="1920318739335033226" />
-            <TweetCard id="1920258312177594500" />
-            <TweetCard id="1919793785384386576" />
-            <TweetCard id="1920316582875496449" />
-            <TweetCard id="1920425974954381456" />
-            <TweetCard id="1919290867451404670" />
-            <TweetCard id="1920192156960239683" />
-
-            <TweetCard id="1920899082253434950" />
-            <TweetCard id="1921928423284629758" />
-            <TweetCard id="1921878010417848443" />
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+            <TweetCard
+              id="1920470706761929048"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920899082253434950"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920318739335033226"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920258312177594500"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1921928423284629758"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920316582875496449"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920425974954381456"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1919290867451404670"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1921878010417848443"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920192156960239683"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1920379817113088341"
+              className="break-inside-avoid mb-4"
+            />
+            <TweetCard
+              id="1919793785384386576"
+              className="break-inside-avoid mb-4"
+            />
           </div>
         </div>
       </section>

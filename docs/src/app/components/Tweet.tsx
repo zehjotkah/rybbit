@@ -67,7 +67,10 @@ export const TweetSkeleton = ({
   [key: string]: unknown;
 }) => (
   <div
-    className={cn("flex size-full max-h-max min-w-72 flex-col gap-2 rounded-lg border p-4", className)}
+    className={cn(
+      "flex size-full max-h-max min-w-72 flex-col gap-2 rounded-lg border p-4",
+      className
+    )}
     {...props}
   >
     <div className="flex flex-row gap-2">
@@ -86,7 +89,10 @@ export const TweetNotFound = ({
   [key: string]: unknown;
 }) => (
   <div
-    className={cn("flex size-full flex-col items-center justify-center gap-2 rounded-lg border p-4", className)}
+    className={cn(
+      "flex size-full flex-col items-center justify-center gap-2 rounded-lg border p-4",
+      className
+    )}
     {...props}
   >
     <h3>Tweet not found</h3>
@@ -232,12 +238,19 @@ export const MagicTweet = ({
   const enrichedTweet = enrichTweet(tweet);
   return (
     <div
-      className={cn("relative flex size-full max-w-lg flex-col gap-2 overflow-hidden rounded-lg border p-4 backdrop-blur-md bg-neutral-900", className)}
+      className={cn(
+        "relative flex size-full max-w-lg flex-col gap-2 overflow-hidden rounded-lg border p-4 backdrop-blur-md bg-neutral-900",
+        className
+      )}
       {...props}
     >
       <TweetHeader tweet={enrichedTweet} />
       <TweetBody tweet={enrichedTweet} />
-      {/* <TweetMedia tweet={enrichedTweet} /> */}
+      {tweet.id_str !== "1920425974954381456" && (
+        <div className="hidden sm:block">
+          <TweetMedia tweet={enrichedTweet} />
+        </div>
+      )}
     </div>
   );
 };
