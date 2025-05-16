@@ -23,7 +23,7 @@ import { cn, formatter, getCountryName } from "../../lib/utils";
 import { formatDuration } from "../../lib/dateTimeUtils";
 import { Badge } from "../ui/badge";
 import { SessionDetails } from "./SessionDetails";
-import { userLocale, is24Hour } from "../../lib/dateTimeUtils";
+import { userLocale, hour12 } from "../../lib/dateTimeUtils";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -194,7 +194,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 zone: "utc",
               }).setLocale(userLocale)
                 .toLocal()
-                .toFormat(is24Hour ? 'dd MMM, HH:mm' : 'MMM d, h:mm a')
+                .toFormat(hour12 ? "MMM d, h:mm a" : "dd MMM, HH:mm")
               }
             </span>
             <span className="hidden md:block">{durationFormatted}</span>

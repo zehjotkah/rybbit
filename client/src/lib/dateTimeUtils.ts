@@ -1,8 +1,12 @@
 
-import { Duration, DateTime, DurationLikeObject, Settings } from "luxon";
+import { Duration, DurationLikeObject, Settings } from "luxon";
 
 // Detect user locale
 export const userLocale = typeof navigator !== "undefined" ? navigator.language : "en-US";
+
+// Detect user 12h/24h preference
+const resolved = new Intl.DateTimeFormat(userLocale, { hour: "numeric" }).resolvedOptions();
+export const hour12 = resolved.hourCycle === "h12";
 
 // Set default locale globally
 Settings.defaultLocale = userLocale;
@@ -106,7 +110,7 @@ export function formatDuration(minutes: number, seconds: number): string {
 
 /**
  * Formats a given hour and minute into a localized time string,
- * respecting either 24-hour or 12-hour format based on the `is24Hour` flag.
+ * respecting either 24-hour or 12-hour format based on the `hour12` flag.
  *
  * @param hour - The hour of the day (0–23).
  * @param minute - The minute of the hour (0–59).
@@ -120,7 +124,7 @@ export const formatLocalTime = (hour: number, minute: number): string => {
   const formatter = new Intl.DateTimeFormat(undefined, {
     hour: "numeric",
     minute: "2-digit",
-    hour12: !is24Hour,
+    hour12: hour12,
   });
 
   // Create a new Date object set to the given hour and minute
@@ -132,9 +136,6 @@ export const formatLocalTime = (hour: number, minute: number): string => {
 };
 
 
-// Detect user 12h/24h preference
-const resolved = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions();
-export const is24Hour = resolved.hourCycle === "h23" || resolved.hourCycle === "h24";
 
 // localized full day names
 // e.g., "Monday" "Tuesday" "Wednesday"
@@ -148,7 +149,7 @@ export const shortDayNames:string[] = getLocalizedWeekdayNames(userLocale, "shor
 // e.g., "00" "01" "02"
 export const hourLabels: string[] = getLocalizedTimeLabels(userLocale, {
   hour: "numeric",
-  hour12: !is24Hour,
+  hour12: hour12,
 });
 
 // localized time (hour with minutes) labels
@@ -156,5 +157,5 @@ export const hourLabels: string[] = getLocalizedTimeLabels(userLocale, {
 export const hourMinuteLabels: string[] = getLocalizedTimeLabels(userLocale, {
   hour: "numeric",
   minute: "2-digit",
-  hour12: !is24Hour,
+  hour12: hour12,
 });

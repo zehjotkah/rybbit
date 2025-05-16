@@ -8,7 +8,7 @@ import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGet
 import { APIResponse } from "../../../../../api/types";
 import { Time } from "../../../../../components/DateSelector/types";
 import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
-import { userLocale, is24Hour } from "../../../../../lib/dateTimeUtils";
+import { userLocale, hour12 } from "../../../../../lib/dateTimeUtils";
 
 export const formatter = Intl.NumberFormat(userLocale, { notation: "compact" });
 
@@ -293,9 +293,9 @@ export function Chart({
         format: (value) => {
           const dt = DateTime.fromJSDate(value).setLocale(userLocale);
           if (time.mode === "day" || time.mode === "last-24-hours" ) {
-            return dt.toFormat(is24Hour ? 'HH:mm' : 'ha');
+            return dt.toFormat(hour12 ? "ha" : "HH:mm");
           }
-          return dt.toFormat(is24Hour ? 'dd MMM' : 'MMM d');
+          return dt.toFormat(hour12 ? "MMM d" : "dd MMM");
         },
       }}
       axisLeft={{
@@ -376,13 +376,13 @@ export function Chart({
 const formatDateTime = (dt: DateTime, bucket: TimeBucket) => {
   const showMinutes = ["minute", "five_minutes", "ten_minutes", "fifteen_minutes", "hour"].includes(bucket);
   const options: Intl.DateTimeFormatOptions = {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    hour12: !is24Hour,
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    hour12: hour12,
   };
-  if (showMinutes && is24Hour) {
-    options.minute = 'numeric';
+  if (showMinutes && !hour12) {
+    options.minute = "numeric";
   }
   if (bucket === "day") {
     options.minute = undefined;
