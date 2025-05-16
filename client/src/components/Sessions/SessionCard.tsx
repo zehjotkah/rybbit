@@ -13,7 +13,7 @@ import {
   MousePointerClick,
   Smartphone
 } from "lucide-react";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import { memo, useState } from "react";
 import { GetSessionsResponse } from "../../api/analytics/userSessions";
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
@@ -57,8 +57,8 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
   // Calculate session duration in minutes
   const start = DateTime.fromSQL(session.session_start);
   const end = DateTime.fromSQL(session.session_end);
-  const duration = end.diff(start, ["minutes", "seconds"]);
-  const durationFormatted = formatDuration(duration.minutes, duration.seconds);
+  const totalSeconds = Math.floor(end.diff(start).milliseconds / 1000);
+  const duration = formatDuration(totalSeconds);
 
   // Truncate user ID to first 8 characters
   const truncatedUserId = session.user_id.substring(0, 8);
@@ -197,7 +197,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 .toFormat(hour12 ? "MMM d, h:mm a" : "dd MMM, HH:mm")
               }
             </span>
-            <span className="hidden md:block">{durationFormatted}</span>
+            <span className="hidden md:block">{duration}</span>
           </div>
 
           {/* Expand/Collapse icon */}

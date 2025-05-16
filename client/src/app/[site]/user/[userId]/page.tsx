@@ -23,10 +23,10 @@ import { Button } from "../../../../components/ui/button";
 import { useSetPageTitle } from "../../../../hooks/useSetPageTitle";
 import { useGetRegionName } from "../../../../lib/geo";
 import {
-  formatDuration,
   getCountryName,
   getLanguageName,
 } from "../../../../lib/utils";
+import { formatDuration } from "../../../../lib/dateTimeUtils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";

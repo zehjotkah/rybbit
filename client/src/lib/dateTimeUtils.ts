@@ -70,22 +70,30 @@ export function getLocalizedTimeLabels(
 }
 
 /**
- * Formats a duration from minutes and seconds into a human-readable string.
+ * Formats a duration in seconds to a human-readable string.
  *
- * @param minutes - Number of minutes.
- * @param seconds - Number of seconds.
- * @returns A compact, readable string like "1 min 30 sec".
+ * @param duration - Duration in seconds.
+ * @returns Human-readable duration string (e.g., "1 min, 30 sec").
  */
-export function formatDuration(minutes: number, seconds: number): string {
-  const units: Record<string, number> = {};
-  if (minutes > 0) units.minutes = minutes;
-  if (seconds > 0 || minutes === 0) units.seconds = seconds;
+export function formatDuration(duration: number): string {
+  // Prepare duration parts in seconds and optionally minutes.
+  const units: Record<string, number> = {
+    seconds: duration % 60,
+  };
 
-  const keys: (keyof DurationLikeObject)[] = minutes > 0 ? ["minutes", "seconds"] : ["seconds"];
+  if (duration > 59) {
+    units.minutes = Math.floor(duration / 60);
+  }
 
-  const duration = Duration.fromObject(units).shiftTo(...keys).normalize();
+  // Choose which units to show: only "seconds" or both "minutes" and "seconds".
+  const keys: (keyof DurationLikeObject)[] = duration > 59 ? ["minutes", "seconds"] : ["seconds"];
 
-  return duration.toHuman({
+  // Convert to Luxon duration object and format to human-readable string.
+  const luxonDuration = Duration.fromObject(units)
+    .shiftTo(...keys)
+    .normalize();
+
+  return luxonDuration.toHuman({
     listStyle: "narrow",
     unitDisplay: "short",
   });

@@ -51,13 +51,8 @@ function PageviewItem({
   let duration = null;
   if (!isEvent && nextTimestamp) {
     const nextTime = DateTime.fromSQL(nextTimestamp, { zone: "utc" }).toLocal();
-    const diff = nextTime.diff(timestamp, ["minutes", "seconds"]);
-    const minutes = Math.floor(diff.minutes);
-    const seconds = Math.floor(diff.seconds);
-
-    if (minutes > 0 || seconds > 0) {
-      duration = formatDuration(minutes, seconds);
-    }
+    const totalSeconds = Math.floor(nextTime.diff(timestamp).milliseconds / 1000);
+    duration = formatDuration(totalSeconds);
   }
 
   return (
