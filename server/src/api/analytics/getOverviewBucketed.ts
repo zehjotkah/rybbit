@@ -39,7 +39,7 @@ function getTimeStatementFill(
     pastMinutes,
     pastMinutesRange,
   }: {
-    date?: { startDate: string; endDate: string; timezone: string };
+    date?: { startDate: string; endDate: string; timeZone: string };
     pastMinutes?: number;
     pastMinutesRange?: { start: number; end: number };
   },
@@ -51,25 +51,25 @@ function getTimeStatementFill(
   );
 
   if (params.date) {
-    const { startDate, endDate, timezone } = params.date;
+    const { startDate, endDate, timeZone } = params.date;
     return `WITH FILL FROM toTimeZone(
       toDateTime(${
         TimeBucketToFn[validatedBucket]
       }(toDateTime(${SqlString.escape(startDate)}, ${SqlString.escape(
-      timezone
+      timeZone
     )}))),
       'UTC'
       )
       TO if(
         toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
-      timezone
+      timeZone
     )}),
         now(),
         toTimeZone(
           toDateTime(${
             TimeBucketToFn[validatedBucket]
           }(toDateTime(${SqlString.escape(endDate)}, ${SqlString.escape(
-      timezone
+      timeZone
     )}))) + INTERVAL 1 DAY,
           'UTC'
         )
@@ -138,7 +138,7 @@ function getTimeStatementFill(
 const getQuery = ({
   startDate,
   endDate,
-  timezone,
+  timeZone,
   bucket,
   site,
   filters,
@@ -147,7 +147,7 @@ const getQuery = ({
 }: {
   startDate: string;
   endDate: string;
-  timezone: string;
+  timeZone: string;
   bucket: TimeBucket;
   site: string;
   filters: string;
@@ -162,7 +162,7 @@ const getQuery = ({
     ? { pastMinutesRange }
     : pastMinutes
     ? { pastMinutes }
-    : { date: { startDate, endDate, timezone } };
+    : { date: { startDate, endDate, timeZone } };
 
   const query = `
 SELECT
@@ -178,7 +178,7 @@ FROM
     SELECT
          toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(start_time, ${SqlString.escape(timezone)}))) AS time,
+         }(toTimeZone(start_time, ${SqlString.escape(timeZone)}))) AS time,
         COUNT() AS sessions,
         AVG(pages_in_session) AS pages_per_session,
         sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
@@ -208,7 +208,7 @@ FULL JOIN
     SELECT
          toDateTime(${
            TimeBucketToFn[bucket]
-         }(toTimeZone(timestamp, ${SqlString.escape(timezone)}))) AS time,
+         }(toTimeZone(timestamp, ${SqlString.escape(timeZone)}))) AS time,
         COUNT(*) AS pageviews,
         COUNT(DISTINCT user_id) AS users
     FROM events
@@ -248,7 +248,7 @@ export async function getOverviewBucketed(
     Querystring: {
       startDate: string;
       endDate: string;
-      timezone: string;
+      timeZone: string;
       bucket: TimeBucket;
       filters: string;
       pastMinutes?: number;
@@ -261,7 +261,7 @@ export async function getOverviewBucketed(
   const {
     startDate,
     endDate,
-    timezone,
+    timeZone,
     bucket,
     filters,
     pastMinutes,
@@ -284,7 +284,7 @@ export async function getOverviewBucketed(
   const query = getQuery({
     startDate,
     endDate,
-    timezone,
+    timeZone,
     bucket,
     site,
     filters,

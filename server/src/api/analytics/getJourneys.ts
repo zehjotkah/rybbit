@@ -10,7 +10,7 @@ export const getJourneys = async (
       steps?: string;
       startDate?: string;
       endDate?: string;
-      timezone?: string;
+      timeZone?: string;
       limit?: string;
     };
   }>,
@@ -22,7 +22,7 @@ export const getJourneys = async (
       steps = "3",
       startDate,
       endDate,
-      timezone = "UTC",
+      timeZone = "UTC",
       limit = "100",
     } = request.query;
 
@@ -49,7 +49,7 @@ export const getJourneys = async (
               startDate:
                 startDate || DateTime.now().minus({ days: 30 }).toISODate(),
               endDate: endDate || DateTime.now().toISODate(),
-              timezone,
+              timeZone,
               table: "events",
             }
           : undefined,

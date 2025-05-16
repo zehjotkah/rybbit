@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
+import { timeZone } from "../../lib/dateTimeUtils";
 import {
   getFilteredFilters,
   GOALS_PAGE_FILTERS,
@@ -56,7 +57,6 @@ export function useGetGoals({
   minutes?: number;
 }) {
   const { site, time } = useStore();
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const filteredFilters = getFilteredFilters(GOALS_PAGE_FILTERS);
 
   // If startDate and endDate are not provided, use time from store
@@ -64,7 +64,7 @@ export function useGetGoals({
 
   if (minutes) {
     // If minutes is explicitly provided, use it
-    timeParams = { minutes: minutes.toString(), timezone };
+    timeParams = { minutes: minutes.toString(), timeZone };
   } else if (!startDate || !endDate) {
     // Otherwise get time parameters from the store's time
     // This will handle last-24-hours mode automatically
@@ -72,7 +72,7 @@ export function useGetGoals({
     timeParams = Object.fromEntries(new URLSearchParams(queryParams));
   } else {
     // Use explicitly provided dates if available
-    timeParams = { startDate, endDate, timezone };
+    timeParams = { startDate, endDate, timeZone };
   }
 
   return useQuery({

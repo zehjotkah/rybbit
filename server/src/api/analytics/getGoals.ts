@@ -42,7 +42,7 @@ export async function getGoals(
     Querystring: {
       startDate?: string;
       endDate?: string;
-      timezone: string;
+      timeZone: string;
       filters?: string;
       page?: string;
       pageSize?: string;
@@ -59,7 +59,7 @@ export async function getGoals(
   const {
     startDate,
     endDate,
-    timezone,
+    timeZone,
     filters,
     page = "1",
     pageSize = "10",
@@ -168,7 +168,7 @@ export async function getGoals(
       : minutes
       ? { pastMinutes: Number(minutes) }
       : startDate || endDate
-      ? { date: { startDate, endDate, timezone } }
+      ? { date: { startDate, endDate, timeZone } }
       : {};
 
     const timeStatement = getTimeStatement(timeParams);

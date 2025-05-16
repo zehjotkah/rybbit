@@ -20,7 +20,7 @@ export interface GetEventPropertiesRequest {
   Querystring: {
     startDate?: string;
     endDate?: string;
-    timezone: string;
+    timeZone: string;
     eventName: string;
     filters?: string;
     minutes?: string;
@@ -31,7 +31,7 @@ export async function getEventProperties(
   req: FastifyRequest<GetEventPropertiesRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, eventName, filters, minutes } =
+  const { startDate, endDate, timeZone, eventName, filters, minutes } =
     req.query;
   const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
@@ -46,7 +46,7 @@ export async function getEventProperties(
   const timeStatement = getTimeStatement(
     minutes
       ? { pastMinutes: Number(minutes) }
-      : { date: { startDate, endDate, timezone } }
+      : { date: { startDate, endDate, timeZone } }
   );
 
   const filterStatement = filters ? getFilterStatement(filters) : "";

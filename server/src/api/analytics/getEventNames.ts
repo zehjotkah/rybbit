@@ -19,7 +19,7 @@ export interface GetEventNamesRequest {
   Querystring: {
     startDate?: string;
     endDate?: string;
-    timezone: string;
+    timeZone: string;
     filters?: string;
     minutes?: string;
   };
@@ -29,7 +29,7 @@ export async function getEventNames(
   req: FastifyRequest<GetEventNamesRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timezone, filters, minutes } = req.query;
+  const { startDate, endDate, timeZone, filters, minutes } = req.query;
   const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
@@ -39,7 +39,7 @@ export async function getEventNames(
   const timeStatement = getTimeStatement(
     minutes
       ? { pastMinutes: Number(minutes) }
-      : { date: { startDate, endDate, timezone } }
+      : { date: { startDate, endDate, timeZone } }
   );
 
   const filterStatement = filters ? getFilterStatement(filters) : "";

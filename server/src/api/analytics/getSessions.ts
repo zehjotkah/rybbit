@@ -40,7 +40,7 @@ export interface GetSessionsRequest {
   Querystring: {
     startDate?: string;
     endDate?: string;
-    timezone: string;
+    timeZone: string;
     filters: string;
     page: number;
     userId?: string;
@@ -57,7 +57,7 @@ export async function getSessions(
   const {
     startDate,
     endDate,
-    timezone,
+    timeZone,
     filters,
     page,
     userId,
@@ -85,7 +85,7 @@ export async function getSessions(
     : minutes
     ? { pastMinutes: Number(minutes) }
     : startDate && endDate
-    ? { date: { startDate, endDate, timezone } }
+    ? { date: { startDate, endDate, timeZone } }
     : {};
 
   const timeStatement = getTimeStatement(timeParams);

@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
+import { timeZone } from "../../lib/dateTimeUtils";
 import {
   getFilteredFilters,
   SESSION_PAGE_FILTERS,
@@ -34,11 +35,10 @@ export function useGetUserSessions(userId: string) {
   return useQuery({
     queryKey: ["user-sessions", userId, time, site, filters],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/user/${userId}/sessions/${site}`, {
         startDate,
         endDate,
-        timezone,
+        timeZone,
         filters,
       }).then((res) => res.json());
     },
@@ -86,11 +86,9 @@ export function useGetSessionsInfinite(userId?: string) {
   return useInfiniteQuery<APIResponse<GetSessionsResponse>>({
     queryKey: ["sessions-infinite", time, site, filteredFilters, userId],
     queryFn: ({ pageParam = 1 }) => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
       // Use an object for request parameters so we can conditionally add fields
       const requestParams: Record<string, any> = {
-        timezone,
+        timeZone,
         filters: filteredFilters,
         page: pageParam,
       };
@@ -219,10 +217,9 @@ export function useGetUserSessionCount(userId: string) {
   return useQuery<APIResponse<UserSessionCountResponse[]>>({
     queryKey: ["user-session-count", userId, site],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/user/session-count/${site}`, {
         userId,
-        timezone,
+        timeZone,
       }).then((res) => res.json());
     },
     staleTime: Infinity,

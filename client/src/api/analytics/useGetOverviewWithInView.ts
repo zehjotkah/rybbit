@@ -1,6 +1,7 @@
 import { useGetOverviewPastMinutes } from "./useGetOverview";
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
+import { timeZone } from "../../lib/dateTimeUtils";
 import { authedFetch } from "../utils";
 
 /**
@@ -20,10 +21,9 @@ export function useGetOverviewWithInView({
   return useQuery({
     queryKey: ["overview-past-minutes", pastMinutes, site],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/overview/${site}`, {
         pastMinutes,
-        timezone,
+        timeZone,
       }).then((res) => res.json());
     },
     enabled: isInView, // Only fetch when in view

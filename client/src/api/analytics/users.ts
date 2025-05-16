@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
+import { timeZone } from "../../lib/dateTimeUtils";
 import {
   useStore,
   Filter,
@@ -64,11 +65,9 @@ export function useGetUsers(options: GetUsersOptions) {
       filteredFilters,
     ],
     queryFn: async () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
       // Build request parameters
       const requestParams: Record<string, any> = {
-        timezone,
+        timeZone,
         filters: filteredFilters,
         page,
         pageSize,

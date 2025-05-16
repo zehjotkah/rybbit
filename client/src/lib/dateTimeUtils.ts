@@ -1,16 +1,17 @@
-
 import { Duration, DurationLikeObject, Settings } from "luxon";
 
-// Detect user locale
+// Detect user locale from the browser environment (fallback to 'en-US' on server)
 export const userLocale = typeof navigator !== "undefined" ? navigator.language : "en-US";
 
-// Detect user 12h/24h preference
+// Detect whether the user prefers 12-hour time format (true = 12h, false = 24h)
 const resolved = new Intl.DateTimeFormat(userLocale, { hour: "numeric" }).resolvedOptions();
 export const hour12 = resolved.hourCycle === "h12";
 
-// Set default locale globally
-Settings.defaultLocale = userLocale;
+// Detect user's timezone (not exported but used internally)
+export const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+// Set default locale for Luxon globally
+Settings.defaultLocale = userLocale;
 
 /**
  * Returns localized weekday names, starting from Monday.

@@ -20,6 +20,7 @@ import { DateSelector } from "../../../components/DateSelector/DateSelector";
 import { DateRangeMode, Time } from "../../../components/DateSelector/types";
 import { MobileSidebar } from "../../../components/MobileSidebar";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
+import { timeZone } from "../../../lib/dateTimeUtils";
 
 const MAX_LINK_HEIGHT = 100;
 
@@ -36,13 +37,13 @@ export default function JourneysPage() {
     startDate: DateTime.now().minus({ days: 7 }).toISODate(),
     endDate: DateTime.now().toISODate(),
     wellKnown: "Last 7 days",
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZone: timeZone,
   } as DateRangeMode);
 
   const { data, isLoading, error } = useJourneys({
     siteId: siteMetadata?.siteId,
     steps,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZone: timeZone,
     time,
     limit: maxJourneys,
   });
