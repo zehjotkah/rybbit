@@ -17,7 +17,7 @@ interface GenericRequest {
     startDate: string;
     endDate: string;
     minutes: number;
-    timezone: string;
+    timeZone: string;
     filters: string;
     parameter: FilterParameter;
     limit?: number;
@@ -36,7 +36,7 @@ type GetSingleColResponse = {
 }[];
 
 const getQuery = (request: FastifyRequest<GenericRequest>) => {
-  const { startDate, endDate, timezone, filters, parameter, limit, minutes } =
+  const { startDate, endDate, timeZone, filters, parameter, limit, minutes } =
     request.query;
 
   const filterStatement = getFilterStatement(filters);
@@ -44,7 +44,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
     minutes
       ? { pastMinutes: Number(minutes) }
       : {
-          date: { startDate, endDate, timezone },
+          date: { startDate, endDate, timeZone },
         }
   );
 

@@ -8,8 +8,9 @@ import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGet
 import { APIResponse } from "../../../../../api/types";
 import { Time } from "../../../../../components/DateSelector/types";
 import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
+import { userLocale, hour12 } from "../../../../../lib/dateTimeUtils";
 
-export const formatter = Intl.NumberFormat("en", { notation: "compact" });
+export const formatter = Intl.NumberFormat(userLocale, { notation: "compact" });
 
 const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
@@ -176,7 +177,8 @@ export function Chart({
     (time.mode === "month" && time.month !== currentMonthStr) || // do not display in month mode if month is not current
     (time.mode === "day" && time.day !== currentDayStr) || // do not display in day mode if day is not current
     (time.mode === "range" && time.endDate !== currentDayStr) || // do not display in range mode if end date is not current day
-    (time.mode === "day" && (bucket === "minute" || bucket === "five_minutes")); // do not display in day mode if bucket is minute or five_minutes
+    (time.mode === "day" && (bucket === "minute" || bucket === "five_minutes")) || // do not display in day mode if bucket is minute or five_minutes
+    (time.mode === "last-24-hours" && (bucket === "minute" || bucket === "five_minutes")); // do not display in last-24-hours mode if bucket is minute or five_minutes
   const displayDashed = formattedData.length >= 2 && !shouldNotDisplay;
 
   const baseGradient = {
@@ -289,23 +291,11 @@ export function Chart({
             : Math.min(12, data?.data?.length ?? 0)
         ),
         format: (value) => {
-          // Convert UTC date to local timezone for display
-          const localTime = DateTime.fromJSDate(value).toLocal();
-
-          if (time.mode === "last-24-hours" || time.mode === "day") {
-            return localTime.toFormat("ha");
-          } else if (time.mode === "range") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "week") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "month") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "year") {
-            return localTime.toFormat("MMM d");
-          } else if (time.mode === "all-time") {
-            return localTime.toFormat("MMM d");
+          const dt = DateTime.fromJSDate(value).setLocale(userLocale);
+          if (time.mode === "day" || time.mode === "last-24-hours" ) {
+            return dt.toFormat(hour12 ? "ha" : "HH:mm");
           }
-          return "";
+          return dt.toFormat(hour12 ? "MMM d" : "dd MMM");
         },
       }}
       axisLeft={{
@@ -354,12 +344,12 @@ export function Chart({
               </div>
             ) : null}
             <div className="flex justify-between text-sm w-36">
-              <div>{formatTime(currentTime, bucket)}</div>
+              <div>{formatDateTime(currentTime, bucket)}</div>
               <div>{formatTooltipValue(currentY, selectedStat)}</div>
             </div>
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
-                <div>{formatTime(previousTime, bucket)}</div>
+                <div>{formatDateTime(previousTime, bucket)}</div>
                 <div>{formatTooltipValue(previousY, selectedStat)}</div>
               </div>
             )}
@@ -383,20 +373,21 @@ export function Chart({
   );
 }
 
-const formatTime = (time: DateTime<boolean>, bucket: TimeBucket) => {
-  // Ensure time is in local timezone
-  const localTime = time.toLocal();
-
-  if (
-    bucket === "minute" ||
-    bucket === "five_minutes" ||
-    bucket === "ten_minutes" ||
-    bucket === "fifteen_minutes"
-  ) {
-    return localTime.toFormat("M/d h:mm a");
-  } else if (bucket === "hour") {
-    return localTime.toFormat("M/d h a");
-  } else {
-    return localTime.toLocaleString();
+const formatDateTime = (dt: DateTime, bucket: TimeBucket) => {
+  const showMinutes = ["minute", "five_minutes", "ten_minutes", "fifteen_minutes", "hour"].includes(bucket);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    hour12: hour12,
+  };
+  if (showMinutes && !hour12) {
+    options.minute = "numeric";
   }
+  if (bucket === "day") {
+    options.minute = undefined;
+    options.hour = undefined;
+    options.month = "long";
+  }
+  return new Intl.DateTimeFormat(userLocale, options).format(dt.toJSDate());
 };

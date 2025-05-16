@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { FilterParameter, useStore } from "../../lib/store";
+import { timeZone } from "../../lib/dateTimeUtils";
 import { APIResponse } from "../types";
 import { BACKEND_URL } from "../../lib/const";
 import { getStartAndEndDate, authedFetch } from "../utils";
@@ -36,7 +37,7 @@ export function useSingleCol({
   const queryParams = isPast24HoursMode
     ? {
         // Past minutes approach
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: timeZone,
         parameter,
         limit,
         minutes: periodTime === "previous" ? 48 * 60 : 24 * 60,
@@ -45,7 +46,7 @@ export function useSingleCol({
     : {
         // Regular date-based approach
         ...getStartAndEndDate(timeToUse),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: timeZone,
         parameter,
         limit,
         filters: useFilters ? filters : undefined,
@@ -97,9 +98,8 @@ export function useSingleColRealtime({
   return useQuery({
     queryKey: [parameter, site, limit, minutes, "realtime"],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/single-col/${site}`, {
-        timezone,
+        timeZone,
         parameter,
         limit,
         minutes,

@@ -16,7 +16,7 @@ const tableSchema = z.enum(["events", "sessions"]).optional();
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * Schema for date parameters with timezone
+ * Schema for date parameters with time zone
  */
 const dateParamsSchema = z.object({
   startDate: z
@@ -33,20 +33,20 @@ const dateParamsSchema = z.object({
     .refine((date) => !date || !isNaN(Date.parse(date)), {
       message: "Invalid date value",
     }),
-  timezone: z
+  timeZone: z
     .string()
-    .min(1, { message: "Timezone cannot be empty" })
+    .min(1, { message: "Time zone cannot be empty" })
     .refine(
       (tz) => {
         try {
-          // Test if timezone is valid by attempting to format a date with it
+          // Test if time zone is valid by attempting to format a date with it
           Intl.DateTimeFormat(undefined, { timeZone: tz });
           return true;
         } catch (e) {
           return false;
         }
       },
-      { message: "Invalid timezone" }
+      { message: "Invalid time zone" }
     ),
   table: tableSchema,
 });
@@ -69,20 +69,20 @@ const fillDateParamsSchema = z.object({
     .refine((date) => !date || !isNaN(Date.parse(date)), {
       message: "Invalid date value",
     }),
-  timezone: z
+  timeZone: z
     .string()
-    .min(1, { message: "Timezone cannot be empty" })
+    .min(1, { message: "Time zone cannot be empty" })
     .refine(
       (tz) => {
         try {
-          // Test if timezone is valid by attempting to format a date with it
+          // Test if time zone is valid by attempting to format a date with it
           Intl.DateTimeFormat(undefined, { timeZone: tz });
           return true;
         } catch (e) {
           return false;
         }
       },
-      { message: "Invalid timezone" }
+      { message: "Invalid time zone" }
     ),
 });
 

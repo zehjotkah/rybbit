@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { TimeBucket, useStore } from "../../lib/store";
+import { timeZone } from "../../lib/dateTimeUtils";
 import { APIResponse } from "../types";
 import { authedFetch, getStartAndEndDate } from "../utils";
 
@@ -40,11 +41,10 @@ export function useGetOverviewBucketed({
   return useQuery({
     queryKey: ["overview-bucketed", timeToUse, bucket, site, filters],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
         startDate,
         endDate,
-        timezone,
+        timeZone,
         bucket,
         filters,
       }).then((res) => res.json());
@@ -99,19 +99,18 @@ export function useGetOverviewBucketedPastMinutes({
         ]
       : ["overview-bucketed-past-minutes", pastMinutes, site, bucket, filters],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(
         `${BACKEND_URL}/overview-bucketed/${site}`,
         useRange
           ? {
-              timezone,
+              timeZone,
               bucket,
               pastMinutesStart,
               pastMinutesEnd,
               filters,
             }
           : {
-              timezone,
+              timeZone,
               bucket,
               pastMinutes,
               filters,
@@ -167,9 +166,8 @@ export function useGetOverviewBucketedPreviousPastMinutes({
       filters,
     ],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
-        timezone,
+        timeZone,
         bucket,
         pastMinutesStart,
         pastMinutesEnd,

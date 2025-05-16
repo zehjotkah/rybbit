@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { TimeBucket } from "../../lib/store";
 import { BACKEND_URL } from "../../lib/const";
+import { timeZone } from "../../lib/dateTimeUtils";
 import { authedFetch } from "../utils";
 import { APIResponse } from "../types";
 import { GetOverviewBucketedResponse } from "./useGetOverviewBucketed";
@@ -25,9 +26,8 @@ export function useGetOverviewBucketedWithInView({
   return useQuery<APIResponse<GetOverviewBucketedResponse>>({
     queryKey: ["overview-bucketed-past-minutes", pastMinutes, site, bucket],
     queryFn: () => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
-        timezone,
+        timeZone,
         bucket,
         pastMinutes,
       }).then((res) => res.json());

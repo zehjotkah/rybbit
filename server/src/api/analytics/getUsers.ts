@@ -30,7 +30,7 @@ export interface GetUsersRequest {
   Querystring: {
     startDate?: string;
     endDate?: string;
-    timezone: string;
+    timeZone: string;
     filters: string;
     page?: string;
     pageSize?: string;
@@ -49,7 +49,7 @@ export async function getUsers(
   const {
     startDate,
     endDate,
-    timezone,
+    timeZone,
     filters,
     page = "1",
     pageSize = "20",
@@ -93,7 +93,7 @@ export async function getUsers(
     : minutes
     ? { pastMinutes: Number(minutes) }
     : startDate && endDate
-    ? { date: { startDate, endDate, timezone } }
+    ? { date: { startDate, endDate, timeZone } }
     : {};
 
   // Generate filter statement and time statement

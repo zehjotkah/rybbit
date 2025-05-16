@@ -27,7 +27,9 @@ import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
 import { cn, getCountryName, getLanguageName } from "../../lib/utils";
+import { formatDuration } from "../../lib/dateTimeUtils";
 import { Button } from "../ui/button";
+import { hour12 } from "../../lib/dateTimeUtils";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -43,21 +45,14 @@ function PageviewItem({
 }) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
-  const formattedTime = timestamp.toFormat("h:mm:ss a");
-
-  console.info(item);
+  const formattedTime = timestamp.toFormat(hour12 ? "h:mm:ss a" : "HH:mm:ss");
 
   // Calculate duration if this is a pageview and we have the next timestamp
   let duration = null;
   if (!isEvent && nextTimestamp) {
     const nextTime = DateTime.fromSQL(nextTimestamp, { zone: "utc" }).toLocal();
-    const diff = nextTime.diff(timestamp, ["minutes", "seconds"]);
-    const minutes = Math.floor(diff.minutes);
-    const seconds = Math.floor(diff.seconds);
-
-    if (minutes > 0 || seconds > 0) {
-      duration = `${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
-    }
+    const totalSeconds = Math.floor(nextTime.diff(timestamp).milliseconds / 1000);
+    duration = formatDuration(totalSeconds);
   }
 
   return (

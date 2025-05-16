@@ -16,7 +16,7 @@ export function getTimeStatement({
   date?: {
     startDate?: string;
     endDate?: string;
-    timezone?: string;
+    timeZone?: string;
     table?: "events" | "sessions";
   };
   pastMinutes?: number;
@@ -34,27 +34,27 @@ export function getTimeStatement({
   });
 
   if (sanitized.date) {
-    const { startDate, endDate, timezone } = sanitized.date;
+    const { startDate, endDate, timeZone } = sanitized.date;
     if (!startDate && !endDate) {
       return "";
     }
 
-    // Use SqlString.escape for date and timezone values
+    // Use SqlString.escape for date and timeZone values
     return `AND timestamp >= toTimeZone(
       toStartOfDay(toDateTime(${SqlString.escape(
         startDate
-      )}, ${SqlString.escape(timezone)})),
+      )}, ${SqlString.escape(timeZone)})),
       'UTC'
       )
       AND timestamp < if(
         toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
-      timezone
+      timeZone
     )}),
         now(),
         toTimeZone(
           toStartOfDay(toDateTime(${SqlString.escape(
             endDate
-          )}, ${SqlString.escape(timezone)})) + INTERVAL 1 DAY,
+          )}, ${SqlString.escape(timeZone)})) + INTERVAL 1 DAY,
           'UTC'
         )
       )`;
