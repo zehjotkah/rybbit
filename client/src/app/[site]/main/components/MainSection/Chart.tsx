@@ -384,5 +384,10 @@ const formatDateTime = (dt: DateTime, bucket: TimeBucket) => {
   if (showMinutes && is24Hour) {
     options.minute = 'numeric';
   }
+  if (bucket === "day") {
+    options.minute = undefined;
+    options.hour = undefined;
+    options.month = "long";
+  }
   return new Intl.DateTimeFormat(userLocale, options).format(dt.toJSDate());
 };
