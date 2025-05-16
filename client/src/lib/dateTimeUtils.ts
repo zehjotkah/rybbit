@@ -102,6 +102,36 @@ export function formatDuration(minutes: number, seconds: number): string {
 }
 
 
+
+
+/**
+ * Formats a given hour and minute into a localized time string,
+ * respecting either 24-hour or 12-hour format based on the `is24Hour` flag.
+ *
+ * @param hour - The hour of the day (0–23).
+ * @param minute - The minute of the hour (0–59).
+ * @returns A localized time string, e.g., "11:00 AM" or "23:00".
+ */
+export const formatLocalTime = (hour: number, minute: number): string => {
+  // Create a DateTimeFormat instance with local settings:
+  // - hour: numeric (e.g., 1, 12, 23)
+  // - minute: 2-digit (e.g., 00, 59)
+  // - hour12: true for 12-hour format, false for 24-hour format
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: !is24Hour,
+  });
+
+  // Create a new Date object set to the given hour and minute
+  const date = new Date();
+  date.setHours(hour, minute, 0, 0);
+
+  // Format the date to a localized time string
+  return formatter.format(date);
+};
+
+
 // Detect user 12h/24h preference
 const resolved = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions();
 export const is24Hour = resolved.hourCycle === "h23" || resolved.hourCycle === "h24";
@@ -114,7 +144,7 @@ export const longDayNames:string[] = getLocalizedWeekdayNames(userLocale, "long"
 // e.g., "Mon" "Tue" "Wed"
 export const shortDayNames:string[] = getLocalizedWeekdayNames(userLocale, "short");
 
-// localized time (hour with minutes) labels
+// localized time (hour witout minutes) labels
 // e.g., "00" "01" "02"
 export const hourLabels: string[] = getLocalizedTimeLabels(userLocale, {
   hour: "numeric",

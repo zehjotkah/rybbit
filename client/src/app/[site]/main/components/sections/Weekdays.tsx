@@ -34,7 +34,7 @@ import {
   shortDayNames,
   longDayNames,
   hourLabels,
-  hourMinuteLabels
+  formatLocalTime
 } from "../../../../../lib/dateTimeUtils";
 
 export function Weekdays() {
@@ -232,7 +232,7 @@ export function Weekdays() {
                     key={hour}
                     className="h-4 text-xs flex items-center justify-end pr-2 text-neutral-400"
                   >
-                    {hour % 2 === 0 ? hourLabels[hour] : ""}
+                    {hour % 2 === 1 ? hourLabels[hour] : ""}
                   </div>
                 ))}
             </div>
@@ -281,7 +281,7 @@ export function Weekdays() {
                             </TooltipTrigger>
                             <TooltipContent className="flex flex-col gap-1 p-2">
                               <div className="font-medium text-sm">
-                                {longDayNames[day]} at {hourMinuteLabels[hour]}
+                                {longDayNames[day]} {formatLocalTime(hour, 0)} - {formatLocalTime(hour, 59)}
                               </div>
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">
