@@ -1,5 +1,5 @@
 
-import { Duration, DateTime } from "luxon";
+import { Duration, DateTime, DurationLikeObject } from "luxon";
 
 /**
  * Returns localized weekday names, starting from Monday.
@@ -78,9 +78,15 @@ export function formatDuration(minutes: number, seconds: number): string {
     units.seconds = seconds;
   }
 
+  const keys: (keyof DurationLikeObject)[] = [];
+  if (minutes > 0) {
+    keys.push("minutes");
+  }
+  keys.push("seconds");
+
   const duration = Duration.fromObject(units)
-    .shiftTo("minutes", "seconds")
-    .normalize();
+  .shiftTo(...keys)
+  .normalize();
 
   return duration.toHuman({
     listStyle: "narrow",
