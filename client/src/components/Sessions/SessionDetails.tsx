@@ -26,13 +26,10 @@ import {
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
-import { cn, getCountryName, getLanguageName, formatDurationHuman } from "../../lib/utils";
+import { cn, getCountryName, getLanguageName } from "../../lib/utils";
+import { formatDuration } from "../../lib/dateTimeUtils";
 import { Button } from "../ui/button";
-
-// Detect user locale and 12h/24h preference
-const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
-const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
-const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+import { localeFormat, is24Hour } from "../../lib/dateTimeUtils";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -48,10 +45,7 @@ function PageviewItem({
 }) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
-  const formattedTime = timestamp.setLocale(userLocale)
-    .toFormat(is24Hour? "HH:mm:ss" : "h:mm:ss a");
-
-  console.info(item);
+  const formattedTime = localeFormat(timestamp, is24Hour ? "HH:mm:ss" : "h:mm:ss a");
 
   // Calculate duration if this is a pageview and we have the next timestamp
   let duration = null;
@@ -62,7 +56,7 @@ function PageviewItem({
     const seconds = Math.floor(diff.seconds);
 
     if (minutes > 0 || seconds > 0) {
-      duration = formatDurationHuman(minutes, seconds);
+      duration = formatDuration(minutes, seconds);
     }
   }
 

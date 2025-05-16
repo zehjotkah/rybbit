@@ -25,9 +25,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { RetentionChart } from "./RetentionChart";
 import { NothingFound } from "../../../components/NothingFound";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
-
-// Detect user locale and 12h/24h preference
-const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
+import { localeFormat } from "../../../lib/dateTimeUtils";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
@@ -102,7 +100,8 @@ export default function RetentionPage() {
   // Function to format date based on mode
   const formatDate = (dateStr: string) => {
     if (mode === "day") {
-      return DateTime.fromISO(dateStr).setLocale(userLocale).toFormat("MMM dd, yyyy");
+      const date = DateTime.fromISO(dateStr);
+      return localeFormat(date, "MMM dd, yyyy");
     } else {
       // For weekly mode, show start and end dates of the week
       const startDate = DateTime.fromISO(dateStr);
@@ -110,19 +109,13 @@ export default function RetentionPage() {
 
       // If same month, don't repeat month name
       if (startDate.month === endDate.month) {
-        return `${startDate.setLocale(userLocale).toFormat("MMM dd")} - ${endDate.setLocale(userLocale).toFormat(
-          "dd, yyyy"
-        )}`;
+        return `${localeFormat(startDate, "MMM dd")} - ${localeFormat(endDate, "dd, yyyy")}`;
       } else if (startDate.year === endDate.year) {
         // Different months, same year
-        return `${startDate.setLocale(userLocale).toFormat("MMM dd")} - ${endDate.setLocale(userLocale).toFormat(
-          "MMM dd, yyyy"
-        )}`;
+        return `${localeFormat(startDate, "MMM dd")} - ${localeFormat(endDate, "MMM dd, yyyy")}`;
       } else {
         // Different years
-        return `${startDate.setLocale(userLocale).toFormat("MMM dd, yyyy")} - ${endDate.setLocale(userLocale).toFormat(
-          "MMM dd, yyyy"
-        )}`;
+        return `${localeFormat(startDate, "MMM dd, yyyy")} - ${localeFormat(endDate, "MMM dd, yyyy")}`;
       }
     }
   };

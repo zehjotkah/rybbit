@@ -8,11 +8,7 @@ import { GetOverviewBucketedResponse } from "../../../../../api/analytics/useGet
 import { APIResponse } from "../../../../../api/types";
 import { Time } from "../../../../../components/DateSelector/types";
 import { formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
-
-// Detect user locale and 12h/24h preference
-const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
-const resolved = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
-const is24Hour = resolved.hourCycle === 'h23' || resolved.hourCycle === 'h24';
+import { userLocale, is24Hour } from "../../../../../lib/dateTimeUtils";
 
 export const formatter = Intl.NumberFormat(userLocale, { notation: "compact" });
 
