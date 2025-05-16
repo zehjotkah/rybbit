@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import { useMemo } from "react";
 import { GetOverviewBucketedResponse } from "../api/analytics/useGetOverviewBucketed";
 import { formatter } from "../lib/utils";
-import { localeFormat, is24Hour } from "../lib/dateTimeUtils";
+import { is24Hour } from "../lib/dateTimeUtils";
 
 interface SiteSessionChartProps {
   data: GetOverviewBucketedResponse;
@@ -61,7 +61,7 @@ export function SiteSessionChart({
           tickValues: 3,
           format: (value) => {
             const time = DateTime.fromJSDate(value);
-            return localeFormat(time, is24Hour ? "HH:mm" : "ha");
+            return time.toFormat(is24Hour ? "HH:mm" : "ha");
           },
         }}
         axisLeft={{
@@ -98,7 +98,7 @@ export function SiteSessionChart({
               <div className="text-xs mb-1">Sessions</div>
               <div className="flex justify-between text-xs w-20">
                 <div className="text-muted-foreground">
-                  { localeFormat(currentTime, is24Hour ? "HH:mm" : "ha") }
+                  { currentTime.toFormat(is24Hour ? "HH:mm" : "ha") }
                 </div>
                 <div className="font-medium">{currentY.toLocaleString()}</div>
               </div>

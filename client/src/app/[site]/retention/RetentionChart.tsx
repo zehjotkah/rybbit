@@ -9,7 +9,6 @@ import {
   RetentionMode,
 } from "../../../api/analytics/useGetRetention";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { localeFormat } from "../../../lib/dateTimeUtils";
 
 interface RetentionChartProps {
   data: ProcessedRetentionData | undefined;
@@ -77,18 +76,18 @@ export function RetentionChart({ data, isLoading, mode }: RetentionChartProps) {
 
       // Format the date label based on mode
       let formattedDate: string;
+      const startDate = DateTime.fromISO(cohortKey);
       if (mode === "day") {
-        formattedDate = localeFormat(DateTime.fromISO(cohortKey), "MMM dd");
+        formattedDate = startDate.toFormat("MMM dd");
       } else {
         // For weekly mode
-        const startDate = DateTime.fromISO(cohortKey);
         const endDate = startDate.plus({ days: 6 });
 
         // If same month, don't repeat month
         if (startDate.month === endDate.month) {
-          formattedDate = `${localeFormat(startDate, "MMM dd")}-${localeFormat(endDate, "dd")}`;
+          formattedDate = `${startDate.toFormat("MMM dd")}-${endDate.toFormat("dd")}`;
         } else {
-          formattedDate = `${localeFormat(startDate, "MMM dd")}-${localeFormat(endDate, "MMM dd")}`;
+          formattedDate = `${startDate.toFormat("MMM dd")}-${endDate.toFormat("MMM dd")}`;
         }
       }
 
@@ -210,19 +209,19 @@ export function RetentionChart({ data, isLoading, mode }: RetentionChartProps) {
           if (originalCohortKey) {
             const startDate = DateTime.fromISO(originalCohortKey);
             if (mode === "day") {
-              cohortDateDisplay = localeFormat(startDate, "MMM dd, yyyy");
+              cohortDateDisplay = startDate.toFormat("MMM dd, yyyy");
             } else {
               const endDate = startDate.plus({ days: 6 });
 
               if (startDate.month === endDate.month) {
-                cohortDateDisplay = `${localeFormat(startDate, "MMM dd"
-                )} - ${localeFormat(endDate, "dd, yyyy")}`;
+                cohortDateDisplay = `${startDate.toFormat("MMM dd"
+                )} - ${endDate.toFormat("dd, yyyy")}`;
               } else if (startDate.year === endDate.year) {
-                cohortDateDisplay = `${localeFormat(startDate, "MMM dd"
-                )} - ${localeFormat(endDate, "MMM dd, yyyy")}`;
+                cohortDateDisplay = `${startDate.toFormat("MMM dd"
+                )} - ${endDate.toFormat("MMM dd, yyyy")}`;
               } else {
-                cohortDateDisplay = `${localeFormat(startDate, "MMM dd, yyyy"
-                )} - ${localeFormat(endDate, "MMM dd, yyyy")}`;
+                cohortDateDisplay = `${startDate.toFormat("MMM dd, yyyy"
+                )} - ${endDate.toFormat("MMM dd, yyyy")}`;
               }
             }
           }

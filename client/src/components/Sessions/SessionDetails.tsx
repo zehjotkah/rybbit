@@ -29,7 +29,7 @@ import { OperatingSystem } from "../../app/[site]/components/shared/icons/Operat
 import { cn, getCountryName, getLanguageName } from "../../lib/utils";
 import { formatDuration } from "../../lib/dateTimeUtils";
 import { Button } from "../ui/button";
-import { localeFormat, is24Hour } from "../../lib/dateTimeUtils";
+import { is24Hour } from "../../lib/dateTimeUtils";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -45,7 +45,7 @@ function PageviewItem({
 }) {
   const isEvent = item.type !== "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
-  const formattedTime = localeFormat(timestamp, is24Hour ? "HH:mm:ss" : "h:mm:ss a");
+  const formattedTime = timestamp.toFormat(is24Hour ? "HH:mm:ss" : "h:mm:ss a");
 
   // Calculate duration if this is a pageview and we have the next timestamp
   let duration = null;

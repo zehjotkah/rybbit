@@ -1,5 +1,12 @@
 
-import { Duration, DateTime, DurationLikeObject } from "luxon";
+import { Duration, DateTime, DurationLikeObject, Settings } from "luxon";
+
+// Detect user locale
+export const userLocale = typeof navigator !== "undefined" ? navigator.language : "en-US";
+
+// Set default locale globally
+Settings.defaultLocale = userLocale;
+
 
 /**
  * Returns localized weekday names, starting from Monday.
@@ -94,25 +101,6 @@ export function formatDuration(minutes: number, seconds: number): string {
   });
 }
 
-/**
- * Formats a Luxon DateTime object using a locale-aware format string.
- *
- * Internally sets the locale of the DateTime object to the detected user locale
- * before formatting, ensuring the output reflects local conventions (e.g., month names, weekdays).
- *
- * @param dateTime - A Luxon DateTime instance to format.
- * @param format - A Luxon-compatible format string (e.g., "yyyy-MM-dd", "HH:mm", "ccc").
- * @returns The formatted date/time string according to the user's locale.
- */
-export function localeFormat(dateTime: DateTime, format: string): string {
-  return dateTime.setLocale(userLocale).toFormat(format);
-}
-
-
-
-
-// Detect user locale
-export const userLocale = typeof navigator !== "undefined" ? navigator.language : "en";
 
 // Detect user 12h/24h preference
 const resolved = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions();
