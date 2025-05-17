@@ -6,7 +6,7 @@ import { updateUsersMonthlyUsage } from "./monthly-usage-checker.js";
 export async function initializeCronJobs() {
   console.log("Initializing cron jobs...");
 
-  if (IS_CLOUD) {
+  if (IS_CLOUD && process.env.NODE_ENV !== "development") {
     // Schedule the monthly usage checker to run every 5 minutes
     cron.schedule("*/5 * * * *", updateUsersMonthlyUsage);
     updateUsersMonthlyUsage();

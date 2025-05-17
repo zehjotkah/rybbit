@@ -45,13 +45,11 @@ import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { initializeCronJobs } from "./cron/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { allowList, loadAllowedDomains } from "./lib/allowedDomains.js";
-import { mapHeaders } from "./lib/auth-utils.js";
+import { getSessionFromReq, mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { siteConfig } from "./lib/siteConfig.js";
 import { trackEvent } from "./tracker/trackEvent.js";
 import { extractSiteId, isSitePublic, normalizeOrigin } from "./utils.js";
-
-// Import Stripe handlers
 import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
 import { createPortalSession } from "./api/stripe/createPortalSession.js";
 import { getSubscription } from "./api/stripe/getSubscription.js";
@@ -182,11 +180,7 @@ server.addHook("onRequest", async (request, reply) => {
   }
 
   try {
-    // Convert Fastify headers object into Fetch-compatible Headers
-    const headers = new Headers(request.headers as HeadersInit);
-
-    // Get session from BetterAuth
-    const session = await auth!.api.getSession({ headers });
+    const session = await getSessionFromReq(request);
 
     if (!session) {
       return reply.status(401).send({ error: "Unauthorized" });

@@ -59,7 +59,7 @@ export async function getSites(req: FastifyRequest, reply: FastifyReply) {
         let isOwner = false;
         let ownerId = "";
 
-        if (!IS_CLOUD || godMode) {
+        if (!IS_CLOUD) {
           return {
             ...site,
             monthlyEventCount: 0,

@@ -94,8 +94,8 @@ export default function RootLayout({
       </TooltipProvider>
       {globalThis?.location?.hostname === "app.rybbit.io" && (
         <Script
-          src="https://app.rybbit.io/api/script.js"
-          data-site-id="349"
+          src="https://demo.rybbit.io/api/script.js"
+          data-site-id="22"
           strategy="afterInteractive"
         />
       )}

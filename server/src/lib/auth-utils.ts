@@ -16,15 +16,14 @@ export function mapHeaders(headers: any) {
   return map;
 }
 
-export async function getSession(req: FastifyRequest) {
+export async function getSessionFromReq(req: FastifyRequest) {
   const headers = new Headers(req.headers as any);
   const session = await auth!.api.getSession({ headers });
   return session;
 }
 
 export async function getUserGodMode(req: FastifyRequest) {
-  const headers = new Headers(req.headers as any);
-  const session = await auth!.api.getSession({ headers });
+  const session = await getSessionFromReq(req);
   const userId = session?.user.id;
 
   if (!userId) {
@@ -43,8 +42,7 @@ export async function getSitesUserHasAccessTo(
   req: FastifyRequest,
   adminOnly = false
 ) {
-  const headers = new Headers(req.headers as any);
-  const session = await auth!.api.getSession({ headers });
+  const session = await getSessionFromReq(req);
 
   const userId = session?.user.id;
 
