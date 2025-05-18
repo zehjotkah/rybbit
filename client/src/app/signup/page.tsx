@@ -1,13 +1,15 @@
 "use client";
 
+import { AuthButton } from "@/components/auth/AuthButton";
+import { AuthError } from "@/components/auth/AuthError";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { SocialButtons } from "@/components/auth/SocialButtons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GithubLogo, GoogleLogo } from "@phosphor-icons/react/dist/ssr";
 import { motion } from "framer-motion";
 import {
-  AlertCircle,
   AppWindow,
   ArrowLeft,
   ArrowRight,
@@ -24,7 +26,6 @@ import { Suspense, useEffect, useState } from "react";
 import { addSite } from "../../api/admin/sites";
 import { CodeSnippet } from "../../components/CodeSnippet";
 import { Logo } from "../../components/Logo";
-import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { useSetPageTitle } from "../../hooks/useSetPageTitle";
 import { authClient } from "../../lib/auth";
 import { useConfigs } from "../../lib/configs";
@@ -217,90 +218,55 @@ export default function SignupPage() {
           >
             <h2 className="text-2xl font-semibold mb-6">Create your account</h2>
             <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="email@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
-                />
-              </div>
-              <Button
+              <AuthInput
+                id="name"
+                label="Name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+
+              <AuthInput
+                id="email"
+                label="Email"
+                type="email"
+                placeholder="email@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+              <AuthInput
+                id="password"
+                label="Password"
+                type="password"
+                placeholder="••••••••"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <AuthButton
+                isLoading={isLoading}
+                loadingText="Creating account..."
                 onClick={handleAccountSubmit}
-                className="w-full mt-6 transition-all duration-300 h-11 bg-emerald-600 hover:bg-emerald-500 text-white"
-                disabled={isLoading || !email || !password}
-                variant="success"
+                type="button"
+                className="mt-6 transition-all duration-300 h-11"
               >
-                {isLoading ? "Creating account..." : "Continue"}
+                Continue
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </AuthButton>
 
               {IS_CLOUD && (
-                <>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        authClient.signIn.social({
-                          provider: "google",
-                          callbackURL: "/signup?step=2",
-                        });
-                      }}
-                      className="transition-all duration-300 hover:bg-muted bg-neutral-800/50 border-neutral-700"
-                    >
-                      <GoogleLogo weight="bold" />
-                      Google
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        authClient.signIn.social({
-                          provider: "github",
-                          callbackURL: "/signup?step=2",
-                        });
-                      }}
-                      className="transition-all duration-300 hover:bg-muted bg-neutral-800/50 border-neutral-700"
-                    >
-                      <GithubLogo weight="bold" />
-                      GitHub
-                    </Button>
-                  </div>
-                </>
+                <SocialButtons
+                  onError={setError}
+                  callbackURL="/signup?step=2"
+                  mode="signup"
+                  className="grid grid-cols-2 gap-2"
+                />
               )}
+
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link
@@ -310,6 +276,8 @@ export default function SignupPage() {
                   Log in
                 </Link>
               </div>
+
+              <AuthError error={error} />
             </div>
           </motion.div>
         );
@@ -597,13 +565,7 @@ export default function SignupPage() {
 
           {/* Right content area */}
           <div className="p-6 md:p-8 flex-1 h-[600px] flex flex-col backdrop-blur-sm bg-neutral-900/50">
-            {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            {error && <AuthError error={error} />}
 
             <div className="flex-1 flex flex-col justify-between">
               <div className="min-h-[400px]">{renderStepContent()}</div>
