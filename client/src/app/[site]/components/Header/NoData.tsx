@@ -12,39 +12,37 @@ export function NoData() {
 
   if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
     return (
-      <div className="m-4 mb-0">
-        <Alert className="p-4 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
-              </span>
-              <div className="font-medium">
-                Waiting for analytics from {siteMetadata?.domain}...
-              </div>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Place this snippet in the &lt;head&gt; of your website:
-            </div>
-            <CodeSnippet
-              language="HTML"
-              code={`<script\n    src="${globalThis.location.origin}/api/script.js"\n    data-site-id="${siteMetadata?.siteId}"\n    defer\n></script>`}
-              className="text-xs"
-            />
-            <span className="text-xs text-muted-foreground">
-              See our{" "}
-              <a
-                href="https://rybbit.io/docs"
-                className="text-blue-500 hover:underline"
-              >
-                docs
-              </a>{" "}
-              for more information.
+      <Alert className="p-4 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
             </span>
+            <div className="font-medium">
+              Waiting for analytics from {siteMetadata?.domain}...
+            </div>
           </div>
-        </Alert>
-      </div>
+          <div className="text-xs text-muted-foreground">
+            Place this snippet in the &lt;head&gt; of your website:
+          </div>
+          <CodeSnippet
+            language="HTML"
+            code={`<script\n    src="${globalThis.location.origin}/api/script.js"\n    data-site-id="${siteMetadata?.siteId}"\n    defer\n></script>`}
+            className="text-xs"
+          />
+          <span className="text-xs text-muted-foreground">
+            See our{" "}
+            <a
+              href="https://rybbit.io/docs"
+              className="text-blue-500 hover:underline"
+            >
+              docs
+            </a>{" "}
+            for more information.
+          </span>
+        </div>
+      </Alert>
     );
   }
 

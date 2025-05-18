@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <StandardPage>
       <FreeTrialBanner />
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center my-4">
         <div className="text-2xl font-bold">{sites?.length} Websites</div>
         <AddSite disabled={hasNoOrganizations || disabled} />
       </div>
