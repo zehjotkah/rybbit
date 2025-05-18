@@ -311,7 +311,7 @@ export default function IndexPage() {
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-neutral-300">
                   <Link
-                    href="/docs/tracker"
+                    href="/docs/script"
                     className="text-emerald-400 hover:text-emerald-300"
                   >
                     Setting up Rybbit

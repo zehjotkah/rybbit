@@ -5,8 +5,9 @@ export default {
     type: "separator",
     title: "Tracking",
   },
-  tracker: "",
+  script: "",
   "track-events": "",
+  sdks: "SDKs",
   integrations: "",
   _4: {
     type: "separator",
@@ -15,16 +16,11 @@ export default {
   "self-hosting": "",
   "self-hosting-advanced": "",
   "self-hosting-nginx": "",
-  _5: {
-    type: "separator",
-    title: "SDKs",
-  },
-  web: "",
   _6: {
     type: "separator",
     title: "Settings",
   },
-  "adding-users": "",
+  "inviting-users": "",
   "public-site": "",
   "enhanced-privacy": "",
   "changing-domains": "",
