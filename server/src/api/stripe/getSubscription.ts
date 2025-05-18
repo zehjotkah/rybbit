@@ -68,6 +68,9 @@ export async function getSubscriptionInner(userId: string) {
           id: subscription.id,
           planName: "Unknown Plan", // Indicate missing details
           status: subscription.status,
+          currentPeriodStart: new Date(
+            subscriptionItem.current_period_start * 1000
+          ),
           currentPeriodEnd: new Date(
             subscriptionItem.current_period_end * 1000
           ),
@@ -83,6 +86,9 @@ export async function getSubscriptionInner(userId: string) {
         id: subscription.id,
         planName: planDetails.name,
         status: subscription.status,
+        currentPeriodStart: new Date(
+          subscriptionItem.current_period_start * 1000
+        ),
         currentPeriodEnd: new Date(subscriptionItem.current_period_end * 1000),
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         eventLimit: planDetails.limits.events,
@@ -110,6 +116,7 @@ export async function getSubscriptionInner(userId: string) {
       planName: "trial",
       status: "trialing",
       currentPeriodEnd: trialEndDate,
+      currentPeriodStart: createdAt,
       eventLimit: TRIAL_EVENT_LIMIT,
       monthlyEventCount: user.monthlyEventCount,
       interval: "month",

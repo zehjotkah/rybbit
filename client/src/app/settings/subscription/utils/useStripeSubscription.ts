@@ -6,6 +6,7 @@ interface SubscriptionData {
   planName: string;
   status: "expired" | "active" | "trialing";
   currentPeriodEnd: string;
+  currentPeriodStart: string;
   monthlyEventCount: number;
   eventLimit: number;
   interval: string;
