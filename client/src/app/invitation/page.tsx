@@ -3,7 +3,7 @@
 import { AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { ThreeDotLoader } from "../../components/Loaders";
 import { TopBar } from "../../components/TopBar";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
@@ -129,21 +129,31 @@ function AcceptInvitationInner() {
   );
 }
 
-export default function AcceptInvitation() {
+function InvitationContent() {
   const { data: sessionData, isPending } = authClient.useSession();
 
+  return (
+    <>
+      {isPending ? (
+        <ThreeDotLoader />
+      ) : !sessionData?.user ? (
+        <AuthComponent />
+      ) : (
+        <AcceptInvitationInner />
+      )}
+    </>
+  );
+}
+
+export default function AcceptInvitation() {
   return (
     <div className="flex flex-col min-h-screen">
       <TopBar />
 
       <div className="flex justify-center items-center flex-grow p-4">
-        {isPending ? (
-          <ThreeDotLoader />
-        ) : !sessionData?.user ? (
-          <AuthComponent />
-        ) : (
-          <AcceptInvitationInner />
-        )}
+        <Suspense fallback={<ThreeDotLoader />}>
+          <InvitationContent />
+        </Suspense>
       </div>
     </div>
   );
