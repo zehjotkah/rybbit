@@ -295,7 +295,7 @@ export function SiteSettingsInner({
               <div className="flex space-x-2">
                 <Input
                   value={newDomain}
-                  onChange={(e) => setNewDomain(e.target.value)}
+                  onChange={(e) => setNewDomain(e.target.value.toLowerCase())}
                   placeholder="example.com"
                 />
                 <Button

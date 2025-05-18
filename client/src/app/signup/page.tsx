@@ -397,7 +397,7 @@ export default function SignupPage() {
                   type="text"
                   placeholder="example.com or sub.example.com"
                   value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
+                  onChange={(e) => setDomain(e.target.value.toLowerCase())}
                   required
                   className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
                 />
