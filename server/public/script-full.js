@@ -27,6 +27,8 @@
     scriptTag.getAttribute("data-track-query") !== "false";
   const trackOutbound =
     scriptTag.getAttribute("data-track-outbound") !== "false";
+  const autoTrackPageview =
+    scriptTag.getAttribute("data-auto-track-pageview") !== "false";
 
   let skipPatterns = [];
   try {
@@ -207,5 +209,7 @@
       track("outbound", "", { url, text, target }),
   };
 
-  trackPageview();
+  if (autoTrackPageview) {
+    trackPageview();
+  }
 })();
