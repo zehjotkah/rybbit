@@ -35,17 +35,7 @@ export function useStripeSubscription() {
       }
     }
 
-    const data = await response.json();
-
-    // If status is expired, the trial has ended and no subscription exists
-    if (data.status === "expired") {
-      return {
-        status: "expired",
-        message: data.message,
-      };
-    }
-
-    return data;
+    return await response.json();
   };
 
   const { data, isLoading, error, refetch } = useQuery<SubscriptionData>({

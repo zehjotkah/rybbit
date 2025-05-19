@@ -128,7 +128,17 @@ export async function getSubscriptionInner(userId: string) {
   }
 
   // User has no subscription and trial has ended - return null
-  return null;
+  return {
+    id: null,
+    planName: "free",
+    status: "expired",
+    currentPeriodEnd: null,
+    currentPeriodStart: null,
+    eventLimit: 0,
+    monthlyEventCount: user.monthlyEventCount,
+    isTrial: false,
+    trialDaysRemaining: 0,
+  };
 }
 
 export async function getSubscription(
@@ -143,15 +153,6 @@ export async function getSubscription(
 
   try {
     const responseData = await getSubscriptionInner(userId);
-
-    // If trial has expired and no subscription, inform the user
-    if (!responseData) {
-      return reply.send({
-        status: "expired",
-        message: "Your trial has expired. Please subscribe to continue.",
-      });
-    }
-
     return reply.send(responseData);
   } catch (error: any) {
     console.error("Get Subscription Error:", error);

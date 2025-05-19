@@ -90,6 +90,7 @@ export default function AdminPage() {
     const success = await handleImpersonate(userId);
     if (success) {
       router.push("/");
+      window.location.reload();
     }
   };
 

@@ -58,8 +58,8 @@ export function FreeTrialBanner() {
               Your Free Trial Has Ended
             </AlertTitle>
             <div className="mb-2 text-sm text-amber-700 dark:text-amber-400">
-              Your 14-day free trial has expired. Subscribe to continue using
-              our analytics services.
+              Your 14-day free trial has expired. Subscribe to continue tracking
+              visits again.
             </div>
 
             <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 items-start sm:items-center">

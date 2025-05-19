@@ -61,8 +61,8 @@ export function TrialPlan() {
                   </>
                 ) : (
                   <>
-                    Your trial ends today. Subscribe to continue using the
-                    service.
+                    Your trial ends today. Subscribe to continue tracking visits
+                    again.
                   </>
                 )}
               </AlertDescription>

@@ -27,10 +27,11 @@ export default function Subscribe() {
   // Calculate trial usage metrics
   const currentUsage = subscription?.monthlyEventCount || 0;
   const trialStartDate = subscription?.currentPeriodStart;
-  const daysInTrial = trialStartDate ? daysElapsed(trialStartDate) : 0;
-  const projectedMonthlyUsage = trialStartDate
-    ? extrapolateMonthlyUsage(currentUsage, daysInTrial)
-    : 0;
+  const daysInTrial = trialStartDate ? daysElapsed(trialStartDate) : 14;
+  const projectedMonthlyUsage = extrapolateMonthlyUsage(
+    currentUsage,
+    daysInTrial
+  );
 
   return (
     <StandardPage>
@@ -48,7 +49,6 @@ export default function Subscribe() {
           currentUsage={currentUsage}
           daysInTrial={daysInTrial}
           projectedMonthlyUsage={projectedMonthlyUsage}
-          isTrial={!!subscription?.isTrial}
         />
 
         {/* FAQ Section */}

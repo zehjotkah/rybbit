@@ -5,7 +5,6 @@ interface TrialUsageStatsProps {
   currentUsage: number;
   daysInTrial: number;
   projectedMonthlyUsage: number;
-  isTrial: boolean;
 }
 
 // Calculate days elapsed since a date
@@ -30,10 +29,7 @@ export function TrialUsageStats({
   currentUsage,
   daysInTrial,
   projectedMonthlyUsage,
-  isTrial,
 }: TrialUsageStatsProps) {
-  if (!isTrial) return null;
-
   return (
     <div className="max-w-lg mx-auto mt-6">
       <div className="bg-blue-900/20 rounded-xl border border-blue-800 p-5">
