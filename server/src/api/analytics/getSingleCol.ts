@@ -26,6 +26,8 @@ interface GenericRequest {
 
 type GetSingleColResponse = {
   value: string;
+  // title is only used for pathname
+  title?: string;
   // count means sessions where this page was the entry/exit
   count: number;
   percentage: number;
@@ -165,6 +167,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         SELECT
             session_id,
             pathname,
+            page_title,
             timestamp,
             leadInFrame(timestamp) OVER (PARTITION BY session_id ORDER BY timestamp ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) as next_timestamp
         FROM events
@@ -178,6 +181,7 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
         SELECT
             session_id,
             pathname,
+            page_title,
             timestamp,
             next_timestamp,
             if(isNull(next_timestamp), 0, dateDiff('second', timestamp, next_timestamp)) as time_diff_seconds
@@ -186,14 +190,16 @@ const getQuery = (request: FastifyRequest<GenericRequest>) => {
     PathStats AS (
         SELECT
             pathname,
+            page_title,
             count() as visits,
             count(DISTINCT session_id) as unique_sessions,
             avg(if(time_diff_seconds < 0, 0, if(time_diff_seconds > 1800, 1800, time_diff_seconds))) as avg_time_on_page_seconds
         FROM PageDurations
-        GROUP BY pathname
+        GROUP BY pathname, page_title
     )
     SELECT
         pathname as value,
+        page_title as title,
         unique_sessions as count,
         round((unique_sessions / sum(unique_sessions) OVER ()) * 100, 2) as percentage,
         visits as pageviews,

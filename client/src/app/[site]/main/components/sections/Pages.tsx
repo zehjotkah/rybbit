@@ -14,7 +14,7 @@ import { truncateString } from "../../../../../lib/utils";
 import { Button } from "../../../../../components/ui/button";
 import { Expand } from "lucide-react";
 
-type Tab = "pages" | "entry_pages" | "exit_pages";
+type Tab = "pages" | "page_title" | "entry_pages" | "exit_pages";
 
 const MAX_LABEL_LENGTH = 70;
 
@@ -37,6 +37,7 @@ export function Pages() {
           <div className="flex flex-row gap-2 justify-between items-center">
             <TabsList>
               <TabsTrigger value="pages">Pages</TabsTrigger>
+              <TabsTrigger value="page_title">Page Titles</TabsTrigger>
               <TabsTrigger value="entry_pages">Entry Pages</TabsTrigger>
               <TabsTrigger value="exit_pages">Exit Pages</TabsTrigger>
             </TabsList>
@@ -58,6 +59,20 @@ export function Pages() {
               close={close}
             />
           </TabsContent>
+          <TabsContent value="page_title">
+            <StandardSection
+              filterParameter="pathname"
+              title="Page Title"
+              getValue={(e) => e.value}
+              getKey={(e) => e.value}
+              getLabel={(e) =>
+                truncateString(e?.title ?? "", MAX_LABEL_LENGTH) || "Other"
+              }
+              getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
+              expanded={expanded}
+              close={close}
+            />
+          </TabsContent>
           <TabsContent value="entry_pages">
             <StandardSection
               filterParameter="entry_page"
@@ -65,7 +80,7 @@ export function Pages() {
               getValue={(e) => e.value}
               getKey={(e) => e.value}
               getLabel={(e) =>
-                truncateString(e.value, MAX_LABEL_LENGTH) || "Other"
+                truncateString(e?.title ?? "", MAX_LABEL_LENGTH) || "Other"
               }
               getLink={(e) => `https://${siteMetadata?.domain}${e.value}`}
               expanded={expanded}

@@ -9,6 +9,7 @@ type PeriodTime = "current" | "previous";
 
 export type SingleColResponse = {
   value: string;
+  title?: string;
   count: number;
   percentage: number;
   pageviews?: number;
