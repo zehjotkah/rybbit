@@ -11,7 +11,7 @@ export function Header() {
   return (
     <div className="flex flex-col">
       {user && (
-        <div className="flex flex-col gap-4 m-4 mb-0">
+        <div className="flex flex-col px-4">
           <FreeTrialBanner />
           <UsageBanners />
           <NoData />

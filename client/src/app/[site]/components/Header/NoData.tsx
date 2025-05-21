@@ -1,8 +1,7 @@
 import { useGetSite, useSiteHasData } from "../../../../api/admin/sites";
+import { CodeSnippet } from "../../../../components/CodeSnippet";
 import { Alert } from "../../../../components/ui/alert";
 import { useStore } from "../../../../lib/store";
-import { CodeSnippet } from "../../../../components/CodeSnippet";
-import { BACKEND_URL } from "../../../../lib/const";
 
 export function NoData() {
   const { site } = useStore();
@@ -12,7 +11,7 @@ export function NoData() {
 
   if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
     return (
-      <Alert className="p-4 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
+      <Alert className="mt-4 p-4 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <span className="relative flex h-3 w-3">

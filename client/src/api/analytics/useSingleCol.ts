@@ -67,9 +67,9 @@ export function useSingleCol({
   return useQuery({
     queryKey,
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/single-col/${site}`, queryParams).then(
-        (res) => res.json()
-      );
+      return authedFetch(`${BACKEND_URL}/single-col/${site}`, queryParams)
+        .then((res) => res.json())
+        .then((res) => res.data);
     },
     staleTime: Infinity,
     placeholderData: (_, query: any) => {
