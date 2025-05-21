@@ -66,7 +66,6 @@ export const initializeClickhouse = async () => {
     await clickhouse.exec({
       query: `
         CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_events_by_site_mv
-        POPULATE
         TO hourly_events_by_site_mv_target -- Name of the target table
         AS SELECT
           toStartOfHour(timestamp) AS event_hour,
