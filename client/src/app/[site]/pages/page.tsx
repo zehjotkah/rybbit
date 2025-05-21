@@ -10,7 +10,8 @@ import { useEffect, useState } from "react";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { PageListItem } from "./components/PageListItem";
 import { PageListSkeleton } from "./components/PageListSkeleton";
-import { Pagination } from "./components/Pagination";
+import { TablePagination } from "@/components/pagination";
+import { createColumnHelper } from "@tanstack/react-table";
 
 // Number of items per page
 const PAGE_SIZE = 10;
@@ -18,7 +19,10 @@ const PAGE_SIZE = 10;
 export default function Pages() {
   const { site } = useStore();
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: PAGE_SIZE,
+  });
   const [totalPages, setTotalPages] = useState(0);
 
   useSetPageTitle("Rybbit · Pages");
@@ -28,7 +32,7 @@ export default function Pages() {
   }
 
   // Calculate offset based on current page
-  const offset = (currentPage - 1) * PAGE_SIZE;
+  const offset = pagination.pageIndex * pagination.pageSize;
 
   const {
     data: apiResponse,
@@ -38,7 +42,7 @@ export default function Pages() {
     isPlaceholderData,
     isFetching,
   } = useGetPageTitlesPaginated({
-    limit: PAGE_SIZE,
+    limit: pagination.pageSize,
     offset: offset,
   });
 
@@ -47,10 +51,32 @@ export default function Pages() {
 
   const isLoading = isLoadingPages || isFetching;
 
+  // Create a minimal table object with the required pagination methods
+  const table = {
+    getState: () => ({
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
+    }),
+    getCanPreviousPage: () => pagination.pageIndex > 0,
+    getCanNextPage: () => {
+      if (totalCount === undefined) return true;
+      return (pagination.pageIndex + 1) * pagination.pageSize < totalCount;
+    },
+    getPageCount: () => totalPages,
+    setPageIndex: (index: number) =>
+      setPagination({ ...pagination, pageIndex: index }),
+    previousPage: () =>
+      setPagination({ ...pagination, pageIndex: pagination.pageIndex - 1 }),
+    nextPage: () =>
+      setPagination({ ...pagination, pageIndex: pagination.pageIndex + 1 }),
+  };
+
   useEffect(() => {
     if (!isLoadingPages && !isPlaceholderData && !isFetching) {
       if (totalCount !== undefined) {
-        setTotalPages(Math.ceil(totalCount / PAGE_SIZE));
+        setTotalPages(Math.ceil(totalCount / pagination.pageSize));
       } else if (
         pagesDataArray &&
         pagesDataArray.length === 0 &&
@@ -58,14 +84,18 @@ export default function Pages() {
       ) {
         // Fallback if totalCount is somehow undefined but we have an empty array on page 1
         setTotalPages(0);
-      } else if (pagesDataArray && pagesDataArray.length < PAGE_SIZE) {
+      } else if (
+        pagesDataArray &&
+        pagesDataArray.length < pagination.pageSize
+      ) {
         // Fallback: if less than a full page is returned, assume it's the last
-        setTotalPages(currentPage);
+        setTotalPages(pagination.pageIndex + 1);
       }
-      // If totalCount is undefined and we have a full page, we can't be sure of totalPages
-      // In this scenario, the UI might show a next button that leads to an empty page if it was the last one.
-      // This is a limitation if totalCount is not reliably provided.
-    } else if (currentPage === 1 && isLoadingPages && !pagesDataArray) {
+    } else if (
+      pagination.pageIndex === 0 &&
+      isLoadingPages &&
+      !pagesDataArray
+    ) {
       // Initial load, no data yet
       setTotalPages(0);
     }
@@ -76,28 +106,17 @@ export default function Pages() {
     isLoadingPages,
     isPlaceholderData,
     isFetching,
-    currentPage,
+    pagination.pageIndex,
+    pagination.pageSize,
     offset,
   ]);
-
-  const handlePageChange = (page: number) => {
-    if (page === currentPage || page < 1) return;
-    // With totalCount, we can be more direct.
-    // Allow navigating to any page up to totalPages if totalPages is known and > 0.
-    // If totalPages is 0 (e.g. initial load or no data), only allow navigating to page 1.
-    if (totalPages > 0 && page > totalPages) return;
-    if (totalPages === 0 && page > 1) return;
-
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <div className="p-2 md:p-4 max-w-[1100px] mx-auto space-y-3">
       <SubHeader />
 
       {isLoading ? (
-        <PageListSkeleton count={PAGE_SIZE} />
+        <PageListSkeleton count={pagination.pageSize} />
       ) : isErrorPages ? (
         <div className="text-center p-8 text-destructive">
           <p>Error loading pages data</p>
@@ -107,7 +126,7 @@ export default function Pages() {
         <>
           {pagesDataArray.map((pageItem: PageTitleItem, index: number) => (
             <PageListItem
-              key={`${pageItem.value}-${index}-${currentPage}`}
+              key={`${pageItem.value}-${index}-${pagination.pageIndex}`}
               pageData={{
                 value: pageItem.pathname,
                 title: pageItem.value,
@@ -117,10 +136,13 @@ export default function Pages() {
             />
           ))}
           {totalPages > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
+            <TablePagination
+              table={table}
+              data={{ items: pagesDataArray || [], total: totalCount || 0 }}
+              pagination={pagination}
+              setPagination={setPagination}
+              isLoading={isLoading}
+              itemName="pages"
             />
           )}
         </>

@@ -7,9 +7,9 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { StandardPage } from "@/components/StandardPage";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
-import { UsersTable } from "@/components/admin/UsersTable";
-import { UserFilters } from "@/components/admin/UserFilters";
-import { UserTablePagination } from "@/components/admin/UserTablePagination";
+import { UsersTable } from "@/app/admin/components/UsersTable";
+import { UserFilters } from "@/app/admin/components/UserFilters";
+import { UserTablePagination } from "@/app/admin/components/UserTablePagination";
 import { authClient } from "@/lib/auth";
 
 export default function AdminPage() {

@@ -1,7 +1,6 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { AdminUser } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,44 +16,58 @@ import {
   ChevronsRight,
 } from "lucide-react";
 
-interface PaginationProps {
-  table: Table<AdminUser>;
-  data: { users: AdminUser[]; total: number } | undefined;
+// Simplified pagination controller interface
+interface PaginationController {
+  getState: () => { pagination: { pageIndex: number; pageSize: number } };
+  getCanPreviousPage: () => boolean;
+  getCanNextPage: () => boolean;
+  getPageCount: () => number;
+  setPageIndex: (index: number) => void;
+  previousPage: () => void;
+  nextPage: () => void;
+}
+
+interface PaginationProps<TData> {
+  table: Table<TData> | PaginationController;
+  data: { items: TData[]; total: number } | undefined;
   pagination: { pageIndex: number; pageSize: number };
   setPagination: (value: { pageIndex: number; pageSize: number }) => void;
   isLoading: boolean;
+  itemName?: string;
 }
 
-export function UserTablePagination({
+export function TablePagination<TData>({
   table,
   data,
   pagination,
   setPagination,
   isLoading,
-}: PaginationProps) {
+  itemName = "items",
+}: PaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between">
       <div className="text-sm text-neutral-400">
         {isLoading ? (
-          <span>Loading users...</span>
+          <span>Loading {itemName}...</span>
         ) : (
           <>
             Showing{" "}
             <span className="font-semibold">
-              {data?.users?.length
+              {data?.items?.length
                 ? pagination.pageIndex * pagination.pageSize + 1
                 : 0}
             </span>{" "}
             to{" "}
             <span className="font-semibold">
-              {data?.users?.length
+              {data?.items?.length
                 ? Math.min(
                     (pagination.pageIndex + 1) * pagination.pageSize,
                     data?.total || 0
                   )
                 : 0}
             </span>{" "}
-            of <span className="font-semibold">{data?.total || 0}</span> users
+            of <span className="font-semibold">{data?.total || 0}</span>{" "}
+            {itemName}
           </>
         )}
       </div>
@@ -83,7 +96,7 @@ export function UserTablePagination({
         </div>
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
           onClick={() => table.setPageIndex(0)}
           disabled={!table.getCanPreviousPage() || isLoading}
         >
@@ -91,7 +104,7 @@ export function UserTablePagination({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage() || isLoading}
         >
@@ -115,7 +128,7 @@ export function UserTablePagination({
         </div>
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage() || isLoading}
         >
@@ -123,7 +136,7 @@ export function UserTablePagination({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
           onClick={() => table.setPageIndex(table.getPageCount() - 1)}
           disabled={!table.getCanNextPage() || isLoading}
         >
