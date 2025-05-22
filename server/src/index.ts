@@ -59,6 +59,8 @@ import { IS_CLOUD } from "./lib/const.js";
 import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
 import { getConfig } from "./api/getConfig.js";
 import { getPageTitles } from "./api/analytics/getPageTitles.js";
+import { getAdminSites } from "./api/admin/getAdminSites.js";
+import { getAdminUsers } from "./api/admin/getAdminUsers.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -153,7 +155,6 @@ const ANALYTICS_ROUTES = [
   "/api/analytics/events/names/",
   "/api/analytics/events/properties/",
   "/events/",
-
   "/get-site",
 ];
 
@@ -256,6 +257,10 @@ if (IS_CLOUD) {
     { config: { rawBody: true } },
     handleWebhook
   ); // Use rawBody parser config for webhook
+
+  // Admin Routes
+  server.get("/admin/sites", getAdminSites);
+  server.get("/admin/users", getAdminUsers);
 }
 
 server.post("/track", trackEvent);
