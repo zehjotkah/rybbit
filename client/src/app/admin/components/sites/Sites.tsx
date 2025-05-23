@@ -37,7 +37,7 @@ export function Sites() {
   ]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   });
 
   // Filter sites based on search query

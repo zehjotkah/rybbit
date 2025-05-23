@@ -12,6 +12,7 @@ import { cn } from "../lib/utils";
 import "./globals.css";
 import Script from "next/script";
 import { useStopImpersonation } from "@/hooks/useStopImpersonation";
+import { ReactScan } from "./ReactScan";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -82,6 +83,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark">
+      <ReactScan />
       <TooltipProvider>
         <body
           className={cn(

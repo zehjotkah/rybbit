@@ -30,7 +30,7 @@ export function OrgUsersList() {
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   });
 
   const toggleExpand = (userId: string) => {
