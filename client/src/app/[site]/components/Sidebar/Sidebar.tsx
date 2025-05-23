@@ -54,12 +54,12 @@ export function Sidebar() {
           href={getTabPath("main")}
           icon={<LayoutDashboard className="w-4 h-4" />}
         />
-        <SidebarLink
+        {/* <SidebarLink
           label="Pages"
           active={isActiveTab("pages")}
           href={getTabPath("pages")}
           icon={<File className="w-4 h-4" />}
-        />
+        /> */}
         <SidebarLink
           label="Realtime"
           active={isActiveTab("realtime")}
