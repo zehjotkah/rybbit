@@ -27,10 +27,14 @@ function SiteSelectorContent() {
           <DropdownMenuItem
             key={site.siteId}
             onClick={() => {
+              if (isSelected) return;
               resetStore();
               router.push(`/${site.siteId}`);
             }}
-            className={cn("flex items-center justify-between", isSelected && "bg-neutral-800")}
+            className={cn(
+              "flex items-center justify-between",
+              isSelected && "bg-neutral-800"
+            )}
           >
             <div className="flex items-center gap-2">
               <Favicon domain={site.domain} className="w-4 h-4" />
