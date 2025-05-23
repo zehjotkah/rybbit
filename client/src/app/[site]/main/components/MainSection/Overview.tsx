@@ -208,7 +208,8 @@ export function Overview() {
     isLoading: isPastMinutesOverviewLoadingPrevious,
   } = useGetOverviewPastMinutes({
     site,
-    pastMinutes: 48 * 60, // Use 48 hours instead of a isPrevious flag
+    pastMinutesStart: 48 * 60,
+    pastMinutesEnd: 24 * 60,
   });
 
   // Combine the data based on the mode

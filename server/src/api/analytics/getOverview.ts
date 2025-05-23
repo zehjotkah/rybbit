@@ -21,17 +21,23 @@ const getQuery = ({
   startDate,
   endDate,
   timeZone,
-  site,
   filters,
   pastMinutes,
+  pastMinutesRange,
 }: {
   startDate: string;
   endDate: string;
   timeZone: string;
-  site: string;
   filters: string;
-  pastMinutes: number;
+  pastMinutes?: number;
+  pastMinutesRange?: { start: number; end: number };
 }) => {
+  const timeParams = pastMinutesRange
+    ? { pastMinutesRange }
+    : pastMinutes
+      ? { pastMinutes }
+      : { date: { startDate, endDate, timeZone } };
+
   const filterStatement = getFilterStatement(filters);
 
   return `SELECT   
@@ -61,13 +67,7 @@ const getQuery = ({
                 WHERE
                     site_id = {siteId:Int32}
                     ${filterStatement}
-                    ${getTimeStatement(
-                      pastMinutes
-                        ? { pastMinutes }
-                        : {
-                            date: { startDate, endDate, timeZone },
-                          }
-                    )}
+                    ${getTimeStatement(timeParams)}
                 GROUP BY session_id
             )
         ) AS session_stats
@@ -81,13 +81,7 @@ const getQuery = ({
             WHERE 
                 site_id = {siteId:Int32}
                 ${filterStatement}
-                ${getTimeStatement(
-                  pastMinutes
-                    ? { pastMinutes }
-                    : {
-                        date: { startDate, endDate, timeZone },
-                      }
-                )}
+                ${getTimeStatement(timeParams)}
                 AND type = 'pageview'
         ) AS page_stats`;
 };
@@ -103,6 +97,8 @@ export interface GenericRequest {
     filters: string;
     parameter: FilterParameter;
     pastMinutes?: number;
+    pastMinutesStart?: number;
+    pastMinutesEnd?: number;
     limit?: number;
   };
 }
@@ -111,20 +107,33 @@ export async function getOverview(
   req: FastifyRequest<GenericRequest>,
   res: FastifyReply
 ) {
-  const { startDate, endDate, timeZone, filters, pastMinutes } = req.query;
+  const {
+    startDate,
+    endDate,
+    timeZone,
+    filters,
+    pastMinutes,
+    pastMinutesStart,
+    pastMinutesEnd,
+  } = req.query;
   const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
     return res.status(403).send({ error: "Forbidden" });
   }
 
+  const pastMinutesRange =
+    pastMinutesStart && pastMinutesEnd
+      ? { start: Number(pastMinutesStart), end: Number(pastMinutesEnd) }
+      : undefined;
+
   const query = getQuery({
     startDate,
     endDate,
     timeZone,
-    site,
     filters,
     pastMinutes: Number(pastMinutes),
+    pastMinutesRange: pastMinutesRange,
   });
 
   try {
