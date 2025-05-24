@@ -36,17 +36,15 @@ const bucketIntervalMap = {
 function getTimeStatementFill(
   {
     date,
-    pastMinutes,
     pastMinutesRange,
   }: {
     date?: { startDate: string; endDate: string; timeZone: string };
-    pastMinutes?: number;
     pastMinutesRange?: { start: number; end: number };
   },
   bucket: TimeBucket
 ) {
   const { params, bucket: validatedBucket } = validateTimeStatementFillParams(
-    { date, pastMinutes, pastMinutesRange },
+    { date, pastMinutesRange },
     bucket
   );
 
@@ -75,45 +73,25 @@ function getTimeStatementFill(
         )
       ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
-  // For specific past minutes range
+  // For specific past minutes range - convert to exact timestamps for better performance
   if (params.pastMinutesRange) {
     const { start, end } = params.pastMinutesRange;
+
+    // Calculate exact timestamps in JavaScript to avoid runtime ClickHouse calculations
+    const now = new Date();
+    const startTimestamp = new Date(now.getTime() - start * 60 * 1000);
+    const endTimestamp = new Date(now.getTime() - end * 60 * 1000);
+
+    // Format as YYYY-MM-DD HH:MM:SS without milliseconds for ClickHouse
+    const startIso = startTimestamp
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const endIso = endTimestamp.toISOString().slice(0, 19).replace("T", " ");
+
     return ` WITH FILL 
-      FROM ${
-        TimeBucketToFn[validatedBucket]
-      }(toDateTime(now() - INTERVAL ${SqlString.escape(start)} MINUTE))
-      TO ${
-        TimeBucketToFn[validatedBucket]
-      }(toDateTime(now() - INTERVAL ${SqlString.escape(
-        end
-      )} MINUTE)) + INTERVAL 1 ${
-        validatedBucket === "minute"
-          ? "MINUTE"
-          : validatedBucket === "five_minutes"
-            ? "MINUTE"
-            : validatedBucket === "ten_minutes"
-              ? "MINUTE"
-              : validatedBucket === "fifteen_minutes"
-                ? "MINUTE"
-                : validatedBucket === "month"
-                  ? "MONTH"
-                  : validatedBucket === "week"
-                    ? "WEEK"
-                    : validatedBucket === "day"
-                      ? "DAY"
-                      : "HOUR"
-      }
-      STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
-  }
-  // For regular past minutes
-  if (params.pastMinutes) {
-    return ` WITH FILL 
-      FROM ${
-        TimeBucketToFn[validatedBucket]
-      }(toDateTime(now() - INTERVAL ${SqlString.escape(
-        params.pastMinutes
-      )} MINUTE))
-      TO ${TimeBucketToFn[validatedBucket]}(toDateTime(now())) + INTERVAL 1 ${
+      FROM ${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(startIso)}))
+      TO ${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(endIso)})) + INTERVAL 1 ${
         validatedBucket === "minute"
           ? "MINUTE"
           : validatedBucket === "five_minutes"
@@ -141,7 +119,6 @@ const getQuery = ({
   timeZone,
   bucket,
   filters,
-  pastMinutes,
   pastMinutesRange,
 }: {
   startDate: string;
@@ -149,18 +126,15 @@ const getQuery = ({
   timeZone: string;
   bucket: TimeBucket;
   filters: string;
-  pastMinutes?: number;
   pastMinutesRange?: { start: number; end: number };
 }) => {
   const filterStatement = getFilterStatement(filters);
 
-  const isAllTime = !startDate && !endDate && !pastMinutes && !pastMinutesRange;
+  const isAllTime = !startDate && !endDate && !pastMinutesRange;
 
   const timeParams = pastMinutesRange
     ? { pastMinutesRange }
-    : pastMinutes
-      ? { pastMinutes }
-      : { date: { startDate, endDate, timeZone } };
+    : { date: { startDate, endDate, timeZone } };
 
   const query = `
 SELECT
@@ -249,7 +223,6 @@ export async function getOverviewBucketed(
       timeZone: string;
       bucket: TimeBucket;
       filters: string;
-      pastMinutes?: number;
       pastMinutesStart?: number;
       pastMinutesEnd?: number;
     };
@@ -262,7 +235,6 @@ export async function getOverviewBucketed(
     timeZone,
     bucket,
     filters,
-    pastMinutes,
     pastMinutesStart,
     pastMinutesEnd,
   } = req.query;
@@ -285,7 +257,6 @@ export async function getOverviewBucketed(
     timeZone,
     bucket,
     filters,
-    pastMinutes: pastMinutes ? Number(pastMinutes) : undefined,
     pastMinutesRange,
   });
 
