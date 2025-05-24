@@ -182,9 +182,12 @@
         eventType === "custom_event" || eventType === "outbound"
           ? JSON.stringify(properties)
           : undefined,
-      // Add custom user ID if available
-      user_id: customUserId,
     };
+
+    // Add custom user ID only if it's set
+    if (customUserId) {
+      payload.user_id = customUserId;
+    }
 
     fetch(`${ANALYTICS_HOST}/track`, {
       method: "POST",
