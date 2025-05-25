@@ -25,6 +25,8 @@ export function getParameterNameLabel(parameter: FilterParameter) {
       return "City";
     case "region":
       return "Region";
+    case "channel":
+      return "Channel";
     case "entry_page":
       return "Entry Page";
     case "exit_page":
