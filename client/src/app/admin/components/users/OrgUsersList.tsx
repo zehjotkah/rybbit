@@ -296,8 +296,8 @@ export function OrgUsersList() {
       await authClient.admin.impersonateUser({
         userId,
       });
-      router.push("/");
       window.location.reload();
+      router.push("/");
       return true;
     } catch (err) {
       const errorMessage =

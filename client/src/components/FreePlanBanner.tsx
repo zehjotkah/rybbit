@@ -1,16 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useGetSites } from "../api/admin/sites";
+import { useCurrentSite } from "../api/admin/sites";
 import { DEFAULT_EVENT_LIMIT } from "../app/settings/subscription/utils/constants";
 import { Button } from "./ui/button";
 
 export function FreePlanBanner() {
-  const { data: sites } = useGetSites();
-  const pathname = usePathname();
-  const site = sites?.find(
-    (site) => site.siteId === Number(pathname.split("/")[1])
-  );
+  const site = useCurrentSite();
 
   if (!site) return null;
 
@@ -29,11 +24,13 @@ export function FreePlanBanner() {
             {formatNumber(site.eventLimit)} events
           </span>
         </div>
-        <Button variant="success" size="sm" asChild>
-          <Link href="/subscribe">
-            Upgrade <ArrowRight className="ml-1 h-3 w-3" />
-          </Link>
-        </Button>
+        {site.isOwner && (
+          <Button variant="success" size="sm" asChild>
+            <Link href="/subscribe">
+              Upgrade <ArrowRight className="ml-1 h-3 w-3" />
+            </Link>
+          </Button>
+        )}
       </div>
     );
   }

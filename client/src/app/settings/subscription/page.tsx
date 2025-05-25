@@ -1,6 +1,11 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProPlan } from "./components/ProPlan";
 import { useStripeSubscription } from "./utils/useStripeSubscription";
@@ -10,6 +15,7 @@ import { TrialPlan } from "./components/TrialPlan";
 import { ExpiredTrialPlan } from "./components/ExpiredTrialPlan";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { FreePlan } from "./components/FreePlan";
+import { Building } from "lucide-react";
 
 export default function SubscriptionPage() {
   useSetPageTitle("Rybbit · Subscription");
@@ -28,6 +34,20 @@ export default function SubscriptionPage() {
     if (!hasOrganization) {
       return (
         <NoOrganization message="You need to be part of an organization to manage your subscription." />
+      );
+    }
+
+    if (organizations[0].role !== "owner") {
+      return (
+        <Card className="p-6 flex flex-col items-center text-center w-full">
+          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Building className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="mb-2 text-xl">Not an owner</CardTitle>
+          <CardDescription className="mb-6">
+            Only the owner of the organization can manage the subscription.
+          </CardDescription>
+        </Card>
       );
     }
 

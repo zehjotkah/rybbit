@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { StandardPage } from "@/components/StandardPage";
-import { Users } from "./components/users/Users";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { authClient } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Sites } from "./components/sites/Sites";
 import { OrgUsersList } from "./components/users/OrgUsersList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { authClient } from "@/lib/auth";
+import { Users } from "./components/users/Users";
 
 export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -38,18 +37,7 @@ export default function AdminPage() {
 
   // If not admin, show access denied
   if (!isAdmin && !isCheckingAdmin) {
-    return (
-      <div className="container mt-8">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            You don't have permission to access this page. Please contact an
-            administrator if you believe this is an error.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+    redirect("/");
   }
 
   return (

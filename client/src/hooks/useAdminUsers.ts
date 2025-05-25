@@ -5,8 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth";
 import { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import { AdminUser } from "@/types/admin";
+import { useRouter } from "next/navigation";
 
 export function useAdminUsers() {
+  const router = useRouter();
   // Table state
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
@@ -86,6 +88,8 @@ export function useAdminUsers() {
       await authClient.admin.impersonateUser({
         userId,
       });
+      console.log("impersonated");
+      router.push("/");
       // Redirect to home after impersonation
       return true;
     } catch (err) {

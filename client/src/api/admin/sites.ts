@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
 import { authedFetchWithError } from "../utils";
+import { usePathname } from "next/navigation";
 
 export type SiteResponse = {
   siteId: number;
@@ -168,3 +169,10 @@ export function changeSiteBlockBots(siteId: number, blockBots: boolean) {
     },
   });
 }
+
+export const useCurrentSite = () => {
+  const { data: sites } = useGetSites();
+  const pathname = usePathname();
+
+  return sites?.find((site) => site.siteId === Number(pathname.split("/")[1]));
+};

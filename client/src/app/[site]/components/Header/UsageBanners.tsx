@@ -1,7 +1,6 @@
 import { AlertTriangle, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useGetSites } from "../../../../api/admin/sites";
+import { useCurrentSite } from "../../../../api/admin/sites";
 import {
   Alert,
   AlertDescription,
@@ -10,12 +9,7 @@ import {
 import { Button } from "../../../../components/ui/button";
 
 export function UsageBanners() {
-  const { data: sites } = useGetSites();
-  const pathname = usePathname();
-
-  const site = sites?.find(
-    (site) => site.siteId === Number(pathname.split("/")[1])
-  );
+  const site = useCurrentSite();
 
   if (!site) return null;
 

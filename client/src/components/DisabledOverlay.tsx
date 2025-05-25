@@ -3,6 +3,8 @@ import Link from "next/link";
 import React, { ReactNode } from "react";
 import { useStripeSubscription } from "../app/settings/subscription/utils/useStripeSubscription";
 import { Button } from "./ui/button";
+import { useCurrentSite } from "../api/admin/sites";
+import { DEFAULT_EVENT_LIMIT } from "../app/settings/subscription/utils/constants";
 
 interface DisabledOverlayProps {
   children: ReactNode;
@@ -13,7 +15,7 @@ interface DisabledOverlayProps {
   style?: React.CSSProperties;
 }
 
-function defaultMessage(message: string) {
+function ownerMessage(message: string) {
   return (
     <div className="bg-neutral-900 rounded-lg  border border-neutral-700 shadow-xl flex items-center gap-3 p-4">
       <Crown className="h-5 w-5 text-amber-500 flex-shrink-0" />
@@ -32,6 +34,21 @@ function defaultMessage(message: string) {
   );
 }
 
+function userMessage(message: string) {
+  return (
+    <div className="bg-neutral-900 rounded-lg  border border-neutral-700 shadow-xl flex items-center gap-3 p-4">
+      <Crown className="h-5 w-5 text-amber-500 flex-shrink-0" />
+      <div className="flex-1">
+        <p className="text-sm text-muted-foreground">
+          Ask your organization owner to upgrade to{" "}
+          <span className="font-medium text-foreground">Pro</span> to unlock{" "}
+          {message}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
   children,
   message = "this feature",
@@ -40,9 +57,9 @@ export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
   showMessage = true,
   style,
 }) => {
-  const { data: subscription } = useStripeSubscription();
+  const site = useCurrentSite();
 
-  const disabled = subscription?.planName === "free";
+  const disabled = site?.eventLimit === DEFAULT_EVENT_LIMIT;
 
   if (!disabled) {
     return <>{children}</>;
@@ -65,7 +82,7 @@ export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
       >
         {showMessage && (
           <div className="flex items-center justify-center">
-            {defaultMessage(message)}
+            {site.isOwner ? ownerMessage(message) : userMessage(message)}
           </div>
         )}
       </div>
