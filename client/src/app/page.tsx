@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useUserOrganizations } from "../api/admin/organizations";
 import { useGetSites } from "../api/admin/sites";
 import { CreateOrganizationDialog } from "../components/CreateOrganizationDialog";
-import { FreePlanBanner } from "../components/FreePlanBanner";
 import { NoOrganization } from "../components/NoOrganization";
 import { SiteCard } from "../components/SiteCard";
 import { StandardPage } from "../components/StandardPage";
@@ -47,7 +46,6 @@ export default function Home() {
 
   return (
     <StandardPage>
-      <FreePlanBanner />
       <div className="flex justify-between items-center my-4">
         <div className="text-2xl font-bold">{sites?.length} Websites</div>
         <AddSite disabled={hasNoOrganizations || disabled} />

@@ -99,7 +99,7 @@ export function PricingSection() {
           <div className="w-full lg:w-70 flex-shrink-0 md:h-[666px] h-full">
             <div className="bg-neutral-800/30 rounded-xl border border-neutral-700 overflow-hidden backdrop-blur-sm shadow-lg h-full">
               <div className="p-6">
-                <div className="md:mb-[74px] mb-6">
+                <div className="md:mb-[70px] mb-6">
                   <div className="flex justify-between mb-3 items-center">
                     <div>
                       <h3 className="font-semibold mb-2">Free</h3>
