@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminUsers, AdminUserData } from "@/api/admin/getAdminUsers";
 import {
@@ -14,7 +14,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import { AlertCircle, ChevronDown, ChevronRight, User } from "lucide-react";
+import {
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  User,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -22,12 +30,21 @@ import { Button } from "@/components/ui/button";
 import { TablePagination } from "@/components/pagination";
 import { authClient } from "@/lib/auth";
 import { userStore } from "@/lib/userStore";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getSortedRowModel,
+  SortingState,
+} from "@tanstack/react-table";
 
 export function OrgUsersList() {
   const router = useRouter();
   const { data: users, isLoading, isError } = useAdminUsers();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,
@@ -55,23 +72,204 @@ export function OrgUsersList() {
     );
   });
 
-  // Paginate the filtered users
-  const paginatedUsers = filteredUsers?.slice(
-    pagination.pageIndex * pagination.pageSize,
-    (pagination.pageIndex + 1) * pagination.pageSize
+  // Define columns for the table
+  const columns = useMemo<ColumnDef<AdminUserData>[]>(
+    () => [
+      {
+        id: "expand",
+        header: "",
+        cell: ({ row }) => (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 p-0"
+            onClick={() => toggleExpand(row.original.id)}
+          >
+            {expandedUsers.has(row.original.id) ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "name",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            User
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) => (
+          <div className="font-medium">{row.getValue("name") || "Unnamed"}</div>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            Email
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) => row.getValue("email"),
+      },
+      {
+        accessorKey: "role",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            Role
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) => row.getValue("role"),
+      },
+      {
+        accessorKey: "createdAt",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            Created
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) =>
+          formatDistanceToNow(new Date(row.getValue("createdAt")), {
+            addSuffix: true,
+          }),
+      },
+      {
+        accessorKey: "monthlyEventCount",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            Monthly Events
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) =>
+          (row.getValue("monthlyEventCount") as number)?.toLocaleString() || 0,
+      },
+      {
+        id: "sites",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent"
+          >
+            Sites
+            {{
+              asc: <ArrowUp className="ml-2 h-4 w-4" />,
+              desc: <ArrowDown className="ml-2 h-4 w-4" />,
+            }[column.getIsSorted() as string] ?? (
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ),
+        accessorFn: (row) => row.sites.length,
+        cell: ({ row }) => <Badge>{row.original.sites.length}</Badge>,
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <Button
+            onClick={() => handleImpersonate(row.original.id)}
+            size="sm"
+            variant="outline"
+            className="flex items-center gap-1"
+            disabled={row.original.id === userStore.getState().user?.id}
+          >
+            <User className="h-4 w-4" />
+            Impersonate
+          </Button>
+        ),
+        enableSorting: false,
+      },
+    ],
+    [expandedUsers]
   );
+
+  // Initialize the table
+  const table = useReactTable({
+    data: filteredUsers || [],
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    manualSorting: false,
+  });
+
+  // Paginate the sorted and filtered users
+  const paginatedUsers = table
+    .getRowModel()
+    .rows.slice(
+      pagination.pageIndex * pagination.pageSize,
+      (pagination.pageIndex + 1) * pagination.pageSize
+    );
 
   // Pagination controller for TablePagination
   const paginationController = {
     getState: () => ({ pagination }),
     getCanPreviousPage: () => pagination.pageIndex > 0,
     getCanNextPage: () =>
-      filteredUsers
+      table.getRowModel().rows.length > 0
         ? pagination.pageIndex <
-          Math.ceil(filteredUsers.length / pagination.pageSize) - 1
+          Math.ceil(table.getRowModel().rows.length / pagination.pageSize) - 1
         : false,
     getPageCount: () =>
-      filteredUsers ? Math.ceil(filteredUsers.length / pagination.pageSize) : 0,
+      table.getRowModel().rows.length > 0
+        ? Math.ceil(table.getRowModel().rows.length / pagination.pageSize)
+        : 0,
     setPageIndex: (index: number) =>
       setPagination({ ...pagination, pageIndex: index }),
     previousPage: () =>
@@ -83,8 +281,9 @@ export function OrgUsersList() {
       setPagination({
         ...pagination,
         pageIndex: Math.min(
-          filteredUsers
-            ? Math.ceil(filteredUsers.length / pagination.pageSize) - 1
+          table.getRowModel().rows.length > 0
+            ? Math.ceil(table.getRowModel().rows.length / pagination.pageSize) -
+                1
             : 0,
           pagination.pageIndex + 1
         ),
@@ -138,16 +337,23 @@ export function OrgUsersList() {
       <div className="rounded-md border border-neutral-700">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-8"></TableHead>
-              <TableHead>User</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Monthly Events</TableHead>
-              <TableHead>Sites</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={header.id === "expand" ? "w-8" : ""}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
             {isLoading ? (
@@ -182,62 +388,28 @@ export function OrgUsersList() {
                   </TableRow>
                 ))
             ) : paginatedUsers && paginatedUsers.length > 0 ? (
-              paginatedUsers.map((user) => (
+              paginatedUsers.map((row) => (
                 <>
-                  <TableRow key={user.id} className="group">
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5 p-0"
-                        onClick={() => toggleExpand(user.id)}
-                      >
-                        {expandedUsers.has(user.id) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
+                  <TableRow key={row.id} className="group">
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
                         )}
-                      </Button>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {user.name || "Unnamed"}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>
-                      {formatDistanceToNow(new Date(user.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      {user.monthlyEventCount?.toLocaleString() || 0}
-                    </TableCell>
-                    <TableCell>
-                      <Badge>{user.sites.length}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={() => handleImpersonate(user.id)}
-                        size="sm"
-                        variant="outline"
-                        className="flex items-center gap-1"
-                        disabled={user.id === userStore.getState().user?.id}
-                      >
-                        <User className="h-4 w-4" />
-                        Impersonate
-                      </Button>
-                    </TableCell>
+                      </TableCell>
+                    ))}
                   </TableRow>
-                  {expandedUsers.has(user.id) && (
+                  {expandedUsers.has(row.original.id) && (
                     <TableRow>
                       <TableCell
-                        colSpan={8}
+                        colSpan={columns.length}
                         className="bg-neutral-900 py-2 px-8"
                       >
                         <div className="text-sm font-semibold mb-2">Sites:</div>
-                        {user.sites.length > 0 ? (
+                        {row.original.sites.length > 0 ? (
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {user.sites.map((site) => (
+                            {row.original.sites.map((site) => (
                               <div
                                 key={site.siteId}
                                 className="p-3 border border-neutral-700 rounded"
@@ -281,7 +453,7 @@ export function OrgUsersList() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={8}
+                  colSpan={columns.length}
                   className="text-center py-6 text-muted-foreground"
                 >
                   {searchQuery
@@ -298,8 +470,11 @@ export function OrgUsersList() {
         <TablePagination
           table={paginationController}
           data={
-            filteredUsers
-              ? { items: filteredUsers, total: filteredUsers.length }
+            table.getRowModel().rows.length > 0
+              ? {
+                  items: table.getRowModel().rows,
+                  total: table.getRowModel().rows.length,
+                }
               : undefined
           }
           pagination={pagination}
