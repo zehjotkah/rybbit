@@ -9,14 +9,13 @@ import { StandardPage } from "@/components/StandardPage";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { UsersTable } from "@/app/admin/components/users/UsersTable";
 import { UserFilters } from "@/app/admin/components/users/UserFilters";
-import { UserTablePagination } from "@/app/admin/components/users/UserTablePagination";
+import { AdminTablePagination } from "@/app/admin/components/shared/AdminTablePagination";
+import { AdminLayout } from "@/app/admin/components/shared/AdminLayout";
+import { ErrorAlert } from "@/app/admin/components/shared/ErrorAlert";
 import { authClient } from "@/lib/auth";
 
 export function Users() {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isImpersonating, setIsImpersonating] = useState(false);
-  const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
 
   const {
     // Data
@@ -41,48 +40,6 @@ export function Users() {
     handleImpersonate,
   } = useAdminUsers();
 
-  useEffect(() => {
-    async function checkAdminPermission() {
-      try {
-        // Check if the user has impersonate permission (admin feature)
-        const result = await authClient.admin.hasPermission({
-          permissions: {
-            user: ["impersonate"],
-          },
-        });
-        setIsAdmin(result.data?.success ?? false);
-
-        // Check if the user is currently impersonating
-        const session = await authClient.getSession();
-        // Check if impersonatedBy exists in the session data
-        setIsImpersonating(Boolean(session.data?.session?.impersonatedBy));
-
-        setIsCheckingAdmin(false);
-      } catch (err) {
-        setIsAdmin(false);
-        setIsCheckingAdmin(false);
-        console.error("Error checking admin status:", err);
-      }
-    }
-
-    checkAdminPermission();
-  }, []);
-
-  // Function to stop impersonating
-  const stopImpersonating = async () => {
-    try {
-      await authClient.admin.stopImpersonating();
-      setIsImpersonating(false);
-      window.location.reload();
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Unknown error occurred";
-      console.error(`Failed to stop impersonation: ${errorMessage}`);
-      return false;
-    }
-  };
-
   const data = { users, total };
 
   // Handle impersonation with navigation
@@ -94,43 +51,16 @@ export function Users() {
     }
   };
 
-  // If not admin, show access denied
-  if (!isAdmin && !isCheckingAdmin) {
+  if (isError) {
     return (
-      <div className="container mt-8">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            You don't have permission to access this page. Please contact an
-            administrator if you believe this is an error.
-          </AlertDescription>
-        </Alert>
-      </div>
+      <AdminLayout title="Users" showStopImpersonating>
+        <ErrorAlert message="Failed to load users. Please try again later." />
+      </AdminLayout>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">Users</h2>
-        {isImpersonating && (
-          <Button onClick={stopImpersonating} variant="destructive">
-            Stop Impersonating
-          </Button>
-        )}
-      </div>
-
-      {isError && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Failed to load users. Please try again later.
-          </AlertDescription>
-        </Alert>
-      )}
-
+    <AdminLayout title="Users" showStopImpersonating>
       <div className="space-y-4">
         {/* Filters */}
         <UserFilters
@@ -176,7 +106,7 @@ export function Users() {
         />
 
         {/* Pagination */}
-        <UserTablePagination
+        <AdminTablePagination
           table={
             {
               getCanPreviousPage: () => pagination.pageIndex > 0,
@@ -202,12 +132,13 @@ export function Users() {
                 }),
             } as any
           }
-          data={data}
+          data={data ? { items: data.users, total: data.total } : undefined}
           pagination={pagination}
           setPagination={setPagination}
           isLoading={isLoading}
+          itemName="users"
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }

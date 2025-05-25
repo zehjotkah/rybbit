@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminUsers, AdminUserData } from "@/api/admin/getAdminUsers";
 import {
@@ -14,17 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import {
-  AlertCircle,
-  ChevronDown,
-  ChevronRight,
-  User,
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-} from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronRight, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TablePagination } from "@/components/pagination";
@@ -38,6 +28,10 @@ import {
   getSortedRowModel,
   SortingState,
 } from "@tanstack/react-table";
+import { SortableHeader } from "../shared/SortableHeader";
+import { SearchInput } from "../shared/SearchInput";
+import { ErrorAlert } from "../shared/ErrorAlert";
+import { AdminLayout } from "../shared/AdminLayout";
 
 export function OrgUsersList() {
   const router = useRouter();
@@ -50,27 +44,56 @@ export function OrgUsersList() {
     pageSize: 50,
   });
 
-  const toggleExpand = (userId: string) => {
-    const newExpanded = new Set(expandedUsers);
-    if (newExpanded.has(userId)) {
-      newExpanded.delete(userId);
-    } else {
-      newExpanded.add(userId);
-    }
-    setExpandedUsers(newExpanded);
-  };
+  const toggleExpand = useCallback(
+    (userId: string) => {
+      const newExpanded = new Set(expandedUsers);
+      if (newExpanded.has(userId)) {
+        newExpanded.delete(userId);
+      } else {
+        newExpanded.add(userId);
+      }
+      setExpandedUsers(newExpanded);
+    },
+    [expandedUsers]
+  );
 
   // Filter users based on search query
-  const filteredUsers = users?.filter((user) => {
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+
+    if (!searchQuery.trim()) return users;
+
     const lowerSearchQuery = searchQuery.toLowerCase();
-    return (
-      user.name?.toLowerCase().includes(lowerSearchQuery) ||
-      user.email.toLowerCase().includes(lowerSearchQuery) ||
-      user.sites.some((site) =>
-        site.domain.toLowerCase().includes(lowerSearchQuery)
-      )
-    );
-  });
+    return users.filter((user) => {
+      return (
+        user.name?.toLowerCase().includes(lowerSearchQuery) ||
+        user.email.toLowerCase().includes(lowerSearchQuery) ||
+        user.sites.some((site) =>
+          site.domain.toLowerCase().includes(lowerSearchQuery)
+        )
+      );
+    });
+  }, [users, searchQuery]);
+
+  // Impersonation handler
+  const handleImpersonate = useCallback(
+    async (userId: string) => {
+      try {
+        await authClient.admin.impersonateUser({
+          userId,
+        });
+        window.location.reload();
+        router.push("/");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
+        console.error(`Failed to impersonate user: ${errorMessage}`);
+        return false;
+      }
+    },
+    [router]
+  );
 
   // Define columns for the table
   const columns = useMemo<ColumnDef<AdminUserData>[]>(
@@ -97,19 +120,7 @@ export function OrgUsersList() {
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            User
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>User</SortableHeader>
         ),
         cell: ({ row }) => (
           <div className="font-medium">{row.getValue("name") || "Unnamed"}</div>
@@ -118,57 +129,21 @@ export function OrgUsersList() {
       {
         accessorKey: "email",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Email
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Email</SortableHeader>
         ),
         cell: ({ row }) => row.getValue("email"),
       },
       {
         accessorKey: "role",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Role
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Role</SortableHeader>
         ),
         cell: ({ row }) => row.getValue("role"),
       },
       {
         accessorKey: "createdAt",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Created
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Created</SortableHeader>
         ),
         cell: ({ row }) =>
           formatDistanceToNow(new Date(row.getValue("createdAt")), {
@@ -178,19 +153,7 @@ export function OrgUsersList() {
       {
         accessorKey: "monthlyEventCount",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Monthly Events
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Monthly Events</SortableHeader>
         ),
         cell: ({ row }) =>
           (row.getValue("monthlyEventCount") as number)?.toLocaleString() || 0,
@@ -198,19 +161,7 @@ export function OrgUsersList() {
       {
         id: "sites",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Sites
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Sites</SortableHeader>
         ),
         accessorFn: (row) => row.sites.length,
         cell: ({ row }) => <Badge>{row.original.sites.length}</Badge>,
@@ -233,7 +184,7 @@ export function OrgUsersList() {
         enableSorting: false,
       },
     ],
-    [expandedUsers]
+    [toggleExpand, handleImpersonate]
   );
 
   // Initialize the table
@@ -290,47 +241,21 @@ export function OrgUsersList() {
       }),
   };
 
-  // Impersonation handler
-  const handleImpersonate = async (userId: string) => {
-    try {
-      await authClient.admin.impersonateUser({
-        userId,
-      });
-      window.location.reload();
-      router.push("/");
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Unknown error occurred";
-      console.error(`Failed to impersonate user: ${errorMessage}`);
-      return false;
-    }
-  };
-
   if (isError) {
     return (
-      <Alert variant="destructive" className="mb-4">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load organization users data. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <AdminLayout title="Organization Owners">
+        <ErrorAlert message="Failed to load organization users data. Please try again later." />
+      </AdminLayout>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">Organization Owners</h2>
-      </div>
-
+    <AdminLayout title="Organization Owners">
       <div className="mb-4">
-        <Input
+        <SearchInput
           placeholder="Search by name, email or domain..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
+          onChange={setSearchQuery}
         />
       </div>
 
@@ -483,6 +408,6 @@ export function OrgUsersList() {
           itemName="users"
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }

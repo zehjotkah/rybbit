@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { UserTableSkeleton } from "./UserTableSkeleton";
 import { userStore } from "@/lib/userStore";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { SortableHeader } from "../shared/SortableHeader";
 
 interface UsersTableProps {
   data: { users: AdminUser[]; total: number } | undefined;
@@ -60,19 +60,7 @@ export function UsersTable({
       {
         accessorKey: "id",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            User ID
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>User ID</SortableHeader>
         ),
         cell: ({ row }) => (
           <div className="font-mono">{row.getValue("id")}</div>
@@ -81,76 +69,28 @@ export function UsersTable({
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Name
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Name</SortableHeader>
         ),
         cell: ({ row }) => row.getValue("name") || "N/A",
       },
       {
         accessorKey: "email",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Email
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Email</SortableHeader>
         ),
         cell: ({ row }) => row.getValue("email"),
       },
       {
         accessorKey: "role",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Role
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Role</SortableHeader>
         ),
         cell: ({ row }) => row.getValue("role") || "user",
       },
       {
         accessorKey: "createdAt",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Created At
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Created At</SortableHeader>
         ),
         cell: ({ row }) =>
           new Date(row.getValue("createdAt")).toLocaleDateString(),

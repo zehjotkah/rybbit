@@ -1,32 +1,33 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { AdminSiteData } from "@/api/admin/getAdminSites";
 import { TablePagination } from "@/components/pagination";
 
-interface SitePaginationProps {
-  table: Table<AdminSiteData>;
-  data: AdminSiteData[] | undefined;
+interface AdminTablePaginationProps<TData> {
+  table: Table<TData>;
+  data: { items: TData[]; total: number } | undefined;
   pagination: { pageIndex: number; pageSize: number };
   setPagination: (value: { pageIndex: number; pageSize: number }) => void;
   isLoading: boolean;
+  itemName: string;
 }
 
-export function SiteTablePagination({
+export function AdminTablePagination<TData>({
   table,
   data,
   pagination,
   setPagination,
   isLoading,
-}: SitePaginationProps) {
+  itemName,
+}: AdminTablePaginationProps<TData>) {
   return (
     <TablePagination
       table={table}
-      data={data ? { items: data, total: data.length } : undefined}
+      data={data}
       pagination={pagination}
       setPagination={setPagination}
       isLoading={isLoading}
-      itemName="sites"
+      itemName={itemName}
     />
   );
 }

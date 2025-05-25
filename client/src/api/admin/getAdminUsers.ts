@@ -25,6 +25,5 @@ export function useAdminUsers() {
   return useQuery<AdminUserData[]>({
     queryKey: ["admin-users"],
     queryFn: getAdminUsers,
-    staleTime: 60000, // 1 minute
   });
 }

@@ -13,10 +13,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import { AlertCircle, ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   ColumnDef,
   flexRender,
@@ -26,7 +22,11 @@ import {
   SortingState,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { SiteTablePagination } from "./SiteTablePagination";
+import { AdminTablePagination } from "../shared/AdminTablePagination";
+import { SortableHeader } from "../shared/SortableHeader";
+import { SearchInput } from "../shared/SearchInput";
+import { ErrorAlert } from "../shared/ErrorAlert";
+import { AdminLayout } from "../shared/AdminLayout";
 import Link from "next/link";
 
 export function Sites() {
@@ -60,19 +60,7 @@ export function Sites() {
       {
         accessorKey: "siteId",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Site ID
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Site ID</SortableHeader>
         ),
         cell: ({ row }) => (
           <div>
@@ -89,19 +77,7 @@ export function Sites() {
       {
         accessorKey: "domain",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Domain
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Domain</SortableHeader>
         ),
         cell: ({ row }) => (
           <div className="font-medium">
@@ -118,19 +94,7 @@ export function Sites() {
       {
         accessorKey: "createdAt",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Created
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Created</SortableHeader>
         ),
         cell: ({ row }) => (
           <div>
@@ -143,19 +107,7 @@ export function Sites() {
       {
         accessorKey: "public",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Public
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Public</SortableHeader>
         ),
         cell: ({ row }) => (
           <div>
@@ -170,19 +122,7 @@ export function Sites() {
       {
         accessorKey: "eventsLast24Hours",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Events (24h)
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Events (24h)</SortableHeader>
         ),
         cell: ({ row }) => (
           <div>
@@ -193,19 +133,7 @@ export function Sites() {
       {
         accessorKey: "organizationOwnerEmail",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent"
-          >
-            Owner Email
-            {{
-              asc: <ArrowUp className="ml-2 h-4 w-4" />,
-              desc: <ArrowDown className="ml-2 h-4 w-4" />,
-            }[column.getIsSorted() as string] ?? (
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
+          <SortableHeader column={column}>Owner Email</SortableHeader>
         ),
         cell: ({ row }) => (
           <div>{row.getValue("organizationOwnerEmail") || "-"}</div>
@@ -233,28 +161,19 @@ export function Sites() {
 
   if (isError) {
     return (
-      <Alert variant="destructive" className="mb-4">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load sites data. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <AdminLayout title="Sites">
+        <ErrorAlert message="Failed to load sites data. Please try again later." />
+      </AdminLayout>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">Sites</h2>
-      </div>
-
+    <AdminLayout title="Sites">
       <div className="mb-4">
-        <Input
+        <SearchInput
           placeholder="Search by domain or owner email..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
+          onChange={setSearchQuery}
         />
       </div>
 
@@ -332,14 +251,19 @@ export function Sites() {
       </div>
 
       <div className="mt-4">
-        <SiteTablePagination
+        <AdminTablePagination
           table={table}
-          data={filteredSites}
+          data={
+            filteredSites
+              ? { items: filteredSites, total: filteredSites.length }
+              : undefined
+          }
           pagination={pagination}
           setPagination={setPagination}
           isLoading={isLoading}
+          itemName="sites"
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }
