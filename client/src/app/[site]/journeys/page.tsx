@@ -432,7 +432,7 @@ export default function JourneysPage() {
   }, [data, steps, maxJourneys, siteMetadata]);
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="User Journeys">
       <div className="container mx-auto p-2 md:p-4">
         <div className="md:hidden mb-2">
           <MobileSidebar />

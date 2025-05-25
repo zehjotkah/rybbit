@@ -28,7 +28,7 @@ export default function RealtimePage() {
   const { data } = useGetLiveUsercount(Number(minutes));
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="Realtime">
       <div className="relative overflow-hidden" ref={ref}>
         <World width={width ?? 0} />
 

@@ -14,7 +14,7 @@ export default function MapPage() {
   const [mapMode, setMapMode] = useState<"total" | "perCapita">("total");
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="Map">
       <div className="relative w-full h-[calc(100vh-45px)]">
         <div className="p-2 md:p-4 relative z-50">
           <SubHeader />

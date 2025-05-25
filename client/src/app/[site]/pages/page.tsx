@@ -111,7 +111,7 @@ export default function Pages() {
   ]);
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="pages">
       <div className="p-2 md:p-4 max-w-[1100px] mx-auto space-y-3">
         <SubHeader />
 

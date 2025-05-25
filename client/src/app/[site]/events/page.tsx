@@ -16,7 +16,7 @@ export default function EventsPage() {
     useGetEventNames();
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="Events">
       <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
         <SubHeader availableFilters={EVENT_FILTERS} />
 

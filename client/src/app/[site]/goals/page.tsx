@@ -83,7 +83,7 @@ export default function GoalsPage() {
   );
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="Goals">
       <div className="p-2 md:p-4 max-w-[1400px] mx-auto space-y-3">
         <SubHeader availableFilters={GOALS_PAGE_FILTERS} />
         <div className="flex items-center justify-between">

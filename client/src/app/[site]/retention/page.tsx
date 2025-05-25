@@ -218,7 +218,7 @@ export default function RetentionPage() {
       : [];
 
   return (
-    <DisabledOverlay>
+    <DisabledOverlay message="Retention">
       <div className="p-2 md:p-4 max-w-[1300px] mx-auto flex flex-col gap-3">
         {/* Single Card containing both chart and grid */}
         <FilterControls />
