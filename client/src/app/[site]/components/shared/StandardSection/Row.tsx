@@ -142,7 +142,7 @@ const Subrows = ({
   }
 
   return (
-    <div className="flex flex-col gap-2 pl-2 pt-2">
+    <div className="flex flex-col gap-2 pl-5 pt-2">
       {itemsForDisplay?.map((e) => (
         <RowItem
           key={getKey(e)}
