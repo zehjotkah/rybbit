@@ -4,6 +4,7 @@ import { sites, member, user } from "../db/postgres/schema.js";
 import { inArray, eq } from "drizzle-orm";
 import { db } from "../db/postgres/postgres.js";
 import { isSitePublic } from "../utils.js";
+import NodeCache from "node-cache";
 
 export function mapHeaders(headers: any) {
   const entries = Object.entries(headers);
@@ -38,6 +39,12 @@ export async function getUserGodMode(req: FastifyRequest) {
   return userRecord.length > 0 && userRecord[0].godMode;
 }
 
+const sitesAccessCache = new NodeCache({
+  stdTTL: 15,
+  checkperiod: 30,
+  useClones: false, // Don't clone objects for better performance with promises
+});
+
 export async function getSitesUserHasAccessTo(
   req: FastifyRequest,
   adminOnly = false
@@ -50,48 +57,73 @@ export async function getSitesUserHasAccessTo(
     return [];
   }
 
-  try {
-    // Fetch user godMode status and member records in parallel
-    const [userRecord, memberRecords] = await Promise.all([
-      db
-        .select({ godMode: user.godMode })
-        .from(user)
-        .where(eq(user.id, userId))
-        .limit(1),
-      db
-        .select({ organizationId: member.organizationId, role: member.role })
-        .from(member)
-        .where(eq(member.userId, userId)),
-    ]);
+  // Create cache key
+  const cacheKey = `${userId}:${adminOnly}`;
 
-    const hasGodMode = userRecord.length > 0 && userRecord[0].godMode;
+  // Check if we have a cached promise
+  const cached = sitesAccessCache.get<Promise<any[]>>(cacheKey);
+  if (cached) {
+    // console.log(
+    //   `[Cache HIT] getSitesUserHasAccessTo for userId: ${userId}, adminOnly: ${adminOnly}`
+    // );
+    return cached;
+  }
 
-    // If user has godMode, return all sites
-    if (hasGodMode) {
-      const allSites = await db.select().from(sites);
-      return allSites;
-    }
+  // console.log(
+  //   `[Cache MISS] getSitesUserHasAccessTo for userId: ${userId}, adminOnly: ${adminOnly}`
+  // );
 
-    if (!memberRecords || memberRecords.length === 0) {
+  // Create new promise and cache it
+  const promise = (async () => {
+    try {
+      // Fetch user godMode status and member records in parallel
+      const [userRecord, memberRecords] = await Promise.all([
+        db
+          .select({ godMode: user.godMode })
+          .from(user)
+          .where(eq(user.id, userId))
+          .limit(1),
+        db
+          .select({ organizationId: member.organizationId, role: member.role })
+          .from(member)
+          .where(eq(member.userId, userId)),
+      ]);
+      const hasGodMode = userRecord.length > 0 && userRecord[0].godMode;
+
+      // If user has godMode, return all sites
+      if (hasGodMode) {
+        const allSites = await db.select().from(sites);
+        return allSites;
+      }
+
+      if (!memberRecords || memberRecords.length === 0) {
+        return [];
+      }
+
+      // Extract organization IDs
+      const organizationIds = memberRecords
+        .filter((record) => !adminOnly || record.role !== "member")
+        .map((record) => record.organizationId);
+
+      // Get sites for these organizations
+      const siteRecords = await db
+        .select()
+        .from(sites)
+        .where(inArray(sites.organizationId, organizationIds));
+
+      return siteRecords;
+    } catch (error) {
+      console.error("Error getting sites user has access to:", error);
+      // Remove from cache on error so it can be retried
+      sitesAccessCache.del(cacheKey);
       return [];
     }
+  })();
 
-    // Extract organization IDs
-    const organizationIds = memberRecords
-      .filter((record) => !adminOnly || record.role !== "member")
-      .map((record) => record.organizationId);
+  // Cache the promise
+  sitesAccessCache.set(cacheKey, promise);
 
-    // Get sites for these organizations
-    const siteRecords = await db
-      .select()
-      .from(sites)
-      .where(inArray(sites.organizationId, organizationIds));
-
-    return siteRecords;
-  } catch (error) {
-    console.error("Error getting sites user has access to:", error);
-    return [];
-  }
+  return promise;
 }
 
 // for routes that are potentially public

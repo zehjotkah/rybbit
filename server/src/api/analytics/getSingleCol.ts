@@ -374,25 +374,28 @@ export async function getSingleCol(
   const isPaginatedRequest = page !== undefined;
 
   const dataQuery = getQuery(req, false);
+  const countQuery = getQuery(req, true);
 
   try {
-    const dataResult = await clickhouse.query({
-      query: dataQuery,
-      format: "JSONEachRow",
-      query_params: {
-        siteId: Number(site),
-      },
-    });
-    const items = await processResults<SingleColItem>(dataResult);
+    // Run both queries in parallel
+    const [dataResult, countResult] = await Promise.all([
+      clickhouse.query({
+        query: dataQuery,
+        format: "JSONEachRow",
+        query_params: {
+          siteId: Number(site),
+        },
+      }),
+      clickhouse.query({
+        query: countQuery,
+        format: "JSONEachRow",
+        query_params: {
+          siteId: Number(site),
+        },
+      }),
+    ]);
 
-    const countQuery = getQuery(req, true);
-    const countResult = await clickhouse.query({
-      query: countQuery,
-      format: "JSONEachRow",
-      query_params: {
-        siteId: Number(site),
-      },
-    });
+    const items = await processResults<SingleColItem>(dataResult);
     const countData = await processResults<{ totalCount: number }>(countResult);
     const totalCount = countData.length > 0 ? countData[0].totalCount : 0;
 
@@ -401,7 +404,6 @@ export async function getSingleCol(
     console.error(`Error fetching ${parameter}:`, error);
     console.error("Failed dataQuery:", dataQuery);
     if (isPaginatedRequest) {
-      const countQuery = getQuery(req, true);
       console.error("Failed countQuery:", countQuery);
     }
     return res.status(500).send({ error: `Failed to fetch ${parameter}` });
