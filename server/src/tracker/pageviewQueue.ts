@@ -29,7 +29,7 @@ const getParsedProperties = (properties: string | undefined) => {
 class PageviewQueue {
   private queue: TotalPayload[] = [];
   private batchSize = 5000;
-  private interval = 10000; // 10 seconds
+  private interval = 10000;
   private processing = false;
 
   constructor() {
