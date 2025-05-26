@@ -127,6 +127,9 @@ export const getSqlParam = (parameter: FilterParameter) => {
   if (parameter === "dimensions") {
     return "concat(toString(screen_width), 'x', toString(screen_height))";
   }
+  if (parameter === "city") {
+    return "concat(toString(region), '-', toString(city))";
+  }
   return filterParamSchema.parse(parameter);
 };
 
