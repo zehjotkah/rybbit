@@ -130,6 +130,16 @@ export const getSqlParam = (parameter: FilterParameter) => {
   if (parameter === "city") {
     return "concat(toString(region), '-', toString(city))";
   }
+  if (parameter === "browser_version") {
+    return "concat(toString(browser), ' ', toString(browser_version))";
+  }
+  if (parameter === "operating_system_version") {
+    return `CASE 
+      WHEN concat(toString(operating_system), ' ', toString(operating_system_version)) = 'Windows 10' 
+      THEN 'Windows 10/11' 
+      ELSE concat(toString(operating_system), ' ', toString(operating_system_version)) 
+    END`;
+  }
   return filterParamSchema.parse(parameter);
 };
 
