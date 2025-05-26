@@ -190,9 +190,6 @@ export async function updateUsersMonthlyUsage() {
   );
 
   try {
-    // Clear the previous list of sites over their limit
-    sitesOverLimit.clear();
-
     // Get all users with their Stripe customer ID
     const users = await db
       .select({
@@ -240,6 +237,10 @@ export async function updateUsersMonthlyUsage() {
           console.log(
             `[Monthly Usage Checker] User ${userData.email} is over limit. Added ${siteIds.length} sites to blocked list.`
           );
+        } else {
+          for (const siteId of siteIds) {
+            sitesOverLimit.delete(siteId);
+          }
         }
 
         // Format additional date info for logging if available
