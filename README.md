@@ -7,7 +7,7 @@
 
 <p align="center">
     <a href="https://rybbit.io" target="_blank">Website</a> |
-    <a href="https://demo.rybbit.io/1" target="_blank">Demo</a> |
+    <a href="https://demo.rybbit.io/21" target="_blank">Demo</a> |
     <a href="https://rybbit.io/docs" target="_blank">Documentation</a> |
     <a href="https://discord.gg/DEhGb4hYBj" target="_blank">Discord</a> |
     <a href="https://github.com/rybbit-io/rybbit?tab=AGPL-3.0-1-ov-file" target="_blank">License (AGPL-3)</a>
@@ -18,7 +18,7 @@
 <a href="https://rybbit.io/" target="_blank">Rybbit</a> is the modern open source and privacy friendly alternative to Google Analytics. It takes only a couple minutes to setup and is super intuitive to use.
 
 <p align="center">
-  <strong><a href="https://demo.rybbit.io/1">🔍 View Live Demo</a></strong> - See Rybbit running on a real-life production site with over a million visits a month.
+  <strong><a href="https://demo.rybbit.io/21">🔍 View Live Demo</a></strong> - See Rybbit running on a real-life production site with over a million visits a month.
 </p>
 
 <hr>
