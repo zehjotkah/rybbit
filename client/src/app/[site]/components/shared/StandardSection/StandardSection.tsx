@@ -7,7 +7,7 @@ import { usePaginatedSingleCol } from "../../../../../api/analytics/usePaginated
 import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { CardLoader } from "../../../../../components/ui/card";
 import { FilterParameter } from "../../../../../lib/store";
-import { BaseStandardSectionDialog } from "./BaseStandardSectionDialog";
+import { StandardSectionDialog } from "./StandardSectionDialog";
 import { Row } from "./Row";
 import { Skeleton } from "./Skeleton";
 
@@ -115,7 +115,7 @@ export function StandardSection({
         )}
         {!isLoading && !error && itemsForDisplay?.length ? (
           <div className="flex flex-row gap-2 justify-between items-center">
-            <BaseStandardSectionDialog
+            <StandardSectionDialog
               title={title}
               ratio={ratio}
               getKey={getKey}

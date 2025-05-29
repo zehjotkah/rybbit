@@ -17,7 +17,7 @@ export default function SiteLayout({
 }) {
   const pathname = usePathname();
   const { setSite, site } = useStore();
-  const { data: siteHasData, isLoading } = useSiteHasData(site);
+  const { isLoading } = useSiteHasData(site);
 
   const { data: siteMetadata, isLoading: isLoadingSiteMetadata } =
     useGetSite(site);

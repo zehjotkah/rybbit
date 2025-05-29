@@ -27,7 +27,7 @@ import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { addFilter, FilterParameter } from "../../../../../lib/store";
 import { cn, formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 
-interface BaseStandardSectionDialogProps {
+interface StandardSectionDialogProps {
   title: string;
   ratio: number;
   getKey: (item: SingleColResponse) => string;
@@ -43,7 +43,7 @@ interface BaseStandardSectionDialogProps {
 
 const columnHelper = createColumnHelper<SingleColResponse>();
 
-export function BaseStandardSectionDialog({
+export function StandardSectionDialog({
   title,
   ratio,
   getKey,
@@ -55,7 +55,7 @@ export function BaseStandardSectionDialog({
   filterParameter,
   expanded,
   close,
-}: BaseStandardSectionDialogProps) {
+}: StandardSectionDialogProps) {
   const {
     data,
     isLoading,
