@@ -33,16 +33,28 @@ export default function Home() {
     refetch: refetchOrganizations,
   } = useUserOrganizations();
 
-  const disabled =
-    !userOrganizationsData?.[0] || userOrganizationsData?.[0].role === "member";
+  // Consolidated loading state
+  const isLoading = isLoadingOrganizations || isPending || isLoadingSites;
+
+  // Check if user has organizations
+  const hasOrganizations =
+    Array.isArray(userOrganizationsData) && userOrganizationsData.length > 0;
+  const hasNoOrganizations = !isLoading && !hasOrganizations;
+
+  // Check user permissions for the active organization
+  const activeOrgMembership = userOrganizationsData?.find(
+    (org) => org.id === activeOrganization?.id
+  );
+
+  const isUserMember = activeOrgMembership?.role === "member";
+  const canAddSites = hasOrganizations && !isUserMember;
+
+  // Check if we should show sites content
+  const shouldShowSites = hasOrganizations && !isLoading;
+  const hasNoSites =
+    shouldShowSites && (!sites?.sites || sites.sites.length === 0);
 
   const [createOrgDialogOpen, setCreateOrgDialogOpen] = useState(false);
-
-  // Check if the user has no organizations and is not in a loading state
-  const hasNoOrganizations =
-    !isLoadingOrganizations &&
-    Array.isArray(userOrganizationsData) &&
-    userOrganizationsData.length === 0;
 
   // Handle successful organization creation
   const handleOrganizationCreated = () => {
@@ -57,7 +69,7 @@ export default function Home() {
           <OrganizationSelector />
         </div>
         {/* <div className="text-2xl font-bold">{sites?.length} Websites</div> */}
-        <AddSite disabled={hasNoOrganizations || disabled} />
+        <AddSite disabled={!canAddSites} />
       </div>
       {/* Organization required message */}
       {hasNoOrganizations && <NoOrganization />}
@@ -76,31 +88,22 @@ export default function Home() {
         })}
 
         {/* No websites message */}
-        {!hasNoOrganizations &&
-          (!sites?.sites || sites?.sites?.length === 0) &&
-          !isLoadingOrganizations &&
-          !isLoadingSites && (
-            <Card className="col-span-full p-6 flex flex-col items-center text-center">
-              <CardTitle className="mb-2 text-xl">No websites yet</CardTitle>
-              <CardDescription className="mb-4">
-                Add your first website to start tracking analytics
-              </CardDescription>
-              <AddSite
-                trigger={
-                  <Button
-                    variant="success"
-                    disabled={
-                      !userOrganizationsData?.[0] ||
-                      userOrganizationsData?.[0].role === "member"
-                    }
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Website
-                  </Button>
-                }
-              />
-            </Card>
-          )}
+        {hasNoSites && (
+          <Card className="col-span-full p-6 flex flex-col items-center text-center">
+            <CardTitle className="mb-2 text-xl">No websites yet</CardTitle>
+            <CardDescription className="mb-4">
+              Add your first website to start tracking analytics
+            </CardDescription>
+            <AddSite
+              trigger={
+                <Button variant="success" disabled={!canAddSites}>
+                  <Plus className="h-4 w-4" />
+                  Add Website
+                </Button>
+              }
+            />
+          </Card>
+        )}
       </div>
 
       <CreateOrganizationDialog
