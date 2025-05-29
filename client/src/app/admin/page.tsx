@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Sites } from "./components/sites/Sites";
 import { OrgUsersList } from "./components/users/OrgUsersList";
 import { Users } from "./components/users/Users";
+import { Organizations } from "./components/organizations/Organizations";
 import { AdminLayout } from "./components/shared/AdminLayout";
 
 export default function AdminPage() {
@@ -22,6 +23,7 @@ export default function AdminPage() {
           <TabsList className="mb-4">
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="org-users">Organization Owners</TabsTrigger>
+            <TabsTrigger value="organizations">Organizations</TabsTrigger>
             <TabsTrigger value="sites">Sites</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -32,6 +34,10 @@ export default function AdminPage() {
 
           <TabsContent value="org-users">
             <OrgUsersList />
+          </TabsContent>
+
+          <TabsContent value="organizations">
+            <Organizations />
           </TabsContent>
 
           <TabsContent value="sites">
