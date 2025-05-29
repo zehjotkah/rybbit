@@ -49,8 +49,6 @@ import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
 import { createPortalSession } from "./api/stripe/createPortalSession.js";
 import { getSubscription } from "./api/stripe/getSubscription.js";
 import { handleWebhook } from "./api/stripe/webhook.js";
-import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
-import { createAccount } from "./api/user/createAccount.js";
 import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { initializeCronJobs } from "./cron/index.js";
@@ -200,7 +198,9 @@ server.addHook("onRequest", async (request, reply) => {
 });
 
 // Analytics
-server.get("/live-user-count/:site", getLiveUsercount);
+
+// This endpoint gets called a lot so we don't want to log it
+server.get("/live-user-count/:site", { logLevel: "silent" }, getLiveUsercount);
 server.get("/overview/:site", getOverview);
 server.get("/overview-bucketed/:site", getOverviewBucketed);
 server.get("/single-col/:site", getSingleCol);
@@ -242,13 +242,11 @@ server.post("/delete-site/:id", deleteSite);
 server.get("/get-sites", getSites);
 server.get("/get-sites-from-org/:organizationId", getSitesFromOrg);
 server.get("/get-site/:id", getSite);
-server.post("/create-account", createAccount);
 server.get(
   "/list-organization-members/:organizationId",
   listOrganizationMembers
 );
 server.get("/user/organizations", getUserOrganizations);
-server.post("/add-user-to-organization", addUserToOrganization);
 
 if (IS_CLOUD) {
   // Stripe Routes
