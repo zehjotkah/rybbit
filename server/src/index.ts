@@ -5,7 +5,6 @@ import Fastify from "fastify";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { getAdminSites } from "./api/admin/getAdminSites.js";
-import { getAdminUsers } from "./api/admin/getAdminUsers.js";
 import { getAdminOrganizations } from "./api/admin/getAdminOrganizations.js";
 import { createFunnel } from "./api/analytics/createFunnel.js";
 import { createGoal } from "./api/analytics/createGoal.js";
@@ -260,7 +259,6 @@ if (IS_CLOUD) {
 
   // Admin Routes
   server.get("/admin/sites", getAdminSites);
-  server.get("/admin/users", getAdminUsers);
   server.get("/admin/organizations", getAdminOrganizations);
 }
 
