@@ -70,16 +70,6 @@ export type GetSitesFromOrgResponse = {
   };
 };
 
-export function useGetSites() {
-  return useQuery<GetSitesResponse>({
-    queryKey: ["get-sites"],
-    queryFn: () => {
-      return authedFetchWithError(`${BACKEND_URL}/get-sites`);
-    },
-    staleTime: Infinity,
-  });
-}
-
 export function useGetSitesFromOrg(organizationId?: string) {
   return useQuery<GetSitesFromOrgResponse>({
     queryKey: ["get-sites-from-org", organizationId],
@@ -91,10 +81,6 @@ export function useGetSitesFromOrg(organizationId?: string) {
     staleTime: 60000, // 1 minute
     enabled: !!organizationId,
   });
-}
-
-export async function getSites() {
-  return authedFetchWithError<GetSitesResponse>(`${BACKEND_URL}/get-sites`);
 }
 
 export function addSite(

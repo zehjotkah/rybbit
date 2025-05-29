@@ -43,7 +43,6 @@ import { deleteSite } from "./api/sites/deleteSite.js";
 import { getSite } from "./api/sites/getSite.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSiteIsPublic } from "./api/sites/getSiteIsPublic.js";
-import { getSites } from "./api/sites/getSites.js";
 import { getSitesFromOrg } from "./api/sites/getSitesFromOrg.js";
 import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
 import { createPortalSession } from "./api/stripe/createPortalSession.js";
@@ -239,7 +238,6 @@ server.post("/change-site-public", changeSitePublic);
 server.post("/change-site-salt", changeSiteSalt);
 server.post("/change-site-block-bots", changeSiteBlockBots);
 server.post("/delete-site/:id", deleteSite);
-server.get("/get-sites", getSites);
 server.get("/get-sites-from-org/:organizationId", getSitesFromOrg);
 server.get("/get-site/:id", getSite);
 server.get(
