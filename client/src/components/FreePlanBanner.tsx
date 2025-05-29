@@ -1,11 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useCurrentSite } from "../api/admin/sites";
-import { DEFAULT_EVENT_LIMIT } from "../app/settings/subscription/utils/constants";
+import { DEFAULT_EVENT_LIMIT } from "../lib/subscription/constants";
 import { Button } from "./ui/button";
 
 export function FreePlanBanner() {
-  const site = useCurrentSite();
+  const { site, subscription } = useCurrentSite();
 
   if (!site) return null;
 
@@ -14,14 +14,17 @@ export function FreePlanBanner() {
     return num.toLocaleString();
   };
 
-  if (site.eventLimit === DEFAULT_EVENT_LIMIT) {
+  if (subscription?.eventLimit === DEFAULT_EVENT_LIMIT) {
     return (
       <div className="mt-4 px-4 py-3 rounded-lg border border-blue-100 dark:border-blue-400/30 bg-blue-50/80 dark:bg-blue-900/20 text-sm flex gap-4 items-center">
         <div className="text-blue-700 dark:text-blue-300 flex items-center font-medium">
           <span>
             Free plan: Using{" "}
-            <strong>{formatNumber(site.monthlyEventCount)}</strong> of{" "}
-            {formatNumber(site.eventLimit)} events
+            <strong>
+              {formatNumber(subscription?.monthlyEventCount || 0)}
+            </strong>{" "}
+            of <strong>{formatNumber(subscription?.eventLimit || 0)}</strong>{" "}
+            events
           </span>
         </div>
         {site.isOwner && (

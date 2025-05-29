@@ -13,6 +13,7 @@ import "./globals.css";
 import Script from "next/script";
 import { useStopImpersonation } from "@/hooks/useStopImpersonation";
 import { ReactScan } from "./ReactScan";
+import { OrganizationInitializer } from "../components/OrganizationInitializer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -91,7 +92,10 @@ export default function RootLayout({
             inter.className
           )}
         >
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <OrganizationInitializer />
+            {children}
+          </QueryProvider>
           <Toaster />
         </body>
       </TooltipProvider>

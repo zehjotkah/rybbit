@@ -2,16 +2,16 @@ import { Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DateTime } from "luxon";
-import { Alert } from "../../../../components/ui/alert";
-import { Button } from "../../../../components/ui/button";
-import { Card, CardContent } from "../../../../components/ui/card";
-import { Progress } from "../../../../components/ui/progress";
-import { useUserOrganizations } from "../../../../api/admin/organizations";
-import { BACKEND_URL } from "../../../../lib/const";
-import { getStripePrices } from "../../../../lib/stripe";
-import { formatDate } from "../utils/planUtils";
-import { useStripeSubscription } from "../utils/useStripeSubscription";
-import { UsageChart } from "../../../../components/UsageChart";
+import { Alert } from "../ui/alert";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Progress } from "../ui/progress";
+import { BACKEND_URL } from "../../lib/const";
+import { getStripePrices } from "../../lib/stripe";
+import { formatDate } from "../../lib/subscription/planUtils";
+import { useStripeSubscription } from "../../lib/subscription/useStripeSubscription";
+import { UsageChart } from "../UsageChart";
+import { authClient } from "@/lib/auth";
 
 export function ProPlan() {
   const {
@@ -21,10 +21,10 @@ export function ProPlan() {
     refetch,
   } = useStripeSubscription();
 
-  const { data: organizations } = useUserOrganizations();
+  const { data: activeOrg } = authClient.useActiveOrganization();
 
-  // Get the first organization (assuming user is part of one organization for now)
-  const organizationId = organizations?.[0]?.id;
+  // Get the active organization ID
+  const organizationId = activeOrg?.id;
 
   // Get last 30 days of data for the chart
   const endDate = DateTime.now().toISODate();
@@ -58,6 +58,11 @@ export function ProPlan() {
     : null;
 
   const createPortalSession = async (flowType?: string) => {
+    if (!organizationId) {
+      toast.error("No organization selected");
+      return;
+    }
+
     setActionError(null);
     setIsProcessing(true);
     try {
@@ -71,6 +76,7 @@ export function ProPlan() {
           credentials: "include",
           body: JSON.stringify({
             returnUrl: window.location.href,
+            organizationId,
             flowType,
           }),
         }

@@ -1,10 +1,9 @@
 import { ArrowRight, Crown } from "lucide-react";
 import Link from "next/link";
 import React, { ReactNode } from "react";
-import { useStripeSubscription } from "../app/settings/subscription/utils/useStripeSubscription";
-import { Button } from "./ui/button";
 import { useCurrentSite } from "../api/admin/sites";
-import { DEFAULT_EVENT_LIMIT } from "../app/settings/subscription/utils/constants";
+import { DEFAULT_EVENT_LIMIT } from "../lib/subscription/constants";
+import { Button } from "./ui/button";
 
 interface DisabledOverlayProps {
   children: ReactNode;
@@ -57,9 +56,9 @@ export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
   showMessage = true,
   style,
 }) => {
-  const site = useCurrentSite();
+  const { subscription, site } = useCurrentSite();
 
-  const disabled = site?.eventLimit === DEFAULT_EVENT_LIMIT;
+  const disabled = subscription?.eventLimit === DEFAULT_EVENT_LIMIT;
 
   if (!disabled) {
     return <>{children}</>;
@@ -82,7 +81,7 @@ export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
       >
         {showMessage && (
           <div className="flex items-center justify-center">
-            {site.isOwner ? ownerMessage(message) : userMessage(message)}
+            {site?.isOwner ? ownerMessage(message) : userMessage(message)}
           </div>
         )}
       </div>

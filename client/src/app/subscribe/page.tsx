@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { DateTime } from "luxon";
 import { TrendingUp } from "lucide-react";
 import { StandardPage } from "../../components/StandardPage";
-import { useStripeSubscription } from "../settings/subscription/utils/useStripeSubscription";
-import { useUserOrganizations } from "../../api/admin/organizations";
+import { useStripeSubscription } from "../../lib/subscription/useStripeSubscription";
 import { useGetOrgEventCount } from "../../api/analytics/useGetOrgEventCount";
 import { UsageChart } from "../../components/UsageChart";
 import { PricingHeader } from "./components/PricingHeader";
@@ -17,16 +16,16 @@ import { FAQSection } from "./components/FAQSection";
 export default function Subscribe() {
   const { data: sessionData } = authClient.useSession();
   const { data: subscription } = useStripeSubscription();
-  const { data: organizations } = useUserOrganizations();
+  const { data: activeOrg } = authClient.useActiveOrganization();
   const router = useRouter();
 
   // Redirect if already subscribed
   if (subscription?.status === "active") {
-    router.push("/settings/subscription");
+    router.push("/organization/subscription");
   }
 
-  // Get the first organization
-  const organizationId = organizations?.[0]?.id;
+  // Get the active organization ID
+  const organizationId = activeOrg?.id;
 
   // Get last 30 days of data
   const endDate = DateTime.now().toISODate();

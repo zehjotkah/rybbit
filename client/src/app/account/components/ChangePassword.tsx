@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "../../../../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -20,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../../components/ui/dialog";
-import { Input } from "../../../../components/ui/input";
-import { Label } from "../../../../components/ui/label";
-import { authClient } from "../../../../lib/auth";
+} from "../../../components/ui/dialog";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { authClient } from "../../../lib/auth";
 
 export function ChangePassword() {
   const [open, setOpen] = useState(false);
@@ -186,7 +186,14 @@ export function ChangePassword() {
               <span>New Password</span>
               {passwordStrength > 0 && (
                 <span
-                  className={cn("text-xs", passwordStrength <= 2 ? "text-red-500" : passwordStrength === 3 ? "text-yellow-500" : "text-green-500")}
+                  className={cn(
+                    "text-xs",
+                    passwordStrength <= 2
+                      ? "text-red-500"
+                      : passwordStrength === 3
+                      ? "text-yellow-500"
+                      : "text-green-500"
+                  )}
                 >
                   {passwordStrength <= 2
                     ? "Weak"
@@ -223,13 +230,25 @@ export function ChangePassword() {
                   {[1, 2, 3, 4].map((index) => (
                     <div
                       key={index}
-                      className={cn("h-1.5 w-1/4 rounded-full transition-colors duration-300", index <= passwordStrength ? getStrengthColor() : "bg-neutral-200 dark:bg-neutral-700")}
+                      className={cn(
+                        "h-1.5 w-1/4 rounded-full transition-colors duration-300",
+                        index <= passwordStrength
+                          ? getStrengthColor()
+                          : "bg-neutral-200 dark:bg-neutral-700"
+                      )}
                     />
                   ))}
                 </div>
                 {passwordFeedback && (
                   <p
-                    className={cn("text-xs mt-1", passwordStrength <= 2 ? "text-red-500" : passwordStrength === 3 ? "text-yellow-500" : "text-green-500")}
+                    className={cn(
+                      "text-xs mt-1",
+                      passwordStrength <= 2
+                        ? "text-red-500"
+                        : passwordStrength === 3
+                        ? "text-yellow-500"
+                        : "text-green-500"
+                    )}
                   >
                     {passwordFeedback}
                   </p>

@@ -7,37 +7,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProPlan } from "./components/ProPlan";
-import { useStripeSubscription } from "./utils/useStripeSubscription";
-import { useUserOrganizations } from "../../../api/admin/organizations";
+import { ProPlan } from "../../../components/subscription/ProPlan";
+import { useStripeSubscription } from "../../../lib/subscription/useStripeSubscription";
 import { NoOrganization } from "../../../components/NoOrganization";
-import { TrialPlan } from "./components/TrialPlan";
-import { ExpiredTrialPlan } from "./components/ExpiredTrialPlan";
+import { TrialPlan } from "../../../components/subscription/TrialPlan";
+import { ExpiredTrialPlan } from "../../../components/subscription/ExpiredTrialPlan";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
-import { FreePlan } from "./components/FreePlan";
+import { FreePlan } from "../../../components/subscription/FreePlan";
 import { Building } from "lucide-react";
+import { authClient } from "@/lib/auth";
 
-export default function SubscriptionPage() {
-  useSetPageTitle("Rybbit · Subscription");
+export default function OrganizationSubscriptionPage() {
+  useSetPageTitle("Rybbit · Organization Subscription");
   const { data: activeSubscription, isLoading: isLoadingSubscription } =
     useStripeSubscription();
 
-  const { data: organizations, isLoading: isLoadingOrganizations } =
-    useUserOrganizations();
+  const { data: activeOrg } = authClient.useActiveOrganization();
+  const { data: session } = authClient.useSession();
 
-  const hasOrganization = !!organizations?.length;
+  // Check if the current user is an owner by looking at the members in the active organization
+  const currentUserMember = activeOrg?.members?.find(
+    (member) => member.userId === session?.user?.id
+  );
+  const isOwner = currentUserMember?.role === "owner";
 
-  const isLoading = isLoadingSubscription || isLoadingOrganizations;
+  const isLoading = isLoadingSubscription;
 
   // Determine which plan to display
   const renderPlanComponent = () => {
-    if (!hasOrganization) {
+    if (!activeOrg) {
       return (
-        <NoOrganization message="You need to be part of an organization to manage your subscription." />
+        <NoOrganization message="You need to select an organization to manage your subscription." />
       );
     }
 
-    if (organizations[0].role !== "owner") {
+    if (!isOwner) {
       return (
         <Card className="p-6 flex flex-col items-center text-center w-full">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -73,16 +77,7 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="py-2">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Subscription</h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Manage your subscription and billing information
-          </p>
-        </div>
-      </div>
-
+    <div className="space-y-6">
       {isLoading ? (
         <Card>
           <CardContent className="pt-6">

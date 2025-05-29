@@ -49,19 +49,6 @@ export function InviteMemberDialog({
 
     setIsLoading(true);
     try {
-      // await fetch(`${BACKEND_URL}/add-user-to-organization`, {
-      //   method: "POST",
-      //   body: JSON.stringify({
-      //     email: email,
-      //     role: role,
-      //     organizationId: organizationId,
-      //   }),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   credentials: "include",
-      // });
-
       await authClient.organization.inviteMember({
         email,
         role,
@@ -119,7 +106,7 @@ export function InviteMemberDialog({
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                {/* <SelectItem value="owner">Owner</SelectItem> */}
+                <SelectItem value="owner">Owner</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
               </SelectContent>

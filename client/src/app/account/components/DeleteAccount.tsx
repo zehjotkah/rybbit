@@ -15,12 +15,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../../../components/ui/alert-dialog";
-import { Button } from "../../../../components/ui/button";
-import { Input } from "../../../../components/ui/input";
-import { Label } from "../../../../components/ui/label";
-import { authClient } from "../../../../lib/auth";
-import { cn } from "../../../../lib/utils";
+} from "../../../components/ui/alert-dialog";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { authClient } from "../../../lib/auth";
+import { cn } from "../../../lib/utils";
 
 export function DeleteAccount() {
   const [isDeleting, setIsDeleting] = useState(false);

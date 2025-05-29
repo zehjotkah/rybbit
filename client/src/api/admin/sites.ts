@@ -3,6 +3,7 @@ import { BACKEND_URL } from "../../lib/const";
 import { useStore } from "../../lib/store";
 import { authedFetchWithError } from "../utils";
 import { usePathname } from "next/navigation";
+import { authClient } from "../../lib/auth";
 
 export type SiteResponse = {
   siteId: number;
@@ -11,6 +12,7 @@ export type SiteResponse = {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  organizationId: string | null;
   public: boolean;
   saltUserIds: boolean;
   blockBots: boolean;
@@ -33,6 +35,41 @@ export type GetSitesResponse = {
   isOwner?: boolean;
 }[];
 
+export type GetSitesFromOrgResponse = {
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string | null;
+    createdAt: string;
+    metadata: string | null;
+    stripeCustomerId: string | null;
+    monthlyEventCount: number | null;
+    overMonthlyLimit: boolean | null;
+  } | null;
+  sites: Array<{
+    siteId: number;
+    name: string;
+    domain: string;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    organizationId: string | null;
+    public: boolean | null;
+    saltUserIds: boolean | null;
+    blockBots: boolean;
+    sessionsLast24Hours: number;
+    isOwner: boolean;
+  }>;
+  subscription: {
+    monthlyEventCount: number;
+    eventLimit: number;
+    overMonthlyLimit: boolean;
+    planName: string;
+    status: string;
+  };
+};
+
 export function useGetSites() {
   return useQuery<GetSitesResponse>({
     queryKey: ["get-sites"],
@@ -40,6 +77,19 @@ export function useGetSites() {
       return authedFetchWithError(`${BACKEND_URL}/get-sites`);
     },
     staleTime: Infinity,
+  });
+}
+
+export function useGetSitesFromOrg(organizationId?: string) {
+  return useQuery<GetSitesFromOrgResponse>({
+    queryKey: ["get-sites-from-org", organizationId],
+    queryFn: () => {
+      return authedFetchWithError(
+        `${BACKEND_URL}/get-sites-from-org/${organizationId}`
+      );
+    },
+    staleTime: 60000, // 1 minute
+    enabled: !!organizationId,
   });
 }
 
@@ -171,8 +221,14 @@ export function changeSiteBlockBots(siteId: number, blockBots: boolean) {
 }
 
 export const useCurrentSite = () => {
-  const { data: sites } = useGetSites();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const { data: sites } = useGetSitesFromOrg(activeOrganization?.id);
   const pathname = usePathname();
 
-  return sites?.find((site) => site.siteId === Number(pathname.split("/")[1]));
+  return {
+    site: sites?.sites.find(
+      (site) => site.siteId === Number(pathname.split("/")[1])
+    ),
+    subscription: sites?.subscription,
+  };
 };
