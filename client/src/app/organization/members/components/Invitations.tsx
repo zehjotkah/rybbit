@@ -32,8 +32,11 @@ export function Invitations({ organizationId, isOwner }: InvitationsProps) {
     null
   );
 
-  const { data: invitations, refetch: refetchInvitations } =
-    useOrganizationInvitations(organizationId);
+  const {
+    data: invitations,
+    refetch: refetchInvitations,
+    isLoading: invitationsLoading,
+  } = useOrganizationInvitations(organizationId);
 
   const handleCancelInvitation = async (invitationId: string) => {
     try {
@@ -101,62 +104,91 @@ export function Invitations({ organizationId, isOwner }: InvitationsProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invitations?.length && invitations.length > 0 ? (
-              invitations.map((invitation) => (
-                <TableRow key={invitation.id}>
-                  <TableCell>{invitation.email}</TableCell>
-                  <TableCell className="capitalize">
-                    {invitation.role}
+            {invitationsLoading ? (
+              // Loading skeleton rows
+              Array.from({ length: 2 }).map((_, index) => (
+                <TableRow key={`loading-${index}`}>
+                  <TableCell>
+                    <div className="h-4 bg-muted animate-pulse rounded w-32"></div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getBadgeVariant(invitation.status)}>
-                      {invitation.status}
-                    </Badge>
+                    <div className="h-4 bg-muted animate-pulse rounded w-16"></div>
                   </TableCell>
                   <TableCell>
-                    {DateTime.fromJSDate(
-                      new Date(invitation.expiresAt)
-                    ).toLocaleString(DateTime.DATE_SHORT)}
+                    <div className="h-6 bg-muted animate-pulse rounded w-20"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-muted animate-pulse rounded w-20"></div>
                   </TableCell>
                   {isOwner && (
-                    <TableCell className="text-right">
-                      {invitation.status === "pending" && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          disabled={loadingInvitationId === invitation.id}
-                          onClick={() => handleCancelInvitation(invitation.id)}
-                        >
-                          {loadingInvitationId === invitation.id
-                            ? "Processing..."
-                            : "Cancel"}
-                        </Button>
-                      )}
-                      {invitation.status === "canceled" && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          disabled={loadingInvitationId === invitation.id}
-                          onClick={() => handleResendInvitation(invitation)}
-                        >
-                          {loadingInvitationId === invitation.id
-                            ? "Processing..."
-                            : "Resend"}
-                        </Button>
-                      )}
+                    <TableCell>
+                      <div className="h-8 bg-muted animate-pulse rounded w-16 ml-auto"></div>
                     </TableCell>
                   )}
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={isOwner ? 5 : 4}
-                  className="text-center py-6 text-muted-foreground"
-                >
-                  No pending invitations
-                </TableCell>
-              </TableRow>
+              <>
+                {invitations?.length && invitations.length > 0 ? (
+                  invitations.map((invitation) => (
+                    <TableRow key={invitation.id}>
+                      <TableCell>{invitation.email}</TableCell>
+                      <TableCell className="capitalize">
+                        {invitation.role}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getBadgeVariant(invitation.status)}>
+                          {invitation.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {DateTime.fromJSDate(
+                          new Date(invitation.expiresAt)
+                        ).toLocaleString(DateTime.DATE_SHORT)}
+                      </TableCell>
+                      {isOwner && (
+                        <TableCell className="text-right">
+                          {invitation.status === "pending" && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              disabled={loadingInvitationId === invitation.id}
+                              onClick={() =>
+                                handleCancelInvitation(invitation.id)
+                              }
+                            >
+                              {loadingInvitationId === invitation.id
+                                ? "Processing..."
+                                : "Cancel"}
+                            </Button>
+                          )}
+                          {invitation.status === "canceled" && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              disabled={loadingInvitationId === invitation.id}
+                              onClick={() => handleResendInvitation(invitation)}
+                            >
+                              {loadingInvitationId === invitation.id
+                                ? "Processing..."
+                                : "Resend"}
+                            </Button>
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={isOwner ? 5 : 4}
+                      className="text-center py-6 text-muted-foreground"
+                    >
+                      No pending invitations
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             )}
           </TableBody>
         </Table>

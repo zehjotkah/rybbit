@@ -22,7 +22,7 @@ export default function OrganizationSubscriptionPage() {
   const { data: activeSubscription, isLoading: isLoadingSubscription } =
     useStripeSubscription();
 
-  const { data: activeOrg } = authClient.useActiveOrganization();
+  const { data: activeOrg, isPending } = authClient.useActiveOrganization();
   const { data: session } = authClient.useSession();
 
   // Check if the current user is an owner by looking at the members in the active organization
@@ -31,11 +31,11 @@ export default function OrganizationSubscriptionPage() {
   );
   const isOwner = currentUserMember?.role === "owner";
 
-  const isLoading = isLoadingSubscription;
+  const isLoading = isLoadingSubscription || isPending;
 
   // Determine which plan to display
   const renderPlanComponent = () => {
-    if (!activeOrg) {
+    if (!activeOrg && !isPending) {
       return (
         <NoOrganization message="You need to select an organization to manage your subscription." />
       );

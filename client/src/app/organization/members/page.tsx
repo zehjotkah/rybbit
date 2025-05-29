@@ -59,7 +59,11 @@ function Organization({
     createdAt: Date;
   };
 }) {
-  const { data: members, refetch } = useOrganizationMembers(org.id);
+  const {
+    data: members,
+    refetch,
+    isLoading: membersLoading,
+  } = useOrganizationMembers(org.id);
   const { refetch: refetchInvitations } = useOrganizationInvitations(org.id);
   const { data } = authClient.useSession();
 
@@ -77,12 +81,7 @@ function Organization({
       <Card className="w-full">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <CardTitle className="text-xl">
-              {org.name}
-              <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({org.slug})
-              </span>
-            </CardTitle>
+            <CardTitle className="text-xl">Members</CardTitle>
 
             <div className="flex items-center gap-2">
               {isOwner && (
@@ -116,38 +115,67 @@ function Organization({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {members?.data?.map((member: any) => (
-                <TableRow key={member.id}>
-                  <TableCell>{member.user?.name || "—"}</TableCell>
-                  <TableCell>{member.user?.email}</TableCell>
-                  <TableCell className="capitalize">{member.role}</TableCell>
-                  <TableCell>
-                    {DateTime.fromSQL(member.createdAt).toLocaleString(
-                      DateTime.DATE_SHORT
-                    )}
-                  </TableCell>
-                  {isOwner && (
-                    <TableCell className="text-right">
-                      {member.role !== "owner" && (
-                        <RemoveMemberDialog
-                          member={member}
-                          organizationId={org.id}
-                          onSuccess={handleRefresh}
-                        />
-                      )}
+              {membersLoading ? (
+                // Loading skeleton rows
+                Array.from({ length: 3 }).map((_, index) => (
+                  <TableRow key={`loading-${index}`}>
+                    <TableCell>
+                      <div className="h-4 bg-muted animate-pulse rounded w-24"></div>
                     </TableCell>
+                    <TableCell>
+                      <div className="h-4 bg-muted animate-pulse rounded w-32"></div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 bg-muted animate-pulse rounded w-16"></div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 bg-muted animate-pulse rounded w-20"></div>
+                    </TableCell>
+                    {isOwner && (
+                      <TableCell>
+                        <div className="h-8 bg-muted animate-pulse rounded w-16 ml-auto"></div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              ) : (
+                <>
+                  {members?.data?.map((member: any) => (
+                    <TableRow key={member.id}>
+                      <TableCell>{member.user?.name || "—"}</TableCell>
+                      <TableCell>{member.user?.email}</TableCell>
+                      <TableCell className="capitalize">
+                        {member.role}
+                      </TableCell>
+                      <TableCell>
+                        {DateTime.fromSQL(member.createdAt).toLocaleString(
+                          DateTime.DATE_SHORT
+                        )}
+                      </TableCell>
+                      {isOwner && (
+                        <TableCell className="text-right">
+                          {member.role !== "owner" && (
+                            <RemoveMemberDialog
+                              member={member}
+                              organizationId={org.id}
+                              onSuccess={handleRefresh}
+                            />
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                  {(!members?.data || members.data.length === 0) && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={isOwner ? 5 : 4}
+                        className="text-center py-6 text-muted-foreground"
+                      >
+                        No members found
+                      </TableCell>
+                    </TableRow>
                   )}
-                </TableRow>
-              ))}
-              {(!members?.data || members.data.length === 0) && (
-                <TableRow>
-                  <TableCell
-                    colSpan={isOwner ? 5 : 4}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    No members found
-                  </TableCell>
-                </TableRow>
+                </>
               )}
             </TableBody>
           </Table>

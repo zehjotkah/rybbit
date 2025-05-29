@@ -50,7 +50,7 @@ export function RemoveMemberDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="ghost" className="text-destructive">
+        <Button size="smIcon" variant="ghost" className="text-destructive">
           <UserMinus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
