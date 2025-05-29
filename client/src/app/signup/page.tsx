@@ -64,7 +64,6 @@ export default function SignupPage() {
 
   // Step 1: Account creation
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
   // Step 2: Organization creation
@@ -105,7 +104,7 @@ export default function SignupPage() {
     try {
       const { data, error } = await authClient.signUp.email({
         email,
-        name,
+        name: email.split("@")[0], // Use email prefix as default name
         password,
       });
 
@@ -218,15 +217,6 @@ export default function SignupPage() {
           >
             <h2 className="text-2xl font-semibold mb-6">Create your account</h2>
             <div className="space-y-4">
-              <AuthInput
-                id="name"
-                label="Name"
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
               <AuthInput
                 id="email"
                 label="Email"
