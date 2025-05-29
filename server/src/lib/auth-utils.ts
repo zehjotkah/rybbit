@@ -23,7 +23,7 @@ export async function getSessionFromReq(req: FastifyRequest) {
   return session;
 }
 
-export async function getUserGodMode(req: FastifyRequest) {
+export async function getIsUserAdmin(req: FastifyRequest) {
   const session = await getSessionFromReq(req);
   const userId = session?.user.id;
 
@@ -32,11 +32,11 @@ export async function getUserGodMode(req: FastifyRequest) {
   }
 
   const userRecord = await db
-    .select({ godMode: user.godMode })
+    .select({ role: user.role })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
-  return userRecord.length > 0 && userRecord[0].godMode;
+  return userRecord.length > 0 && userRecord[0].role === "admin";
 }
 
 const sitesAccessCache = new NodeCache({
@@ -76,22 +76,15 @@ export async function getSitesUserHasAccessTo(
   // Create new promise and cache it
   const promise = (async () => {
     try {
-      // Fetch user godMode status and member records in parallel
-      const [userRecord, memberRecords] = await Promise.all([
-        db
-          .select({ godMode: user.godMode })
-          .from(user)
-          .where(eq(user.id, userId))
-          .limit(1),
+      const [isAdmin, memberRecords] = await Promise.all([
+        getIsUserAdmin(req),
         db
           .select({ organizationId: member.organizationId, role: member.role })
           .from(member)
           .where(eq(member.userId, userId)),
       ]);
-      const hasGodMode = userRecord.length > 0 && userRecord[0].godMode;
 
-      // If user has godMode, return all sites
-      if (hasGodMode) {
+      if (isAdmin) {
         const allSites = await db.select().from(sites);
         return allSites;
       }

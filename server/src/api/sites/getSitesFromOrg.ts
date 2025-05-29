@@ -3,7 +3,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
 import { db } from "../../db/postgres/postgres.js";
 import { sites, member, organization } from "../../db/postgres/schema.js";
-import { getSessionFromReq, getUserGodMode } from "../../lib/auth-utils.js";
+import { getSessionFromReq, getIsUserAdmin } from "../../lib/auth-utils.js";
 import { IS_CLOUD, DEFAULT_EVENT_LIMIT } from "../../lib/const.js";
 import { processResults } from "../analytics/utils.js";
 import { getSubscriptionInner } from "../stripe/getSubscription.js";
@@ -25,11 +25,10 @@ export async function getSitesFromOrg(
       return res.status(401).send({ error: "Unauthorized" });
     }
 
-    // Check if user has god mode
-    const godMode = await getUserGodMode(req);
+    const isAdmin = await getIsUserAdmin(req);
 
-    // If not god mode, verify user is a member of the organization
-    if (!godMode) {
+    // If not admin, verify user is a member of the organization
+    if (!isAdmin) {
       const memberCheck = await db
         .select()
         .from(member)

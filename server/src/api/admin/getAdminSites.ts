@@ -3,8 +3,8 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { DateTime } from "luxon";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
 import { db } from "../../db/postgres/postgres.js";
-import { member, user, sites } from "../../db/postgres/schema.js";
-import { getSessionFromReq } from "../../lib/auth-utils.js";
+import { member, user } from "../../db/postgres/schema.js";
+import { getIsUserAdmin } from "../../lib/auth-utils.js";
 
 // Define event count result type
 interface EventCountResult {
@@ -16,15 +16,9 @@ export async function getAdminSites(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  const session = await getSessionFromReq(request);
+  const isAdmin = await getIsUserAdmin(request);
 
-  const userRecord = await db
-    .select({ godMode: user.godMode })
-    .from(user)
-    .where(eq(user.id, session?.user.id ?? ""))
-    .limit(1);
-
-  if (!userRecord || !userRecord[0].godMode) {
+  if (!isAdmin) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
