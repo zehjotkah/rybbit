@@ -17,10 +17,6 @@ export default function SiteLayout({
 }) {
   const pathname = usePathname();
   const { setSite, site } = useStore();
-  const { isLoading } = useSiteHasData(site);
-
-  const { data: siteMetadata, isLoading: isLoadingSiteMetadata } =
-    useGetSite(site);
 
   // Sync store state with URL parameters
   useSyncStateWithUrl();
@@ -32,14 +28,6 @@ export default function SiteLayout({
   }, [pathname]);
 
   const { width } = useWindowSize();
-
-  if (!site) {
-    return null;
-  }
-
-  if (isLoadingSiteMetadata || isLoading || !siteMetadata) {
-    return null;
-  }
 
   if (width && width < 768) {
     return (
