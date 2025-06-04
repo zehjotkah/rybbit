@@ -54,18 +54,20 @@ export function Sidebar() {
           href={getTabPath("main")}
           icon={<LayoutDashboard className="w-4 h-4" />}
         />
-        {/* <SidebarLink
-          label="Pages"
-          active={isActiveTab("pages")}
-          href={getTabPath("pages")}
-          icon={<File className="w-4 h-4" />}
-        /> */}
         <SidebarLink
           label="Realtime"
           active={isActiveTab("realtime")}
           href={getTabPath("realtime")}
           icon={<Earth className="w-4 h-4" />}
         />
+        {IS_CLOUD && (
+          <SidebarLink
+            label="Pages"
+            active={isActiveTab("pages")}
+            href={getTabPath("pages")}
+            icon={<File className="w-4 h-4" />}
+          />
+        )}
         {IS_CLOUD && (
           <SidebarLink
             label="Performance"
