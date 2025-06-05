@@ -16,7 +16,7 @@ import { useState } from "react";
 import { PageSparklineChart } from "./PageSparklineChart";
 
 // Maximum length for page titles
-const MAX_TITLE_LENGTH = 70;
+const MAX_TITLE_LENGTH = 90;
 
 type PageListItemProps = {
   pageData: SingleColResponse;
@@ -104,12 +104,12 @@ export function PageListItem({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
           {/* Left side: Page title/path with thumbnail */}
           <div className="flex gap-3 flex-1 min-w-0">
             {thumbnailUrl && !isLoadingMetadata && (
-              <div className="hidden sm:block flex-shrink-0 h-16 w-24 relative rounded-md overflow-hidden border border-neutral-800">
+              <div className="hidden sm:block flex-shrink-0 h-12 w-16 relative rounded-md overflow-hidden border border-neutral-800">
                 <img
                   src={thumbnailUrl}
                   alt={`Thumbnail for ${pageData.title || pageData.value}`}
@@ -121,7 +121,7 @@ export function PageListItem({
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-medium truncate">
+                <h3 className="text-base font-medium truncate">
                   {truncateString(
                     pageData.title || pageData.value,
                     MAX_TITLE_LENGTH
@@ -145,9 +145,9 @@ export function PageListItem({
           </div>
 
           {/* Right side: Sparkline chart and session count */}
-          <div className="flex items-center gap-6 w-full md:w-auto">
+          <div className="flex items-center gap-0 w-full md:w-auto">
             {/* Sparkline chart */}
-            <div className="h-16 w-48">
+            <div className="h-12 w-40">
               <PageSparklineChart
                 data={pageTrafficData}
                 isHovering={isHovering}
@@ -157,8 +157,8 @@ export function PageListItem({
             </div>
 
             {/* Session count */}
-            <div className="text-right min-w-[80px]">
-              <div className="text-xl font-semibold">
+            <div className="text-right min-w-[70px]">
+              <div className="text-lg font-semibold">
                 {pageData.count.toLocaleString()}
               </div>
               <div className="text-xs text-muted-foreground">sessions</div>
