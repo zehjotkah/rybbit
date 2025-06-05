@@ -10,6 +10,7 @@ import { usePageMetadata } from "@/api/usePageMetadata";
 import { Card, CardContent } from "@/components/ui/card";
 import { Filter, useStore } from "@/lib/store";
 import { truncateString } from "@/lib/utils";
+import { formatShortDuration } from "@/lib/dateTimeUtils";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -156,12 +157,22 @@ export function PageListItem({
               />
             </div>
 
-            {/* Session count */}
-            <div className="text-right min-w-[70px]">
-              <div className="text-lg font-semibold">
-                {pageData.count.toLocaleString()}
+            {/* Session count and duration */}
+            <div className="text-right min-w-[120px]">
+              <div>
+                <span className="text-base font-semibold">
+                  {pageData.count.toLocaleString()}
+                </span>
+                <span className="text-xs text-foreground/70"> sessions</span>
               </div>
-              <div className="text-xs text-muted-foreground">sessions</div>
+              {pageData.time_on_page_seconds !== undefined && (
+                <div>
+                  <span className="text-base font-semibold">
+                    {formatShortDuration(pageData.time_on_page_seconds)}{" "}
+                  </span>
+                  <span className="text-xs text-foreground/70">avg time</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
