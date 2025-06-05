@@ -83,6 +83,8 @@ export async function processResults<T>(
     for (const key in row) {
       // Only convert to number if the value is not null/undefined and is a valid number
       if (
+        key !== "session_id" &&
+        key !== "user_id" &&
         row[key] !== null &&
         row[key] !== undefined &&
         row[key] !== "" &&
