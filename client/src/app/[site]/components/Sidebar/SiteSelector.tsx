@@ -1,5 +1,6 @@
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useGetSite, useGetSitesFromOrg } from "../../../../api/admin/sites";
 import { Favicon } from "../../../../components/Favicon";
 import {
@@ -14,7 +15,7 @@ import { userStore } from "../../../../lib/userStore";
 import { cn, formatter } from "../../../../lib/utils";
 import { AddSite } from "../../../components/AddSite";
 
-function SiteSelectorContent() {
+function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: sites } = useGetSitesFromOrg(activeOrganization?.id);
   const { setSite } = useStore();
@@ -33,10 +34,14 @@ function SiteSelectorContent() {
                 <div
                   key={site.siteId}
                   onClick={() => {
-                    if (isSelected) return;
+                    if (isSelected) {
+                      onSiteSelect(); // Close popover even if same site
+                      return;
+                    }
                     resetStore();
                     setSite(site.siteId.toString());
                     router.push(`/${site.siteId}`);
+                    onSiteSelect(); // Close popover immediately
                   }}
                   className={cn(
                     "flex items-center justify-between p-2 cursor-pointer hover:bg-neutral-800/50 transition-colors rounded-md border-b border-neutral-800 last:border-b-0",
@@ -93,9 +98,10 @@ export function SiteSelector() {
   const { user } = userStore();
   const { site: currentSite } = useStore();
   const { data: site } = useGetSite(currentSite);
+  const [open, setOpen] = useState(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         {site ? (
           <button className="flex gap-2 items-center border border-neutral-800 rounded-lg py-1.5 px-3 justify-start cursor-pointer hover:bg-neutral-800/50 transition-colors h-[36px] w-full">
@@ -113,7 +119,7 @@ export function SiteSelector() {
           </button>
         )}
       </PopoverTrigger>
-      {user && <SiteSelectorContent />}
+      {user && <SiteSelectorContent onSiteSelect={() => setOpen(false)} />}
     </Popover>
   );
 }
