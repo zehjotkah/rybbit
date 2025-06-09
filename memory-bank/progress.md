@@ -155,3 +155,23 @@ This file tracks the project's progress using a task list format.
   - [`Overview.tsx`](client/src/app/[site]/main/components/MainSection/Overview.tsx:1) - Replaced 2 instances with `useGetOverview`
 - **Final Status**: All TypeScript errors resolved, hook consolidation complete across entire codebase
 - **Total Impact**: 9 analytics hook files now use centralized patterns, eliminating 100+ lines of duplicated code
+
+[2025-06-08 22:08:11] - **COMPLETED: SiteSelector UI Enhancement - Dropdown to Popover Conversion**
+
+- **Task**: Convert SiteSelector from dropdown menu to popover with enhanced functionality
+- **Status**: ✅ COMPLETED
+- **Work Done**:
+  - Replaced [`DropdownMenu`](client/src/components/ui/dropdown-menu.tsx:1) components with [`Popover`](client/src/components/ui/popover.tsx:1) components
+  - Enhanced site display to show sessions in past 24 hours using [`sessionsLast24Hours`](client/src/api/admin/sites.ts:60) field
+  - Integrated [`AddSite`](client/src/app/components/AddSite.tsx:1) component at bottom of popover for new site creation
+  - Added [`ChevronDown`](https://lucide.dev/icons/chevron-down) icon to trigger button
+  - Implemented scrollable container (`max-h-96 overflow-y-auto`) for better UX with many sites
+  - Enhanced skeleton loading states to match new layout structure
+- **Files Modified**:
+  - [`client/src/app/[site]/components/Sidebar/SiteSelector.tsx`](client/src/app/[site]/components/Sidebar/SiteSelector.tsx:1) - Complete UI transformation
+- **Features Added**:
+  - Site domain display with sessions count (e.g., "example.com - 42 sessions (24h)")
+  - Inline new site creation capability
+  - Improved visual hierarchy and spacing
+  - Better responsive design with scrolling support
+- **Impact**: Enhanced user experience for site management with richer information display and streamlined site creation workflow
