@@ -5,11 +5,11 @@ import { useStore } from "../../../../lib/store";
 
 export function NoData() {
   const { site } = useStore();
-  const { data: siteHasData, isFetching } = useSiteHasData(site);
-  const { data: siteMetadata, isFetching: isFetchingSiteMetadata } =
+  const { data: siteHasData, isLoading } = useSiteHasData(site);
+  const { data: siteMetadata, isLoading: isLoadingSiteMetadata } =
     useGetSite(site);
 
-  if (!siteHasData && !isFetching && !isFetchingSiteMetadata) {
+  if (!siteHasData && !isLoading && !isLoadingSiteMetadata) {
     return (
       <Alert className="mt-4 p-4 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
         <div className="flex flex-col gap-3">
