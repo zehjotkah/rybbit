@@ -95,3 +95,12 @@ This file tracks the project's progress using a task list format.
 - Significantly expanded Shopify guide ([`docs/src/content/guides/shopify.mdx`](docs/src/content/guides/shopify.mdx:1)) with e-commerce event tracking.
 - Expanded Framer guide ([`docs/src/content/guides/framer.mdx`](docs/src/content/guides/framer.mdx:1)) and Webflow guide ([`docs/src/content/guides/webflow.mdx`](docs/src/content/guides/webflow.mdx:1)) with notes on SPA behavior and custom event tracking.
 - Corrected minor inconsistencies in Hugo and Jekyll guides.
+
+2025-06-08 19:13:40 - Added past 24-hour mode support to performance analytics hooks
+
+- Modified [`useGetPerformanceTimeSeries.ts`](client/src/api/analytics/useGetPerformanceTimeSeries.ts:1) to support last-24-hours mode
+- Modified [`useGetPerformanceOverview.ts`](client/src/api/analytics/useGetPerformanceOverview.ts:1) to support last-24-hours mode
+- Implemented conditional query parameter logic using pastMinutesStart/pastMinutesEnd for 24-hour mode
+- Updated query keys to differentiate between "past-minutes" and "date-range" modes
+- Maintained backward compatibility with existing date-range based queries
+- Achieved consistency across all performance analytics hooks

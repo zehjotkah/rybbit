@@ -24,7 +24,6 @@ import { getOrgEventCount } from "./api/analytics/getOrgEventCount.js";
 import { getOverview } from "./api/analytics/getOverview.js";
 import { getOverviewBucketed } from "./api/analytics/getOverviewBucketed.js";
 import { getPageTitles } from "./api/analytics/getPageTitles.js";
-import { getPerformanceByPath } from "./api/analytics/getPerformanceByPath.js";
 import { getPerformanceByDimension } from "./api/analytics/getPerformanceByDimension.js";
 import { getPerformanceOverview } from "./api/analytics/getPerformanceOverview.js";
 import { getPerformanceTimeSeries } from "./api/analytics/getPerformanceTimeSeries.js";
@@ -248,7 +247,6 @@ server.get("/api/org-event-count/:organizationId", getOrgEventCount);
 // Performance Analytics
 server.get("/api/performance/overview/:site", getPerformanceOverview);
 server.get("/api/performance/time-series/:site", getPerformanceTimeSeries);
-server.get("/api/performance/by-path/:site", getPerformanceByPath);
 server.get("/api/performance/by-dimension/:site", getPerformanceByDimension);
 
 // Administrative

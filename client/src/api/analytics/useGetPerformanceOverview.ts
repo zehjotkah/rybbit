@@ -33,7 +33,27 @@ export function useGetPerformanceOverview({
   const { time, previousTime, filters } = useStore();
   const { selectedPercentile } = usePerformanceStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
-  const { startDate, endDate } = getStartAndEndDate(timeToUse);
+
+  // Check if we're using last-24-hours mode
+  const isPast24HoursMode = timeToUse.mode === "last-24-hours";
+
+  // Determine the query parameters based on mode
+  const queryParams = isPast24HoursMode
+    ? {
+        // Past minutes approach for last-24-hours mode
+        timeZone,
+        pastMinutesStart: 24 * 60, // 24 hours ago
+        pastMinutesEnd: 0, // now
+        filters,
+        percentile: selectedPercentile,
+      }
+    : {
+        // Regular date-based approach
+        ...getStartAndEndDate(timeToUse),
+        timeZone,
+        filters,
+        percentile: selectedPercentile,
+      };
 
   return useQuery({
     queryKey: [
@@ -42,17 +62,12 @@ export function useGetPerformanceOverview({
       site,
       filters,
       selectedPercentile,
+      isPast24HoursMode ? "past-minutes" : "date-range",
     ],
     queryFn: () => {
       return authedFetch<{ data: GetPerformanceOverviewResponse }>(
         `/performance/overview/${site}`,
-        {
-          startDate,
-          endDate,
-          timeZone,
-          filters,
-          percentile: selectedPercentile,
-        }
+        queryParams
       );
     },
     staleTime: Infinity,

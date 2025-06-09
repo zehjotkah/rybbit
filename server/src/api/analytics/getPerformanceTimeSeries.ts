@@ -132,6 +132,7 @@ const getQuery = ({
   const filterStatement = getFilterStatement(filters);
 
   const isAllTime = !startDate && !endDate && !pastMinutesRange;
+  console.log(pastMinutesRange);
 
   const timeParams = pastMinutesRange
     ? { pastMinutesRange }
@@ -172,6 +173,8 @@ WHERE
 GROUP BY time ORDER BY time ${
     isAllTime ? "" : getTimeStatementFill(timeParams, bucket)
   }`;
+
+  console.log(query);
 
   return query;
 };

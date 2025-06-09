@@ -63,9 +63,28 @@ export function useGetPerformanceTimeSeries({
   const timeToUse = periodTime === "previous" ? previousTime : time;
   const bucketToUse = bucket || storeBucket;
 
-  const { startDate, endDate } = getStartAndEndDate(timeToUse);
+  // Check if we're using last-24-hours mode
+  const isPast24HoursMode = timeToUse.mode === "last-24-hours";
 
   const combinedFilters = [...globalFilters, ...dynamicFilters];
+
+  // Determine the query parameters based on mode
+  const queryParams = isPast24HoursMode
+    ? {
+        // Past minutes approach for last-24-hours mode
+        timeZone,
+        pastMinutesStart: 24 * 60, // 24 hours ago
+        pastMinutesEnd: 0, // now
+        bucket: bucketToUse,
+        filters: combinedFilters,
+      }
+    : {
+        // Regular date-based approach
+        ...getStartAndEndDate(timeToUse),
+        timeZone,
+        bucket: bucketToUse,
+        filters: combinedFilters,
+      };
 
   return useQuery({
     queryKey: [
@@ -75,17 +94,12 @@ export function useGetPerformanceTimeSeries({
       site,
       combinedFilters,
       selectedPerformanceMetric,
+      isPast24HoursMode ? "past-minutes" : "date-range",
     ],
     queryFn: () => {
       return authedFetch<APIResponse<GetPerformanceTimeSeriesResponse>>(
         `/performance/time-series/${site}`,
-        {
-          startDate,
-          endDate,
-          timeZone,
-          bucket: bucketToUse,
-          filters: combinedFilters,
-        }
+        queryParams
       );
     },
     placeholderData: (_, query: any) => {

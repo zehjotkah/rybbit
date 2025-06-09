@@ -60,3 +60,23 @@ User feedback indicated they didn't like the overloading behavior and wanted the
 - Second parameter is now always `params?: Record<string, any>`
 - Third parameter remains `config: AxiosRequestConfig = {}` for advanced axios options
 - Simplified function body to always treat second argument as query parameters
+
+[2025-06-08 19:13:30] - Added past 24-hour mode support to performance analytics hooks
+
+## Rationale
+
+User requested to add support for the past 24-hour mode to useGetPerformanceTimeSeries and useGetPerformanceOverview hooks, following the same pattern already implemented in useGetPerformanceByDimension. This decision was made to:
+
+- Provide consistent API behavior across all performance analytics hooks
+- Support real-time analytics for the last 24 hours using pastMinutes parameters
+- Maintain backward compatibility with existing date-range based queries
+- Ensure proper query key differentiation between different time modes
+
+## Implementation Details
+
+- Modified useGetPerformanceTimeSeries to detect `time.mode === "last-24-hours"`
+- Modified useGetPerformanceOverview to detect `time.mode === "last-24-hours"`
+- Added conditional query parameter logic using pastMinutesStart/pastMinutesEnd for 24-hour mode
+- Updated query keys to include mode differentiation ("past-minutes" vs "date-range")
+- Maintained existing date-based approach for all other time modes
+- Used same pattern as useGetPerformanceByDimension for consistency
