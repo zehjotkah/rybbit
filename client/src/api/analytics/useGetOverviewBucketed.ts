@@ -4,7 +4,6 @@ import {
   UseQueryResult,
   useQuery,
 } from "@tanstack/react-query";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { APIResponse } from "../types";
@@ -46,13 +45,16 @@ export function useGetOverviewBucketed({
   return useQuery({
     queryKey: ["overview-bucketed", timeToUse, bucket, site, combinedFilters],
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
-        startDate,
-        endDate,
-        timeZone,
-        bucket,
-        filters: combinedFilters,
-      }).then((res) => res.json());
+      return authedFetch<APIResponse<GetOverviewBucketedResponse>>(
+        `/overview-bucketed/${site}`,
+        {
+          startDate,
+          endDate,
+          timeZone,
+          bucket,
+          filters: combinedFilters,
+        }
+      );
     },
     placeholderData: (_, query: any) => {
       if (!query?.queryKey) return undefined;
@@ -105,13 +107,16 @@ export function useGetOverviewBucketedPastMinutes({
       combinedFilters,
     ],
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
-        timeZone,
-        bucket,
-        pastMinutesStart,
-        pastMinutesEnd,
-        filters: combinedFilters,
-      }).then((res) => res.json());
+      return authedFetch<APIResponse<GetOverviewBucketedResponse>>(
+        `/overview-bucketed/${site}`,
+        {
+          timeZone,
+          bucket,
+          pastMinutesStart,
+          pastMinutesEnd,
+          filters: combinedFilters,
+        }
+      );
     },
     refetchInterval,
     placeholderData: (_, query: any) => {
@@ -167,13 +172,16 @@ export function useGetOverviewBucketedPreviousPastMinutes({
       combinedFilters,
     ],
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/overview-bucketed/${site}`, {
-        timeZone,
-        bucket,
-        pastMinutesStart,
-        pastMinutesEnd,
-        filters: combinedFilters,
-      }).then((res) => res.json());
+      return authedFetch<APIResponse<GetOverviewBucketedResponse>>(
+        `/overview-bucketed/${site}`,
+        {
+          timeZone,
+          bucket,
+          pastMinutesStart,
+          pastMinutesEnd,
+          filters: combinedFilters,
+        }
+      );
     },
     refetchInterval,
     placeholderData: (_, query: any) => {

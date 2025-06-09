@@ -5,7 +5,6 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { usePerformanceStore } from "../../app/[site]/performance/performanceStore";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { APIResponse } from "../types";
@@ -78,13 +77,16 @@ export function useGetPerformanceTimeSeries({
       selectedPerformanceMetric,
     ],
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/performance/time-series/${site}`, {
-        startDate,
-        endDate,
-        timeZone,
-        bucket: bucketToUse,
-        filters: combinedFilters,
-      }).then((res) => res.json());
+      return authedFetch<APIResponse<GetPerformanceTimeSeriesResponse>>(
+        `/performance/time-series/${site}`,
+        {
+          startDate,
+          endDate,
+          timeZone,
+          bucket: bucketToUse,
+          filters: combinedFilters,
+        }
+      );
     },
     placeholderData: (_, query: any) => {
       if (!query?.queryKey) return undefined;

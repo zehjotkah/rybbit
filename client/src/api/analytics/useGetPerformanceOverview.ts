@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useStore } from "../../lib/store";
 import { usePerformanceStore } from "../../app/[site]/performance/performanceStore";
 import { authedFetch, getStartAndEndDate } from "../utils";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 
 export type GetPerformanceOverviewResponse = {
@@ -45,13 +44,16 @@ export function useGetPerformanceOverview({
       selectedPercentile,
     ],
     queryFn: () => {
-      return authedFetch(`${BACKEND_URL}/performance/overview/${site}`, {
-        startDate,
-        endDate,
-        timeZone,
-        filters,
-        percentile: selectedPercentile,
-      }).then((res) => res.json());
+      return authedFetch<{ data: GetPerformanceOverviewResponse }>(
+        `/performance/overview/${site}`,
+        {
+          startDate,
+          endDate,
+          timeZone,
+          filters,
+          percentile: selectedPercentile,
+        }
+      );
     },
     staleTime: Infinity,
     placeholderData: (_, query: any) => {

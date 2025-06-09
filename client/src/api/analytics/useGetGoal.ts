@@ -1,6 +1,5 @@
 import { Filter } from "@rybbit/shared";
 import { useQuery } from "@tanstack/react-query";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { authedFetch } from "../utils";
@@ -28,12 +27,12 @@ export function useGetGoal({
   return useQuery({
     queryKey: ["goal", site, goalId, startDate, endDate, timeZone, filters],
     queryFn: async () => {
-      return authedFetch(`${BACKEND_URL}/goal/${goalId}/${site}`, {
+      return authedFetch<GetGoalResponse>(`/goal/${goalId}/${site}`, {
         startDate,
         endDate,
         timeZone,
         filters,
-      }).then((res) => res.json());
+      });
     },
     enabled: !!site && !!goalId && enabled,
   });

@@ -1,6 +1,5 @@
 import { Filter } from "@rybbit/shared";
 import { useQuery } from "@tanstack/react-query";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import {
   useStore,
@@ -84,9 +83,13 @@ export function useGetUsers(options: GetUsersOptions) {
         requestParams.endDate = timeParams.endDate;
       }
 
-      return authedFetch(`${BACKEND_URL}/users/${site}`, requestParams).then(
-        (res) => res.json()
-      );
+      return authedFetch<
+        APIResponse<UsersResponse[]> & {
+          totalCount: number;
+          page: number;
+          pageSize: number;
+        }
+      >(`/users/${site}`, requestParams);
     },
     // Use default staleTime (0) for real-time data
     staleTime: 0,

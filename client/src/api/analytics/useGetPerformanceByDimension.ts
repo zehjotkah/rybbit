@@ -1,7 +1,6 @@
 import { Filter } from "@rybbit/shared";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { usePerformanceStore } from "../../app/[site]/performance/performanceStore";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { authedFetch, getStartAndEndDate } from "../utils";
@@ -119,13 +118,12 @@ export function useGetPerformanceByDimension({
       sortBy,
       sortOrder,
     ],
-    queryFn: () => {
-      return authedFetch(
-        `${BACKEND_URL}/performance/by-dimension/${site}`,
+    queryFn: async () => {
+      const response = await authedFetch<{ data: any }>(
+        `/performance/by-dimension/${site}`,
         queryParams
-      )
-        .then((res) => res.json())
-        .then(({ data }) => data);
+      );
+      return response.data;
     },
     staleTime: Infinity,
     placeholderData: (_, query: any) => {

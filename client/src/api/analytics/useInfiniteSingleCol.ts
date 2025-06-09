@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-query";
 import { SingleColResponse } from "@/api/analytics/useSingleCol";
 import { authedFetch, getStartAndEndDate } from "@/api/utils";
-import { BACKEND_URL } from "@/lib/const";
 import { timeZone } from "@/lib/dateTimeUtils";
 import { useStore } from "@/lib/store";
 
@@ -62,12 +61,10 @@ export function useInfiniteSingleCol({
             filters: useFilters ? filters : undefined,
           };
 
-      const response = await authedFetch(
-        `${BACKEND_URL}/single-col/${site}`,
-        queryParams
-      );
-      const json = await response.json();
-      return json.data;
+      const response = await authedFetch<{
+        data: InfinitePaginatedResponse;
+      }>(`/single-col/${site}`, queryParams);
+      return response.data;
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {

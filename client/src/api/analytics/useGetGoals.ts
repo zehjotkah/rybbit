@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { BACKEND_URL } from "../../lib/const";
 import { timeZone } from "../../lib/dateTimeUtils";
 import {
   getFilteredFilters,
@@ -93,14 +92,14 @@ export function useGetGoals({
       order,
     ],
     queryFn: async () => {
-      return authedFetch(`${BACKEND_URL}/goals/${site}`, {
+      return authedFetch<GoalsResponse>(`/goals/${site}`, {
         ...timeParams,
         filteredFilters,
         page,
         pageSize,
         sort,
         order,
-      }).then((res) => res.json());
+      });
     },
     enabled: !!site && enabled,
   });
