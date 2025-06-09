@@ -9,13 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "../../../../components/ui/dropdown-menu";
 import { authClient } from "../../../../lib/auth";
-import { resetStore } from "../../../../lib/store";
+import { resetStore, useStore } from "../../../../lib/store";
 import { userStore } from "../../../../lib/userStore";
 import { cn } from "../../../../lib/utils";
 
 function SiteSelectorContent() {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: sites } = useGetSitesFromOrg(activeOrganization?.id);
+  const { setSite } = useStore();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -32,6 +33,7 @@ function SiteSelectorContent() {
                 onClick={() => {
                   if (isSelected) return;
                   resetStore();
+                  setSite(site.siteId.toString());
                   router.push(`/${site.siteId}`);
                 }}
                 className={cn(
@@ -64,11 +66,9 @@ function SiteSelectorContent() {
 }
 
 export function SiteSelector() {
-  const pathname = usePathname();
-
   const { user } = userStore();
-  const currentSiteId = Number(pathname.split("/")[1]);
-  const { data: site } = useGetSite(currentSiteId);
+  const { site: currentSite } = useStore();
+  const { data: site } = useGetSite(currentSite);
 
   return (
     <DropdownMenu>
