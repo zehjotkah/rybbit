@@ -54,6 +54,7 @@ export default function IndexPage() {
           href="https://app.rybbit.io/signup"
           className="w-full sm:w-auto"
           data-rybbit-event="signup"
+          data-rybbit-prop-location="hero"
         >
           <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
             Track your Site
@@ -398,7 +399,11 @@ export default function IndexPage() {
                   href="https://app.rybbit.io/signup"
                   className="w-full sm:w-auto"
                 >
-                  <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
+                  <button
+                    data-rybbit-event="signup"
+                    data-rybbit-prop-location="bottom"
+                    className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer"
+                  >
                     Track your site now
                   </button>
                 </Link>
