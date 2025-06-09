@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "../../lib/store";
 import { usePerformanceStore } from "../../app/[site]/performance/performanceStore";
-import { authedFetch, getStartAndEndDate } from "../utils";
+import { authedFetch, getQueryParams } from "../utils";
 import { timeZone } from "../../lib/dateTimeUtils";
 
 export type GetPerformanceOverviewResponse = {
@@ -34,26 +34,10 @@ export function useGetPerformanceOverview({
   const { selectedPercentile } = usePerformanceStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
-  // Check if we're using last-24-hours mode
-  const isPast24HoursMode = timeToUse.mode === "last-24-hours";
-
-  // Determine the query parameters based on mode
-  const queryParams = isPast24HoursMode
-    ? {
-        // Past minutes approach for last-24-hours mode
-        timeZone,
-        pastMinutesStart: 24 * 60, // 24 hours ago
-        pastMinutesEnd: 0, // now
-        filters,
-        percentile: selectedPercentile,
-      }
-    : {
-        // Regular date-based approach
-        ...getStartAndEndDate(timeToUse),
-        timeZone,
-        filters,
-        percentile: selectedPercentile,
-      };
+  const queryParams = getQueryParams(timeToUse, {
+    filters,
+    percentile: selectedPercentile,
+  });
 
   return useQuery({
     queryKey: [
@@ -62,7 +46,7 @@ export function useGetPerformanceOverview({
       site,
       filters,
       selectedPercentile,
-      isPast24HoursMode ? "past-minutes" : "date-range",
+      timeToUse.mode === "last-24-hours" ? "past-minutes" : "date-range",
     ],
     queryFn: () => {
       return authedFetch<{ data: GetPerformanceOverviewResponse }>(

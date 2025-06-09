@@ -5,7 +5,7 @@ import {
   InfiniteData,
 } from "@tanstack/react-query";
 import { SingleColResponse } from "@/api/analytics/useSingleCol";
-import { authedFetch, getStartAndEndDate } from "@/api/utils";
+import { authedFetch, getQueryParams } from "@/api/utils";
 import { timeZone } from "@/lib/dateTimeUtils";
 import { useStore } from "@/lib/store";
 
@@ -29,8 +29,6 @@ export function useInfiniteSingleCol({
 > {
   const { time, site, filters } = useStore();
 
-  const isPast24HoursMode = time.mode === "last-24-hours";
-
   return useInfiniteQuery({
     queryKey: [
       parameter,
@@ -38,28 +36,17 @@ export function useInfiniteSingleCol({
       site,
       filters,
       limit,
-      isPast24HoursMode ? "past-minutes" : "date-range",
+      time.mode === "last-24-hours" ? "past-minutes" : "date-range",
       "infinite-single-col",
     ],
     queryFn: async ({ pageParam = 1 }) => {
-      const queryParams = isPast24HoursMode
-        ? {
-            timeZone: timeZone,
-            pastMinutesStart: 24 * 60, // 24 hours ago
-            pastMinutesEnd: 0, // now
-            parameter,
-            limit,
-            page: pageParam,
-            filters: useFilters ? filters : undefined,
-          }
-        : {
-            ...getStartAndEndDate(time),
-            timeZone: timeZone,
-            parameter,
-            limit,
-            page: pageParam,
-            filters: useFilters ? filters : undefined,
-          };
+      const queryParams = {
+        ...getQueryParams(time),
+        parameter,
+        limit,
+        page: pageParam,
+        filters: useFilters ? filters : undefined,
+      };
 
       const response = await authedFetch<{
         data: InfinitePaginatedResponse;

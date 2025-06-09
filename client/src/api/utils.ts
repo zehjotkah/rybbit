@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { Time } from "../components/DateSelector/types";
 import axios, { AxiosRequestConfig } from "axios";
 import { BACKEND_URL } from "../lib/const";
+import { timeZone } from "../lib/dateTimeUtils";
 
 export function getStartAndEndDate(time: Time) {
   if (time.mode === "range") {
@@ -32,6 +33,32 @@ export function getStartAndEndDate(time: Time) {
     return { startDate: null, endDate: null };
   }
   return { startDate: time.day, endDate: time.day };
+}
+
+export function getQueryParams(
+  time: Time,
+  additionalParams: Record<string, any> = {},
+  options: {
+    pastMinutesStart?: number;
+    pastMinutesEnd?: number;
+  } = {}
+): Record<string, any> {
+  const isPast24HoursMode = time.mode === "last-24-hours";
+
+  return isPast24HoursMode
+    ? {
+        // Past minutes approach for last-24-hours mode
+        timeZone,
+        pastMinutesStart: options.pastMinutesStart ?? 24 * 60, // 24 hours ago by default
+        pastMinutesEnd: options.pastMinutesEnd ?? 0, // now by default
+        ...additionalParams,
+      }
+    : {
+        // Regular date-based approach
+        ...getStartAndEndDate(time),
+        timeZone,
+        ...additionalParams,
+      };
 }
 
 export async function authedFetch<T>(

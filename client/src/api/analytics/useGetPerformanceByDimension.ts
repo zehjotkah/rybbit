@@ -1,9 +1,8 @@
 import { Filter } from "@rybbit/shared";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { usePerformanceStore } from "../../app/[site]/performance/performanceStore";
-import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
-import { authedFetch, getStartAndEndDate } from "../utils";
+import { authedFetch, getQueryParams } from "../utils";
 
 type UseGetPerformanceByDimensionOptions = {
   site: number | string;
@@ -72,36 +71,15 @@ export function useGetPerformanceByDimension({
   const { time, filters } = useStore();
   const { selectedPercentile } = usePerformanceStore();
 
-  // Check if we're using last-24-hours mode
-  const isPast24HoursMode = time.mode === "last-24-hours";
-
-  // Determine the query parameters based on mode
-  const queryParams = isPast24HoursMode
-    ? {
-        // Past minutes approach for last-24-hours mode
-        timeZone: timeZone,
-        pastMinutesStart: 24 * 60, // 24 hours ago
-        pastMinutesEnd: 0, // now
-        limit,
-        page,
-        percentile: selectedPercentile,
-        filters: useFilters ? [...filters, ...additionalFilters] : undefined,
-        sortBy,
-        sortOrder,
-        dimension,
-      }
-    : {
-        // Regular date-based approach
-        ...getStartAndEndDate(time),
-        timeZone: timeZone,
-        limit,
-        page,
-        percentile: selectedPercentile,
-        filters: useFilters ? [...filters, ...additionalFilters] : undefined,
-        sortBy,
-        sortOrder,
-        dimension,
-      };
+  const queryParams = getQueryParams(time, {
+    limit,
+    page,
+    percentile: selectedPercentile,
+    filters: useFilters ? [...filters, ...additionalFilters] : undefined,
+    sortBy,
+    sortOrder,
+    dimension,
+  });
 
   return useQuery({
     queryKey: [
@@ -113,7 +91,7 @@ export function useGetPerformanceByDimension({
       selectedPercentile,
       limit,
       page,
-      isPast24HoursMode ? "past-minutes" : "date-range",
+      time.mode === "last-24-hours" ? "past-minutes" : "date-range",
       additionalFilters,
       sortBy,
       sortOrder,

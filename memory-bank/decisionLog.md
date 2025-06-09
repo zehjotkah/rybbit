@@ -80,3 +80,22 @@ User requested to add support for the past 24-hour mode to useGetPerformanceTime
 - Updated query keys to include mode differentiation ("past-minutes" vs "date-range")
 - Maintained existing date-based approach for all other time modes
 - Used same pattern as useGetPerformanceByDimension for consistency
+
+[2025-01-08 19:23:09] - **Code Deduplication: Query Parameter Logic Refactoring**
+
+- **Decision**: Created a centralized `getQueryParams` utility function to eliminate duplicated conditional logic across analytics hooks
+- **Problem**: Found 7+ instances of identical `isPast24HoursMode` conditional logic for query parameter construction
+- **Solution**:
+  - Created `getQueryParams(time, pastMinutesStart?, pastMinutesEnd?)` utility in `client/src/api/utils.ts`
+  - Handles both past-24-hours mode (using pastMinutesStart/End) and regular date-based queries
+  - Supports optional custom past minutes parameters for complex cases
+- **Files Refactored**:
+  - `useGetPerformanceTimeSeries.ts` - Reduced ~20 lines to 3 lines
+  - `useGetPerformanceOverview.ts` - Simplified conditional logic
+  - `useGetPerformanceByDimension.ts` - Removed duplicated logic
+  - `useSingleCol.ts` - Enhanced with custom past minutes support
+  - `usePaginatedSingleCol.ts` - Simplified query parameter construction
+  - `useInfiniteSingleCol.ts` - Removed conditional logic duplication
+  - `useGetPageTitles.ts` - Standardized query parameter handling
+- **Benefits**: Improved maintainability, reduced code duplication, centralized time-based query logic
+- **Impact**: Significant reduction in duplicated code across analytics layer

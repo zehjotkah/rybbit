@@ -3,7 +3,7 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { timeZone } from "@/lib/dateTimeUtils";
 import { useStore } from "@/lib/store";
 import { APIResponse } from "../types";
-import { authedFetch, getStartAndEndDate } from "../utils";
+import { authedFetch, getQueryParams } from "../utils";
 
 // This should match PageTitleItem from the backend
 export type PageTitleItem = {
@@ -42,28 +42,12 @@ export function useGetPageTitlesPaginated({
 > {
   const { time, site, filters } = useStore();
 
-  // Check if we're using last-24-hours mode
-  const isPast24HoursMode = time.mode === "last-24-hours";
-
-  // Determine the query parameters based on mode
-  const queryParams = isPast24HoursMode
-    ? {
-        // Past minutes approach for last-24-hours mode
-        timeZone: timeZone,
-        pastMinutesStart: 24 * 60, // 24 hours ago
-        pastMinutesEnd: 0, // now
-        limit,
-        page,
-        filters: useFilters ? filters : undefined,
-      }
-    : {
-        // Regular date-based approach
-        ...getStartAndEndDate(time),
-        timeZone: timeZone,
-        limit,
-        page,
-        filters: useFilters ? filters : undefined,
-      };
+  const queryParams = {
+    ...getQueryParams(time),
+    limit,
+    page,
+    filters: useFilters ? filters : undefined,
+  };
 
   return useQuery({
     queryKey: [
@@ -73,7 +57,7 @@ export function useGetPageTitlesPaginated({
       filters,
       limit,
       page,
-      isPast24HoursMode ? "past-minutes" : "date-range",
+      time.mode === "last-24-hours" ? "past-minutes" : "date-range",
     ],
     queryFn: () => {
       return authedFetch<APIResponse<PageTitlesPaginatedResponse>>(

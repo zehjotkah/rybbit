@@ -104,3 +104,23 @@ This file tracks the project's progress using a task list format.
 - Updated query keys to differentiate between "past-minutes" and "date-range" modes
 - Maintained backward compatibility with existing date-range based queries
 - Achieved consistency across all performance analytics hooks
+
+[2025-01-08 19:23:28] - **COMPLETED: Analytics Hooks Code Deduplication**
+
+- **Task**: Eliminate duplicated query parameter logic across analytics hooks
+- **Status**: ✅ COMPLETED
+- **Work Done**:
+  - Created centralized [`getQueryParams`](client/src/api/utils.ts:1) utility function
+  - Refactored 7 analytics hook files to use the new utility
+  - Reduced code duplication from ~20 lines per file to 3 lines
+  - Enhanced utility to support custom past minutes parameters for complex cases
+- **Files Modified**:
+  - [`client/src/api/utils.ts`](client/src/api/utils.ts:1) - Added `getQueryParams` utility
+  - [`useGetPerformanceTimeSeries.ts`](client/src/api/analytics/useGetPerformanceTimeSeries.ts:1) - Refactored
+  - [`useGetPerformanceOverview.ts`](client/src/api/analytics/useGetPerformanceOverview.ts:1) - Refactored
+  - [`useGetPerformanceByDimension.ts`](client/src/api/analytics/useGetPerformanceByDimension.ts:1) - Refactored
+  - [`useSingleCol.ts`](client/src/api/analytics/useSingleCol.ts:1) - Refactored with custom params
+  - [`usePaginatedSingleCol.ts`](client/src/api/analytics/usePaginatedSingleCol.ts:1) - Refactored
+  - [`useInfiniteSingleCol.ts`](client/src/api/analytics/useInfiniteSingleCol.ts:1) - Refactored
+  - [`useGetPageTitles.ts`](client/src/api/analytics/useGetPageTitles.ts:1) - Refactored
+- **Impact**: Significantly improved code maintainability and reduced duplication across analytics layer

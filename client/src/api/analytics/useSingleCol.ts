@@ -3,7 +3,7 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { APIResponse } from "../types";
-import { authedFetch, getStartAndEndDate } from "../utils";
+import { authedFetch, getQueryParams } from "../utils";
 
 type PeriodTime = "current" | "previous";
 
@@ -31,28 +31,18 @@ export function useSingleCol({
   const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
-  // Check if we're using last-24-hours mode
-  const isPast24HoursMode = timeToUse.mode === "last-24-hours";
-
-  // Determine the query parameters based on mode
-  const queryParams = isPast24HoursMode
-    ? {
-        // Past minutes approach using pastMinutesStart/pastMinutesEnd
-        timeZone: timeZone,
-        parameter,
-        limit,
-        pastMinutesStart: periodTime === "previous" ? 48 * 60 : 24 * 60,
-        pastMinutesEnd: periodTime === "previous" ? 24 * 60 : 0,
-        filters: useFilters ? filters : undefined,
-      }
-    : {
-        // Regular date-based approach
-        ...getStartAndEndDate(timeToUse),
-        timeZone: timeZone,
-        parameter,
-        limit,
-        filters: useFilters ? filters : undefined,
-      };
+  const queryParams = getQueryParams(
+    timeToUse,
+    {
+      parameter,
+      limit,
+      filters: useFilters ? filters : undefined,
+    },
+    {
+      pastMinutesStart: periodTime === "previous" ? 48 * 60 : 24 * 60,
+      pastMinutesEnd: periodTime === "previous" ? 24 * 60 : 0,
+    }
+  );
 
   // Use a consistent query key format that includes the mode
   const queryKey = [
@@ -62,7 +52,7 @@ export function useSingleCol({
     filters,
     limit,
     useFilters,
-    isPast24HoursMode ? "past-minutes" : "date-range",
+    timeToUse.mode === "last-24-hours" ? "past-minutes" : "date-range",
   ];
 
   return useQuery({
