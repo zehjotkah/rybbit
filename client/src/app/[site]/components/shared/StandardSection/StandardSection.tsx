@@ -10,6 +10,7 @@ import { CardLoader } from "../../../../../components/ui/card";
 import { StandardSectionDialog } from "./StandardSectionDialog";
 import { Row } from "./Row";
 import { Skeleton } from "./Skeleton";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export function StandardSection({
   title,
@@ -52,6 +53,10 @@ export function StandardSection({
     ? 100 / itemsForDisplay[0].percentage
     : 1;
 
+  const { width } = useWindowSize();
+
+  const MAX_ITEMS_TO_DISPLAY = width && width < 768 ? 10 : Infinity;
+
   return (
     <>
       {isFetching && (
@@ -83,14 +88,14 @@ export function StandardSection({
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 overflow-x-hidden">
             <div className="flex flex-row gap-2 justify-between pr-1 text-xs text-neutral-400">
               <div>{title}</div>
               <div>{countLabel || "Sessions"}</div>
             </div>
             {itemsForDisplay?.length ? (
               itemsForDisplay
-                .slice(0, 10)
+                .slice(0, MAX_ITEMS_TO_DISPLAY)
                 .map((e) => (
                   <Row
                     key={getKey(e)}
