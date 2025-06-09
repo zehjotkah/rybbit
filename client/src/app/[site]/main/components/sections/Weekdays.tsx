@@ -1,9 +1,6 @@
 import { DateTime } from "luxon";
 import { useMemo, useState } from "react";
-import {
-  useGetOverviewBucketed,
-  useGetOverviewBucketedPastMinutes,
-} from "../../../../../api/analytics/useGetOverviewBucketed";
+import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
 import {
   Tabs,
   TabsList,
@@ -57,7 +54,7 @@ export function Weekdays() {
     data: past24HoursData,
     isFetching: isPast24HoursFetching,
     error: past24HoursError,
-  } = useGetOverviewBucketedPastMinutes({
+  } = useGetOverviewBucketed({
     pastMinutesStart: 24 * 60,
     pastMinutesEnd: 0,
     site,

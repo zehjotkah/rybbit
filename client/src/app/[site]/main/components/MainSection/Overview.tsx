@@ -6,10 +6,7 @@ import NumberFlow from "@number-flow/react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
-import {
-  useGetOverviewBucketed,
-  useGetOverviewBucketedPastMinutes,
-} from "../../../../../api/analytics/useGetOverviewBucketed";
+import { useGetOverviewBucketed } from "../../../../../api/analytics/useGetOverviewBucketed";
 import { StatType, useStore } from "../../../../../lib/store";
 import { SparklinesChart } from "./SparklinesChart";
 
@@ -79,28 +76,16 @@ const Stat = ({
   const [isHovering, setIsHovering] = useState(false);
   const isPast24HoursMode = time.mode === "last-24-hours";
 
-  // Regular bucketed data for sparklines
-  const { data: regularData } = useGetOverviewBucketed({
+  // Consolidated bucketed data for sparklines - automatically handles both modes
+  const { data } = useGetOverviewBucketed({
     site,
     bucket,
-    props: {
-      enabled: !isPast24HoursMode,
-    },
+    // For past-24-hours mode, use custom past minutes; otherwise use regular time-based approach
+    ...(isPast24HoursMode && {
+      pastMinutesStart: 24 * 60,
+      pastMinutesEnd: 0,
+    }),
   });
-
-  // Past minutes data for sparklines
-  const { data: pastMinutesData } = useGetOverviewBucketedPastMinutes({
-    pastMinutesStart: 24 * 60,
-    pastMinutesEnd: 0,
-    site,
-    bucket,
-    props: {
-      enabled: isPast24HoursMode,
-    },
-  });
-
-  // Use the appropriate data source based on mode
-  const data = isPast24HoursMode ? pastMinutesData : regularData;
 
   // Filter and format sparklines data
   const sparklinesData =

@@ -1,10 +1,7 @@
 "use client";
 
 import { useGetSite } from "@/api/admin/sites";
-import {
-  useGetOverviewBucketed,
-  useGetOverviewBucketedPastMinutes,
-} from "@/api/analytics/useGetOverviewBucketed";
+import { useGetOverviewBucketed } from "@/api/analytics/useGetOverviewBucketed";
 import { SingleColResponse } from "@/api/analytics/useSingleCol";
 import { usePageMetadata } from "@/api/usePageMetadata";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,7 +53,7 @@ export function PageListItem({
 
   // Past minutes data for sparklines
   const { data: pastMinutesData, isLoading: isLoadingPastMinutes } =
-    useGetOverviewBucketedPastMinutes({
+    useGetOverviewBucketed({
       pastMinutesStart: 24 * 60,
       pastMinutesEnd: 0,
       site,
