@@ -99,3 +99,32 @@ User requested to add support for the past 24-hour mode to useGetPerformanceTime
   - `useGetPageTitles.ts` - Standardized query parameter handling
 - **Benefits**: Improved maintainability, reduced code duplication, centralized time-based query logic
 - **Impact**: Significant reduction in duplicated code across analytics layer
+
+[2025-01-08 19:31:12] - **Hook Consolidation: useGetOverview Functions**
+
+- **Decision**: Combined `useGetOverview` and `useGetOverviewPastMinutes` into a single, flexible hook
+- **Problem**: Two separate hooks with duplicated logic and similar functionality
+- **Solution**:
+  - Enhanced `useGetOverview` to accept optional `pastMinutesStart` and `pastMinutesEnd` parameters
+  - Maintained backward compatibility by keeping `useGetOverviewPastMinutes` as a wrapper function
+  - Integrated with the `getQueryParams` utility for consistent query parameter handling
+  - Implemented intelligent query key generation based on parameters used
+- **Benefits**:
+  - Reduced code duplication between the two hooks
+  - Simplified API while maintaining backward compatibility
+  - Consistent with other analytics hooks using `getQueryParams` utility
+  - Single source of truth for overview data fetching logic
+- **Impact**: Improved maintainability and consistency across overview data fetching
+
+[2025-01-08 19:36:50] - **Bug Fix: TypeScript Error in useGetOverview**
+
+- **Problem**: TypeScript error "Argument of type 'number' is not assignable to parameter of type 'Record<string, any>'" when calling `getQueryParams` with `pastMinutesStart` parameter
+- **Root Cause**: Incorrect function call signature - `getQueryParams` expects parameters as `(time, additionalParams, options)` but was being called with individual numbers
+- **Solution**: Fixed function call to use correct parameter structure: `getQueryParams(timeToUse, { filters }, { pastMinutesStart, pastMinutesEnd })`
+- **Additional Work**: Updated all callsites of `useGetOverviewPastMinutes` to use the consolidated `useGetOverview` hook
+- **Files Updated**:
+  - [`useGetOverview.ts`](client/src/api/analytics/useGetOverview.ts:1) - Fixed function call signature
+  - [`useGetOverviewWithInView.ts`](client/src/api/analytics/useGetOverviewWithInView.ts:1) - Updated import and comment
+  - [`SiteCard.tsx`](client/src/components/SiteCard.tsx:1) - Replaced `useGetOverviewPastMinutes` with `useGetOverview`
+  - [`Overview.tsx`](client/src/app/[site]/main/components/MainSection/Overview.tsx:1) - Replaced both instances of `useGetOverviewPastMinutes` with `useGetOverview`
+- **Impact**: Eliminated TypeScript errors and completed hook consolidation across the codebase

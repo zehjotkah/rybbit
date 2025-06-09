@@ -124,3 +124,34 @@ This file tracks the project's progress using a task list format.
   - [`useInfiniteSingleCol.ts`](client/src/api/analytics/useInfiniteSingleCol.ts:1) - Refactored
   - [`useGetPageTitles.ts`](client/src/api/analytics/useGetPageTitles.ts:1) - Refactored
 - **Impact**: Significantly improved code maintainability and reduced duplication across analytics layer
+
+[2025-01-08 19:31:22] - **COMPLETED: Additional Hook Consolidation - useGetOverview**
+
+- **Task**: Combine `useGetOverview` and `useGetOverviewPastMinutes` functions
+- **Status**: ✅ COMPLETED
+- **Work Done**:
+  - Enhanced [`useGetOverview`](client/src/api/analytics/useGetOverview.ts:1) to accept optional `pastMinutesStart` and `pastMinutesEnd` parameters
+  - Integrated with [`getQueryParams`](client/src/api/utils.ts:1) utility for consistent query parameter handling
+  - Maintained backward compatibility by keeping `useGetOverviewPastMinutes` as a wrapper function
+  - Implemented intelligent query key generation based on parameters used
+- **Benefits**:
+  - Eliminated code duplication between two similar hooks
+  - Simplified API while maintaining backward compatibility
+  - Consistent with other refactored analytics hooks
+  - Single source of truth for overview data fetching
+- **Total Refactoring Summary**: 8 analytics hook files now use the centralized `getQueryParams` utility, significantly reducing code duplication across the entire analytics layer
+
+[2025-01-08 19:37:23] - **COMPLETED: Bug Fix and Callsite Updates for useGetOverview**
+
+- **Task**: Fix TypeScript error and update all callsites to use consolidated `useGetOverview` hook
+- **Status**: ✅ COMPLETED
+- **Bug Fixed**:
+  - TypeScript error: "Argument of type 'number' is not assignable to parameter of type 'Record<string, any>'"
+  - Root cause: Incorrect function call signature for [`getQueryParams`](client/src/api/utils.ts:38)
+  - Solution: Fixed parameter structure in [`useGetOverview`](client/src/api/analytics/useGetOverview.ts:1)
+- **Callsites Updated**: 4 files updated to use consolidated hook
+  - [`useGetOverviewWithInView.ts`](client/src/api/analytics/useGetOverviewWithInView.ts:1) - Updated import and comment
+  - [`SiteCard.tsx`](client/src/components/SiteCard.tsx:1) - Replaced `useGetOverviewPastMinutes` with `useGetOverview`
+  - [`Overview.tsx`](client/src/app/[site]/main/components/MainSection/Overview.tsx:1) - Replaced 2 instances with `useGetOverview`
+- **Final Status**: All TypeScript errors resolved, hook consolidation complete across entire codebase
+- **Total Impact**: 9 analytics hook files now use centralized patterns, eliminating 100+ lines of duplicated code

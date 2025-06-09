@@ -1,10 +1,10 @@
-import { useGetOverviewPastMinutes } from "./useGetOverview";
+import { useGetOverview } from "./useGetOverview";
 import { useQuery } from "@tanstack/react-query";
 import { timeZone } from "../../lib/dateTimeUtils";
 import { authedFetch } from "../utils";
 
 /**
- * A wrapper around useGetOverviewPastMinutes that adds support for
+ * A hook that provides overview data with support for
  * conditional fetching based on viewport visibility
  */
 export function useGetOverviewWithInView({

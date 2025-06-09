@@ -5,10 +5,7 @@ import { cn, formatSecondsAsMinutesAndSeconds } from "@/lib/utils";
 import NumberFlow from "@number-flow/react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import {
-  useGetOverview,
-  useGetOverviewPastMinutes,
-} from "../../../../../api/analytics/useGetOverview";
+import { useGetOverview } from "../../../../../api/analytics/useGetOverview";
 import {
   useGetOverviewBucketed,
   useGetOverviewBucketedPastMinutes,
@@ -179,61 +176,35 @@ export function Overview() {
   const { site, time } = useStore();
   const isPast24HoursMode = time.mode === "last-24-hours";
 
-  // Regular time-based queries
+  // Current period - automatically handles both regular time-based and past-minutes queries
   const {
-    data: regularOverviewData,
-    isFetching: isRegularOverviewFetching,
-    isLoading: isRegularOverviewLoading,
-    error: regularOverviewError,
-  } = useGetOverview({ site });
-
-  const {
-    data: regularOverviewDataPrevious,
-    isLoading: isRegularOverviewLoadingPrevious,
-  } = useGetOverview({ site, periodTime: "previous" });
-
-  // Past minutes-based queries
-  const {
-    data: pastMinutesOverviewData,
-    isFetching: isPastMinutesOverviewFetching,
-    isLoading: isPastMinutesOverviewLoading,
-    error: pastMinutesOverviewError,
-  } = useGetOverviewPastMinutes({
+    data: overviewData,
+    isFetching: isOverviewFetching,
+    isLoading: isOverviewLoading,
+    error: overviewError,
+  } = useGetOverview({
     site,
-    pastMinutesStart: 24 * 60,
-    pastMinutesEnd: 0,
+    // For past-24-hours mode, use custom past minutes; otherwise use regular time-based approach
+    ...(isPast24HoursMode && {
+      pastMinutesStart: 24 * 60,
+      pastMinutesEnd: 0,
+    }),
   });
 
-  // Past minutes-based queries for previous period
-  const {
-    data: pastMinutesOverviewDataPrevious,
-    isLoading: isPastMinutesOverviewLoadingPrevious,
-  } = useGetOverviewPastMinutes({
-    site,
-    pastMinutesStart: 48 * 60,
-    pastMinutesEnd: 24 * 60,
-  });
-
-  // Combine the data based on the mode
-  const overviewData = isPast24HoursMode
-    ? pastMinutesOverviewData
-    : regularOverviewData;
-  const overviewDataPrevious = isPast24HoursMode
-    ? pastMinutesOverviewDataPrevious
-    : regularOverviewDataPrevious;
-
-  const isOverviewFetching = isPast24HoursMode
-    ? isPastMinutesOverviewFetching
-    : isRegularOverviewFetching;
-  const isOverviewLoading = isPast24HoursMode
-    ? isPastMinutesOverviewLoading
-    : isRegularOverviewLoading;
-  const isOverviewLoadingPrevious = isPast24HoursMode
-    ? isPastMinutesOverviewLoadingPrevious
-    : isRegularOverviewLoadingPrevious;
-  const overviewError = isPast24HoursMode
-    ? pastMinutesOverviewError
-    : regularOverviewError;
+  // Previous period - automatically handles both regular time-based and past-minutes queries
+  const { data: overviewDataPrevious, isLoading: isOverviewLoadingPrevious } =
+    useGetOverview({
+      site,
+      // For past-24-hours mode, use previous 24-hour period; otherwise use regular previous period
+      ...(isPast24HoursMode
+        ? {
+            pastMinutesStart: 48 * 60,
+            pastMinutesEnd: 24 * 60,
+          }
+        : {
+            periodTime: "previous",
+          }),
+    });
 
   const isLoading = isOverviewLoading || isOverviewLoadingPrevious;
 
