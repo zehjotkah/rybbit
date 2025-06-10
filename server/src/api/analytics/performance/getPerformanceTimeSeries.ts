@@ -35,23 +35,16 @@ const bucketIntervalMap = {
   year: "1 YEAR",
 } as const;
 
-function getTimeStatementFill(
-  {
-    date,
-    pastMinutesRange,
-  }: {
-    date?: { startDate: string; endDate: string; timeZone: string };
-    pastMinutesRange?: { start: number; end: number };
-  },
-  bucket: TimeBucket
-) {
-  const { params, bucket: validatedBucket } = validateTimeStatementFillParams(
-    { date, pastMinutesRange },
-    bucket
-  );
+function getTimeStatementFill(params: FilterParams, bucket: TimeBucket) {
+  const { params: validatedParams, bucket: validatedBucket } =
+    validateTimeStatementFillParams(params, bucket);
 
-  if (params.date) {
-    const { startDate, endDate, timeZone } = params.date;
+  if (
+    validatedParams.startDate &&
+    validatedParams.endDate &&
+    validatedParams.timeZone
+  ) {
+    const { startDate, endDate, timeZone } = validatedParams;
     return `WITH FILL FROM toTimeZone(
       toDateTime(${
         TimeBucketToFn[validatedBucket]
@@ -76,8 +69,11 @@ function getTimeStatementFill(
       ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   // For specific past minutes range - convert to exact timestamps for better performance
-  if (params.pastMinutesRange) {
-    const { start, end } = params.pastMinutesRange;
+  if (
+    validatedParams.pastMinutesStart !== undefined &&
+    validatedParams.pastMinutesEnd !== undefined
+  ) {
+    const { pastMinutesStart: start, pastMinutesEnd: end } = validatedParams;
 
     // Calculate exact timestamps in JavaScript to avoid runtime ClickHouse calculations
     const now = new Date();
@@ -115,28 +111,20 @@ function getTimeStatementFill(
   return "";
 }
 
-const getQuery = ({
-  startDate,
-  endDate,
-  timeZone,
-  bucket,
-  filters,
-  pastMinutesRange,
-}: {
-  startDate: string;
-  endDate: string;
-  timeZone: string;
-  bucket: TimeBucket;
-  filters: string;
-  pastMinutesRange?: { start: number; end: number };
-}) => {
+const getQuery = (params: FilterParams<{ bucket: TimeBucket }>) => {
+  const {
+    startDate,
+    endDate,
+    timeZone,
+    bucket,
+    filters,
+    pastMinutesStart,
+    pastMinutesEnd,
+  } = params;
   const filterStatement = getFilterStatement(filters);
 
-  const isAllTime = !startDate && !endDate && !pastMinutesRange;
-
-  const timeParams = pastMinutesRange
-    ? { pastMinutesRange }
-    : { date: { startDate, endDate, timeZone } };
+  const isAllTime =
+    !startDate && !endDate && !pastMinutesStart && !pastMinutesEnd;
 
   const query = `
 SELECT
@@ -169,12 +157,10 @@ WHERE
     site_id = {siteId:Int32}
     AND type = 'performance'
     ${filterStatement}
-    ${getTimeStatement(timeParams)}
+    ${getTimeStatement(params)}
 GROUP BY time ORDER BY time ${
-    isAllTime ? "" : getTimeStatementFill(timeParams, bucket)
+    isAllTime ? "" : getTimeStatementFill(params, bucket)
   }`;
-
-  console.log(query);
 
   return query;
 };
@@ -190,15 +176,6 @@ export async function getPerformanceTimeSeries(
   }>,
   res: FastifyReply
 ) {
-  const {
-    startDate,
-    endDate,
-    timeZone,
-    bucket,
-    filters,
-    pastMinutesStart,
-    pastMinutesEnd,
-  } = req.query;
   const site = req.params.site;
 
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
@@ -206,20 +183,7 @@ export async function getPerformanceTimeSeries(
     return res.status(403).send({ error: "Forbidden" });
   }
 
-  // Handle specific past minutes range if provided
-  const pastMinutesRange =
-    pastMinutesStart && pastMinutesEnd
-      ? { start: Number(pastMinutesStart), end: Number(pastMinutesEnd) }
-      : undefined;
-
-  const query = getQuery({
-    startDate,
-    endDate,
-    timeZone,
-    bucket,
-    filters,
-    pastMinutesRange,
-  });
+  const query = getQuery(req.query);
 
   try {
     const result = await clickhouse.query({
