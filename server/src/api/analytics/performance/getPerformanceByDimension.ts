@@ -6,24 +6,19 @@ import {
   getTimeStatement,
   processResults,
 } from "../utils.js";
+import { FilterParams } from "@rybbit/shared";
 
 interface GetPerformanceByDimensionRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    pastMinutesStart?: number;
-    pastMinutesEnd?: number;
-    timeZone: string;
-    filters: string;
+  Querystring: FilterParams<{
     limit?: number;
     page?: number;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
     dimension: string;
-  };
+  }>;
 }
 
 // Generic type for performance by dimension

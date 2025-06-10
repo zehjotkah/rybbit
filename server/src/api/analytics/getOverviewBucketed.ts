@@ -1,13 +1,14 @@
+import { FilterParams } from "@rybbit/shared";
 import { FastifyReply, FastifyRequest } from "fastify";
+import SqlString from "sqlstring";
 import clickhouse from "../../db/clickhouse/clickhouse.js";
+import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import { validateTimeStatementFillParams } from "./query-validation.js";
 import {
   getFilterStatement,
   getTimeStatement,
   processResults,
 } from "./utils.js";
-import SqlString from "sqlstring";
-import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
-import { validateTimeStatementFillParams } from "./query-validation.js";
 
 const TimeBucketToFn = {
   minute: "toStartOfMinute",
@@ -217,15 +218,9 @@ export async function getOverviewBucketed(
     Params: {
       site: string;
     };
-    Querystring: {
-      startDate: string;
-      endDate: string;
-      timeZone: string;
+    Querystring: FilterParams<{
       bucket: TimeBucket;
-      filters: string;
-      pastMinutesStart?: number;
-      pastMinutesEnd?: number;
-    };
+    }>;
   }>,
   res: FastifyReply
 ) {

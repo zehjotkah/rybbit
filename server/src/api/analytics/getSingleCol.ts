@@ -8,22 +8,17 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
+import { FilterParams } from "@rybbit/shared";
 
 interface GetSingleColRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    pastMinutesStart?: number;
-    pastMinutesEnd?: number;
-    timeZone: string;
-    filters: string;
+  Querystring: FilterParams<{
     parameter: FilterParameter;
     limit?: number;
     page?: number;
-  };
+  }>;
 }
 
 type GetSingleColResponse = {

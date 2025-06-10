@@ -6,6 +6,7 @@ import {
   processResults,
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
+import { FilterParams } from "@rybbit/shared";
 
 export type GetSessionsResponse = {
   session_id: string;
@@ -37,16 +38,10 @@ export interface GetSessionsRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate?: string;
-    endDate?: string;
-    timeZone: string;
-    filters: string;
+  Querystring: FilterParams<{
     page: number;
     userId?: string;
-    pastMinutesStart?: string;
-    pastMinutesEnd?: string;
-  };
+  }>;
 }
 
 export async function getSessions(

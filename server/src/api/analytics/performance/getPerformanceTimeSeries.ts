@@ -9,6 +9,7 @@ import SqlString from "sqlstring";
 import { getUserHasAccessToSitePublic } from "../../../lib/auth-utils.js";
 import { validateTimeStatementFillParams } from "../query-validation.js";
 import { TimeBucket, PerformanceTimeSeriesPoint } from "../types.js";
+import { FilterParams } from "@rybbit/shared";
 
 const TimeBucketToFn = {
   minute: "toStartOfMinute",
@@ -132,7 +133,6 @@ const getQuery = ({
   const filterStatement = getFilterStatement(filters);
 
   const isAllTime = !startDate && !endDate && !pastMinutesRange;
-  console.log(pastMinutesRange);
 
   const timeParams = pastMinutesRange
     ? { pastMinutesRange }
@@ -184,15 +184,9 @@ export async function getPerformanceTimeSeries(
     Params: {
       site: string;
     };
-    Querystring: {
-      startDate: string;
-      endDate: string;
-      timeZone: string;
+    Querystring: FilterParams<{
       bucket: TimeBucket;
-      filters: string;
-      pastMinutesStart?: number;
-      pastMinutesEnd?: number;
-    };
+    }>;
   }>,
   res: FastifyReply
 ) {

@@ -6,6 +6,7 @@ import {
   getFilterStatement,
 } from "../utils.js";
 import { getUserHasAccessToSitePublic } from "../../../lib/auth-utils.js";
+import { FilterParams } from "@rybbit/shared";
 
 export type GetEventNamesResponse = {
   eventName: string;
@@ -16,14 +17,9 @@ export interface GetEventNamesRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate?: string;
-    endDate?: string;
-    timeZone: string;
-    filters?: string;
-    pastMinutesStart?: string;
-    pastMinutesEnd?: string;
-  };
+  Querystring: FilterParams<{
+    eventName: string;
+  }>;
 }
 
 export async function getEventNames(

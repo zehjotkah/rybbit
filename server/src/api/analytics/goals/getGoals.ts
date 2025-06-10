@@ -11,6 +11,7 @@ import {
   patternToRegex,
 } from "../utils.js";
 import SqlString from "sqlstring";
+import { FilterParams } from "@rybbit/shared";
 
 // Types for the response
 interface GoalWithConversions {
@@ -39,18 +40,12 @@ export async function getGoals(
     Params: {
       site: string;
     };
-    Querystring: {
-      startDate?: string;
-      endDate?: string;
-      timeZone: string;
-      filters?: string;
+    Querystring: FilterParams<{
       page?: string;
       pageSize?: string;
       sort?: string;
       order?: "asc" | "desc";
-      pastMinutesStart?: string;
-      pastMinutesEnd?: string;
-    };
+    }>;
   }>,
   reply: FastifyReply
 ) {

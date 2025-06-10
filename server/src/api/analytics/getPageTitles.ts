@@ -6,21 +6,16 @@ import {
   getTimeStatement,
   processResults,
 } from "./utils.js";
+import { FilterParams } from "@rybbit/shared";
 
 interface GetPageTitlesRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    pastMinutesStart?: number;
-    pastMinutesEnd?: number;
-    timeZone: string;
-    filters: string;
+  Querystring: FilterParams<{
     limit?: number;
     page?: number;
-  };
+  }>;
 }
 
 // This type represents a single item in the array

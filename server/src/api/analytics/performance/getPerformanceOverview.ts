@@ -7,6 +7,7 @@ import {
 } from "../utils.js";
 import { getUserHasAccessToSitePublic } from "../../../lib/auth-utils.js";
 import { PerformanceOverviewMetrics } from "../types.js";
+import { FilterParams } from "@rybbit/shared";
 
 const getQuery = ({
   startDate,
@@ -61,14 +62,7 @@ export interface PerformanceOverviewRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    timeZone: string;
-    filters: string;
-    pastMinutesStart?: number;
-    pastMinutesEnd?: number;
-  };
+  Querystring: FilterParams;
 }
 
 export async function getPerformanceOverview(

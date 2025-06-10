@@ -7,6 +7,7 @@ import {
 } from "./utils.js";
 import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { FilterParameter } from "./types.js";
+import { FilterParams } from "@rybbit/shared";
 
 type GetOverviewResponse = {
   sessions: number;
@@ -86,16 +87,7 @@ export interface OverviewRequest {
   Params: {
     site: string;
   };
-  Querystring: {
-    startDate: string;
-    endDate: string;
-    timeZone: string;
-    filters: string;
-    parameter: FilterParameter;
-    pastMinutesStart?: number;
-    pastMinutesEnd?: number;
-    limit?: number;
-  };
+  Querystring: FilterParams;
 }
 
 export async function getOverview(
