@@ -149,6 +149,10 @@ export default function GoalFormModal({
         });
       }
 
+      // Reset form and state after successful submission
+      form.reset();
+      setUseProperties(false);
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error saving goal:", error);
@@ -162,6 +166,7 @@ export default function GoalFormModal({
         setIsOpen(open);
         if (!open) {
           form.reset();
+          setUseProperties(false);
         }
       }}
     >
