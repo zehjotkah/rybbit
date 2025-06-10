@@ -24,7 +24,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useGetUsers, UsersResponse } from "../../../api/analytics/users";
 import { Button } from "../../../components/ui/button";
-import { TablePagination } from "../../../components/pagination";
+import { Pagination } from "../../../components/pagination";
 import {
   Tooltip,
   TooltipContent,
@@ -369,7 +369,7 @@ export default function UsersPage() {
           {/* Pagination */}
           <div className="border-t border-neutral-800">
             <div className="px-4 py-3">
-              <TablePagination
+              <Pagination
                 table={table}
                 data={{ items: data?.data || [], total: data?.totalCount || 0 }}
                 pagination={pagination}

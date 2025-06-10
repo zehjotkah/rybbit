@@ -7,7 +7,7 @@ import {
 } from "../../../api/analytics/goals/useGetGoals";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { NothingFound } from "../../../components/NothingFound";
-import { TablePagination } from "../../../components/pagination";
+import { Pagination } from "../../../components/pagination";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { GOALS_PAGE_FILTERS, useStore } from "../../../lib/store";
 import { SubHeader } from "../components/SubHeader/SubHeader";
@@ -147,7 +147,7 @@ export default function GoalsPage() {
             <GoalsList goals={goalsData.data} siteId={Number(site)} />
 
             {goalsData.meta.totalPages > 1 && (
-              <TablePagination
+              <Pagination
                 table={paginationController}
                 data={paginationData}
                 pagination={pagination}

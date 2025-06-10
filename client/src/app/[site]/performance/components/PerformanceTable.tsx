@@ -32,7 +32,7 @@ import {
   PerformanceByDimensionItem,
   useGetPerformanceByDimension,
 } from "../../../../api/analytics/performance/useGetPerformanceByDimension";
-import { TablePagination } from "../../../../components/pagination";
+import { Pagination } from "../../../../components/pagination";
 import { FilterParameter } from "@rybbit/shared";
 import { useStore, addFilter, removeFilter } from "../../../../lib/store";
 import { PerformanceMetric, usePerformanceStore } from "../performanceStore";
@@ -501,7 +501,7 @@ export function PerformanceTable({ dimension, title }: PerformanceTableProps) {
 
           {totalPages > 1 && (
             <div className="mt-4">
-              <TablePagination
+              <Pagination
                 table={paginationController}
                 data={paginationData}
                 pagination={pagination}
