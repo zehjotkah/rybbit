@@ -82,7 +82,7 @@ const getQuery = ({
         ) AS page_stats`;
 };
 
-export interface GenericRequest {
+export interface OverviewRequest {
   Params: {
     site: string;
   };
@@ -99,7 +99,7 @@ export interface GenericRequest {
 }
 
 export async function getOverview(
-  req: FastifyRequest<GenericRequest>,
+  req: FastifyRequest<OverviewRequest>,
   res: FastifyReply
 ) {
   const {
