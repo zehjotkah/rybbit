@@ -232,12 +232,6 @@ export async function getOverviewBucketed(
     return res.status(403).send({ error: "Forbidden" });
   }
 
-  // Handle specific past minutes range if provided
-  const pastMinutesRange =
-    pastMinutesStart && pastMinutesEnd
-      ? { start: Number(pastMinutesStart), end: Number(pastMinutesEnd) }
-      : undefined;
-
   const query = getQuery({
     startDate,
     endDate,

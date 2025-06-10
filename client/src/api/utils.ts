@@ -43,9 +43,7 @@ export function getQueryParams(
     pastMinutesEnd?: number;
   } = {}
 ): Record<string, any> {
-  const isPast24HoursMode = time.mode === "last-24-hours";
-
-  return isPast24HoursMode
+  return options.pastMinutesStart || options.pastMinutesEnd
     ? {
         // Past minutes approach for last-24-hours mode
         timeZone,
