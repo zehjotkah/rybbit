@@ -26,7 +26,10 @@
     });
 
   // Check if the user has opted out of tracking
-  if (!window.__RYBBIT_OPTOUT__ || localStorage.getItem("disable-rybbit") !== null) {
+  if (
+    !!window.__RYBBIT_OPTOUT__ ||
+    localStorage.getItem("disable-rybbit") !== null
+  ) {
     // Create a no-op implementation to ensure the API still works
     window.rybbit = {
       pageview: () => {},
@@ -368,7 +371,7 @@
       }
       target = target.parentElement;
     }
-    
+
     // Then check for outbound links
     if (trackOutbound) {
       const link = e.target.closest("a");
