@@ -17,7 +17,11 @@ import {
   formatSecondsAsMinutesAndSeconds,
   formatter,
 } from "../../../../../lib/utils";
-import { userLocale, hour12 } from "../../../../../lib/dateTimeUtils";
+import {
+  userLocale,
+  hour12,
+  formatChartDateTime,
+} from "../../../../../lib/dateTimeUtils";
 
 const getMax = (time: Time, bucket: TimeBucket) => {
   const now = DateTime.now();
@@ -336,7 +340,6 @@ export function Chart({
       enablePoints={false}
       useMesh={true}
       animate={false}
-      // motionConfig="stiff"
       enableSlices={"x"}
       colors={["hsl(var(--dataviz))"]}
       enableArea={true}
@@ -351,31 +354,30 @@ export function Chart({
         const previousTime = slice.points[0].data.previousTime as DateTime;
 
         const diff = currentY - previousY;
-        const diffPercentage = (diff / previousY) * 100;
+        const diffPercentage = previousY ? (diff / previousY) * 100 : 9999;
 
         return (
-          <div className="text-sm bg-neutral-900 p-2 rounded-md">
-            {previousY ? (
-              <div
-                className="text-lg font-medium"
-                style={{
-                  color:
-                    diffPercentage > 0
-                      ? "hsl(var(--green-400))"
-                      : "hsl(var(--red-400))",
-                }}
-              >
-                {diffPercentage > 0 ? "+" : ""}
-                {diffPercentage.toFixed(2)}%
-              </div>
-            ) : null}
-            <div className="flex justify-between text-sm w-36">
-              <div>{formatDateTime(currentTime, bucket)}</div>
+          <div className="text-sm bg-neutral-850 p-2 rounded-md border border-neutral-750">
+            <div
+              className="text-lg font-medium"
+              style={{
+                color:
+                  diffPercentage > 0
+                    ? "hsl(var(--green-400))"
+                    : "hsl(var(--red-400))",
+              }}
+            >
+              {diffPercentage > 0 ? "+" : ""}
+              {diffPercentage.toFixed(2)}%
+            </div>
+
+            <div className="flex justify-between text-sm w-40">
+              <div>{formatChartDateTime(currentTime, bucket)}</div>
               <div>{formatTooltipValue(currentY, selectedStat)}</div>
             </div>
             {previousTime && (
               <div className="flex justify-between text-sm text-muted-foreground">
-                <div>{formatDateTime(previousTime, bucket)}</div>
+                <div>{formatChartDateTime(previousTime, bucket)}</div>
                 <div>{formatTooltipValue(previousY, selectedStat)}</div>
               </div>
             )}
@@ -398,28 +400,3 @@ export function Chart({
     />
   );
 }
-
-const formatDateTime = (dt: DateTime, bucket: TimeBucket) => {
-  const showMinutes = [
-    "minute",
-    "five_minutes",
-    "ten_minutes",
-    "fifteen_minutes",
-    "hour",
-  ].includes(bucket);
-  const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    hour12: hour12,
-  };
-  if (showMinutes && !hour12) {
-    options.minute = "numeric";
-  }
-  if (bucket === "day") {
-    options.minute = undefined;
-    options.hour = undefined;
-    options.month = "long";
-  }
-  return new Intl.DateTimeFormat(userLocale, options).format(dt.toJSDate());
-};
