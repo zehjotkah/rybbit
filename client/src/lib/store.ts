@@ -165,8 +165,8 @@ export const useStore = create<Store>((set) => ({
 
       previousTime = {
         mode: "past-minutes",
-        pastMinutesStart: time.pastMinutesStart,
-        pastMinutesEnd: time.pastMinutesEnd,
+        pastMinutesStart: time.pastMinutesStart + timeDiff,
+        pastMinutesEnd: time.pastMinutesEnd + timeDiff,
       };
     } else if (time.mode === "range") {
       const timeRangeLength =
