@@ -16,47 +16,15 @@ type PeriodTime = "current" | "previous";
 type UseGetOverviewOptions = {
   periodTime?: PeriodTime;
   site?: number | string;
-  // Optional parameters for custom past minutes (for backward compatibility)
-  pastMinutesStart?: number;
-  pastMinutesEnd?: number;
 };
 
-export function useGetOverview({
-  periodTime,
-  site,
-  pastMinutesStart,
-  pastMinutesEnd,
-}: UseGetOverviewOptions) {
+export function useGetOverview({ periodTime, site }: UseGetOverviewOptions) {
   const { time, previousTime, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
-  // Use custom past minutes if provided, otherwise use the time-based approach
-  const queryParams =
-    pastMinutesStart !== undefined && pastMinutesEnd !== undefined
-      ? getQueryParams(
-          timeToUse,
-          { filters },
-          { pastMinutesStart, pastMinutesEnd }
-        )
-      : getQueryParams(timeToUse, { filters });
+  const queryParams = getQueryParams(timeToUse, { filters });
 
-  // Create appropriate query key based on the parameters used
-  const queryKey =
-    pastMinutesStart !== undefined && pastMinutesEnd !== undefined
-      ? [
-          "overview-past-minutes",
-          pastMinutesStart,
-          pastMinutesEnd,
-          site,
-          filters,
-        ]
-      : [
-          "overview",
-          timeToUse,
-          site,
-          filters,
-          timeToUse.mode === "last-24-hours" ? "past-minutes" : "date-range",
-        ];
+  const queryKey = ["overview", timeToUse, site, filters];
 
   return useQuery({
     queryKey,
@@ -66,7 +34,7 @@ export function useGetOverview({
         queryParams
       );
     },
-    staleTime: Infinity,
+    staleTime: 60_000,
     placeholderData: (_, query: any) => {
       if (!query?.queryKey) return undefined;
       const prevQueryKey = query.queryKey;
