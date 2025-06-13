@@ -4,29 +4,6 @@
   const scriptTag = document.currentScript;
   const ANALYTICS_HOST = scriptTag.getAttribute("src").split("/script.js")[0];
 
-  // Load Web Vitals library dynamically from CDN
-  const loadWebVitals = () => {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js";
-      script.onload = () => resolve();
-      script.onerror = () =>
-        reject(new Error("Failed to load web-vitals library"));
-      document.head.appendChild(script);
-    });
-  };
-
-  // Initialize web vitals loading only if enabled
-  if (enableWebVitals) {
-    loadWebVitals()
-      .then(() => {
-        initWebVitals();
-      })
-      .catch((e) => {
-        console.warn("Failed to load web vitals library:", e);
-      });
-  }
-
   // Check if the user has opted out of tracking
   if (
     !!window.__RYBBIT_OPTOUT__ ||
@@ -71,6 +48,29 @@
   const trackOutbound =
     scriptTag.getAttribute("data-track-outbound") !== "false";
   const enableWebVitals = scriptTag.getAttribute("data-web-vitals") === "true";
+
+  // Load Web Vitals library dynamically from CDN
+  const loadWebVitals = () => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js";
+      script.onload = () => resolve();
+      script.onerror = () =>
+        reject(new Error("Failed to load web-vitals library"));
+      document.head.appendChild(script);
+    });
+  };
+
+  // Initialize web vitals loading only if enabled
+  if (enableWebVitals) {
+    loadWebVitals()
+      .then(() => {
+        initWebVitals();
+      })
+      .catch((e) => {
+        console.warn("Failed to load web vitals library:", e);
+      });
+  }
 
   let skipPatterns = [];
   try {
