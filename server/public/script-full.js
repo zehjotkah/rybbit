@@ -16,14 +16,16 @@
     });
   };
 
-  // Initialize web vitals loading
-  loadWebVitals()
-    .then(() => {
-      initWebVitals();
-    })
-    .catch((e) => {
-      console.warn("Failed to load web vitals library:", e);
-    });
+  // Initialize web vitals loading only if enabled
+  if (enableWebVitals) {
+    loadWebVitals()
+      .then(() => {
+        initWebVitals();
+      })
+      .catch((e) => {
+        console.warn("Failed to load web vitals library:", e);
+      });
+  }
 
   // Check if the user has opted out of tracking
   if (
@@ -68,6 +70,7 @@
     scriptTag.getAttribute("data-track-query") !== "false";
   const trackOutbound =
     scriptTag.getAttribute("data-track-outbound") !== "false";
+  const enableWebVitals = scriptTag.getAttribute("data-web-vitals") === "true";
 
   let skipPatterns = [];
   try {
@@ -309,9 +312,9 @@
     checkAndSendWebVitals();
   };
 
-  // Initialize web vitals tracking if available
+  // Initialize web vitals tracking if available and enabled
   const initWebVitals = () => {
-    if (typeof webVitals !== "undefined") {
+    if (typeof webVitals !== "undefined" && enableWebVitals) {
       try {
         // Track Core Web Vitals
         webVitals.getLCP(collectMetric);

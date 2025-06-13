@@ -196,3 +196,21 @@ This file tracks the project's progress using a task list format.
   - Professional error messaging with helpful context
   - Brand-consistent styling matching the analytics platform theme
 - **Impact**: Users encountering 404 errors now have a professional, helpful experience with clear navigation options and access to support resources
+
+[2025-06-12 21:10:00] - **COMPLETED: Web Vitals Opt-in Flag Implementation**
+
+- **Task**: Add web vitals flag to disable Web Vitals collection unless explicitly enabled
+- **Status**: ✅ COMPLETED
+- **Work Done**:
+  - Added `data-web-vitals` attribute support to [`server/public/script-full.js`](server/public/script-full.js:1)
+  - Web Vitals library loading now conditional based on flag setting
+  - Modified `initWebVitals()` function to respect the enableWebVitals flag
+  - Updated documentation in [`docs/src/content/script.mdx`](docs/src/content/script.mdx:1)
+  - Added comprehensive Web Vitals section with usage examples
+  - Added `data-track-outbound` to documentation table for completeness
+- **Key Changes**:
+  - Web Vitals are now **disabled by default** (opt-in behavior)
+  - Users must set `data-web-vitals="true"` to enable performance metrics collection
+  - Reduced default script overhead by not loading Web Vitals library unless needed
+  - Enhanced documentation with clear usage examples and explanations
+- **Impact**: Improved default performance while giving users explicit control over Web Vitals collection
