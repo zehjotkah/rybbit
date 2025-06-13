@@ -124,6 +124,7 @@ FROM events
 WHERE
     site_id = {siteId:Int32}
     AND session_id = {sessionId:String}
+    AND type != 'performance'
     ${timeFilterWithConnector}
     `;
 
@@ -143,6 +144,7 @@ FROM events
 WHERE
     site_id = {siteId:Int32}
     AND session_id = {sessionId:String}
+    AND type != 'performance'
     ${timeFilterWithConnector}
 ORDER BY timestamp ASC
 LIMIT {limit:Int32}
