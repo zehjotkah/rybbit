@@ -47,7 +47,9 @@
     scriptTag.getAttribute("data-track-query") !== "false";
   const trackOutbound =
     scriptTag.getAttribute("data-track-outbound") !== "false";
-  const enableWebVitals = scriptTag.getAttribute("data-web-vitals") === "true";
+  // only true temporarily to test web vitals
+  const enableWebVitals = true;
+  // const enableWebVitals = scriptTag.getAttribute("data-web-vitals") === "true";
 
   // Load Web Vitals library dynamically from CDN
   const loadWebVitals = () => {
