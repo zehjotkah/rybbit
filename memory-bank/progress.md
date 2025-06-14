@@ -214,3 +214,22 @@ This file tracks the project's progress using a task list format.
   - Reduced default script overhead by not loading Web Vitals library unless needed
   - Enhanced documentation with clear usage examples and explanations
 - **Impact**: Improved default performance while giving users explicit control over Web Vitals collection
+
+[2025-06-13 23:46:38] - **COMPLETED: Added Web Vitals Option to ScriptBuilder Component**
+
+- **Task**: Add Web Vitals toggle option to the ScriptBuilder component in site settings
+- **Status**: ✅ COMPLETED
+- **Work Done**:
+  - Added `webVitals` state variable (defaults to `false` to match opt-in behavior)
+  - Added `data-web-vitals="true"` attribute to generated script when enabled
+  - Created Web Vitals toggle section in the UI with proper labeling and description
+  - Positioned the option logically after the track query parameters section
+  - Used consistent styling and layout patterns matching existing options
+- **Files Modified**:
+  - [`client/src/components/SiteSettings/ScriptBuilder.tsx`](client/src/components/SiteSettings/ScriptBuilder.tsx:1) - Added Web Vitals configuration option
+- **Features Added**:
+  - Toggle switch for enabling/disabling Web Vitals collection
+  - Clear description explaining what metrics are collected (LCP, CLS, INP, FCP, TTFB)
+  - Conditional script attribute generation (`data-web-vitals="true"` only when enabled)
+  - Consistent with existing opt-in behavior (disabled by default)
+- **Impact**: Users can now easily enable Web Vitals performance metrics collection through the ScriptBuilder UI, matching the functionality documented in the script documentation
