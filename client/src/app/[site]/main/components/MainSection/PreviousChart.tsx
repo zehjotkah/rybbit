@@ -30,10 +30,6 @@ const getMin = (time: Time, bucket: TimeBucket) => {
   } else if (time.mode === "year") {
     const yearDate = DateTime.fromISO(time.year).startOf("year");
     return yearDate.toJSDate();
-  } else if (time.mode === "range") {
-    const startDate = DateTime.fromISO(time.startDate).startOf("day");
-    const endDate = DateTime.fromISO(time.endDate).startOf("day");
-    return startDate.toJSDate();
   }
   return undefined;
 };
