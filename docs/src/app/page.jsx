@@ -33,9 +33,70 @@ export const metadata = {
     "Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.",
 };
 
+// FAQ Structured Data
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is Rybbit GDPR and CCPA compliant?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, Rybbit is fully compliant with GDPR, CCPA, and other privacy regulations. We don't use cookies or collect any personal data that could identify your users. We salt user IDs daily to ensure users are not fingerprinted. You will not need to display a cookie consent banner to your users."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "How does Rybbit compare to Google Analytics?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Rybbit is much less bloated than Google Analytics, both in terms of our tracking script and the UX of the dashboard. We show you exactly what you need to see. The difference in usability is night and day."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Can I self-host Rybbit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Absolutely! Rybbit is available as a self-hosted option. You can install it on your own server and have complete control over your data. We also offer a cloud version if you prefer a managed solution."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "How easy is it to set up Rybbit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Setting up Rybbit is incredibly simple. Just add a small script to your website or install @rybbit/js from npm, and you're good to go. Most users are up and running in less than 5 minutes."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "What platforms does Rybbit support?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Rybbit works with virtually any website platform. Whether you're using WordPress, Shopify, Next.js, React, Vue, or any other framework, our simple tracking snippet integrates seamlessly."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Is Rybbit truly open source?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, Rybbit is 100% open source. Every single line of code, including for our cloud/enterprise offerings, is available on GitHub under the AGPL 3.0 license."
+      }
+    }
+  ]
+};
+
 export default function IndexPage() {
   return (
-    <div className="flex flex-col items-center justify-center overflow-x-hidden">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <div className="flex flex-col items-center justify-center overflow-x-hidden">
       <h1
         className={cn(
           "text-4xl md:text-5xl lg:text-7xl font-semibold pt-16 md:pt-24 px-4 tracking-tight max-w-4xl text-center text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400",
@@ -422,6 +483,7 @@ export default function IndexPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

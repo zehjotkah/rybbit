@@ -298,7 +298,7 @@ export function PerformanceChart() {
                 tilt_wrap.className
               )}
             >
-              <Image src="/rybbit.png" alt="Rybbit" width={20} height={20} />
+              <Image src="/rybbit.svg" alt="Rybbit" width={20} height={20} />
               rybbit.io
             </Link>
           </div>

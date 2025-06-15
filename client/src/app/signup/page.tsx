@@ -463,7 +463,7 @@ export default function SignupPage() {
       <div className="flex justify-center items-center h-screen w-full">
         <Card className="w-full max-w-sm p-1">
           <CardHeader>
-            <Image src="/rybbit.png" alt="Rybbit" width={32} height={32} />
+            <Image src="/rybbit.svg" alt="Rybbit" width={32} height={32} />
             <CardTitle className="text-2xl flex justify-center">
               Sign Up Disabled
             </CardTitle>
@@ -565,8 +565,8 @@ export default function SignupPage() {
         </div>
       </Card>
       <div className="text-xs text-muted-foreground relative z-10 mt-4">
-        <a 
-          href="https://rybbit.io" 
+        <a
+          href="https://rybbit.io"
           target="_blank"
           rel="noopener"
           title="Rybbit - Open Source Privacy-Focused Web Analytics"

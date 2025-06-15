@@ -27,6 +27,9 @@ export const metadata = {
   // description: 'Next-gen, open source, lightweight, cookieless web & product analytics for everyone — GDPR/CCPA compliant.',
   applicationName: "Rybbit",
   generator: "Next.js",
+  alternates: {
+    canonical: "https://rybbit.io",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -91,6 +94,44 @@ function Footer_() {
   );
 }
 
+// JSON-LD structured data for organization
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Rybbit",
+  description: "Open source, privacy-focused web analytics platform",
+  url: "https://rybbit.io",
+  logo: "https://rybbit.io/rybbit.svg",
+  sameAs: ["https://github.com/rybbit-io/rybbit"],
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "hello@rybbit.io",
+    contactType: "customer support",
+  },
+};
+
+// JSON-LD structured data for software application
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Rybbit",
+  applicationCategory: "Analytics",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    priceValidUntil: "2025-12-31",
+  },
+  description: "Open source web analytics platform that respects user privacy",
+  softwareVersion: "1.0",
+  url: "https://rybbit.io",
+  author: {
+    "@type": "Organization",
+    name: "Rybbit",
+  },
+};
+
 export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
@@ -101,7 +142,7 @@ export default async function RootLayout({ children }) {
             tilt_wrap.className
           )}
         >
-          <Image src="/rybbit.png" alt="Rybbit" width={30} height={30} />
+          <Image src="/rybbit.svg" alt="Rybbit" width={30} height={30} />
           rybbit.
         </div>
       }
@@ -179,6 +220,16 @@ export default async function RootLayout({ children }) {
             defer
             src="https://buttons.github.io/buttons.js"
           ></script>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(organizationSchema),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+          />
         </PostHogProvider>
       </body>
     </html>
