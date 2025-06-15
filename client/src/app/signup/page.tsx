@@ -486,7 +486,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-background p-4 relative overflow-hidden">
+    <div className="flex flex-col justify-between items-center min-h-screen bg-background p-4 relative overflow-hidden">
       {/* Suspense boundary for the URL parameter handler */}
       <Suspense fallback={null}>
         <StepHandler onSetStep={setCurrentStep} />
@@ -501,6 +501,7 @@ export default function SignupPage() {
 
       <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-20"></div>
 
+      <div></div>
       <Card className="w-full max-w-4xl p-0 overflow-hidden shadow-2xl border-neutral-700/50 backdrop-blur-sm bg-neutral-800/20 relative z-10">
         <div className="flex flex-col md:flex-row h-full">
           {/* Left sidebar with steps */}
@@ -563,6 +564,16 @@ export default function SignupPage() {
           </div>
         </div>
       </Card>
+      <div className="text-xs text-muted-foreground relative z-10 mt-4">
+        <a 
+          href="https://rybbit.io" 
+          target="_blank"
+          rel="noopener"
+          title="Rybbit - Open Source Privacy-Focused Web Analytics"
+        >
+          Open source web analytics powered by Rybbit
+        </a>
+      </div>
     </div>
   );
 }

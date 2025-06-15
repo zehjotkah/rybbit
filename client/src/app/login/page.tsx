@@ -50,7 +50,8 @@ export default function Page() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-full p-4">
+    <div className="flex flex-col justify-between items-center h-screen w-full p-4">
+      <div></div>
       <Card className="w-full max-w-sm p-1">
         <CardHeader>
           <Image src="/rybbit.png" alt="Rybbit" width={32} height={32} />
@@ -109,6 +110,16 @@ export default function Page() {
           </form>
         </CardContent>
       </Card>
+      <div className="text-xs text-muted-foreground">
+        <a 
+          href="https://rybbit.io" 
+          target="_blank"
+          rel="noopener"
+          title="Rybbit - Open Source Privacy-Focused Web Analytics"
+        >
+          Open source web analytics powered by Rybbit
+        </a>
+      </div>
     </div>
   );
 }
