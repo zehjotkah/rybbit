@@ -29,6 +29,11 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
   const { data, isLoading, isSuccess } = useGetOverviewBucketed({
     site: siteId,
     bucket: "hour",
+    overrideTime: {
+      mode: "past-minutes",
+      pastMinutesStart: 1440,
+      pastMinutesEnd: 0,
+    },
     props: {
       enabled: isInView,
     },
@@ -40,6 +45,11 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
     isSuccess: isOverviewSuccess,
   } = useGetOverview({
     site: siteId,
+    overrideTime: {
+      mode: "past-minutes",
+      pastMinutesStart: 1440,
+      pastMinutesEnd: 0,
+    },
   });
 
   // Update the hasLoadedData ref when data loads successfully

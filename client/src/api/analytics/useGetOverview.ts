@@ -16,11 +16,21 @@ type PeriodTime = "current" | "previous";
 type UseGetOverviewOptions = {
   periodTime?: PeriodTime;
   site?: number | string;
+  overrideTime?:
+    | { mode: "past-minutes"; pastMinutesStart: number; pastMinutesEnd: number }
+    | { mode: "range"; startDate: string; endDate: string };
 };
 
-export function useGetOverview({ periodTime, site }: UseGetOverviewOptions) {
+export function useGetOverview({
+  periodTime,
+  site,
+  overrideTime,
+}: UseGetOverviewOptions) {
   const { time, previousTime, filters } = useStore();
-  const timeToUse = periodTime === "previous" ? previousTime : time;
+
+  // Use overrideTime if provided, otherwise use store time
+  const baseTime = overrideTime || time;
+  const timeToUse = periodTime === "previous" ? previousTime : baseTime;
 
   const queryParams = getQueryParams(timeToUse, { filters });
 
