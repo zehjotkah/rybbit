@@ -7,7 +7,6 @@ import "nextra-theme-docs/style.css";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import { cn } from "../lib/utils";
-import { SmallLogo } from "./components/Logo";
 import "./globals.css";
 import { PostHogProvider } from "./providers";
 
@@ -70,7 +69,7 @@ function Footer_() {
     <div className="max-w-[1300px] mx-auto">
       <div className="flex flex-col md:flex-row items-center md:justify-between w-full px-6 py-4 space-y-4 md:space-y-0">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-0 md:justify-between w-full">
-          <SmallLogo />
+          <Image src="/rybbit-text.svg" alt="Rybbit" width={120} height={27} />
           <div className="text-sm text-neutral-400 text-center md:text-left">
             Copyright {new Date().getFullYear()} © Rybbit.
           </div>
@@ -136,15 +135,7 @@ export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
       logo={
-        <div
-          className={cn(
-            "text-2xl flex items-center gap-1.5",
-            tilt_wrap.className
-          )}
-        >
-          <Image src="/rybbit.svg" alt="Rybbit" width={30} height={30} />
-          rybbit.
-        </div>
+        <Image src="/rybbit-text.svg" alt="Rybbit" width={110} height={27} />
       }
       chatLink="https://discord.gg/DEhGb4hYBj"
       projectLink="https://github.com/rybbit-io/rybbit"

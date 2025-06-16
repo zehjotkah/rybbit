@@ -18,9 +18,9 @@ import { UserFlowAnalysis } from "./components/Cards/UserFlowAnalysis";
 import { UserProfiles } from "./components/Cards/UserProfiles";
 import { UserSessions } from "./components/Cards/UserSessions";
 import { Integrations } from "./components/integrations";
-import { Logo } from "./components/Logo";
 import { PricingSection } from "./pricing/components/PricingSection";
 import { TweetCard } from "./components/Tweet";
+import Image from "next/image";
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],
@@ -444,7 +444,12 @@ export default function IndexPage() {
 
               <div className="relative p-6 md:p-12 flex flex-col items-center justify-center text-center">
                 <div className="mb-6 md:mb-8">
-                  <Logo />
+                  <Image
+                    src="/rybbit-text.svg"
+                    alt="Rybbit"
+                    width={150}
+                    height={27}
+                  />
                 </div>
                 <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">
                   It's time to switch to analytics that's made for you

@@ -25,7 +25,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { addSite } from "../../api/admin/sites";
 import { CodeSnippet } from "../../components/CodeSnippet";
-import { Logo } from "../../components/Logo";
 import { useSetPageTitle } from "../../hooks/useSetPageTitle";
 import { authClient } from "../../lib/auth";
 import { useConfigs } from "../../lib/configs";
@@ -513,7 +512,14 @@ export default function SignupPage() {
               />
             </div>
             <div className="relative z-10 flex flex-col space-y-4">
-              <Logo size="xlarge" />
+              <a href="https://rybbit.io" target="_blank">
+                <Image
+                  src="/rybbit-text.svg"
+                  alt="Rybbit"
+                  width={120}
+                  height={27}
+                />
+              </a>
 
               {[1, 2, 3, 4].map((step) => (
                 <div
