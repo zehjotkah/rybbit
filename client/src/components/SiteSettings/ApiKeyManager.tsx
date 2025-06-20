@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 import {
   useGenerateApiKey,
@@ -50,8 +51,23 @@ export function ApiKeyManager({
       <div>
         <h4 className="text-sm font-semibold text-foreground">API Key</h4>
         <p className="text-xs text-muted-foreground mt-1">
-          Generate an API key to track events using the API endpoint or from
-          localhost during development.
+          Generate an API key to track events from{" "}
+          <Link
+            href="https://rybbit.io/docs/local-tracking"
+            target="_blank"
+            className="text-indigo-300 hover:underline"
+          >
+            localhost
+          </Link>
+          , server-side applications, or mobile apps using the{" "}
+          <Link
+            href="https://rybbit.io/docs/api"
+            target="_blank"
+            className="text-indigo-300 hover:underline"
+          >
+            API endpoint
+          </Link>
+          .
         </p>
       </div>
 
@@ -106,8 +122,7 @@ export function ApiKeyManager({
               </div>
             </div>
           </div>
-
-          <div>
+          <div className="space-y-4">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
