@@ -17,6 +17,7 @@ export default {
     title: "Self-hosting",
   },
   "self-hosting": "",
+  troubleshooting: "",
   "self-hosting-advanced": "",
   "self-hosting-nginx": "",
   "v1-migration": "",
