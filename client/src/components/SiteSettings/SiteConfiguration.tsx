@@ -30,6 +30,7 @@ import {
   SiteResponse,
   useGetSitesFromOrg,
 } from "@/api/admin/sites";
+import { normalizeDomain } from "@/lib/utils";
 
 interface SiteConfigurationProps {
   siteMetadata: SiteResponse;
@@ -37,14 +38,14 @@ interface SiteConfigurationProps {
   onClose?: () => void;
 }
 
-export function SiteConfiguration({ 
-  siteMetadata, 
+export function SiteConfiguration({
+  siteMetadata,
   disabled = false,
-  onClose 
+  onClose,
 }: SiteConfigurationProps) {
   const { refetch } = useGetSitesFromOrg(siteMetadata?.organizationId ?? "");
   const router = useRouter();
-  
+
   const [newDomain, setNewDomain] = useState(siteMetadata.domain);
   const [isChangingDomain, setIsChangingDomain] = useState(false);
   const [isPublic, setIsPublic] = useState(siteMetadata.public || false);
@@ -65,7 +66,8 @@ export function SiteConfiguration({
 
     try {
       setIsChangingDomain(true);
-      await changeSiteDomain(siteMetadata.siteId, newDomain);
+      const normalizedDomain = normalizeDomain(newDomain);
+      await changeSiteDomain(siteMetadata.siteId, normalizedDomain);
       toast.success("Domain updated successfully");
       router.refresh();
       refetch();
@@ -157,8 +159,7 @@ export function SiteConfiguration({
             Public Analytics
           </Label>
           <p className="text-xs text-muted-foreground mt-1">
-            When enabled, anyone can view your site analytics without
-            logging in
+            When enabled, anyone can view your site analytics without logging in
           </p>
         </div>
         <Switch
@@ -179,8 +180,8 @@ export function SiteConfiguration({
             Enable User ID Salting
           </Label>
           <p className="text-xs text-muted-foreground mt-1">
-            When enabled, user IDs will be salted with a daily rotating
-            key for enhanced privacy
+            When enabled, user IDs will be salted with a daily rotating key for
+            enhanced privacy
           </p>
         </div>
         <Switch
@@ -233,9 +234,7 @@ export function SiteConfiguration({
             variant="outline"
             onClick={handleDomainChange}
             disabled={
-              isChangingDomain ||
-              newDomain === siteMetadata.domain ||
-              disabled
+              isChangingDomain || newDomain === siteMetadata.domain || disabled
             }
           >
             {isChangingDomain ? "Updating..." : "Update"}
@@ -245,9 +244,7 @@ export function SiteConfiguration({
 
       {/* Danger Zone Section */}
       <div className="space-y-3 pt-3">
-        <h4 className="text-sm font-semibold text-destructive">
-          Danger Zone
-        </h4>
+        <h4 className="text-sm font-semibold text-destructive">Danger Zone</h4>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
@@ -261,13 +258,11 @@ export function SiteConfiguration({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you absolutely sure?
-              </AlertDialogTitle>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete
-                the site &quot;{siteMetadata.name}&quot; and all of its
-                analytics data.
+                This action cannot be undone. This will permanently delete the
+                site &quot;{siteMetadata.name}&quot; and all of its analytics
+                data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

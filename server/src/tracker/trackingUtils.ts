@@ -124,8 +124,6 @@ export function createBasePayload(
   const ipAddress = validatedBody.ip_address || getIpAddress(request);
   const siteId = validatedBody.site_id;
 
-  console.log("ipAddress", ipAddress);
-
   // Use custom user ID if provided, otherwise generate one
   const userId = validatedBody.user_id
     ? validatedBody.user_id.trim()
