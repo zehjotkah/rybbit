@@ -92,11 +92,11 @@ export const trackingPayloadSchema = z.discriminatedUnion("type", [
       ip_address: z.string().ip().optional(), // Custom IP for geolocation
       user_agent: z.string().max(512).optional(), // Custom user agent
       // Performance metrics (can be null if not collected)
-      lcp: z.number().positive().nullable().optional(),
+      lcp: z.number().min(0).nullable().optional(),
       cls: z.number().min(0).nullable().optional(),
-      inp: z.number().positive().nullable().optional(),
-      fcp: z.number().positive().nullable().optional(),
-      ttfb: z.number().positive().nullable().optional(),
+      inp: z.number().min(0).nullable().optional(),
+      fcp: z.number().min(0).nullable().optional(),
+      ttfb: z.number().min(0).nullable().optional(),
     })
     .strict(),
 ]);
