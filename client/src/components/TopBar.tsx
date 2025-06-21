@@ -72,6 +72,7 @@ export function TopBar() {
         ) : (
           <Link
             href={
+              typeof window !== "undefined" &&
               globalThis.location.hostname === "demo.rybbit.io"
                 ? "https://app.rybbit.io/signup"
                 : "/signup"
