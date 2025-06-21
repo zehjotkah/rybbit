@@ -166,6 +166,7 @@ export default async function RootLayout({ children }) {
         data-site-id="21"
         defer
         data-enable-replay="true"
+        data-web-vitals="true"
         {...(isDev && {
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
