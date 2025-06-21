@@ -47,6 +47,7 @@ export default function RootLayout({
             data-site-id="22"
             strategy="afterInteractive"
             data-web-vitals="true"
+            data-track-errors="true"
           />
         </>
       )}
