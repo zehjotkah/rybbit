@@ -24,6 +24,7 @@ import { formatDuration } from "../../lib/dateTimeUtils";
 import { Badge } from "../ui/badge";
 import { SessionDetails } from "./SessionDetails";
 import { userLocale, hour12 } from "../../lib/dateTimeUtils";
+import { useGetRegionName } from "../../lib/geo";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -52,6 +53,8 @@ function truncatePath(path: string, maxLength: number = 32) {
 }
 
 export function SessionCard({ session, onClick, userId }: SessionCardProps) {
+  const { getRegionName } = useGetRegionName();
+
   const [expanded, setExpanded] = useState(false);
 
   // Calculate session duration in minutes
@@ -69,6 +72,20 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
     } else {
       setExpanded(!expanded);
     }
+  };
+
+  const getFullLocation = (session: GetSessionsResponse[number]) => {
+    let location = "";
+    if (session.city) {
+      location += `${session.city}, `;
+    }
+    if (getRegionName(session.region)) {
+      location += `${getRegionName(session.region)}, `;
+    }
+    if (session.country) {
+      location += getCountryName(session.country);
+    }
+    return location;
   };
 
   return (
@@ -92,7 +109,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{getCountryName(session.country)}</p>
+                  <p>{getFullLocation(session)}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -105,7 +122,10 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{session.browser || "Unknown browser"}</p>
+                <p>
+                  {session.browser || "Unknown browser"}
+                  {session.browser_version && ` ${session.browser_version}`}
+                </p>
               </TooltipContent>
             </Tooltip>
 
@@ -117,7 +137,11 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{session.operating_system || "Unknown OS"}</p>
+                <p>
+                  {session.operating_system || "Unknown OS"}
+                  {session.operating_system_version &&
+                    ` ${session.operating_system_version}`}
+                </p>
               </TooltipContent>
             </Tooltip>
 
@@ -129,7 +153,12 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{session.device_type || "Unknown device"}</p>
+                <p>
+                  {session.device_type || "Unknown device"}
+                  {session.screen_width &&
+                    session.screen_height &&
+                    ` ${session.screen_width}x${session.screen_height}`}
+                </p>
               </TooltipContent>
             </Tooltip>
 
