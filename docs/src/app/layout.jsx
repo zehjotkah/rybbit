@@ -165,7 +165,7 @@ export default async function RootLayout({ children }) {
         src="https://demo.rybbit.io/api/script.js"
         data-site-id="21"
         defer
-        data-enable-replay="true"
+        data-session-replay="true"
         data-web-vitals="true"
         data-track-errors="true"
         {...(isDev && {
