@@ -160,7 +160,7 @@ async function getMonthlyPageviews(
       query: `
         SELECT COUNT(*) as count
         FROM events
-        WHERE site_id IN (${siteIds.join(",")})
+        WHERE site_id IN (${siteIds.join(",")}) AND type = 'pageview'
         AND timestamp >= toDate('${periodStart}')
       `,
       format: "JSONEachRow",
