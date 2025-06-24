@@ -295,9 +295,9 @@ export const SessionCardSkeleton = memo(() => {
             <Skeleton className="h-4 w-4 rounded-sm flex-shrink-0" />
             <Skeleton className="h-4 w-4 rounded-sm" />
             {/* Badge skeleton for pageviews */}
-            <Skeleton className="h-4 w-8 rounded-sm" />
+            <Skeleton className="h-[21px] w-8 rounded-sm" />
             {/* Badge skeleton for events */}
-            <Skeleton className="h-4 w-8 rounded-sm" />
+            <Skeleton className="h-[21px] w-8 rounded-sm" />
           </div>
 
           {/* Entry/Exit paths with randomized widths */}
