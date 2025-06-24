@@ -173,51 +173,45 @@ export default async function RootLayout({ children }) {
         })}
       ></script>
       <body>
-        <PostHogProvider>
-          <Layout
-            banner={
-              <div className="text-center text-sm text-neutral-100 pt-2 pb-1 bg-neutral-700/50 flex items-center justify-center gap-2">
-                <div className="mb-1">
-                  🚀 We just launched! Please star us on Github!{" "}
-                </div>
-                <a
-                  className="github-button"
-                  href="https://github.com/rybbit-io/rybbit"
-                  data-color-scheme="no-preference: light; light: light; dark: light;"
-                  data-show-count="true"
-                  aria-label="Star rybbit-io/rybbit on GitHub"
-                ></a>
+        <Layout
+          banner={
+            <div className="text-center text-sm text-neutral-100 pt-2 pb-1 bg-neutral-700/50 flex items-center justify-center gap-2">
+              <div className="mb-1">
+                🚀 We just launched! Please star us on Github!{" "}
               </div>
-            }
-            navbar={navbar}
-            footer={<Footer_ />}
-            editLink="Edit this page on GitHub"
-            docsRepositoryBase="https://github.com/rybbit-io/rybbit/tree/master/docs"
-            sidebar={{ defaultMenuCollapseLevel: 1 }}
-            pageMap={pageMap}
-            nextThemes={{
-              defaultTheme: "dark",
-              forcedTheme: "dark",
-            }}
-          >
-            {children}
-          </Layout>
-          <script
-            async
-            defer
-            src="https://buttons.github.io/buttons.js"
-          ></script>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(organizationSchema),
-            }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-          />
-        </PostHogProvider>
+              <a
+                className="github-button"
+                href="https://github.com/rybbit-io/rybbit"
+                data-color-scheme="no-preference: light; light: light; dark: light;"
+                data-show-count="true"
+                aria-label="Star rybbit-io/rybbit on GitHub"
+              ></a>
+            </div>
+          }
+          navbar={navbar}
+          footer={<Footer_ />}
+          editLink="Edit this page on GitHub"
+          docsRepositoryBase="https://github.com/rybbit-io/rybbit/tree/master/docs"
+          sidebar={{ defaultMenuCollapseLevel: 1 }}
+          pageMap={pageMap}
+          nextThemes={{
+            defaultTheme: "dark",
+            forcedTheme: "dark",
+          }}
+        >
+          {children}
+        </Layout>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+        />
       </body>
     </html>
   );
