@@ -23,27 +23,23 @@ function getTimeStatementFill(params: FilterParams, bucket: TimeBucket) {
     validatedParams.timeZone
   ) {
     const { startDate, endDate, timeZone } = validatedParams;
-    return `WITH FILL FROM toTimeZone(
-      toDateTime(${
+    return `WITH FILL FROM ${
         TimeBucketToFn[validatedBucket]
       }(toDateTime(${SqlString.escape(startDate)}, ${SqlString.escape(
         timeZone
-      )}))),
-      'UTC'
-      )
+      )}))
       TO if(
         toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(
           timeZone
         )}),
-        now(),
-        toTimeZone(
-          toDateTime(${
-            TimeBucketToFn[validatedBucket]
-          }(toDateTime(${SqlString.escape(endDate)}, ${SqlString.escape(
-            timeZone
-          )}))) + INTERVAL 1 DAY,
-          'UTC'
-        )
+        ${TimeBucketToFn[validatedBucket]}(toTimeZone(now(), ${SqlString.escape(
+          timeZone
+        )})),
+        ${
+          TimeBucketToFn[validatedBucket]
+        }(toDateTime(${SqlString.escape(endDate)}, ${SqlString.escape(
+          timeZone
+        )})) + INTERVAL 1 DAY
       ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
   }
   // For specific past minutes range - convert to exact timestamps for better performance
@@ -101,7 +97,7 @@ export async function getErrorBucketed(
   try {
     const query = `
       SELECT
-        ${TimeBucketToFn[bucket]}(timestamp) AS time,
+        ${TimeBucketToFn[bucket]}(toTimeZone(timestamp, {timeZone:String})) AS time,
         COUNT(*) AS error_count
       FROM events
       WHERE
@@ -121,6 +117,7 @@ export async function getErrorBucketed(
       query_params: {
         siteId: numericSiteId,
         errorMessage: errorMessage,
+        timeZone: req.query.timeZone || 'UTC',
       },
     });
 
