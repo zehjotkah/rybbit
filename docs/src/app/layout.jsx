@@ -172,6 +172,11 @@ export default async function RootLayout({ children }) {
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       ></script>
+      <script
+        defer
+        data-domain="rybbit.io"
+        src="https://plausible.io/js/script.hash.outbound-links.js"
+      ></script>
       <body>
         <Layout
           banner={
