@@ -7,24 +7,32 @@ import { getCountryName } from "../../lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 // DeviceIcon component for displaying mobile/desktop icons
-function DeviceIcon({ deviceType }: { deviceType: string }) {
+function DeviceIcon({
+  deviceType,
+  size = 16,
+}: {
+  deviceType: string;
+  size?: number;
+}) {
   const type = deviceType.toLowerCase();
 
   if (type.includes("mobile") || type.includes("tablet")) {
-    return <Smartphone className="w-4 h-4" />;
+    return <Smartphone width={size} height={size} />;
   }
 
-  return <Laptop className="w-4 h-4" />;
+  return <Laptop width={size} height={size} />;
 }
 
 export function CountryFlagTooltipIcon({
   country,
   city,
   region,
+  className,
 }: {
   country: string;
   city: string;
   region: string;
+  className?: string;
 }) {
   const getFullLocation = <
     T extends { country: string; city: string; region: string }
@@ -48,7 +56,7 @@ export function CountryFlagTooltipIcon({
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex items-center">
-          <CountryFlag country={country} />
+          <CountryFlag country={country} className={className} />
         </div>
       </TooltipTrigger>
       <TooltipContent>
@@ -61,15 +69,17 @@ export function CountryFlagTooltipIcon({
 export function BrowserTooltipIcon({
   browser,
   browser_version,
+  size = 16,
 }: {
   browser: string;
   browser_version?: string;
+  size?: number;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex-shrink-0">
-          <Browser browser={browser || "Unknown"} />
+          <Browser browser={browser || "Unknown"} size={size} />
         </div>
       </TooltipTrigger>
       <TooltipContent>
@@ -85,15 +95,17 @@ export function BrowserTooltipIcon({
 export function OperatingSystemTooltipIcon({
   operating_system,
   operating_system_version,
+  size = 16,
 }: {
   operating_system: string;
   operating_system_version?: string;
+  size?: number;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex-shrink-0">
-          <OperatingSystem os={operating_system || ""} />
+          <OperatingSystem os={operating_system || ""} size={size} />
         </div>
       </TooltipTrigger>
       <TooltipContent>
@@ -110,22 +122,26 @@ export function DeviceTypeTooltipIcon({
   device_type,
   screen_width,
   screen_height,
+  size = 18,
 }: {
   device_type: string;
   screen_width?: number;
   screen_height?: number;
+  size?: number;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div>
-          <DeviceIcon deviceType={device_type || ""} />
+          <DeviceIcon deviceType={device_type || ""} size={size} />
         </div>
       </TooltipTrigger>
       <TooltipContent>
         <p>
           {device_type || "Unknown device"}
-          {screen_width && screen_height && ` ${screen_width}x${screen_height}`}
+          {screen_width &&
+            screen_height &&
+            ` ${screen_width} x ${screen_height}`}
         </p>
       </TooltipContent>
     </Tooltip>
