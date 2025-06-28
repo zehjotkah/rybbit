@@ -38,6 +38,9 @@ import { updateGoal } from "./api/analytics/goals/updateGoal.js";
 import { getPerformanceByDimension } from "./api/analytics/performance/getPerformanceByDimension.js";
 import { getPerformanceOverview } from "./api/analytics/performance/getPerformanceOverview.js";
 import { getPerformanceTimeSeries } from "./api/analytics/performance/getPerformanceTimeSeries.js";
+import { recordSessionReplay } from "./api/sessionReplay/recordSessionReplay.js";
+import { getSessionReplays } from "./api/sessionReplay/getSessionReplays.js";
+import { getSessionReplayEvents } from "./api/sessionReplay/getSessionReplayEvents.js";
 import { getConfig } from "./api/getConfig.js";
 import { addSite } from "./api/sites/addSite.js";
 import { changeSiteBlockBots } from "./api/sites/changeSiteBlockBots.js";
@@ -78,15 +81,18 @@ const server = Fastify({
   },
   maxParamLength: 1500,
   trustProxy: true,
+  bodyLimit: 10 * 1024 * 1024, // 10MB limit for session replay data
 });
 
 server.register(cors, {
   origin: (origin, callback) => {
-    if (!origin || allowList.includes(normalizeOrigin(origin))) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"), false);
-    }
+    callback(null, true);
+
+    // if (!origin || allowList.includes(normalizeOrigin(origin))) {
+    //   callback(null, true);
+    // } else {
+    //   callback(new Error("Not allowed by CORS"), false);
+    // }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -128,12 +134,17 @@ server.register(
 const PUBLIC_ROUTES: string[] = [
   "/api/health",
   "/api/track",
+  "/track",
   "/api/script.js", // Updated script route
+  "/api/script-full.js", // Updated script route
+  "/script-full.js", // Updated script route
+  "/script.js", // Updated script route
   "/api/config",
   "/api/auth",
   "/api/auth/callback/google",
   "/api/auth/callback/github",
   "/api/stripe/webhook",
+  "/api/session-replay/record",
 ];
 
 // Define analytics routes that can be public
@@ -169,6 +180,7 @@ const ANALYTICS_ROUTES = [
   "/api/error-names/",
   "/api/error-events/",
   "/api/error-bucketed/",
+  "/api/session-replay/",
 ];
 
 server.addHook("onRequest", async (request, reply) => {
@@ -197,7 +209,7 @@ server.addHook("onRequest", async (request, reply) => {
     const session = await getSessionFromReq(request);
 
     if (!session) {
-      return reply.status(401).send({ error: "Unauthorized" });
+      return reply.status(401).send({ error: "Unauthorized 1" });
     }
 
     // Attach session user info to request
@@ -257,6 +269,11 @@ server.get("/api/performance/overview/:site", getPerformanceOverview);
 server.get("/api/performance/time-series/:site", getPerformanceTimeSeries);
 server.get("/api/performance/by-dimension/:site", getPerformanceByDimension);
 
+// Session Replay
+server.post("/api/session-replay/record/:site", recordSessionReplay);
+server.get("/api/session-replay/list/:site", getSessionReplays);
+server.get("/api/session-replay/:sessionId/:site", getSessionReplayEvents);
+
 // Administrative
 server.get("/api/config", getConfig);
 server.post("/api/add-site", addSite);
@@ -291,7 +308,9 @@ if (IS_CLOUD) {
   server.get("/api/admin/organizations", getAdminOrganizations);
 }
 
+server.post("/track", trackEvent);
 server.post("/api/track", trackEvent);
+
 server.get("/api/health", { logLevel: "silent" }, (_, reply) =>
   reply.send("OK")
 );

@@ -3,16 +3,23 @@ import {
   ScriptConfig,
   TrackingPayload,
   WebVitalsData,
+  SessionReplayBatch,
 } from "./types.js";
 import { findMatchingPattern } from "./utils.js";
+import { SessionReplayRecorder } from "./sessionReplay.js";
 
 export class Tracker {
   private config: ScriptConfig;
   private customUserId: string | null = null;
+  private sessionReplayRecorder?: SessionReplayRecorder;
 
   constructor(config: ScriptConfig) {
     this.config = config;
     this.loadUserId();
+
+    if (config.enableSessionReplay) {
+      this.initializeSessionReplay();
+    }
   }
 
   private loadUserId(): void {
@@ -23,6 +30,41 @@ export class Tracker {
       }
     } catch (e) {
       // localStorage not available
+    }
+  }
+
+  private async initializeSessionReplay(): Promise<void> {
+    try {
+      this.sessionReplayRecorder = new SessionReplayRecorder(
+        this.config,
+        this.customUserId || "",
+        (batch) => this.sendSessionReplayBatch(batch)
+      );
+      await this.sessionReplayRecorder.initialize();
+    } catch (error) {
+      console.error("Failed to initialize session replay:", error);
+    }
+  }
+
+  private async sendSessionReplayBatch(
+    batch: SessionReplayBatch
+  ): Promise<void> {
+    try {
+      await fetch(
+        `${this.config.analyticsHost}/session-replay/record/${this.config.siteId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(batch),
+          mode: "cors",
+          keepalive: false, // Disable keepalive for large session replay requests
+        }
+      );
+    } catch (error) {
+      console.error("Failed to send session replay batch:", error);
+      throw error;
     }
   }
 
@@ -192,28 +234,33 @@ export class Tracker {
     if (filename) {
       errorProperties.fileName = filename;
     }
-    
+
     if (additionalInfo.lineno) {
-      const lineNum = typeof additionalInfo.lineno === 'string' 
-        ? parseInt(additionalInfo.lineno, 10) 
-        : additionalInfo.lineno;
+      const lineNum =
+        typeof additionalInfo.lineno === "string"
+          ? parseInt(additionalInfo.lineno, 10)
+          : additionalInfo.lineno;
       if (lineNum && lineNum !== 0) {
         errorProperties.lineNumber = lineNum;
       }
     }
-    
+
     if (additionalInfo.colno) {
-      const colNum = typeof additionalInfo.colno === 'string' 
-        ? parseInt(additionalInfo.colno, 10) 
-        : additionalInfo.colno;
+      const colNum =
+        typeof additionalInfo.colno === "string"
+          ? parseInt(additionalInfo.colno, 10)
+          : additionalInfo.colno;
       if (colNum && colNum !== 0) {
         errorProperties.columnNumber = colNum;
       }
     }
-    
+
     // Add any other additional info
     for (const key in additionalInfo) {
-      if (!['lineno', 'colno'].includes(key) && additionalInfo[key] !== undefined) {
+      if (
+        !["lineno", "colno"].includes(key) &&
+        additionalInfo[key] !== undefined
+      ) {
         errorProperties[key] = additionalInfo[key];
       }
     }
@@ -233,6 +280,11 @@ export class Tracker {
     } catch (e) {
       console.warn("Could not persist user ID to localStorage");
     }
+
+    // Update session replay recorder with new user ID
+    if (this.sessionReplayRecorder) {
+      this.sessionReplayRecorder.updateUserId(this.customUserId);
+    }
   }
 
   clearUserId(): void {
@@ -246,5 +298,38 @@ export class Tracker {
 
   getUserId(): string | null {
     return this.customUserId;
+  }
+
+  // Session Replay methods
+  startSessionReplay(): void {
+    if (this.sessionReplayRecorder) {
+      this.sessionReplayRecorder.startRecording();
+    } else {
+      console.warn("Session replay not initialized");
+    }
+  }
+
+  stopSessionReplay(): void {
+    if (this.sessionReplayRecorder) {
+      this.sessionReplayRecorder.stopRecording();
+    }
+  }
+
+  isSessionReplayActive(): boolean {
+    return this.sessionReplayRecorder?.isActive() ?? false;
+  }
+
+  // Handle page changes for SPA
+  onPageChange(): void {
+    if (this.sessionReplayRecorder) {
+      this.sessionReplayRecorder.onPageChange();
+    }
+  }
+
+  // Cleanup
+  cleanup(): void {
+    if (this.sessionReplayRecorder) {
+      this.sessionReplayRecorder.cleanup();
+    }
   }
 }

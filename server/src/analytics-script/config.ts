@@ -44,6 +44,23 @@ export function parseScriptConfig(
 
   const apiKey = scriptTag.getAttribute("data-api-key") || undefined;
 
+  const sessionReplayBatchSize = scriptTag.getAttribute(
+    "data-replay-batch-size"
+  )
+    ? Math.max(1, parseInt(scriptTag.getAttribute("data-replay-batch-size")!))
+    : 3; // Reduced from 50 to 3 for production stability
+
+  const sessionReplayBatchInterval = scriptTag.getAttribute(
+    "data-replay-batch-interval"
+  )
+    ? Math.max(
+        1000,
+        parseInt(scriptTag.getAttribute("data-replay-batch-interval")!)
+      )
+    : 2000; // Reduced from 5000 to 2000ms for faster, smaller batches
+
+  console.info(scriptTag);
+
   return {
     analyticsHost,
     siteId,
@@ -55,6 +72,10 @@ export function parseScriptConfig(
     trackOutbound: scriptTag.getAttribute("data-track-outbound") !== "false",
     enableWebVitals: scriptTag.getAttribute("data-web-vitals") === "true",
     trackErrors: scriptTag.getAttribute("data-track-errors") === "true",
+    enableSessionReplay:
+      scriptTag.getAttribute("data-session-replay") === "true",
+    sessionReplayBatchSize,
+    sessionReplayBatchInterval,
     skipPatterns,
     maskPatterns,
     apiKey,

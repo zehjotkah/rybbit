@@ -8,6 +8,9 @@ export interface ScriptConfig {
   trackOutbound: boolean;
   enableWebVitals: boolean;
   trackErrors: boolean;
+  enableSessionReplay: boolean;
+  sessionReplayBatchSize: number;
+  sessionReplayBatchInterval: number;
   skipPatterns: string[];
   maskPatterns: string[];
   apiKey?: string;
@@ -54,4 +57,24 @@ export interface RybbitAPI {
   identify: (userId: string) => void;
   clearUserId: () => void;
   getUserId: () => string | null;
+  startSessionReplay: () => void;
+  stopSessionReplay: () => void;
+  isSessionReplayActive: () => boolean;
+}
+
+export interface SessionReplayEvent {
+  type: string | number;
+  data: any;
+  timestamp: number;
+}
+
+export interface SessionReplayBatch {
+  userId: string;
+  events: SessionReplayEvent[];
+  metadata?: {
+    pageUrl: string;
+    viewportWidth?: number;
+    viewportHeight?: number;
+    language?: string;
+  };
 }

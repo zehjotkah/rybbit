@@ -1,21 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { z, ZodError } from "zod";
 import { isbot } from "isbot";
-import {
-  clearSelfReferrer,
-  createBasePayload,
-  getExistingSession,
-  isSiteOverLimit,
-  TotalTrackingPayload,
-} from "./trackingUtils.js";
-import { db } from "../db/postgres/postgres.js";
-import { activeSessions } from "../db/postgres/schema.js";
-import { eq } from "drizzle-orm";
-import { getDeviceType, normalizeOrigin } from "../utils.js";
-import { pageviewQueue } from "./pageviewQueue.js";
-import { siteConfig } from "../lib/siteConfig.js";
-import { DISABLE_ORIGIN_CHECK } from "./const.js";
+import { z, ZodError } from "zod";
 import { apiKeyRateLimiter } from "../lib/rateLimiter.js";
+import { siteConfig } from "../lib/siteConfig.js";
+import { sessionsService } from "../services/sessions/sessionsService.js";
+import { normalizeOrigin } from "../utils.js";
+import { DISABLE_ORIGIN_CHECK } from "./const.js";
+import { createBasePayload, isSiteOverLimit } from "./utils.js";
+import { pageviewQueue } from "./pageviewQueue.js";
 
 // Define Zod schema for validation
 export const trackingPayloadSchema = z.discriminatedUnion("type", [
@@ -162,61 +154,6 @@ export const trackingPayloadSchema = z.discriminatedUnion("type", [
     })
     .strict(),
 ]);
-
-// Update session for both pageviews and events
-async function updateSession(
-  payload: TotalTrackingPayload,
-  existingSession: any | null,
-  isPageview: boolean = true
-): Promise<void> {
-  if (existingSession) {
-    // Update session with Drizzle
-    const updateData: any = {
-      lastActivity: new Date(payload.timestamp),
-    };
-
-    // Only increment pageviews count for actual pageviews
-    if (isPageview) {
-      updateData.pageviews = (existingSession.pageviews || 0) + 1;
-    }
-
-    await db
-      .update(activeSessions)
-      .set(updateData)
-      .where(eq(activeSessions.userId, existingSession.userId));
-    return;
-  }
-
-  // Insert new session with Drizzle
-  const insertData = {
-    sessionId: payload.sessionId,
-    siteId:
-      typeof payload.site_id === "string"
-        ? parseInt(payload.site_id, 10)
-        : payload.site_id,
-    userId: payload.userId,
-    hostname: payload.hostname || null,
-    startTime: new Date(payload.timestamp || Date.now()),
-    lastActivity: new Date(payload.timestamp || Date.now()),
-    pageviews: isPageview ? 1 : 0,
-    entryPage: payload.pathname || null,
-    deviceType: getDeviceType(
-      payload.screenWidth,
-      payload.screenHeight,
-      payload.ua
-    ),
-    screenWidth: payload.screenWidth || null,
-    screenHeight: payload.screenHeight || null,
-    browser: payload.ua.browser.name || null,
-    operatingSystem: payload.ua.os.name || null,
-    language: payload.language || null,
-    referrer: payload.hostname
-      ? clearSelfReferrer(payload.referrer || "", payload.hostname)
-      : payload.referrer || null,
-  };
-
-  await db.insert(activeSessions).values(insertData);
-}
 
 /**
  * Validates API key for the site
@@ -432,24 +369,14 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
       validatedPayload.type,
       validatedPayload // Add validated payload back
     );
-
-    // Get existing session
-    const existingSession = await getExistingSession(
-      payload.userId,
-      payload.site_id
-    );
-
-    if (existingSession) {
-      payload.sessionId = existingSession.sessionId;
-    }
+    // Update session
+    const { sessionId } = await sessionsService.updateSession({
+      userId: payload.userId,
+      site_id: payload.site_id,
+    });
 
     // Add to queue for processing
-    pageviewQueue.add(payload);
-    await updateSession(
-      payload,
-      existingSession,
-      validatedPayload.type === "pageview"
-    );
+    await pageviewQueue.add({ ...payload, sessionId });
 
     return reply.status(200).send({
       success: true,
