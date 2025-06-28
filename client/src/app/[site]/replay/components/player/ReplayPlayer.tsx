@@ -3,18 +3,18 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import rrwebPlayer from "rrweb-player";
 import "rrweb-player/dist/style.css";
-import { useGetSessionReplayEvents } from "../../../../api/analytics/sessionReplay/useGetSessionReplayEvents";
-import { ThreeDotLoader } from "../../../../components/Loaders";
-import { ActivitySlider } from "../../../../components/ui/activity-slider";
-import { Button } from "../../../../components/ui/button";
+import { useGetSessionReplayEvents } from "../../../../../api/analytics/sessionReplay/useGetSessionReplayEvents";
+import { ThreeDotLoader } from "../../../../../components/Loaders";
+import { ActivitySlider } from "../../../../../components/ui/activity-slider";
+import { Button } from "../../../../../components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../components/ui/select";
-import { useReplayStore } from "./replayStore";
+} from "../../../../../components/ui/select";
+import { useReplayStore } from "../replayStore";
 
 export function ReplayPlayer({
   width,

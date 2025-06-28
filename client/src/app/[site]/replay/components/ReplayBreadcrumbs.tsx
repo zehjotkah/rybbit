@@ -83,12 +83,7 @@ export function ReplayBreadcrumbs() {
         currentGroup.type === eventTypeStr &&
         currentGroup.subType === subType &&
         // Only group incremental events (type 3) and certain subtypes
-        eventTypeStr === "3" &&
-        (subType === 0 || // Mutation
-          subType === 1 || // Mouse move
-          subType === 2 || // Mouse interaction (click, etc.)
-          subType === 3 || // Scroll
-          subType === 5); // Input
+        eventTypeStr === "3";
 
       if (shouldGroup && currentGroup) {
         // Add to current group

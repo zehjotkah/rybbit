@@ -8,7 +8,7 @@ import { SESSION_REPLAY_PAGE_FILTERS } from "../../../lib/store";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { EnableSessionReplay } from "./components/EnableSessionReplay";
 import { ReplayList } from "./components/ReplayList";
-import { ReplayPlayer } from "./components/ReplayPlayer";
+import { ReplayPlayer } from "./components/player/ReplayPlayer";
 import { NothingFound } from "../../../components/NothingFound";
 import { ReplayBreadcrumbs } from "./components/ReplayBreadcrumbs";
 

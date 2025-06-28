@@ -14,7 +14,7 @@ import {
 } from "../lib/const.js";
 import { stripe } from "../lib/stripe.js";
 
-export class UsageCheckerService {
+export class UsageService {
   private sitesOverLimit = new Set<number>();
   private usageCheckTask: cron.ScheduledTask | null = null;
 
@@ -32,7 +32,10 @@ export class UsageCheckerService {
         try {
           await this.updateOrganizationsMonthlyUsage();
         } catch (error) {
-          console.error("[UsageCheckerService] Error during usage check:", error);
+          console.error(
+            "[UsageCheckerService] Error during usage check:",
+            error
+          );
         }
       });
 
@@ -247,7 +250,10 @@ export class UsageCheckerService {
             await this.getOrganizationSubscriptionInfo(orgData);
 
           // Get monthly pageview count from ClickHouse using the billing period start date
-          const pageviewCount = await this.getMonthlyPageviews(siteIds, periodStart);
+          const pageviewCount = await this.getMonthlyPageviews(
+            siteIds,
+            periodStart
+          );
 
           // Check if over limit and update global set
           const isOverLimit = pageviewCount > eventLimit;
@@ -316,4 +322,4 @@ export class UsageCheckerService {
 }
 
 // Create a singleton instance
-export const usageCheckerService = new UsageCheckerService();
+export const usageService = new UsageService();
