@@ -1,7 +1,6 @@
 "use client";
 
 import SessionsList from "@/components/Sessions/SessionsList";
-import Avatar from "boring-avatars";
 import {
   ArrowLeft,
   Calendar,
@@ -29,6 +28,7 @@ import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { VisitCalendar } from "./components/Calendar";
+import { Avatar } from "../../../../components/Avatar";
 
 export default function UserPage() {
   useSetPageTitle("Rybbit · User");
@@ -58,12 +58,7 @@ export default function UserPage() {
           <div>
             <MobileSidebar />
           </div>
-          <Avatar
-            size={40}
-            name={userId as string}
-            variant="marble"
-            colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
-          />
+          <Avatar size={40} name={userId as string} />
           {userId?.slice(0, 10)}
         </h1>
         <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-750 text-sm mb-3">

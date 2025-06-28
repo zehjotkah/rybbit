@@ -16,6 +16,9 @@ import { useGetSessionReplayEvents } from "../../../../api/analytics/sessionRepl
 import { ScrollArea } from "../../../../components/ui/scroll-area";
 import { cn } from "../../../../lib/utils";
 import { useReplayStore } from "./replayStore";
+import { Avatar } from "../../../../components/Avatar";
+import Link from "next/link";
+import { Button } from "../../../../components/ui/button";
 
 // Event type mapping based on rrweb event types
 const EVENT_TYPE_INFO = {
@@ -213,56 +216,70 @@ export function ReplayBreadcrumbs() {
   };
 
   return (
-    <div className="rounded-lg border border-neutral-800 flex flex-col">
-      <div className="p-2 border-b border-neutral-800 bg-neutral-900 text-xs text-neutral-400">
-        {data.events.length} events captured ({groupedEvents.length} groups)
+    <div className="flex flex-col gap-2">
+      <div className="rounded-lg border border-neutral-800 bg-neutral-900 flex items-center justify-between gap-2 p-2 text-xs text-neutral-200">
+        <div className="flex items-center gap-2">
+          <Avatar name={data.metadata.user_id} size={20} />
+          {data.metadata.user_id.slice(0, 20)}
+        </div>
+        <Link
+          href={`/${siteId}/user/${data.metadata.user_id}`}
+          className="flex items-center gap-2"
+        >
+          <Button size="sm">View User</Button>
+        </Link>
       </div>
-      <ScrollArea className="h-[calc(100vh-156px)]">
-        <div className="flex flex-col">
-          {groupedEvents.map((group, index) => {
-            const firstEvent = group.events[0];
-            const Icon = getEventIcon(firstEvent);
-            const color = getEventColor(firstEvent);
-            const description = getGroupDescription(group);
-            const startTimeMs = getTime(group.startTime);
-            const endTimeMs = getTime(group.endTime);
-            const durationMs = endTimeMs - startTimeMs;
+      <div className="rounded-lg border border-neutral-800 flex flex-col">
+        <div className="p-2 border-b border-neutral-800 bg-neutral-900 text-xs text-neutral-400">
+          {data.events.length} events captured ({groupedEvents.length} groups)
+        </div>
+        <ScrollArea className="h-[calc(100vh-156px)]">
+          <div className="flex flex-col">
+            {groupedEvents.map((group, index) => {
+              const firstEvent = group.events[0];
+              const Icon = getEventIcon(firstEvent);
+              const color = getEventColor(firstEvent);
+              const description = getGroupDescription(group);
+              const startTimeMs = getTime(group.startTime);
+              const endTimeMs = getTime(group.endTime);
+              const durationMs = endTimeMs - startTimeMs;
 
-            return (
-              <div
-                key={`${group.startTime}-${index}`}
-                className={cn(
-                  "p-2 border-b border-neutral-800 bg-neutral-900",
-                  "hover:bg-neutral-800/80 transition-colors cursor-pointer",
-                  "flex items-center gap-2 group"
-                )}
-                onClick={() => handleGroupClick(group)}
-              >
-                <div className="text-xs text-neutral-400 w-10">
-                  {Duration.fromMillis(startTimeMs).toFormat("mm:ss")}
-                </div>
-                <Icon className={cn("w-4 h-4 flex-shrink-0", color)} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-neutral-200 font-medium truncate">
-                    {description}
+              return (
+                <div
+                  key={`${group.startTime}-${index}`}
+                  className={cn(
+                    "p-2 border-b border-neutral-800 bg-neutral-900",
+                    "hover:bg-neutral-800/80 transition-colors cursor-pointer",
+                    "flex items-center gap-2 group"
+                  )}
+                  onClick={() => handleGroupClick(group)}
+                >
+                  <div className="text-xs text-neutral-400 w-10">
+                    {Duration.fromMillis(startTimeMs).toFormat("mm:ss")}
                   </div>
-                  {group.count > 1 && durationMs > 0 && (
-                    <div className="text-xs text-neutral-500 mt-0.5">
-                      {Duration.fromMillis(durationMs).toFormat("s.SSS")}s
-                      duration
+                  <Icon className={cn("w-4 h-4 flex-shrink-0", color)} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-neutral-200 font-medium truncate">
+                      {description}
+                    </div>
+                    {group.count > 1 && durationMs > 0 && (
+                      <div className="text-xs text-neutral-500 mt-0.5">
+                        {Duration.fromMillis(durationMs).toFormat("s.SSS")}s
+                        duration
+                      </div>
+                    )}
+                  </div>
+                  {group.count > 5 && (
+                    <div className="text-xs text-neutral-500 bg-neutral-800 px-1.5 py-0.5 rounded">
+                      {group.count}
                     </div>
                   )}
                 </div>
-                {group.count > 5 && (
-                  <div className="text-xs text-neutral-500 bg-neutral-800 px-1.5 py-0.5 rounded">
-                    {group.count}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </ScrollArea>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
