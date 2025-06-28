@@ -25,6 +25,7 @@ export const useReplayPlayer = ({ data, width, height }: UseReplayPlayerProps) =
       playerContainerRef.current.innerHTML = "";
 
       let newPlayer: any = null;
+      let handleVisibilityChange: (() => void) | null = null;
 
       try {
         // Initialize rrweb player
@@ -44,7 +45,18 @@ export const useReplayPlayer = ({ data, width, height }: UseReplayPlayerProps) =
 
         // Set up event listeners
         newPlayer.addEventListener("ui-update-current-time", (event: any) => {
-          setCurrentTime(event.payload);
+          // Validate that current time doesn't exceed duration
+          const currentTime = event.payload;
+          const playerDuration = newPlayer.getMetaData().totalTime;
+          
+          if (playerDuration && currentTime > playerDuration) {
+            // If we've exceeded duration, pause and set to end
+            newPlayer.pause();
+            setCurrentTime(playerDuration);
+            setIsPlaying(false);
+          } else {
+            setCurrentTime(currentTime);
+          }
         });
 
         newPlayer.addEventListener("ui-update-player-state", (event: any) => {
@@ -63,6 +75,39 @@ export const useReplayPlayer = ({ data, width, height }: UseReplayPlayerProps) =
           }
         }, 100);
 
+        // Handle page visibility changes to prevent tab-switching issues
+        let wasPlayingBeforeHidden = false;
+        
+        handleVisibilityChange = () => {
+          if (document.hidden) {
+            // Tab became hidden - pause if playing and remember state
+            if (newPlayer && setIsPlaying) {
+              const playerState = newPlayer.getMetaData();
+              wasPlayingBeforeHidden = playerState?.isPlaying || false;
+              if (wasPlayingBeforeHidden) {
+                newPlayer.pause();
+                setIsPlaying(false);
+              }
+            }
+          } else {
+            // Tab became visible - resume if it was playing before
+            if (newPlayer && wasPlayingBeforeHidden) {
+              // Re-sync duration in case it got corrupted
+              const playerDuration = newPlayer.getMetaData().totalTime;
+              if (playerDuration) {
+                setDuration(playerDuration);
+              }
+              
+              // Resume playback
+              newPlayer.play();
+              setIsPlaying(true);
+              wasPlayingBeforeHidden = false;
+            }
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
       } catch (error) {
         console.error("Failed to initialize rrweb player:", error);
         return;
@@ -75,6 +120,9 @@ export const useReplayPlayer = ({ data, width, height }: UseReplayPlayerProps) =
         }
         if (playerContainerRef.current) {
           playerContainerRef.current.innerHTML = "";
+        }
+        if (handleVisibilityChange) {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
         }
         setPlayer(null);
       };
