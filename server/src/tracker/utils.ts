@@ -1,12 +1,10 @@
-import crypto from "crypto";
 import { FastifyRequest } from "fastify";
 import UAParser, { UAParser as userAgentParser } from "ua-parser-js";
 import { z } from "zod";
-import { sitesOverLimit } from "../cron/monthly-usage-checker.js";
-import { siteConfig } from "../lib/siteConfig.js";
+import { usageCheckerService } from "../services/usageCheckerService.js";
+import { userIdService } from "../services/userId/userIdService.js";
 import { trackingPayloadSchema } from "./trackEvent.js";
 import { TrackingPayload } from "./types.js";
-import { userIdService } from "../services/userId/userIdService.js";
 
 export type TotalTrackingPayload = TrackingPayload & {
   type?: string;
@@ -87,7 +85,7 @@ export function clearSelfReferrer(referrer: string, hostname: string): string {
 
 // Check if site is over the monthly limit
 export function isSiteOverLimit(siteId: number | string): boolean {
-  return sitesOverLimit.has(Number(siteId));
+  return usageCheckerService.getSitesOverLimit().has(Number(siteId));
 }
 
 // Create base tracking payload from request
@@ -125,7 +123,6 @@ export function createBasePayload(
     userId: userId,
   };
 }
-
 
 // Helper function to get IP address
 const getIpAddress = (request: FastifyRequest): string => {
