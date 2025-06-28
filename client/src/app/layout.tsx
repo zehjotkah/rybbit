@@ -48,6 +48,7 @@ export default function RootLayout({
             strategy="afterInteractive"
             data-web-vitals="true"
             data-track-errors="true"
+            data-session-replay="true"
           />
         </>
       )}
