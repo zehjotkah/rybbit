@@ -233,7 +233,7 @@ export function ReplayBreadcrumbs() {
         <div className="p-2 border-b border-neutral-800 bg-neutral-900 text-xs text-neutral-400">
           {data.events.length} events captured ({groupedEvents.length} groups)
         </div>
-        <ScrollArea className="h-[calc(100vh-156px)]">
+        <ScrollArea className="h-[calc(100vh-215px)]">
           <div className="flex flex-col">
             {groupedEvents.map((group, index) => {
               const firstEvent = group.events[0];

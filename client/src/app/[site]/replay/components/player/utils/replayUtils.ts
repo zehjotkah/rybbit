@@ -50,6 +50,6 @@ export const PLAYBACK_SPEEDS = [
   { value: "4", label: "4x" },
 ];
 
-export const CONTROLS_HEIGHT = 67;
+export const CONTROLS_HEIGHT = 101;
 export const SKIP_SECONDS = 10000; // 10 seconds in milliseconds
 export const OVERLAY_TIMEOUT = 800; // milliseconds
