@@ -10,7 +10,7 @@ import {
   OperatingSystemTooltipIcon,
 } from "../../../../../components/TooltipIcons/TooltipIcons";
 
-export function ReplayPlayerTobar() {
+export function ReplayPlayerTopbar() {
   const params = useParams();
   const siteId = Number(params.site);
   const { sessionId } = useReplayStore();
@@ -19,12 +19,12 @@ export function ReplayPlayerTobar() {
 
   if (!data?.metadata) {
     return (
-      <div className="border border-neutral-800 bg-neutral-900 px-2 py-2 rounded-t-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="border border-neutral-800 bg-neutral-900 px-2 py-2 rounded-t-lg overflow-hidden">
+        <div className="flex items-center justify-between min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="h-4 w-32 bg-neutral-700 rounded animate-pulse" />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
             <div className="h-4 w-24 bg-neutral-700 rounded animate-pulse" />
           </div>
         </div>
@@ -47,29 +47,20 @@ export function ReplayPlayerTobar() {
   };
 
   return (
-    <div className="border border-neutral-800 bg-neutral-900 px-2 py-2 rounded-t-lg">
-      <div className="flex items-center justify-between">
+    <div className="border border-neutral-800 bg-neutral-900 px-2 py-2 rounded-t-lg overflow-hidden">
+      <div className="flex items-center justify-between min-w-0">
         {/* Left side: Page path with external link */}
-        <div className="flex items-center gap-1 min-w-0 flex-1">
-          <span className="text-xs text-neutral-300 truncate" title={pageUrl}>
-            {getDisplayPath(pageUrl)}
-          </span>
-
-          {pageUrl && (
-            <Link
-              href={pageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors flex-shrink-0"
-              title={`Open ${pageUrl} in new tab`}
-            >
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          )}
-        </div>
+        <Link
+          className="text-xs text-neutral-300 truncate flex-1 min-w-0 flex items-center hover:underline"
+          href={pageUrl}
+          target="_blank"
+          title={`Open ${pageUrl} in new tab`}
+        >
+          {getDisplayPath(pageUrl)}
+        </Link>
 
         {/* Right side: Screen dimensions */}
-        <div className="flex items-center gap-2 text-xs text-neutral-400 flex-shrink-0">
+        <div className="flex items-center gap-2 text-xs text-neutral-400 flex-shrink-0 ml-2">
           <CountryFlagTooltipIcon
             country={metadata.country}
             city={metadata.city}
@@ -93,7 +84,7 @@ export function ReplayPlayerTobar() {
             size={16}
           />
 
-          <span>{screenDimensions}</span>
+          <span className="whitespace-nowrap">{screenDimensions}</span>
         </div>
       </div>
     </div>

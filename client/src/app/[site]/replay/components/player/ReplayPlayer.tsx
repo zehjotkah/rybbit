@@ -9,7 +9,7 @@ import { useReplayKeyboardShortcuts } from "./hooks/useReplayKeyboardShortcuts";
 import { ReplayPlayerControls } from "./ReplayPlayerControls";
 import { ReplayPlayerCore } from "./ReplayPlayerCore";
 import { SKIP_SECONDS } from "./utils/replayUtils";
-import { ReplayPlayerTobar } from "./ReplayPlayerTopbar";
+import { ReplayPlayerTopbar } from "./ReplayPlayerTopbar";
 
 export function ReplayPlayer({
   width,
@@ -117,8 +117,11 @@ export function ReplayPlayer({
   }
 
   return (
-    <div className="flex flex-col bg-neutral-950">
-      <ReplayPlayerTobar />
+    <div 
+      className="flex flex-col bg-neutral-950 overflow-hidden"
+      style={{ width: width, height: height }}
+    >
+      <ReplayPlayerTopbar />
       <ReplayPlayerCore
         data={data}
         width={width}
