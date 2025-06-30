@@ -53,31 +53,47 @@ There are two ways to start using Rybbit:
 
 ### Main
 
-![image](https://github.com/user-attachments/assets/7f2d3b79-90b6-496b-9b47-373ba1c62a7e)
+![image](https://github.com/user-attachments/assets/9b0f75d5-1048-4ea3-95a6-22a6c70b5100)
+
+## Session Replay
+
+![image](https://github.com/user-attachments/assets/b06b689e-ae9a-44bf-81a5-44bce684c839)
 
 ### Realtime
 
-![image](https://github.com/user-attachments/assets/54996620-4eff-4ecc-9135-10ce21483f6a)
+![image](https://github.com/user-attachments/assets/fcaae1f3-0956-4d98-a2b8-d0bb096bcdff)
 
 ### Sessions
 
-![image](https://github.com/user-attachments/assets/b87769f3-650d-4069-9e18-5d59e41a175b)
+![image](https://github.com/user-attachments/assets/56230cfb-c88f-4274-869f-6853bf846338)
 
 ### Journeys
 
-![image](https://github.com/user-attachments/assets/890f9de8-3025-4962-91c5-5a1b2ddf0d82)
+![image](https://github.com/user-attachments/assets/652d4011-3bef-49f7-acf7-d577c0aded8b)
 
 ### Map
 
-![image](https://github.com/user-attachments/assets/b1f7be89-ec8d-4ccc-9a87-45b0fb31d3a1)
+![image](https://github.com/user-attachments/assets/0d331663-a290-4e3e-b97a-6793e6c4e412)
 
 ### Funnels
 
-![image](https://github.com/user-attachments/assets/bad9e37c-1ff6-49b4-9285-6dde7f90051f)
+![image](https://github.com/user-attachments/assets/500e570c-5821-4c69-87f2-91cf1504e4b9)
 
 ### Goals
 
-![image](https://github.com/user-attachments/assets/60503585-5daf-4cfe-927e-4e149749f538)
+![image](https://github.com/user-attachments/assets/d337d39d-923d-4d80-8677-7921cc0bb916)
+
+### users
+
+![image](https://github.com/user-attachments/assets/4f92b5d0-cb43-4d72-a2e6-107a1eff3cf8)
+
+### Errors
+
+![image](https://github.com/user-attachments/assets/2ec82c13-4551-4f23-afee-e7d94059b221)
+
+### Retention
+
+![image](https://github.com/user-attachments/assets/9a193108-b928-464f-a7f3-ff2b8a572f05)
 
 <hr>
 
