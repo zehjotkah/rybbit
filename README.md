@@ -1,8 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/1425302a-40b6-4d97-bf4b-89927ea93fb9" height="250" style="border-radius: 5%;">
-    <h1 align="center">
-        Rybbit Analytics 
-    </h1>
+  <img src="https://github.com/user-attachments/assets/be982e50-8d59-471c-9fb7-e8982658a608" height="100">
     <p align="center">Open Source Web & Product Analytics</p>
 
 <p align="center">
