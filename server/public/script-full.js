@@ -134,17 +134,14 @@
       }
       if (window.rrweb) {
         this.startRecording();
-      } else {
-        console.warn("Failed to load rrweb, session replay disabled");
       }
     }
     async loadRrweb() {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/rrweb@2.0.0-alpha.11/dist/rrweb.min.js";
+        script.src = `${this.config.analyticsHost}/replay.js`;
         script.async = false;
         script.onload = () => {
-          console.log("[Session Replay] rrweb loaded successfully");
           resolve();
         };
         script.onerror = () => reject(new Error("Failed to load rrweb"));
@@ -153,34 +150,11 @@
     }
     startRecording() {
       if (this.isRecording || !window.rrweb || !this.config.enableSessionReplay) {
-        console.log("[Session Replay] Cannot start recording:", {
-          isRecording: this.isRecording,
-          hasRrweb: !!window.rrweb,
-          enableSessionReplay: this.config.enableSessionReplay
-        });
         return;
       }
-      console.log(
-        "[Session Replay] Starting recording at",
-        (/* @__PURE__ */ new Date()).toISOString()
-      );
-      console.log("[Session Replay] Document ready state:", document.readyState);
       try {
         this.stopRecordingFn = window.rrweb.record({
           emit: (event) => {
-            const eventTypeNames = {
-              0: "DOMContentLoaded",
-              1: "Load",
-              2: "FullSnapshot",
-              3: "IncrementalSnapshot",
-              4: "Meta",
-              5: "Custom",
-              6: "Plugin"
-            };
-            const typeName = eventTypeNames[event.type] || `Unknown(${event.type})`;
-            console.log(
-              `[Session Replay] Event collected: Type ${event.type} (${typeName}) at ${new Date(event.timestamp || Date.now()).toISOString()}`
-            );
             this.addEvent({
               type: event.type,
               data: event.data,
@@ -226,9 +200,7 @@
         });
         this.isRecording = true;
         this.setupBatchTimer();
-        console.log("Session replay recording started");
       } catch (error) {
-        console.error("Failed to start session replay recording:", error);
       }
     }
     stopRecording() {
@@ -243,20 +215,13 @@
       if (this.eventBuffer.length > 0) {
         this.flushEvents();
       }
-      console.log("Session replay recording stopped");
     }
     isActive() {
       return this.isRecording;
     }
     addEvent(event) {
       this.eventBuffer.push(event);
-      console.log(
-        `[Session Replay] Event added to buffer (${this.eventBuffer.length}/${this.config.sessionReplayBatchSize})`
-      );
       if (this.eventBuffer.length >= this.config.sessionReplayBatchSize) {
-        console.log(
-          `[Session Replay] Buffer full, flushing ${this.eventBuffer.length} events`
-        );
         this.flushEvents();
       }
     }
@@ -264,9 +229,6 @@
       this.clearBatchTimer();
       this.batchTimer = window.setInterval(() => {
         if (this.eventBuffer.length > 0) {
-          console.log(
-            `[Session Replay] Timer triggered, flushing ${this.eventBuffer.length} events`
-          );
           this.flushEvents();
         }
       }, this.config.sessionReplayBatchInterval);
@@ -283,18 +245,6 @@
       }
       const events = [...this.eventBuffer];
       this.eventBuffer = [];
-      console.log(
-        `[Session Replay] Sending batch with ${events.length} events to server`
-      );
-      console.log(
-        `[Session Replay] Event types in batch:`,
-        events.map((e2) => `Type ${e2.type}`).join(", ")
-      );
-      console.log(
-        `[Session Replay] Batch size:`,
-        JSON.stringify(events).length,
-        "characters"
-      );
       const batch = {
         userId: this.userId,
         events,
@@ -307,21 +257,7 @@
       };
       try {
         await this.sendBatch(batch);
-        console.log(
-          `[Session Replay] Successfully sent batch with ${events.length} events`
-        );
       } catch (error) {
-        console.error("Failed to send session replay batch:", error);
-        console.error("Failed batch details:", {
-          eventCount: events.length,
-          eventTypes: events.map((e2) => e2.type),
-          batchSize: JSON.stringify(batch).length,
-          userId: this.userId,
-          url: window.location.href
-        });
-        console.log(
-          `[Session Replay] Re-queuing ${events.length} failed events for retry`
-        );
         this.eventBuffer.unshift(...events);
       }
     }
@@ -851,7 +787,9 @@
       if (this.sent) return;
       const metricName = metric.name.toLowerCase();
       this.data[metricName] = metric.value;
-      const allCollected = Object.values(this.data).every((value) => value !== null);
+      const allCollected = Object.values(this.data).every(
+        (value) => value !== null
+      );
       if (allCollected) {
         this.sendData();
       }
