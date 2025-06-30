@@ -190,23 +190,40 @@ export function ReplayBreadcrumbs() {
     // Special icons for specific incremental snapshot types
     if (eventTypeStr === "3" && event.data?.source !== undefined) {
       switch (event.data.source) {
-        case 0: return FileEdit; // Mutation
-        case 1: return Mouse; // Mouse Move
-        case 2: return MousePointerClick; // Mouse Interaction
-        case 3: return ScrollText; // Scroll
-        case 4: return Maximize2; // Viewport Resize
-        case 5: return Keyboard; // Input
-        case 6: return Smartphone; // Touch Move
-        case 7: return Play; // Media Interaction
-        case 8: return Palette; // Style Sheet Rule
-        case 9: return Brush; // Canvas Mutation
-        case 10: return Type; // Font
-        case 11: return Terminal; // Log
-        case 12: return Move; // Drag
-        case 13: return PaintBucket; // Style Declaration
-        case 14: return TextSelect; // Selection
-        case 15: return FileCode; // Adopted Style Sheet
-        default: return MousePointer; // Fallback
+        case 0:
+          return FileEdit; // Mutation
+        case 1:
+          return Mouse; // Mouse Move
+        case 2:
+          return MousePointerClick; // Mouse Interaction
+        case 3:
+          return ScrollText; // Scroll
+        case 4:
+          return Maximize2; // Viewport Resize
+        case 5:
+          return Keyboard; // Input
+        case 6:
+          return Smartphone; // Touch Move
+        case 7:
+          return Play; // Media Interaction
+        case 8:
+          return Palette; // Style Sheet Rule
+        case 9:
+          return Brush; // Canvas Mutation
+        case 10:
+          return Type; // Font
+        case 11:
+          return Terminal; // Log
+        case 12:
+          return Move; // Drag
+        case 13:
+          return PaintBucket; // Style Declaration
+        case 14:
+          return TextSelect; // Selection
+        case 15:
+          return FileCode; // Adopted Style Sheet
+        default:
+          return MousePointer; // Fallback
       }
     }
 

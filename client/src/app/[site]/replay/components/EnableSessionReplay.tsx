@@ -15,7 +15,7 @@ export function EnableSessionReplay() {
     data: replayData,
     isLoading,
     isError,
-  } = useGetSessionReplays({ limit: 1 });
+  } = useGetSessionReplays({ limit: 1, minDuration: 0 });
 
   // Don't show banner while loading or if there's an error
   if (isLoading || isError) return null;

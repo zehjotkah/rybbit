@@ -11,11 +11,14 @@ import { ReplayList } from "./components/ReplayList";
 import { ReplayPlayer } from "./components/player/ReplayPlayer";
 import { NothingFound } from "../../../components/NothingFound";
 import { ReplayBreadcrumbs } from "./components/ReplayBreadcrumbs";
+import { useReplayStore } from "./components/replayStore";
 
 export default function SessionReplayPage() {
   useSetPageTitle("Rybbit · Session Replay");
 
-  const { data, isLoading } = useGetSessionReplays();
+  const { minDuration } = useReplayStore();
+
+  const { data, isLoading } = useGetSessionReplays({ minDuration });
 
   const hasNoReplays = !isLoading && !data?.pages[0].data?.length;
 
@@ -23,7 +26,7 @@ export default function SessionReplayPage() {
 
   return (
     <DisabledOverlay message="Replay">
-      <div className="p-2 md:p-4 max-w-[2000px] mx-auto flex flex-col gap-1 overflow-hidden h-full">
+      <div className="p-2 md:p-4 max-w-[2000px] mx-auto flex flex-col gap-1 overflow-y-hidden">
         <SubHeader availableFilters={SESSION_REPLAY_PAGE_FILTERS} />
         <EnableSessionReplay />
         {hasNoReplays ? (
@@ -38,7 +41,10 @@ export default function SessionReplayPage() {
             <ReplayList />
             <div ref={ref} className="w-[calc(min(100vw, 2000px)-780px)]">
               {resolvedWidth && resolvedHeight && (
-                <ReplayPlayer width={resolvedWidth} height={resolvedHeight} />
+                <ReplayPlayer
+                  width={resolvedWidth}
+                  height={resolvedHeight - 1}
+                />
               )}
             </div>
             <ReplayBreadcrumbs />

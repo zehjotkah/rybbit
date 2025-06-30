@@ -29,21 +29,24 @@ export interface SessionReplayListResponse {
 
 type UseGetSessionReplaysOptions = {
   limit?: number;
+  minDuration?: number;
 };
 
 export function useGetSessionReplays({
   limit = 20,
+  minDuration = 30,
 }: UseGetSessionReplaysOptions = {}) {
   const { time, site, filters } = useStore();
 
   return useInfiniteQuery({
-    queryKey: ["session-replays", site, time, filters, limit],
+    queryKey: ["session-replays", site, time, filters, limit, minDuration],
     queryFn: async ({ pageParam = 0 }) => {
       const queryParams = {
         ...getQueryParams(time),
         limit,
         offset: pageParam,
         filters,
+        minDuration,
       };
 
       const response = await authedFetch<SessionReplayListResponse>(

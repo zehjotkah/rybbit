@@ -22,6 +22,7 @@ export class SessionReplayQueryService {
       limit?: number;
       offset?: number;
       userId?: string;
+      minDuration?: number;
     } & Pick<
       FilterParams,
       | "startDate"
@@ -32,7 +33,7 @@ export class SessionReplayQueryService {
       | "filters"
     >
   ): Promise<SessionReplayListItem[]> {
-    const { limit = 50, offset = 0, userId } = options;
+    const { limit = 50, offset = 0, userId, minDuration } = options;
 
     const timeStatement = getTimeStatement(options).replace(
       /timestamp/g,
@@ -47,6 +48,11 @@ export class SessionReplayQueryService {
     if (userId) {
       whereConditions.push(`user_id = {userId:String}`);
       queryParams.userId = userId;
+    }
+
+    if (minDuration !== undefined) {
+      whereConditions.push(`duration_ms >= {minDuration:UInt32}`);
+      queryParams.minDuration = minDuration * 1000; // Convert seconds to milliseconds
     }
 
     // Build the base query for session IDs that have replay events

@@ -9,19 +9,21 @@ export async function getSessionReplays(
       limit?: string;
       offset?: string;
       userId?: string;
+      minDuration?: string;
     }>;
   }>,
   reply: FastifyReply
 ) {
   try {
     const siteId = Number(request.params.site);
-    const { limit, offset, userId, filters } = request.query;
+    const { limit, offset, userId, minDuration, filters } = request.query;
 
     const sessionReplayService = new SessionReplayQueryService();
     const replays = await sessionReplayService.getSessionReplayList(siteId, {
       limit: limit ? Number(limit) : 50,
       offset: offset ? Number(offset) : 0,
       userId: userId || undefined,
+      minDuration: minDuration ? Number(minDuration) : undefined,
       startDate: request.query.startDate,
       endDate: request.query.endDate,
       timeZone: request.query.timeZone,

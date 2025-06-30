@@ -117,7 +117,7 @@ export function ReplayPlayer({
   }
 
   return (
-    <div 
+    <div
       className="flex flex-col bg-neutral-950 overflow-hidden"
       style={{ width: width, height: height }}
     >
