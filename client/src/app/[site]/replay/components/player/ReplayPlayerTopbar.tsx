@@ -1,19 +1,19 @@
-import { ExternalLink, Monitor } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
 import { useGetSessionReplayEvents } from "../../../../../api/analytics/sessionReplay/useGetSessionReplayEvents";
-import { useReplayStore } from "../replayStore";
 import {
   BrowserTooltipIcon,
   CountryFlagTooltipIcon,
   DeviceTypeTooltipIcon,
   OperatingSystemTooltipIcon,
 } from "../../../../../components/TooltipIcons/TooltipIcons";
+import { useReplayStore } from "../replayStore";
 
 export function ReplayPlayerTopbar() {
   const params = useParams();
   const siteId = Number(params.site);
-  const { sessionId } = useReplayStore();
+  const { sessionId, currentTime } = useReplayStore();
 
   const { data } = useGetSessionReplayEvents(siteId, sessionId);
 
@@ -33,7 +33,6 @@ export function ReplayPlayerTopbar() {
   }
 
   const { metadata } = data;
-  const pageUrl = metadata.page_url;
   const screenDimensions = `${metadata.screen_width} × ${metadata.screen_height}`;
 
   // Extract pathname from full URL for display
@@ -45,6 +44,30 @@ export function ReplayPlayerTopbar() {
       return url;
     }
   };
+
+  const pageViewEvents = useMemo(() => {
+    return data?.events?.filter((event) => event.type === 4);
+  }, [data?.events]);
+
+  // Get the current page URL based on the replay currentTime
+  const pageUrl = useMemo(() => {
+    if (!pageViewEvents || currentTime === 0) {
+      return metadata.page_url;
+    }
+
+    let currentUrl = metadata.page_url;
+    const firstTimestamp = pageViewEvents[0].timestamp;
+
+    // Find the most recent Meta event (type 4) with href before currentTime
+    for (const event of pageViewEvents) {
+      if (event.timestamp - firstTimestamp > currentTime) break;
+      if (event.data?.href) {
+        currentUrl = event.data.href;
+      }
+    }
+
+    return currentUrl;
+  }, [pageViewEvents, currentTime, metadata.page_url]);
 
   return (
     <div className="border border-neutral-800 bg-neutral-900 px-2 py-2 rounded-t-lg overflow-hidden">
