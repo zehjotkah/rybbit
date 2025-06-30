@@ -38,11 +38,11 @@ There are two ways to start using Rybbit:
 ## ✨ Key Features
 
 - All key web analytics metrics including sessions, unique users, pageviews, bounce rate, session duration
+- Session replays
 - No cookies or user tracking - GDPR & CCPA compliant
 - Customizable goals. retention, user journeys, and funnels dashboards
 - Advanced filtering across 15+ dimensions
 - Custom events with JSON properties
-- Live sessions dashboard
 - 3 level location tracking (country -> region -> city) + advanced map visualizations
 - Real time dashboard
 - Support for organizations and unlimited number of sites
