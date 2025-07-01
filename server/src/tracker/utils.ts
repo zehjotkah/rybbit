@@ -126,11 +126,13 @@ export function createBasePayload(
 
 // Helper function to get IP address
 const getIpAddress = (request: FastifyRequest): string => {
+  // Priority 1: Cloudflare header (already validated by CF)
   const cfConnectingIp = request.headers["cf-connecting-ip"];
   if (cfConnectingIp && typeof cfConnectingIp === "string") {
     return cfConnectingIp.trim();
   }
 
+  // Priority 2: X-Forwarded-For - just use the first IP
   const forwardedFor = request.headers["x-forwarded-for"];
   if (forwardedFor && typeof forwardedFor === "string") {
     const ips = forwardedFor
@@ -138,9 +140,8 @@ const getIpAddress = (request: FastifyRequest): string => {
       .map((ip) => ip.trim())
       .filter(Boolean);
     if (ips.length > 0) {
-      // Return rightmost IP - the last proxy before reaching our server
-      // This is the most trustworthy IP in the chain
-      return ips[ips.length - 1];
+      // Always use the first IP - the original client
+      return ips[0];
     }
   }
 
