@@ -59,8 +59,6 @@ export function parseScriptConfig(
       )
     : 2000; // Reduced from 5000 to 2000ms for faster, smaller batches
 
-  console.info(scriptTag);
-
   return {
     analyticsHost,
     siteId,

@@ -96,7 +96,6 @@
       1e3,
       parseInt(scriptTag.getAttribute("data-replay-batch-interval"))
     ) : 2e3;
-    console.info(scriptTag);
     return {
       analyticsHost,
       siteId,
