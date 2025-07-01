@@ -6,18 +6,13 @@ import {
   TooltipTrigger,
 } from "../../../../../components/ui/tooltip";
 import { useGetRegionName } from "../../../../../lib/geo";
-import {
-  removeFilter,
-  updateFilter,
-  useStore,
-} from "../../../../../lib/store";
+import { removeFilter, updateFilter, useStore } from "../../../../../lib/store";
 import { cn } from "../../../../../lib/utils";
 import {
   filterTypeToLabel,
   getParameterNameLabel,
   getParameterValueLabel,
 } from "../../shared/Filters/utils";
-import { NewFilterButton } from "./NewFilterButton";
 
 export function Filters({
   availableFilters,
@@ -29,7 +24,6 @@ export function Filters({
 
   return (
     <div className="flex gap-2 flex-wrap">
-      <NewFilterButton availableFilters={availableFilters} />
       {filters.map((filter, i) => {
         const disabled =
           availableFilters && !availableFilters.includes(filter.parameter);

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { IS_CLOUD } from "../../lib/const";
 
 interface ScriptBuilderProps {
   siteId: number;
@@ -270,27 +271,29 @@ export function ScriptBuilder({ siteId }: ScriptBuilderProps) {
           </div> */}
 
           {/* Web Vitals Option */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label
-                  htmlFor="webVitals"
-                  className="text-sm font-medium text-foreground block"
-                >
-                  Enable Web Vitals performance metrics
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Collect Core Web Vitals (LCP, CLS, INP) and additional metrics
-                  (FCP, TTFB)
-                </p>
+          {IS_CLOUD && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label
+                    htmlFor="webVitals"
+                    className="text-sm font-medium text-foreground block"
+                  >
+                    Enable Web Vitals performance metrics
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Collect Core Web Vitals (LCP, CLS, INP) and additional
+                    metrics (FCP, TTFB)
+                  </p>
+                </div>
+                <Switch
+                  id="webVitals"
+                  checked={webVitals}
+                  onCheckedChange={setWebVitals}
+                />
               </div>
-              <Switch
-                id="webVitals"
-                checked={webVitals}
-                onCheckedChange={setWebVitals}
-              />
             </div>
-          </div>
+          )}
 
           {/* Track Errors Option */}
           <div className="space-y-2">

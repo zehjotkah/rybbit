@@ -6,12 +6,11 @@ import {
 } from "../../../../components/ui/tooltip";
 import NumberFlow from "@number-flow/react";
 
-export default function LiveUserCount() {
+export function LiveUserCount() {
   const { data } = useGetLiveUsercount(5);
 
   return (
-    <div className="flex items-center gap-2 text-base text-neutral-200 ml-3 mb-1">
-      {/* <div className="flex items-center gap-2 text-base text-neutral-200 cursor-default bg-neutral-800/50 rounded-lg px-2 py-1 border border-neutral-750"> */}
+    <div className="flex items-center gap-1 text-base text-neutral-200 mr-1">
       <div className="flex justify-center">
         <span className="relative flex h-3 w-3">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
@@ -21,14 +20,14 @@ export default function LiveUserCount() {
 
       <Tooltip>
         <TooltipTrigger>
-          <span className="text-sm text-neutral-300 ml-1">
+          <span className="text-sm text-neutral-200 ml-1 font-medium">
             {
               <NumberFlow
                 respectMotionPreference={false}
                 value={data?.count ?? 0}
               />
             }
-            <span className="ml-1">users online</span>
+            <span className="ml-1"></span>
           </span>
         </TooltipTrigger>
         <TooltipContent>
