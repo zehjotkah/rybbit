@@ -95,7 +95,7 @@ export class UsageService {
     createdAt: string;
     name: string;
   }): Promise<[number, string | null]> {
-    if (orgData.name === "tomato 2") {
+    if (orgData.name === "tomato 2" || orgData.name === "Zam") {
       return [Infinity, this.getStartOfMonth()];
     }
     if (!orgData.stripeCustomerId) {
