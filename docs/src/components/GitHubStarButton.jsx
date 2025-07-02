@@ -35,7 +35,7 @@ export function GitHubStarButton() {
         href="https://github.com/rybbit-io/rybbit"
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-700 hover:to-neutral-600 border border-neutral-500/70 hover:border-neutral-400/80 text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-neutral-900/50 hover:shadow-2xl hover:shadow-neutral-800/60 backdrop-blur-sm ring-1 ring-white/10 hover:ring-white/20"
+        className="inline-flex items-center gap-1 bg-neutral-800/70 hover:bg-neutral-700/70 border border-neutral-600/70 hover:border-neutral-700/80 text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-neutral-900/50 hover:shadow-2xl hover:shadow-neutral-800/60 backdrop-blur-sm ring-1 ring-white/10 hover:ring-white/20"
       >
         <svg
           className="w-3.5 h-3.5 mr-1"
