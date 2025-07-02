@@ -362,26 +362,26 @@ export default async function RootLayout({ children }) {
         })}
       ></script>
       <script
-          defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="bd7e35bc-5718-474e-a60d-1a775139a16d"
+        defer
+        src="https://cloud.umami.is/script.js"
+        data-website-id="bd7e35bc-5718-474e-a60d-1a775139a16d"
       ></script>
       <body>
         <Layout
-          banner={
-            <div className="text-center text-sm text-neutral-100 pt-2 pb-1 bg-neutral-700/50 flex items-center justify-center gap-2">
-              <div className="mb-1">
-                🚀 We just launched! Please star us on Github!{" "}
-              </div>
-              <a
-                className="github-button"
-                href="https://github.com/rybbit-io/rybbit"
-                data-color-scheme="no-preference: light; light: light; dark: light;"
-                data-show-count="true"
-                aria-label="Star rybbit-io/rybbit on GitHub"
-              ></a>
-            </div>
-          }
+          // banner={
+          //   <div className="text-center text-sm text-neutral-100 pt-2 pb-1 bg-neutral-700/50 flex items-center justify-center gap-2">
+          //     <div className="mb-1">
+          //       🚀 We just launched! Please star us on Github!{" "}
+          //     </div>
+          //     <a
+          //       className="github-button"
+          //       href="https://github.com/rybbit-io/rybbit"
+          //       data-color-scheme="no-preference: light; light: light; dark: light;"
+          //       data-show-count="true"
+          //       aria-label="Star rybbit-io/rybbit on GitHub"
+          //     ></a>
+          //   </div>
+          // }
           navbar={navbar}
           footer={<Footer_ />}
           editLink="Edit this page on GitHub"

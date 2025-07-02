@@ -8,6 +8,7 @@ import { Tilt_Warp } from "next/font/google";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { cn } from "../lib/utils";
+import { GitHubStarButton } from "@/components/GitHubStarButton";
 import { AdvancedFilters } from "./components/Cards/AdvancedFilters";
 import { EventTracking } from "./components/Cards/EventTracking";
 import { Funnels } from "./components/Cards/Funnels";
@@ -99,6 +100,8 @@ export default function IndexPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <div className="flex flex-col items-center justify-center overflow-x-hidden pt-16 md:pt-24">
+        <GitHubStarButton />
+
         <h1
           className={cn(
             "text-4xl md:text-5xl lg:text-7xl font-semibold  px-4 tracking-tight max-w-4xl text-center text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400",
