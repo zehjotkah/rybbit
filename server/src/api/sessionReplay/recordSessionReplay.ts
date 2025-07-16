@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { SessionReplayIngestService } from "../../services/replay/sessionReplayIngestService.js";
 import { RecordSessionReplayRequest } from "../../types/sessionReplay.js";
+import { getIpAddress } from "../../utils.js";
 
 const recordSessionReplaySchema = z.object({
   userId: z.string(),
@@ -10,7 +11,7 @@ const recordSessionReplaySchema = z.object({
       type: z.union([z.string(), z.number()]),
       data: z.any(),
       timestamp: z.number(),
-    })
+    }),
   ),
   metadata: z
     .object({
@@ -27,13 +28,11 @@ export async function recordSessionReplay(
     Params: { site: string };
     Body: RecordSessionReplayRequest;
   }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) {
   try {
     const siteId = Number(request.params.site);
-    const body = recordSessionReplaySchema.parse(
-      request.body
-    ) as RecordSessionReplayRequest;
+    const body = recordSessionReplaySchema.parse(request.body) as RecordSessionReplayRequest;
 
     // Extract request metadata for tracking
     const userAgent = request.headers["user-agent"] || "";
@@ -58,24 +57,3 @@ export async function recordSessionReplay(
     return reply.status(500).send({ error: "Internal server error" });
   }
 }
-
-// Helper function to get IP address
-const getIpAddress = (request: FastifyRequest): string => {
-  const cfConnectingIp = request.headers["cf-connecting-ip"];
-  if (cfConnectingIp && typeof cfConnectingIp === "string") {
-    return cfConnectingIp.trim();
-  }
-
-  const forwardedFor = request.headers["x-forwarded-for"];
-  if (forwardedFor && typeof forwardedFor === "string") {
-    const ips = forwardedFor
-      .split(",")
-      .map((ip) => ip.trim())
-      .filter(Boolean);
-    if (ips.length > 0) {
-      return ips[ips.length - 1];
-    }
-  }
-
-  return request.ip;
-};
