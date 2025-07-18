@@ -51,8 +51,8 @@ export const sites = pgTable(
     siteId: serial("site_id").primaryKey().notNull(),
     name: text("name").notNull(),
     domain: text("domain").notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
