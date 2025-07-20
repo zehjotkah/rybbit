@@ -46,6 +46,13 @@ class UsageService {
   }
 
   /**
+   * Checks if a site is over its monthly limit
+   */
+  public isSiteOverLimit(siteId: number): boolean {
+    return this.sitesOverLimit.has(siteId);
+  }
+
+  /**
    * Gets the first day of the current month in YYYY-MM-DD format using Luxon
    */
   private getStartOfMonth(): string {
