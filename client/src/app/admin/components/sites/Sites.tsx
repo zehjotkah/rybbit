@@ -41,8 +41,7 @@ export function Sites() {
       const lowerSearchQuery = searchQuery.toLowerCase();
       return (
         site.domain.toLowerCase().includes(lowerSearchQuery) ||
--        (site.organizationOwnerEmail && site.organizationOwnerEmail.toLowerCase().includes(lowerSearchQuery))
-+        site.organizationOwnerEmail?.toLowerCase().includes(lowerSearchQuery)
+        site.organizationOwnerEmail?.toLowerCase().includes(lowerSearchQuery)
       );
     });
   }, [sites, searchQuery]);
@@ -152,7 +151,7 @@ export function Sites() {
   return (
     <AdminLayout title="Sites">
       <GrowthChart data={sites || []} title="Sites" color="#10b981" />
-      
+
       <div className="mb-4">
         <SearchInput placeholder="Search by domain or owner email..." value={searchQuery} onChange={setSearchQuery} />
       </div>
