@@ -10,6 +10,7 @@ import {
   ChevronRight,
   FileText,
   MousePointerClick,
+  TriangleAlert,
 } from "lucide-react";
 import { DateTime } from "luxon";
 import { memo, useState } from "react";
@@ -115,6 +116,18 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>Events</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 bg-neutral-800 text-gray-300"
+                >
+                  <TriangleAlert className="w-4 h-4 text-red-500" />
+                  <span>{formatter(session.errors)}</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>Errors</TooltipContent>
             </Tooltip>
           </div>
 

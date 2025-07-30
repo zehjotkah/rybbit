@@ -12,6 +12,7 @@ import {
   MousePointerClick,
   Smartphone,
   Tablet,
+  TriangleAlert,
 } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
@@ -44,13 +45,15 @@ function PageviewItem({
   isLast?: boolean;
   nextTimestamp?: string; // Timestamp of the next event for duration calculation
 }) {
-  const isEvent = item.type !== "pageview";
+  const isError = item.type === "error";
+  const isEvent = item.type === "custom_event";
+  const isPageview = item.type === "pageview";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).toLocal();
   const formattedTime = timestamp.toFormat(hour12 ? "h:mm:ss a" : "HH:mm:ss");
 
   // Calculate duration if this is a pageview and we have the next timestamp
   let duration = null;
-  if (!isEvent && nextTimestamp) {
+  if (isPageview && nextTimestamp) {
     const nextTime = DateTime.fromSQL(nextTimestamp, { zone: "utc" }).toLocal();
     const totalSeconds = Math.floor(
       nextTime.diff(timestamp).milliseconds / 1000
@@ -76,7 +79,8 @@ function PageviewItem({
             "flex items-center justify-center w-8 h-8 rounded-full border",
             isEvent
               ? "bg-amber-900/30 border-amber-500/50"
-              : "bg-blue-900/30 border-blue-500/50"
+              : (isError ? "bg-red-900/30 border-red-500/50"
+                         : "bg-blue-900/30 border-blue-500/50")
           )}
         >
           <span className="text-sm font-medium">{index + 1}</span>
@@ -88,13 +92,15 @@ function PageviewItem({
           <div className="flex-shrink-0 mr-3">
             {isEvent ? (
               <MousePointerClick className="w-4 h-4 text-amber-500" />
+            ) : (isError ? (
+              <TriangleAlert className="w-4 h-4 text-red-500" />
             ) : (
               <FileText className="w-4 h-4 text-blue-500" />
-            )}
+            ))}
           </div>
 
           <div className="flex-1 min-w-0 mr-4">
-            {item.type === "pageview" ? (
+            {isPageview ? (
               <Link
                 href={`https://${item.hostname}${item.pathname}${
                   item.querystring ? `${item.querystring}` : ""
@@ -122,7 +128,7 @@ function PageviewItem({
             {formattedTime}
           </div>
         </div>
-        {!isEvent && duration && (
+        {isPageview && duration && (
           <div className="flex items-center pl-7 mt-1">
             <div className="text-xs text-gray-400">
               <Clock className="w-3 h-3 inline mr-1 text-gray-400" />
@@ -147,6 +153,40 @@ function PageviewItem({
                       {String(value)}
                     </Badge>
                   ))}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        )}
+        {isError && (
+          <div className="flex items-center pl-7 mt-1">
+            <div className="text-xs text-gray-400">
+              {item.props ? (
+                <span>
+                  {item.props.message && (
+                    <Badge
+                      key="message"
+                      variant="outline"
+                      className="px-1.5 py-0 h-5 text-xs bg-neutral-800 text-gray-100 font-medium"
+                    >
+                      <span className="text-gray-300 font-light mr-1">
+                        message:
+                      </span>{" "}
+                      {String(item.props.message)}
+                    </Badge>
+                  )}
+
+                  {item.props.stack && (
+                    <div>
+                      <p className="mt-2 mb-1 text-gray-300 font-light">
+                        Stack Trace:
+                      </p>
+                      <pre className="text-xs text-neutral-100 bg-neutral-800 p-2 rounded overflow-x-auto whitespace-pre-wrap break-words">
+                        {item.props.stack}
+                      </pre>
+                    </div>
+                  )}
+
                 </span>
               ) : null}
             </div>
@@ -253,7 +293,11 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
   }, [allEvents]);
 
   const totalEvents = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type !== "pageview").length;
+    return allEvents.filter((p: SessionEvent) => p.type === "custom_event").length;
+  }, [allEvents]);
+
+  const totalErrors = useMemo(() => {
+    return allEvents.filter((p: SessionEvent) => p.type === "error").length;
   }, [allEvents]);
 
   const { getRegionName } = useGetRegionName();
@@ -307,6 +351,13 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                 >
                   <MousePointerClick className="w-3 h-3" />
                   <span>Events: {totalEvents}</span>
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1 text-gray-300 bg-red-500/60"
+                >
+                  <TriangleAlert className="w-3 h-3" />
+                  <span>Errors: {totalErrors}</span>
                 </Badge>
               </div>
               <div className="px-1 pt-2 pb-1">
