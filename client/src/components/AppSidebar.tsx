@@ -31,13 +31,13 @@ export function AppSidebar() {
           active={pathname === "/" || !isNaN(Number(pathname.split("/")[1]))}
           expanded={isExpanded}
         />
-        <SidebarLink
+        {/* <SidebarLink
           href="/uptime/monitors"
           icon={<SquareActivity className="w-5 h-5" />}
           label="Uptime"
           active={pathname.startsWith("/uptime")}
           expanded={isExpanded}
-        />
+        /> */}
       </div>
       <SidebarLink
         href="/settings/account"

@@ -3,7 +3,7 @@ import { MonitorExecutor } from "./monitorExecutor.js";
 import { RegionHealthChecker } from "./regionHealthChecker.js";
 import { createServiceLogger } from "../../lib/logger/logger.js";
 
-export class UptimeService {
+class UptimeService {
   private scheduler: MonitorScheduler;
   private executor: MonitorExecutor;
   private regionHealthChecker: RegionHealthChecker;
