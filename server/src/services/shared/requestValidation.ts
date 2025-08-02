@@ -54,6 +54,7 @@ export async function validateApiKey(
   }
 }
 
+
 /**
  * Validates if the request's origin matches the registered domain for the site
  * @param siteId The site ID from the tracking payload
@@ -62,7 +63,7 @@ export async function validateApiKey(
  */
 export async function validateOrigin(
   siteId: string | number,
-  requestOrigin?: string
+  requestOrigin?: string,
 ): Promise<OriginValidationResult> {
   try {
     // If origin checking is disabled, return success
@@ -107,15 +108,21 @@ export async function validateOrigin(
       const normalizedOriginHost = normalizeOrigin(requestOrigin);
       const normalizedSiteDomain = normalizeOrigin(`https://${siteDomain}`);
 
-      // Check if the normalized domains match
-      if (normalizedOriginHost !== normalizedSiteDomain) {
-        return {
-          success: false,
-          error: `Origin mismatch. Received: ${requestOrigin}`,
-        };
+      // Check for exact match first
+      if (normalizedOriginHost === normalizedSiteDomain) {
+        return { success: true };
       }
 
-      return { success: true };
+      // Always allow subdomains - check if origin is a subdomain of site domain
+      if (normalizedOriginHost.endsWith(`.${normalizedSiteDomain}`)) {
+        return { success: true };
+      }
+
+      // If we get here, neither exact match nor valid subdomain
+      return {
+        success: false,
+        error: `Origin mismatch. Received: ${requestOrigin}`,
+      };
     } catch (error) {
       return {
         success: false,
