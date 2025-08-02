@@ -293,6 +293,7 @@ export function PerformanceChart() {
               enableSlices="x"
               enableArea={false}
               markers={markers}
+              lineWidth={1}
               sliceTooltip={({ slice }: any) => {
                 const currentTime = DateTime.fromJSDate(new Date(slice.points[0].data.x));
 
