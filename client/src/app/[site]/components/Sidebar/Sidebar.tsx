@@ -44,15 +44,13 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-56 bg-neutral-900 border-r border-neutral-800 flex flex-col justify-between">
+    <div className="w-56 bg-neutral-900 border-r border-neutral-800 flex flex-col justify-between h-screen">
       <div className="flex flex-col">
         <div className="flex flex-col p-3 border-b border-neutral-800">
           <SiteSelector />
         </div>
         <div className="flex flex-col p-3">
-          <div className="text-xs text-neutral-400 mt-0 mb-1 mx-3 font-medium">
-            Web Analytics
-          </div>
+          <div className="text-xs text-neutral-400 mt-0 mb-1 mx-3 font-medium">Web Analytics</div>
           <SidebarLink
             label="Main"
             active={isActiveTab("main")}
@@ -65,7 +63,6 @@ export function Sidebar() {
             href={getTabPath("realtime")}
             icon={<Earth className="w-4 h-4" />}
           />
-
           <SidebarLink
             label="Map"
             active={isActiveTab("map")}
@@ -94,9 +91,7 @@ export function Sidebar() {
             href={getTabPath("goals")}
             icon={<Target weight="bold" />}
           />
-          <div className="text-xs text-neutral-400 mt-3 mb-1 mx-3 font-medium">
-            Product Analytics
-          </div>
+          <div className="text-xs text-neutral-400 mt-3 mb-1 mx-3 font-medium">Product Analytics</div>
           <div className="hidden md:block">
             <SidebarLink
               label="Replay"
@@ -123,9 +118,7 @@ export function Sidebar() {
             href={getTabPath("retention")}
             icon={<ChartColumnDecreasing className="w-4 h-4" />}
           />
-          <div className="text-xs text-neutral-400 mt-3 mb-1 mx-3 font-medium">
-            Behavior
-          </div>
+          <div className="text-xs text-neutral-400 mt-3 mb-1 mx-3 font-medium">Behavior</div>
           <SidebarLink
             label="Sessions"
             active={isActiveTab("sessions")}
@@ -194,9 +187,7 @@ function SidebarLink({
       <div
         className={cn(
           "px-3 py-2 rounded-lg transition-colors w-full",
-          active
-            ? "bg-neutral-800 text-white"
-            : "text-neutral-200 hover:text-white hover:bg-neutral-800/50"
+          active ? "bg-neutral-800 text-white" : "text-neutral-200 hover:text-white hover:bg-neutral-800/50"
         )}
       >
         <div className="flex items-center gap-2">
