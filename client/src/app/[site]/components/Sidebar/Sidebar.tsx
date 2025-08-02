@@ -44,127 +44,126 @@ export function Sidebar() {
 
   return (
     <div className="w-56 bg-neutral-900 border-r border-neutral-850 flex flex-col h-screen">
-      <div className="flex flex-col">
-        <div className="flex flex-col p-3 border-b border-neutral-800">
-          <SiteSelector />
+      <div className="flex flex-col p-3 border-b border-neutral-800">
+        <SiteSelector />
+      </div>
+      <div className="flex flex-col p-3 pt-1">
+        <SidebarComponents.SectionHeader>Web Analytics</SidebarComponents.SectionHeader>
+        <SidebarComponents.Item
+          label="Main"
+          active={isActiveTab("main")}
+          href={getTabPath("main")}
+          icon={<LayoutDashboard className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Realtime"
+          active={isActiveTab("realtime")}
+          href={getTabPath("realtime")}
+          icon={<Earth className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Map"
+          active={isActiveTab("map")}
+          href={getTabPath("map")}
+          icon={<Map className="w-4 h-4" />}
+        />
+        {IS_CLOUD && (
+          <SidebarComponents.Item
+            label="Pages"
+            active={isActiveTab("pages")}
+            href={getTabPath("pages")}
+            icon={<File className="w-4 h-4" />}
+          />
+        )}
+        {IS_CLOUD && (
+          <SidebarComponents.Item
+            label="Performance"
+            active={isActiveTab("performance")}
+            href={getTabPath("performance")}
+            icon={<Gauge className="w-4 h-4" />}
+          />
+        )}
+        <SidebarComponents.Item
+          label="Goals"
+          active={isActiveTab("goals")}
+          href={getTabPath("goals")}
+          icon={<Target weight="bold" />}
+        />
+        <SidebarComponents.SectionHeader>Product Analytics</SidebarComponents.SectionHeader>
+        <div className="hidden md:block">
+          <SidebarComponents.Item
+            label="Replay"
+            active={isActiveTab("replay")}
+            href={getTabPath("replay")}
+            icon={<Video className="w-4 h-4" />}
+          />
         </div>
-        <div className="flex flex-col p-3 pt-1">
-          <SidebarComponents.SectionHeader>Web Analytics</SidebarComponents.SectionHeader>
-          <SidebarComponents.Item
-            label="Main"
-            active={isActiveTab("main")}
-            href={getTabPath("main")}
-            icon={<LayoutDashboard className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Realtime"
-            active={isActiveTab("realtime")}
-            href={getTabPath("realtime")}
-            icon={<Earth className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Map"
-            active={isActiveTab("map")}
-            href={getTabPath("map")}
-            icon={<Map className="w-4 h-4" />}
-          />
-          {IS_CLOUD && (
-            <SidebarComponents.Item
-              label="Pages"
-              active={isActiveTab("pages")}
-              href={getTabPath("pages")}
-              icon={<File className="w-4 h-4" />}
-            />
-          )}
-          {IS_CLOUD && (
-            <SidebarComponents.Item
-              label="Performance"
-              active={isActiveTab("performance")}
-              href={getTabPath("performance")}
-              icon={<Gauge className="w-4 h-4" />}
-            />
-          )}
-          <SidebarComponents.Item
-            label="Goals"
-            active={isActiveTab("goals")}
-            href={getTabPath("goals")}
-            icon={<Target weight="bold" />}
-          />
-          <SidebarComponents.SectionHeader>Product Analytics</SidebarComponents.SectionHeader>
-          <div className="hidden md:block">
-            <SidebarComponents.Item
-              label="Replay"
-              active={isActiveTab("replay")}
-              href={getTabPath("replay")}
-              icon={<Video className="w-4 h-4" />}
-            />
-          </div>
-          <SidebarComponents.Item
-            label="Funnels"
-            active={isActiveTab("funnels")}
-            href={getTabPath("funnels")}
-            icon={<Funnel weight="bold" />}
-          />
-          <SidebarComponents.Item
-            label="Journeys"
-            active={isActiveTab("journeys")}
-            href={getTabPath("journeys")}
-            icon={<Split className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Retention"
-            active={isActiveTab("retention")}
-            href={getTabPath("retention")}
-            icon={<ChartColumnDecreasing className="w-4 h-4" />}
-          />
-          <SidebarComponents.SectionHeader>Behavior</SidebarComponents.SectionHeader>
-          <SidebarComponents.Item
-            label="Sessions"
-            active={isActiveTab("sessions")}
-            href={getTabPath("sessions")}
-            icon={<Rewind className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Users"
-            active={isActiveTab("users")}
-            href={getTabPath("users")}
-            icon={<User className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Events"
-            active={isActiveTab("events")}
-            href={getTabPath("events")}
-            icon={<MousePointerClick className="w-4 h-4" />}
-          />
-          <SidebarComponents.Item
-            label="Errors"
-            active={isActiveTab("errors")}
-            href={getTabPath("errors")}
-            icon={<AlertTriangle className="w-4 h-4" />}
-          />
-          {/* <SidebarComponents.Item
+        <SidebarComponents.Item
+          label="Funnels"
+          active={isActiveTab("funnels")}
+          href={getTabPath("funnels")}
+          icon={<Funnel weight="bold" />}
+        />
+        <SidebarComponents.Item
+          label="Journeys"
+          active={isActiveTab("journeys")}
+          href={getTabPath("journeys")}
+          icon={<Split className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Retention"
+          active={isActiveTab("retention")}
+          href={getTabPath("retention")}
+          icon={<ChartColumnDecreasing className="w-4 h-4" />}
+        />
+        <SidebarComponents.SectionHeader>Behavior</SidebarComponents.SectionHeader>
+        <SidebarComponents.Item
+          label="Sessions"
+          active={isActiveTab("sessions")}
+          href={getTabPath("sessions")}
+          icon={<Rewind className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Users"
+          active={isActiveTab("users")}
+          href={getTabPath("users")}
+          icon={<User className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Events"
+          active={isActiveTab("events")}
+          href={getTabPath("events")}
+          icon={<MousePointerClick className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label="Errors"
+          active={isActiveTab("errors")}
+          href={getTabPath("errors")}
+          icon={<AlertTriangle className="w-4 h-4" />}
+        />
+        {/* <SidebarComponents.Item
           label="Reports"
           active={isActiveTab("reports")}
           href={getTabPath("reports")}
           icon={<ChartBarDecreasing className="w-4 h-4" />}
           /> */}
-        </div>
-      </div>
-      {session.data && (
-        <div className="flex flex-col p-3">
-          <SiteSettings
-            siteId={site?.siteId ?? 0}
-            trigger={
-              <div className="px-3 py-2 rounded-lg transition-colors w-full text-neutral-200 hover:text-white hover:bg-neutral-800/50 cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  <span className="text-sm">Site Settings</span>
+        {session.data && (
+          <>
+            <SidebarComponents.SectionHeader>Settings</SidebarComponents.SectionHeader>
+            <SiteSettings
+              siteId={site?.siteId ?? 0}
+              trigger={
+                <div className="px-3 py-2 rounded-lg transition-colors w-full text-neutral-200 hover:text-white hover:bg-neutral-800/50 cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span className="text-sm">Site Settings</span>
+                  </div>
                 </div>
-              </div>
-            }
-          />
-        </div>
-      )}
+              }
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
