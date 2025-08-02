@@ -414,7 +414,7 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
           </TabsContent>
 
           <TabsContent value="info" className="mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_auto_auto] gap-8 mb-6">
               {/* User Information */}
               <div>
                 <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
@@ -576,6 +576,41 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                       </span>
                     </div>
                   ) : null}
+                </div>
+              </div>
+
+              {/* Source Information */}
+              <div>
+                <h4 className="text-sm font-medium mb-3 text-gray-300 border-b border-neutral-800 pb-2">
+                  Source Information
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Channel:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <span>{sessionDetails?.channel || "None"}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Referrer:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <span>{sessionDetails?.referrer || "None"}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-300 min-w-[80px]">
+                      Entry Page:
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                      <span>{sessionDetails?.entry_page || "None"}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

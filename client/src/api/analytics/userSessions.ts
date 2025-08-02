@@ -106,6 +106,7 @@ export interface SessionDetails {
   screen_width: number;
   screen_height: number;
   referrer: string;
+  channel: string;
   session_end: string;
   session_start: string;
   pageviews: number;
