@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { IS_CLOUD } from "../lib/const";
 import { cn } from "../lib/utils";
 
 export function AppSidebar() {
@@ -15,7 +14,7 @@ export function AppSidebar() {
   return (
     <div
       className={cn(
-        "flex flex-col items-start justify-between h-screen p-2 py-3 bg-neutral-900 border-r border-neutral-800 gap-3 transition-all duration-1s00",
+        "flex flex-col items-start justify-between h-screen p-2 py-3 bg-neutral-900 border-r border-neutral-850 gap-3 transition-all duration-1s00",
         isExpanded ? "w-44" : "w-[45px]"
       )}
       onMouseEnter={() => setIsExpanded(true)}

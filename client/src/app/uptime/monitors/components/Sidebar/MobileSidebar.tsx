@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar } from "./Sidebar";
+import { UptimeSidebar } from "./UptimeSidebar";
 
 import { Menu } from "lucide-react";
 import { VisuallyHidden } from "radix-ui";
@@ -24,7 +24,7 @@ export function MobileSidebar() {
         </VisuallyHidden.Root>
         <SheetContent side="left" className="p-0 w-[240px] flex gap-0" showClose={false}>
           <AppSidebar />
-          <Sidebar />
+          <UptimeSidebar />
         </SheetContent>
       </Sheet>
     </div>

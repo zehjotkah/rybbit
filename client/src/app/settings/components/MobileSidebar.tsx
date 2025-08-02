@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../.
 import { Menu } from "lucide-react";
 import { VisuallyHidden } from "radix-ui";
 import { AppSidebar } from "../../../components/AppSidebar";
-import { Sidebar } from "./SIdebar";
+import { SettingsSidebar } from "./SettingsSidebar";
 
 export function MobileSidebar() {
   return (
@@ -24,7 +24,7 @@ export function MobileSidebar() {
         </VisuallyHidden.Root>
         <SheetContent side="left" className="p-0 w-[240px] flex gap-0" showClose={false}>
           <AppSidebar />
-          <Sidebar />
+          <SettingsSidebar />
         </SheetContent>
       </Sheet>
     </div>
