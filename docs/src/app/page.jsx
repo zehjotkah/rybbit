@@ -126,7 +126,7 @@ export default function IndexPage() {
           </div>
           <p className="text-neutral-400 text-xs md:text-sm flex items-center justify-center gap-2 mt-6">
             <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
-            No credit card required
+            First 10,000 events/m are free. No credit card required.
           </p>
         </div>
 
@@ -383,7 +383,7 @@ export default function IndexPage() {
                 It's time to switch to analytics that's made for you
               </h2>
               <p className="text-base md:text-xl text-neutral-300 mb-6 md:mb-10 max-w-3xl mx-auto">
-                The first 3,000 events a month are free
+                The first 10,000 events a month are free
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
