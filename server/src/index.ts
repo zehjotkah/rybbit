@@ -51,10 +51,12 @@ import { changeSiteSalt } from "./api/sites/changeSiteSalt.js";
 import { deleteSite } from "./api/sites/deleteSite.js";
 import { getSite } from "./api/sites/getSite.js";
 import { getSiteApiConfig } from "./api/sites/getSiteApiConfig.js";
+import { getSiteExcludedIPs } from "./api/sites/getSiteExcludedIPs.js";
 import { getSiteHasData } from "./api/sites/getSiteHasData.js";
 import { getSiteIsPublic } from "./api/sites/getSiteIsPublic.js";
 import { getSitesFromOrg } from "./api/sites/getSitesFromOrg.js";
 import { updateSiteApiConfig } from "./api/sites/updateSiteApiConfig.js";
+import { updateSiteExcludedIPs } from "./api/sites/updateSiteExcludedIPs.js";
 import { createCheckoutSession } from "./api/stripe/createCheckoutSession.js";
 import { createPortalSession } from "./api/stripe/createPortalSession.js";
 import { getSubscription } from "./api/stripe/getSubscription.js";
@@ -115,23 +117,25 @@ const server = Fastify({
                 level: process.env.LOG_LEVEL || "info",
                 options: {
                   colorize: true,
-                  translateTime: "SYS:standard",
-                  ignore: "pid,hostname",
+                  singleLine: true,
+                  translateTime: "HH:MM:ss",
+                  ignore: "pid,hostname,name",
                   destination: 1, // stdout
                 },
               },
             ],
           }
         : process.env.NODE_ENV === "development"
-        ? {
-            target: "pino-pretty",
-            options: {
-              colorize: true,
-              translateTime: "SYS:standard",
-              ignore: "pid,hostname",
-            },
-          }
-        : undefined, // Production without Axiom - plain JSON to stdout
+          ? {
+              target: "pino-pretty",
+              options: {
+                colorize: true,
+                singleLine: true,
+                translateTime: "HH:MM:ss",
+                ignore: "pid,hostname,name",
+              },
+            }
+          : undefined, // Production without Axiom - plain JSON to stdout
     serializers: {
       req(request) {
         return {
@@ -155,7 +159,7 @@ const server = Fastify({
 });
 
 server.register(cors, {
-  origin: (origin, callback) => {
+  origin: (_origin, callback) => {
     callback(null, true);
 
     // if (!origin || allowList.includes(normalizeOrigin(origin))) {
@@ -353,6 +357,8 @@ server.get("/api/get-sites-from-org/:organizationId", getSitesFromOrg);
 server.get("/api/get-site/:id", getSite);
 server.get("/api/site/:siteId/api-config", getSiteApiConfig);
 server.post("/api/site/:siteId/api-config", updateSiteApiConfig);
+server.get("/api/site/:siteId/excluded-ips", getSiteExcludedIPs);
+server.post("/api/site/:siteId/excluded-ips", updateSiteExcludedIPs);
 server.get("/api/list-organization-members/:organizationId", listOrganizationMembers);
 server.get("/api/user/organizations", getUserOrganizations);
 server.post("/api/add-user-to-organization", addUserToOrganization);
@@ -413,15 +419,15 @@ const start = async () => {
     }
 
     // Initialize uptime monitoring service in the background (non-blocking)
-    uptimeService
-      .initialize()
-      .then(() => {
-        server.log.info("Uptime monitoring service initialized successfully");
-      })
-      .catch((error) => {
-        server.log.error("Failed to initialize uptime service:", error);
-        // Continue running without uptime monitoring
-      });
+    // uptimeService
+    //   .initialize()
+    //   .then(() => {
+    //     server.log.info("Uptime monitoring service initialized successfully");
+    //   })
+    //   .catch((error) => {
+    //     server.log.error("Failed to initialize uptime service:", error);
+    //     // Continue running without uptime monitoring
+    //   });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
