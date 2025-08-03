@@ -65,9 +65,9 @@ export class RegionHealthChecker {
       }
 
       const healthyCount = results.filter((r) => r.isHealthy).length;
-      console.log(`[Uptime] Region health check complete: ${healthyCount}/${remoteRegions.length} regions healthy`);
+      this.logger.info({ healthyCount, totalRegions: remoteRegions.length }, "Region health check complete");
     } catch (error) {
-      console.error("Error in region health check:", error);
+      this.logger.error(error, "Error in region health check");
     }
   }
 
@@ -79,7 +79,7 @@ export class RegionHealthChecker {
       });
 
       if (!response.ok) {
-        console.warn(`Region ${region.code} returned status ${response.status}`);
+        this.logger.warn({ regionCode: region.code, status: response.status }, "Region returned non-ok status");
         return { region, isHealthy: false };
       }
 
@@ -90,10 +90,10 @@ export class RegionHealthChecker {
         return { region, isHealthy: true };
       }
 
-      console.warn(`Region ${region.code} returned unexpected response:`, data);
+      this.logger.warn({ regionCode: region.code, response: data }, "Region returned unexpected response");
       return { region, isHealthy: false };
     } catch (error) {
-      console.error(`Health check failed for region ${region.code}:`, error);
+      this.logger.error({ regionCode: region.code, error }, "Health check failed for region");
       return { region, isHealthy: false };
     }
   }

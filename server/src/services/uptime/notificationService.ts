@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { and, eq, InferSelectModel } from "drizzle-orm";
 import { db } from "../../db/postgres/postgres.js";
 import { notificationChannels } from "../../db/postgres/schema.js";
+import { createServiceLogger } from "../../lib/logger/logger.js";
 import { sendEmail } from "../../lib/resend.js";
 import { sendSMS } from "../../lib/twilio.js";
 
@@ -33,6 +34,8 @@ interface Incident {
 }
 
 export class NotificationService {
+  private logger = createServiceLogger("notification-service");
+
   async sendTestNotification(channel: NotificationChannel, monitor: Monitor, incident: Incident, eventType: "down" | "recovery"): Promise<void> {
     try {
       if (channel.type === "email" && channel.config.email) {
@@ -51,7 +54,7 @@ export class NotificationService {
         await this.sendSMSNotification(channel.config.phoneNumber, monitor, incident, eventType);
       }
     } catch (error) {
-      console.error(`Failed to send test ${channel.type} notification:`, error);
+      this.logger.error({ channelType: channel.type, error }, "Failed to send test notification");
       throw error;
     }
   }
@@ -117,11 +120,11 @@ export class NotificationService {
             .set({ lastNotifiedAt: now.toISOString() })
             .where(eq(notificationChannels.id, channel.id));
         } catch (error) {
-          console.error(`Failed to send ${channel.type} notification for channel ${channel.id}:`, error);
+          this.logger.error({ channelType: channel.type, channelId: channel.id, error }, "Failed to send notification");
         }
       }
     } catch (error) {
-      console.error("Failed to send incident notifications:", error);
+      this.logger.error(error, "Failed to send incident notifications");
     }
   }
 
@@ -175,7 +178,7 @@ export class NotificationService {
     }
 
     await sendEmail(email, subject, html);
-    console.log(`[Uptime] Sent ${eventType} email notification to ${email} for monitor ${monitor.id}`);
+    this.logger.info({ eventType, email, monitorId: monitor.id }, "Sent email notification");
   }
 
   private async sendDiscordNotification(
@@ -259,7 +262,7 @@ export class NotificationService {
       throw new Error(`Discord webhook failed: ${response.status} ${response.statusText}`);
     }
 
-    console.log(`[Uptime] Sent ${eventType} Discord notification for monitor ${monitor.id}`);
+    this.logger.info({ eventType, monitorId: monitor.id }, "Sent Discord notification");
   }
 
   private async sendSlackNotification(
@@ -355,7 +358,7 @@ export class NotificationService {
       throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
     }
 
-    console.log(`[Uptime] Sent ${eventType} Slack notification for monitor ${monitor.id}`);
+    this.logger.info({ eventType, monitorId: monitor.id }, "Sent Slack notification");
   }
 
   private async sendSMSNotification(
@@ -398,6 +401,6 @@ export class NotificationService {
       throw new Error(result.error || "Failed to send SMS");
     }
 
-    console.log(`[Uptime] Sent ${eventType} SMS notification to ${phoneNumber} for monitor ${monitor.id}`);
+    this.logger.info({ eventType, phoneNumber, monitorId: monitor.id }, "Sent SMS notification");
   }
 }

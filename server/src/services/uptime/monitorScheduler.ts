@@ -20,7 +20,7 @@ export class MonitorScheduler {
       ...(process.env.REDIS_PASSWORD && { password: process.env.REDIS_PASSWORD }),
     };
 
-    this.logger.info(`BullMQ connecting to Redis at ${this.connection.host}:${this.connection.port}`);
+    this.logger.info({ host: this.connection.host, port: this.connection.port }, "BullMQ connecting to Redis");
 
     this.queue = new Queue("monitor-checks", {
       connection: this.connection,
@@ -56,7 +56,7 @@ export class MonitorScheduler {
     // Load and schedule all active monitors
     await this.loadAndScheduleMonitors();
 
-    console.log("[Uptime] BullMQ monitor scheduler initialized");
+    this.logger.info("BullMQ monitor scheduler initialized");
   }
 
   private async clearStaleJobs(): Promise<void> {
@@ -64,7 +64,7 @@ export class MonitorScheduler {
       // For Dragonfly compatibility, we'll clear jobs more carefully
       // First, try to get counts to see if there are any jobs
       const counts = await this.queue.getJobCounts();
-      console.log("[Uptime] Current job counts:", counts);
+      this.logger.debug({ counts }, "Current job counts");
 
       // Only try to clear if there are actually jobs
       if (counts.delayed > 0 || counts.waiting > 0 || counts.active > 0) {
@@ -73,26 +73,26 @@ export class MonitorScheduler {
           const waitingJobs = await this.queue.getJobs(["waiting"]);
           const activeJobs = await this.queue.getJobs(["active"]);
 
-          console.log(`[Uptime] Found ${waitingJobs.length} waiting and ${activeJobs.length} active jobs`);
+          this.logger.debug({ waitingJobs: waitingJobs.length, activeJobs: activeJobs.length }, "Found stale jobs");
 
           // Remove jobs individually
           for (const job of [...waitingJobs, ...activeJobs]) {
             try {
               await job.remove();
             } catch (err) {
-              console.warn(`Failed to remove job ${job.id}:`, err);
+              this.logger.warn({ jobId: job.id, error: err }, "Failed to remove job");
             }
           }
 
-          console.log("[Uptime] Cleared stale jobs");
+          this.logger.info("Cleared stale jobs");
         } catch (err) {
-          console.warn("Could not clear all job types:", err);
+          this.logger.warn({ error: err }, "Could not clear all job types");
         }
       } else {
-        console.log("[Uptime] No stale jobs to clear");
+        this.logger.debug("No stale jobs to clear");
       }
     } catch (error) {
-      console.error("Error clearing stale jobs:", error);
+      this.logger.error(error, "Error clearing stale jobs");
       // Continue anyway - this is not critical for startup
     }
   }
@@ -102,14 +102,14 @@ export class MonitorScheduler {
       // Load all enabled monitors
       const monitors = await db.select().from(uptimeMonitors).where(eq(uptimeMonitors.enabled, true));
 
-      console.log(`[Uptime] Found ${monitors.length} enabled monitors`);
+      this.logger.info({ monitorCount: monitors.length }, "Found enabled monitors");
 
       // Schedule each monitor
       for (const monitor of monitors) {
         await this.scheduleMonitor(monitor.id, monitor.intervalSeconds);
       }
     } catch (error) {
-      console.error("Error loading monitors:", error);
+      this.logger.error(error, "Error loading monitors");
     }
   }
 
@@ -134,9 +134,9 @@ export class MonitorScheduler {
         jobId: jobName, // Use monitor ID as job ID to prevent duplicates
       });
 
-      console.log(`[Uptime] Scheduled monitor ${monitorId} to run every ${intervalSeconds} seconds (job: ${job.id})`);
+      this.logger.info({ monitorId, intervalSeconds, jobId: job.id }, "Scheduled monitor");
     } catch (error) {
-      console.error(`Error scheduling monitor ${monitorId}:`, error);
+      this.logger.error({ monitorId, error }, "Error scheduling monitor");
     }
   }
 
@@ -163,14 +163,14 @@ export class MonitorScheduler {
             await job.remove();
           } catch (err) {
             // Ignore errors for jobs that can't be removed (e.g., repeat jobs)
-            console.warn(`Could not remove job ${job.id}:`, err);
+            this.logger.warn({ jobId: job.id, error: err }, "Could not remove job");
           }
         }),
       );
 
-      console.log(`[Uptime] Removed schedule for monitor ${monitorId}`);
+      this.logger.info({ monitorId }, "Removed schedule for monitor");
     } catch (error) {
-      console.error(`Error removing monitor schedule ${monitorId}:`, error);
+      this.logger.error({ monitorId, error }, "Error removing monitor schedule");
     }
   }
 
@@ -194,14 +194,14 @@ export class MonitorScheduler {
         removeOnFail: false,
       });
 
-      console.log(`[Uptime] Triggered immediate check for monitor ${monitorId} (job: ${job.id})`);
+      this.logger.info({ monitorId, jobId: job.id }, "Triggered immediate check for monitor");
     } catch (error) {
-      console.error(`Error triggering immediate check for monitor ${monitorId}:`, error);
+      this.logger.error({ monitorId, error }, "Error triggering immediate check for monitor");
     }
   }
 
   async shutdown(): Promise<void> {
-    console.log("[Uptime] Shutting down BullMQ monitor scheduler...");
+    this.logger.info("Shutting down BullMQ monitor scheduler...");
     this.isShuttingDown = true;
 
     try {
@@ -210,16 +210,16 @@ export class MonitorScheduler {
         Promise.race([
           this.queueEvents.close(),
           new Promise((_, reject) => setTimeout(() => reject(new Error("Queue events close timeout")), 3000)),
-        ]).catch((err) => console.error("Queue events close error:", err)),
+        ]).catch((err) => this.logger.error(err, "Queue events close error")),
         Promise.race([
           this.queue.close(),
           new Promise((_, reject) => setTimeout(() => reject(new Error("Queue close timeout")), 3000)),
-        ]).catch((err) => console.error("Queue close error:", err)),
+        ]).catch((err) => this.logger.error(err, "Queue close error")),
       ]);
 
-      console.log("[Uptime] BullMQ monitor scheduler shut down successfully");
+      this.logger.info("BullMQ monitor scheduler shut down successfully");
     } catch (error) {
-      console.error("Error during scheduler shutdown:", error);
+      this.logger.error(error, "Error during scheduler shutdown");
     }
   }
 
