@@ -106,27 +106,28 @@ export default function IndexPage() {
           Next-gen, open source, lightweight, cookieless web & product analytics for everyone.
         </h2>
 
-        <div className="flex flex-col sm:flex-row my-8 md:my-10 items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">
-          <Link
-            href="https://app.rybbit.io/signup"
-            className="w-full sm:w-auto"
-            data-rybbit-event="signup"
-            data-rybbit-prop-location="hero"
-          >
-            <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
-              Track your site for free
-            </button>
-            <p className="text-neutral-400 text-xs md:text-sm flex items-center justify-center gap-2 mt-6">
-              <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
-              No credit card required
-            </p>
-          </Link>
-
-          {/* <Link href="https://demo.rybbit.io/21" className="w-full sm:w-auto" data-rybbit-event="demo">
-            <button className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50 cursor-pointer">
-              View Live Demo
-            </button>
-          </Link> */}
+        <div className="flex flex-col items-center my-8 md:my-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">
+            <Link
+              href="https://app.rybbit.io/signup"
+              className="w-full sm:w-auto"
+              data-rybbit-event="signup"
+              data-rybbit-prop-location="hero"
+            >
+              <button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
+                Track your site
+              </button>
+            </Link>
+            <Link href="https://demo.rybbit.io/21" className="w-full sm:w-auto" data-rybbit-event="demo">
+              <button className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50 cursor-pointer">
+                See live demo
+              </button>
+            </Link>
+          </div>
+          <p className="text-neutral-400 text-xs md:text-sm flex items-center justify-center gap-2 mt-6">
+            <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
+            No credit card required
+          </p>
         </div>
 
         <div className="relative w-full max-w-[1300px] mb-10 px-4">
@@ -259,9 +260,9 @@ export default function IndexPage() {
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-4 text-neutral-300">
                     <p>
-                      Google Analytics is free because Google uses it as a funnel into their ecosystem and to sell
-                      ads. Rybbit's only goal is to provide you with high quality analytics. No more confusing
-                      dashboards pushing random AI features nobody wants.
+                      Google Analytics is free because Google uses it as a funnel into their ecosystem and to sell ads.
+                      Rybbit's only goal is to provide you with high quality analytics. No more confusing dashboards
+                      pushing random AI features nobody wants.
                     </p>
                     <br />
                     <p>
