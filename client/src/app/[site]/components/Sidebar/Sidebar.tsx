@@ -1,5 +1,4 @@
 "use client";
-import { Funnel, Target } from "@phosphor-icons/react/dist/ssr";
 import {
   AlertTriangle,
   ChartColumnDecreasing,
@@ -9,12 +8,14 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Map,
+  Target,
   MousePointerClick,
   Rewind,
   Settings,
   Split,
   User,
   Video,
+  Funnel,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useGetSite } from "../../../../api/admin/sites";
@@ -87,7 +88,7 @@ export function Sidebar() {
           label="Goals"
           active={isActiveTab("goals")}
           href={getTabPath("goals")}
-          icon={<Target weight="bold" />}
+          icon={<Target className="w-4 h-4" />}
         />
         <SidebarComponents.SectionHeader>Product Analytics</SidebarComponents.SectionHeader>
         <div className="hidden md:block">
@@ -102,7 +103,7 @@ export function Sidebar() {
           label="Funnels"
           active={isActiveTab("funnels")}
           href={getTabPath("funnels")}
-          icon={<Funnel weight="bold" />}
+          icon={<Funnel className="w-4 h-4" />}
         />
         <SidebarComponents.Item
           label="Journeys"
