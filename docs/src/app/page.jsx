@@ -102,7 +102,7 @@ export default function IndexPage() {
         >
           The Open Source Google Analytics Replacement
         </h1>
-        <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-3xl text-center text-neutral-300">
+        <h2 className="text-lg md:text-2xl pt-4 md:pt-6 px-4 tracking-tight max-w-4xl text-center text-neutral-300">
           Next-gen, open source, lightweight, cookieless web & product analytics for everyone.
         </h2>
 
@@ -160,6 +160,91 @@ export default function IndexPage() {
             ></iframe>
           </div>
         </div>
+
+        {/* Logo Section */}
+        <section className="py-12 md:py-16 w-full">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-10 md:mb-12">
+              <p className="text-neutral-400 text-sm uppercase tracking-wider font-medium">
+                Trusted by 2000+ companies worldwide
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/vanguard.webp"
+                  alt="Vanguard"
+                  width={120}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/ustwo.svg"
+                  alt="ustwo"
+                  width={100}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/tilaa.svg"
+                  alt="Tilaa"
+                  width={100}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/strawpoll.svg"
+                  alt="StrawPoll"
+                  width={120}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/mydramalist.png"
+                  alt="MyDramaList"
+                  width={120}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/dtelecom.svg"
+                  alt="DTelecom"
+                  width={100}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity grayscale"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/onyx.webp"
+                  alt="Onyx"
+                  width={100}
+                  height={40}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/logos/apc.webp"
+                  alt="Apc"
+                  width={90}
+                  height={30}
+                  className="opacity-60 hover:opacity-100 transition-opacity invert grayscale"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section className="py-14 md:py-20 w-full max-w-7xl px-4">
           <div className="text-center mb-10 md:mb-16">
