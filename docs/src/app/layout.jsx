@@ -314,11 +314,6 @@ export default async function RootLayout({ children }) {
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       ></script>
-      <script
-        defer
-        src="https://cloud.umami.is/script.js"
-        data-website-id="bd7e35bc-5718-474e-a60d-1a775139a16d"
-      ></script>
       <body>
         <Layout
           // banner={
