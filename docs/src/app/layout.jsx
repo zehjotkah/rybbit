@@ -310,14 +310,12 @@ export default async function RootLayout({ children }) {
         data-session-replay="true"
         data-web-vitals="true"
         data-track-errors="true"
+        data-track-outbound="true"
         {...(isDev && {
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       ></script>
-      <script
-        async
-        src="https://scripts.simpleanalyticscdn.com/latest.js"
-      ></script>
+      <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
       <body>
         <Layout
           // banner={
