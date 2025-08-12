@@ -7,11 +7,15 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAdminPermission } from "../app/admin/hooks/useAdminPermission";
 import { cn } from "../lib/utils";
+import { useEmbedablePage } from "../app/[site]/utils";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { isAdmin } = useAdminPermission();
   const [isExpanded, setIsExpanded] = useState(false);
+  const embed = useEmbedablePage();
+
+  if (embed) return null;
 
   return (
     <div

@@ -10,10 +10,13 @@ import { resetStore, useStore } from "../../../../lib/store";
 import { userStore } from "../../../../lib/userStore";
 import { cn, formatter } from "../../../../lib/utils";
 import { AddSite } from "../../../components/AddSite";
+import { useEmbedablePage } from "../../utils";
 
 function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: sites } = useGetSitesFromOrg(activeOrganization?.id);
+  const embed = useEmbedablePage();
+
   const { setSite } = useStore();
 
   const pathname = usePathname();
@@ -22,6 +25,8 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
   const currentSiteId = Number(pathname.split("/")[1]);
 
   const { user } = userStore();
+
+  if (embed) return null;
 
   if (typeof window !== "undefined" && globalThis.location.hostname === "demo.rybbit.io") {
     return (
@@ -149,6 +154,7 @@ export function SiteSelector() {
   const { site: currentSite } = useStore();
   const { data: site } = useGetSite(currentSite);
   const [open, setOpen] = useState(false);
+  const embed = useEmbedablePage();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -157,13 +163,13 @@ export function SiteSelector() {
           <button className="flex gap-2 items-center border border-neutral-800 rounded-lg py-1.5 px-3 justify-start cursor-pointer hover:bg-neutral-800/50 transition-colors h-[36px] w-full">
             <Favicon domain={site.domain} className="w-5 h-5" />
             <div className="text-white truncate text-sm flex-1 text-left">{site.domain}</div>
-            <ChevronDown className="w-4 h-4 text-neutral-400" />
+            {!embed && <ChevronDown className="w-4 h-4 text-neutral-400" />}
           </button>
         ) : (
           <button className="flex gap-2 border border-neutral-800 rounded-lg py-1.5 px-3 justify-start items-center h-[36px] w-full animate-pulse">
             <div className="w-5 h-5 bg-neutral-800 rounded"></div>
             <div className="h-4 bg-neutral-800 rounded w-24 flex-1"></div>
-            <ChevronDown className="w-4 h-4 text-neutral-400" />
+            {!embed && <ChevronDown className="w-4 h-4 text-neutral-400" />}
           </button>
         )}
       </PopoverTrigger>
