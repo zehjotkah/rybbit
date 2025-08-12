@@ -1,6 +1,6 @@
 import { ChevronDown, Plus } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useGetSite, useGetSitesFromOrg } from "../../../../api/admin/sites";
 import { Favicon } from "../../../../components/Favicon";
 import { Button } from "../../../../components/ui/button";
@@ -150,7 +150,7 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
   );
 }
 
-export function SiteSelector() {
+function SiteSelectorWrapper() {
   const { site: currentSite } = useStore();
   const { data: site } = useGetSite(currentSite);
   const [open, setOpen] = useState(false);
@@ -173,7 +173,17 @@ export function SiteSelector() {
           </button>
         )}
       </PopoverTrigger>
-      <SiteSelectorContent onSiteSelect={() => setOpen(false)} />
+      <Suspense fallback={null}>
+        <SiteSelectorContent onSiteSelect={() => setOpen(false)} />
+      </Suspense>
     </Popover>
+  );
+}
+
+export function SiteSelector() {
+  return (
+    <Suspense fallback={null}>
+      <SiteSelectorWrapper />
+    </Suspense>
   );
 }

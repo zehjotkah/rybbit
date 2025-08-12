@@ -4,12 +4,12 @@ import { BarChart, ShieldUser, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useAdminPermission } from "../app/admin/hooks/useAdminPermission";
 import { cn } from "../lib/utils";
 import { useEmbedablePage } from "../app/[site]/utils";
 
-export function AppSidebar() {
+function AppSidebarContent() {
   const pathname = usePathname();
   const { isAdmin } = useAdminPermission();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,6 +62,14 @@ export function AppSidebar() {
         expanded={isExpanded}
       />
     </div>
+  );
+}
+
+export function AppSidebar() {
+  return (
+    <Suspense fallback={null}>
+      <AppSidebarContent />
+    </Suspense>
   );
 }
 

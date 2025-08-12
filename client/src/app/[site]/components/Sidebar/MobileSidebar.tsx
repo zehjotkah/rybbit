@@ -11,8 +11,9 @@ import { VisuallyHidden } from "radix-ui";
 import { Favicon } from "../../../../components/Favicon";
 import { AppSidebar } from "../../../../components/AppSidebar";
 import { useEmbedablePage } from "../../utils";
+import { Suspense } from "react";
 
-export function MobileSidebar() {
+function MobileSidebarContent() {
   const pathname = usePathname();
   const { data: site } = useGetSite(Number(pathname.split("/")[1]));
 
@@ -39,5 +40,13 @@ export function MobileSidebar() {
       </Sheet>
       {site && <Favicon domain={site.domain} className="w-6 h-6" />}
     </div>
+  );
+}
+
+export function MobileSidebar() {
+  return (
+    <Suspense fallback={null}>
+      <MobileSidebarContent />
+    </Suspense>
   );
 }

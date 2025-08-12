@@ -25,8 +25,9 @@ import { authClient } from "../../../../lib/auth";
 import { IS_CLOUD } from "../../../../lib/const";
 import { SiteSelector } from "./SiteSelector";
 import { useEmbedablePage } from "../../utils";
+import { Suspense } from "react";
 
-export function Sidebar() {
+function SidebarContent() {
   const session = authClient.useSession();
   const pathname = usePathname();
   const embed = useEmbedablePage();
@@ -168,5 +169,13 @@ export function Sidebar() {
         )}
       </div>
     </div>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <Suspense fallback={null}>
+      <SidebarContent />
+    </Suspense>
   );
 }
