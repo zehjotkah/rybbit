@@ -91,7 +91,7 @@ After building and deploying your application, open your Rybbit dashboard to che
   //   filter(event => event instanceof NavigationEnd)
   // ).subscribe(() => {{
   //   if (window.rybbit) {{
-  //     window.rybbit.trackPageview();
+  //     window.rybbit.pageview();
   //   }}
   // }});
   ```
@@ -110,8 +110,8 @@ import { Component } from '@angular/core';
 declare global {
   interface Window {
     rybbit?: {
-      trackEvent: (eventName: string, eventData?: Record<string, any>) => void;
-      trackPageview: () => void;
+      event: (eventName: string, eventData?: Record<string, any>) => void;
+      pageview: () => void;
       // Add other methods if you use them
     };
   }

@@ -94,7 +94,7 @@ After building and deploying your Astro site, open your Rybbit dashboard to chec
     // In a client-side script, perhaps in your common layout or a global script file
     document.addEventListener('astro:after-swap', () => {
       if (window.rybbit) {
-        window.rybbit.trackPageview();
+        window.rybbit.pageview();
       }
     });
     ```
