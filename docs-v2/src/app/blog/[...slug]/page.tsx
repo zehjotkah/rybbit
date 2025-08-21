@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Pre } from 'fumadocs-ui/components/codeblock';
+import Script from 'next/script';
 
 export function generateStaticParams() {
   return blogSource.getPages().map((page) => ({
@@ -18,9 +19,43 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   const page = blogSource.getPage(params.slug);
   if (!page) return {};
 
+  const url = `https://docs.rybbit.io/blog/${params.slug.join('/')}`;
+  const publishedTime = page.data.date ? new Date(page.data.date).toISOString() : undefined;
+  const ogImage = page.data.image || '/opengraph-image.png';
+
   return {
     title: page.data.title,
     description: page.data.description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: page.data.title,
+      description: page.data.description,
+      type: 'article',
+      publishedTime,
+      authors: page.data.author ? [page.data.author] : undefined,
+      url,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: page.data.title,
+        },
+      ],
+      siteName: 'Rybbit',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: page.data.title,
+      description: page.data.description,
+      images: [ogImage],
+      creator: '@rybbitio',
+    },
+    keywords: page.data.tags ? [...page.data.tags, 'web analytics', 'privacy analytics', 'Rybbit'] : ['web analytics', 'privacy analytics', 'Rybbit'],
+    authors: page.data.author ? [{ name: page.data.author }] : undefined,
   };
 }
 
@@ -34,9 +69,43 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
 
   const MDXContent = page.data.body;
   const date = page.data.date ? new Date(page.data.date) : null;
+  
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: page.data.title,
+    description: page.data.description,
+    image: page.data.image || 'https://docs.rybbit.io/opengraph-image.png',
+    datePublished: date?.toISOString(),
+    dateModified: date?.toISOString(),
+    author: {
+      '@type': 'Person',
+      name: page.data.author || 'Rybbit Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Rybbit',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://docs.rybbit.io/rybbit.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://docs.rybbit.io/blog/${params.slug.join('/')}`,
+    },
+    keywords: page.data.tags?.join(', '),
+  };
 
   return (
-    <article className="max-w-4xl mx-auto px-4 py-16">
+    <>
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <article className="max-w-4xl mx-auto px-4 py-16">
       <Link 
         href="/blog" 
         className="inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-8"
@@ -122,5 +191,6 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
         }} />
       </div>
     </article>
+    </>
   );
 }
