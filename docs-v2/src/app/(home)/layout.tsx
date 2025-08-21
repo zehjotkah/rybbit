@@ -19,6 +19,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       ></script>
+      <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
       <CustomHeader />
       <main className="flex-1">{children}</main>
       <Footer />
