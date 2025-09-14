@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
-import { agentRegions } from "../../db/postgres/schema.js";
+import { agentRegions } from "../../db/postgres/uptimeSchema.js";
 import { getSessionFromReq } from "../../lib/auth-utils.js";
 
 export async function getRegions(

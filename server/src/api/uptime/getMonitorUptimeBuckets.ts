@@ -3,7 +3,8 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { clickhouse } from "../../db/clickhouse/clickhouse.js";
 import { db } from "../../db/postgres/postgres.js";
-import { member, uptimeMonitors } from "../../db/postgres/schema.js";
+import { member } from "../../db/postgres/schema.js";
+import { uptimeMonitors } from "../../db/postgres/uptimeSchema.js";
 import { getSessionFromReq } from "../../lib/auth-utils.js";
 import { processResults } from "../analytics/utils.js";
 
