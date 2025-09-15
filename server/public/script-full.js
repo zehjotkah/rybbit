@@ -71,7 +71,7 @@
       return null;
     }
     const siteId = scriptTag.getAttribute("data-site-id") || scriptTag.getAttribute("site-id");
-    if (!siteId || isNaN(Number(siteId))) {
+    if (!siteId) {
       console.error("Please provide a valid site ID using the data-site-id attribute");
       return null;
     }
