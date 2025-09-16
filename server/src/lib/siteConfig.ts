@@ -14,6 +14,13 @@ interface SiteConfigData {
   blockBots: boolean;
   excludedIPs: string[];
   apiKey?: string | null;
+  sessionReplay: boolean;
+  webVitals: boolean;
+  trackErrors: boolean;
+  trackOutbound: boolean;
+  trackUrlParams: boolean;
+  trackInitialPageView: boolean;
+  trackSpaNavigation: boolean;
 }
 
 class SiteConfig {
@@ -31,7 +38,7 @@ class SiteConfig {
     try {
       const isNumeric = this.isNumericId(siteIdOrId);
 
-      const site = await db
+      const [site] = await db
         .select({
           id: sites.id,
           siteId: sites.siteId,
@@ -41,31 +48,44 @@ class SiteConfig {
           blockBots: sites.blockBots,
           excludedIPs: sites.excludedIPs,
           apiKey: sites.apiKey,
+          sessionReplay: sites.sessionReplay,
+          webVitals: sites.webVitals,
+          trackErrors: sites.trackErrors,
+          trackOutbound: sites.trackOutbound,
+          trackUrlParams: sites.trackUrlParams,
+          trackInitialPageView: sites.trackInitialPageView,
+          trackSpaNavigation: sites.trackSpaNavigation,
         })
         .from(sites)
         .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)))
         .limit(1);
 
-      if (!site[0]) {
+      if (!site) {
         return undefined;
       }
 
       return {
-        id: site[0].id,
-        siteId: site[0].siteId,
-        public: site[0].public || false,
-        saltUserIds: site[0].saltUserIds || false,
-        domain: site[0].domain || "",
-        blockBots: site[0].blockBots === undefined ? true : site[0].blockBots,
-        excludedIPs: Array.isArray(site[0].excludedIPs) ? site[0].excludedIPs : [],
-        apiKey: site[0].apiKey,
+        id: site.id,
+        siteId: site.siteId,
+        public: site.public || false,
+        saltUserIds: site.saltUserIds || false,
+        domain: site.domain || "",
+        blockBots: site.blockBots === undefined ? true : site.blockBots,
+        excludedIPs: Array.isArray(site.excludedIPs) ? site.excludedIPs : [],
+        apiKey: site.apiKey,
+        sessionReplay: site.sessionReplay || false,
+        webVitals: site.webVitals || false,
+        trackErrors: site.trackErrors || false,
+        trackOutbound: site.trackOutbound || true,
+        trackUrlParams: site.trackUrlParams || true,
+        trackInitialPageView: site.trackInitialPageView || true,
+        trackSpaNavigation: site.trackSpaNavigation || true,
       };
     } catch (error) {
       logger.error(error as Error, `Error fetching site configuration for ${siteIdOrId}`);
       return undefined;
     }
   }
-
 
   /**
    * Get the full site configuration
@@ -75,99 +95,15 @@ class SiteConfig {
     return this.getSiteByAnyId(siteIdOrId);
   }
 
-  /**
-   * Update the public status of a site
-   */
-  async updateSitePublicStatus(siteIdOrId: number | string, isPublic: boolean): Promise<void> {
+  async updateConfig(siteIdOrId: number | string, config: Partial<SiteConfigData>): Promise<void> {
     try {
       const isNumeric = this.isNumericId(siteIdOrId);
-
       await db
         .update(sites)
-        .set({ public: isPublic })
+        .set(config)
         .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
     } catch (error) {
-      logger.error(error as Error, `Error updating public status for site ${siteIdOrId}`);
-    }
-  }
-
-  /**
-   * Update the salt user IDs setting of a site
-   */
-  async updateSiteSaltSetting(siteIdOrId: number | string, saltUserIds: boolean): Promise<void> {
-    try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      await db
-        .update(sites)
-        .set({ saltUserIds })
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
-    } catch (error) {
-      logger.error(error as Error, `Error updating salt setting for site ${siteIdOrId}`);
-    }
-  }
-
-  /**
-   * Update the bot blocking setting of a site
-   */
-  async updateSiteBlockBotsSetting(siteIdOrId: number | string, blockBots: boolean): Promise<void> {
-    try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      await db
-        .update(sites)
-        .set({ blockBots })
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
-    } catch (error) {
-      logger.error(error as Error, `Error updating block bots setting for site ${siteIdOrId}`);
-    }
-  }
-
-  /**
-   * Update the domain of a site
-   */
-  async updateSiteDomain(siteIdOrId: number | string, domain: string): Promise<void> {
-    try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      await db
-        .update(sites)
-        .set({ domain })
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
-    } catch (error) {
-      logger.error(error as Error, `Error updating domain for site ${siteIdOrId}`);
-    }
-  }
-
-  /**
-   * Update the API key of a site
-   */
-  async updateSiteApiKey(siteIdOrId: number | string, apiKey: string | null): Promise<void> {
-    try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      await db
-        .update(sites)
-        .set({ apiKey })
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
-    } catch (error) {
-      logger.error(error as Error, `Error updating API key for site ${siteIdOrId}`);
-    }
-  }
-
-  /**
-   * Update the excluded IPs of a site
-   */
-  async updateSiteExcludedIPs(siteIdOrId: number | string, excludedIPs: string[]): Promise<void> {
-    try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      await db
-        .update(sites)
-        .set({ excludedIPs })
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
-    } catch (error) {
-      logger.error(error as Error, `Error updating excluded IPs for site ${siteIdOrId}`);
+      logger.error(error as Error, `Error updating site configuration for ${siteIdOrId}`);
     }
   }
 

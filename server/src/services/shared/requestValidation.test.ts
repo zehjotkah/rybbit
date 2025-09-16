@@ -10,6 +10,14 @@ interface SiteConfigData {
   saltUserIds: boolean;
   blockBots: boolean;
   excludedIPs: string[];
+  sessionReplay: boolean;
+  webVitals: boolean;
+  errors: boolean;
+  outbound: boolean;
+  trackOutbound: boolean;
+  trackUrlParams: boolean;
+  trackInitialPageView: boolean;
+  trackSpaNavigation: boolean;
 }
 
 // Mock dependencies
@@ -69,6 +77,14 @@ describe("validateApiKey", () => {
       saltUserIds: false,
       blockBots: true,
       excludedIPs: [],
+      sessionReplay: false,
+      webVitals: false,
+      errors: false,
+      outbound: true,
+      trackOutbound: true,
+      trackUrlParams: true,
+      trackInitialPageView: true,
+      trackSpaNavigation: true,
     };
 
     vi.mocked(siteConfig.getConfig).mockResolvedValue(mockSite);
@@ -94,6 +110,14 @@ describe("validateApiKey", () => {
       saltUserIds: false,
       blockBots: true,
       excludedIPs: [],
+      sessionReplay: false,
+      webVitals: false,
+      errors: false,
+      outbound: true,
+      trackOutbound: true,
+      trackUrlParams: true,
+      trackInitialPageView: true,
+      trackSpaNavigation: true,
     };
 
     vi.mocked(siteConfig.getConfig).mockResolvedValue(mockSite);
@@ -113,6 +137,14 @@ describe("validateApiKey", () => {
       saltUserIds: false,
       blockBots: true,
       excludedIPs: [],
+      sessionReplay: false,
+      webVitals: false,
+      errors: false,
+      outbound: true,
+      trackOutbound: true,
+      trackUrlParams: true,
+      trackInitialPageView: true,
+      trackSpaNavigation: true,
     };
 
     vi.mocked(siteConfig.getConfig).mockResolvedValue(mockSite);
@@ -124,7 +156,7 @@ describe("validateApiKey", () => {
 
   it("should handle site with no API key configured", async () => {
     const mockSite: Partial<SiteConfigData> &
-      Pick<SiteConfigData, "id" | "siteId" | "domain" | "public" | "saltUserIds" | "blockBots" | "excludedIPs"> = {
+      Pick<SiteConfigData, "id" | "siteId" | "domain" | "public" | "saltUserIds" | "blockBots" | "excludedIPs" | "sessionReplay" | "webVitals" | "errors" | "outbound" | "trackOutbound" | "trackUrlParams" | "trackInitialPageView" | "trackSpaNavigation"> = {
       id: "test-id",
       siteId: 1,
       domain: "example.com",
@@ -132,6 +164,14 @@ describe("validateApiKey", () => {
       saltUserIds: false,
       blockBots: true,
       excludedIPs: [],
+      sessionReplay: false,
+      webVitals: false,
+      errors: false,
+      outbound: true,
+      trackOutbound: true,
+      trackUrlParams: true,
+      trackInitialPageView: true,
+      trackSpaNavigation: true,
     }; // No apiKey property
 
     vi.mocked(siteConfig.getConfig).mockResolvedValue(mockSite as SiteConfigData);

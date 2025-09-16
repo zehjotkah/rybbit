@@ -66,6 +66,13 @@ export const sites = pgTable(
     saltUserIds: boolean().default(false),
     blockBots: boolean().default(true).notNull(),
     excludedIPs: jsonb("excluded_ips").default([]), // Array of IP addresses/ranges to exclude
+    sessionReplay: boolean().default(false),
+    webVitals: boolean().default(false),
+    trackErrors: boolean().default(false),
+    trackOutbound: boolean().default(true),
+    trackUrlParams: boolean().default(true),
+    trackInitialPageView: boolean().default(true),
+    trackSpaNavigation: boolean().default(true),
     apiKey: text("api_key"), // Format: rb_{32_hex_chars} = 35 chars total
   },
   table => [

@@ -30,17 +30,7 @@ export async function changeSitePublic(request: FastifyRequest<ChangeSitePublicR
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Update site public status
-    await db
-      .update(sites)
-      .set({
-        public: isPublic,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(sites.siteId, siteId));
-
-    // Update the public sites cache
-    siteConfig.updateSitePublicStatus(siteId, isPublic);
+    siteConfig.updateConfig(siteId, { public: isPublic });
 
     return reply.status(200).send({ success: true });
   } catch (error) {

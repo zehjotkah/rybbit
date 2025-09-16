@@ -30,17 +30,7 @@ export async function changeSiteSalt(request: FastifyRequest<ChangeSiteSaltReque
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Update site salt setting
-    await db
-      .update(sites)
-      .set({
-        saltUserIds: saltUserIds,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(sites.siteId, siteId));
-
-    // Update the site config cache
-    siteConfig.updateSiteSaltSetting(siteId, saltUserIds);
+    siteConfig.updateConfig(siteId, { saltUserIds });
 
     return reply.status(200).send({ success: true });
   } catch (error) {

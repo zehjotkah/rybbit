@@ -30,17 +30,8 @@ export async function changeSiteBlockBots(request: FastifyRequest<ChangeSiteBloc
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Update site blockBots setting
-    await db
-      .update(sites)
-      .set({
-        blockBots: blockBots,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(sites.siteId, siteId));
-
     // Update the site config cache
-    siteConfig.updateSiteBlockBotsSetting(siteId, blockBots);
+    siteConfig.updateConfig(siteId, { blockBots });
 
     return reply.status(200).send({ success: true });
   } catch (error) {

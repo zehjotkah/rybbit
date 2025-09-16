@@ -1,11 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { db } from "../../db/postgres/postgres.js";
-import { sites } from "../../db/postgres/schema.js";
-import { siteConfig } from "../../lib/siteConfig.js";
-import { validateIPPattern } from "../../lib/ipUtils.js";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
-import { eq } from "drizzle-orm";
+import { validateIPPattern } from "../../lib/ipUtils.js";
+import { siteConfig } from "../../lib/siteConfig.js";
 
 const updateExcludedIPsSchema = z.object({
   siteId: z.string().min(1),
@@ -62,21 +59,7 @@ export async function updateSiteExcludedIPs(request: FastifyRequest, reply: Fast
       });
     }
 
-    // Update the database and cache atomically
-    await db.transaction(async tx => {
-      // Update the database
-      await tx
-        .update(sites)
-        .set({
-          excludedIPs: excludedIPs,
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(sites.siteId, numericSiteId));
-
-      // Update the cache - if this fails, the transaction will rollback
-      siteConfig.updateSiteExcludedIPs(numericSiteId, excludedIPs);
-    });
-
+    siteConfig.updateConfig(numericSiteId, { excludedIPs });
     return reply.send({
       success: true,
       message: "Excluded IPs updated successfully",

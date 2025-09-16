@@ -76,6 +76,7 @@ import { trackEvent } from "./services/tracker/trackEvent.js";
 // need to import telemetry service here to start it
 import { telemetryService } from "./services/telemetryService.js";
 import { extractSiteId } from "./utils.js";
+import { getTrackingConfig } from "./api/sites/getTrackingConfig.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -207,6 +208,7 @@ const PUBLIC_ROUTES: string[] = [
   "/api/stripe/webhook",
   "/api/session-replay/record",
   "/api/admin/telemetry",
+  "/api/site/:siteId/tracking-config",
 ];
 
 // Define analytics routes that can be public
@@ -346,6 +348,7 @@ server.get("/api/get-sites-from-org/:organizationId", getSitesFromOrg);
 server.get("/api/get-site/:id", getSite);
 server.get("/api/site/:siteId/api-config", getSiteApiConfig);
 server.post("/api/site/:siteId/api-config", updateSiteApiConfig);
+server.get("/api/site/:siteId/tracking-config", getTrackingConfig);
 server.get("/api/site/:siteId/excluded-ips", getSiteExcludedIPs);
 server.post("/api/site/:siteId/excluded-ips", updateSiteExcludedIPs);
 server.get("/api/list-organization-members/:organizationId", listOrganizationMembers);
