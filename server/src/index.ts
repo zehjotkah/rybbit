@@ -67,7 +67,6 @@ import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
-import { loadAllowedDomains } from "./lib/allowedDomains.js";
 import { getSessionFromReq, mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { IS_CLOUD } from "./lib/const.js";
@@ -149,12 +148,6 @@ const server = Fastify({
 server.register(cors, {
   origin: (_origin, callback) => {
     callback(null, true);
-
-    // if (!origin || allowList.includes(normalizeOrigin(origin))) {
-    //   callback(null, true);
-    // } else {
-    //   callback(new Error("Not allowed by CORS"), false);
-    // }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -415,7 +408,7 @@ server.get("/api/health", { logLevel: "silent" }, (_, reply) => reply.send("OK")
 const start = async () => {
   try {
     console.info("Starting server...");
-    await Promise.all([initializeClickhouse(), loadAllowedDomains(), initPostgres()]);
+    await Promise.all([initializeClickhouse(), initPostgres()]);
 
     telemetryService.startTelemetryCron();
 
