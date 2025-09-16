@@ -12,8 +12,7 @@ interface SiteConfigData {
   excludedIPs: string[];
   sessionReplay: boolean;
   webVitals: boolean;
-  errors: boolean;
-  outbound: boolean;
+  trackErrors: boolean;
   trackOutbound: boolean;
   trackUrlParams: boolean;
   trackInitialPageView: boolean;
@@ -79,8 +78,7 @@ describe("validateApiKey", () => {
       excludedIPs: [],
       sessionReplay: false,
       webVitals: false,
-      errors: false,
-      outbound: true,
+      trackErrors: false,
       trackOutbound: true,
       trackUrlParams: true,
       trackInitialPageView: true,
@@ -112,8 +110,7 @@ describe("validateApiKey", () => {
       excludedIPs: [],
       sessionReplay: false,
       webVitals: false,
-      errors: false,
-      outbound: true,
+      trackErrors: false,
       trackOutbound: true,
       trackUrlParams: true,
       trackInitialPageView: true,
@@ -139,8 +136,7 @@ describe("validateApiKey", () => {
       excludedIPs: [],
       sessionReplay: false,
       webVitals: false,
-      errors: false,
-      outbound: true,
+      trackErrors: false,
       trackOutbound: true,
       trackUrlParams: true,
       trackInitialPageView: true,
@@ -156,7 +152,23 @@ describe("validateApiKey", () => {
 
   it("should handle site with no API key configured", async () => {
     const mockSite: Partial<SiteConfigData> &
-      Pick<SiteConfigData, "id" | "siteId" | "domain" | "public" | "saltUserIds" | "blockBots" | "excludedIPs" | "sessionReplay" | "webVitals" | "errors" | "outbound" | "trackOutbound" | "trackUrlParams" | "trackInitialPageView" | "trackSpaNavigation"> = {
+      Pick<
+        SiteConfigData,
+        | "id"
+        | "siteId"
+        | "domain"
+        | "public"
+        | "saltUserIds"
+        | "blockBots"
+        | "excludedIPs"
+        | "sessionReplay"
+        | "webVitals"
+        | "trackErrors"
+        | "trackOutbound"
+        | "trackUrlParams"
+        | "trackInitialPageView"
+        | "trackSpaNavigation"
+      > = {
       id: "test-id",
       siteId: 1,
       domain: "example.com",
@@ -166,8 +178,7 @@ describe("validateApiKey", () => {
       excludedIPs: [],
       sessionReplay: false,
       webVitals: false,
-      errors: false,
-      outbound: true,
+      trackErrors: false,
       trackOutbound: true,
       trackUrlParams: true,
       trackInitialPageView: true,
