@@ -66,47 +66,11 @@ class SiteConfig {
     }
   }
 
-  /**
-   * Check if a site is public
-   */
-  async isSitePublic(siteIdOrId?: string | number): Promise<boolean> {
-    if (!siteIdOrId) return false;
-    const config = await this.getSiteByAnyId(siteIdOrId);
-    return config?.public || false;
-  }
-
-  /**
-   * Check if a site has user ID salting enabled
-   */
-  async shouldSaltUserIds(siteIdOrId?: string | number): Promise<boolean> {
-    if (!siteIdOrId) return false;
-    const config = await this.getSiteByAnyId(siteIdOrId);
-    return config?.saltUserIds || false;
-  }
-
-  /**
-   * Check if a site has bot blocking enabled
-   */
-  async shouldBlockBots(siteIdOrId?: string | number): Promise<boolean> {
-    if (!siteIdOrId) return true; // Default to blocking bots if no site specified
-    const config = await this.getSiteByAnyId(siteIdOrId);
-    // Default to true if configuration is not found (safeguard)
-    return config?.blockBots !== false;
-  }
-
-  /**
-   * Get the domain of a site
-   */
-  async getSiteDomain(siteIdOrId?: string | number): Promise<string> {
-    if (!siteIdOrId) return "";
-    const config = await this.getSiteByAnyId(siteIdOrId);
-    return config?.domain || "";
-  }
 
   /**
    * Get the full site configuration
    */
-  async getSiteConfig(siteIdOrId?: string | number): Promise<SiteConfigData | undefined> {
+  async getConfig(siteIdOrId?: string | number): Promise<SiteConfigData | undefined> {
     if (!siteIdOrId) return undefined;
     return this.getSiteByAnyId(siteIdOrId);
   }
@@ -192,15 +156,6 @@ class SiteConfig {
   }
 
   /**
-   * Get excluded IPs for a site
-   */
-  async getExcludedIPs(siteIdOrId?: string | number): Promise<string[]> {
-    if (!siteIdOrId) return [];
-    const config = await this.getSiteByAnyId(siteIdOrId);
-    return config?.excludedIPs || [];
-  }
-
-  /**
    * Update the excluded IPs of a site
    */
   async updateSiteExcludedIPs(siteIdOrId: number | string, excludedIPs: string[]): Promise<void> {
@@ -255,7 +210,8 @@ class SiteConfig {
    */
   async isIPExcluded(ipAddress: string, siteIdOrId?: string | number): Promise<boolean> {
     if (!siteIdOrId) return false; // If no site specified, don't exclude any IPs
-    const excludedIPs = await this.getExcludedIPs(siteIdOrId);
+    const config = await this.getSiteByAnyId(siteIdOrId);
+    const excludedIPs = config?.excludedIPs || [];
     if (!excludedIPs || excludedIPs.length === 0) {
       return false;
     }
