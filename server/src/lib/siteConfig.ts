@@ -24,6 +24,9 @@ interface SiteConfigData {
 }
 
 class SiteConfig {
+  private cache = new Map<string, { data: SiteConfigData; expires: number }>();
+  private cacheTTL = 60 * 1000; // 1 minute TTL
+
   /**
    * Helper to determine if the input is a numeric siteId or string id
    */
@@ -35,6 +38,13 @@ class SiteConfig {
    * Get site by either siteId or id
    */
   private async getSiteByAnyId(siteIdOrId: string | number): Promise<SiteConfigData | undefined> {
+    const cacheKey = String(siteIdOrId);
+    const cached = this.cache.get(cacheKey);
+
+    if (cached && cached.expires > Date.now()) {
+      return cached.data;
+    }
+
     try {
       const isNumeric = this.isNumericId(siteIdOrId);
 
@@ -64,7 +74,7 @@ class SiteConfig {
         return undefined;
       }
 
-      return {
+      const configData: SiteConfigData = {
         id: site.id,
         siteId: site.siteId,
         public: site.public || false,
@@ -81,6 +91,13 @@ class SiteConfig {
         trackInitialPageView: site.trackInitialPageView || true,
         trackSpaNavigation: site.trackSpaNavigation || true,
       };
+
+      this.cache.set(cacheKey, {
+        data: configData,
+        expires: Date.now() + this.cacheTTL,
+      });
+
+      return configData;
     } catch (error) {
       logger.error(error as Error, `Error fetching site configuration for ${siteIdOrId}`);
       return undefined;
@@ -102,6 +119,9 @@ class SiteConfig {
         .update(sites)
         .set(config)
         .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
+
+      // Invalidate cache after update
+      this.cache.delete(String(siteIdOrId));
     } catch (error) {
       logger.error(error as Error, `Error updating site configuration for ${siteIdOrId}`);
     }
@@ -136,6 +156,9 @@ class SiteConfig {
       const isNumeric = this.isNumericId(siteIdOrId);
 
       await db.delete(sites).where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
+
+      // Invalidate cache after deletion
+      this.cache.delete(String(siteIdOrId));
     } catch (error) {
       logger.error(error as Error, `Error removing site ${siteIdOrId}`);
     }
