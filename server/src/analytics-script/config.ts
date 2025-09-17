@@ -27,7 +27,6 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
   // These can be overridden via data attributes for testing/debugging
   const skipPatterns = parseJsonSafely<string[]>(scriptTag.getAttribute("data-skip-patterns"), []);
   const maskPatterns = parseJsonSafely<string[]>(scriptTag.getAttribute("data-mask-patterns"), []);
-  const apiKey = scriptTag.getAttribute("data-api-key") || undefined;
 
   const debounceDuration = scriptTag.getAttribute("data-debounce")
     ? Math.max(0, parseInt(scriptTag.getAttribute("data-debounce")!))
@@ -50,7 +49,6 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
     sessionReplayBatchInterval,
     skipPatterns,
     maskPatterns,
-    apiKey,
     // Default all tracking to true initially (will be updated from API)
     autoTrackPageview: true,
     autoTrackSpa: true,

@@ -54,7 +54,6 @@ describe("parseScriptConfig", () => {
       enableSessionReplay: true, // sessionReplay from API
       skipPatterns: [],
       maskPatterns: [],
-      apiKey: undefined,
       sessionReplayBatchInterval: 5000,
       sessionReplayBatchSize: 250,
     });
@@ -96,7 +95,6 @@ describe("parseScriptConfig", () => {
       enableSessionReplay: false,
       skipPatterns: [],
       maskPatterns: [],
-      apiKey: undefined,
       sessionReplayBatchInterval: 5000,
       sessionReplayBatchSize: 250,
     });
@@ -128,7 +126,6 @@ describe("parseScriptConfig", () => {
       enableSessionReplay: false,
       skipPatterns: [],
       maskPatterns: [],
-      apiKey: undefined,
       sessionReplayBatchInterval: 5000,
       sessionReplayBatchSize: 250,
     });
@@ -216,7 +213,6 @@ describe("parseScriptConfig", () => {
     mockScriptTag.setAttribute("data-site-id", "123");
     mockScriptTag.setAttribute("data-skip-patterns", '["/admin/**"]');
     mockScriptTag.setAttribute("data-mask-patterns", '["/user/**"]');
-    mockScriptTag.setAttribute("data-api-key", "test-key");
 
     // Mock successful API response
     (global.fetch as any).mockResolvedValueOnce({
@@ -237,7 +233,6 @@ describe("parseScriptConfig", () => {
     // These should be from data attributes (overrides for testing)
     expect(config?.skipPatterns).toEqual(["/admin/**"]);
     expect(config?.maskPatterns).toEqual(["/user/**"]);
-    expect(config?.apiKey).toBe("test-key");
 
     // These should be from API
     expect(config?.enableSessionReplay).toBe(true);
