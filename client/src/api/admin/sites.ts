@@ -17,6 +17,14 @@ export type SiteResponse = {
   saltUserIds: boolean;
   blockBots: boolean;
   isOwner: boolean;
+  // Analytics features
+  sessionReplay?: boolean;
+  webVitals?: boolean;
+  trackErrors?: boolean;
+  trackOutbound?: boolean;
+  trackUrlParams?: boolean;
+  trackInitialPageView?: boolean;
+  trackSpaNavigation?: boolean;
 };
 
 export type GetSitesFromOrgResponse = {

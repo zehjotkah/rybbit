@@ -46,6 +46,14 @@ export async function getSite(request: FastifyRequest<GetSiteParams>, reply: Fas
       public: site.public,
       blockBots: site.blockBots,
       isOwner: isOwner,
+      // Analytics features
+      sessionReplay: site.sessionReplay,
+      webVitals: site.webVitals,
+      trackErrors: site.trackErrors,
+      trackOutbound: site.trackOutbound,
+      trackUrlParams: site.trackUrlParams,
+      trackInitialPageView: site.trackInitialPageView,
+      trackSpaNavigation: site.trackSpaNavigation,
     });
   } catch (error) {
     console.error("Error retrieving site:", error);

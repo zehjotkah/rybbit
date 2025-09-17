@@ -52,7 +52,7 @@ function SiteSettingsInner({ siteMetadata, trigger }: { siteMetadata: SiteRespon
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[750px]">
         <DialogHeader>
           <DialogTitle>Site Settings</DialogTitle>
           <DialogDescription>Manage settings for {siteMetadata.domain}</DialogDescription>
