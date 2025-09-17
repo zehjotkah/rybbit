@@ -98,12 +98,29 @@ export function deleteSite(siteId: number) {
   });
 }
 
-export function changeSiteDomain(siteId: number, newDomain: string) {
-  return authedFetch("/change-site-domain", undefined, {
+// Consolidated function to update any site configuration
+export function updateSiteConfig(
+  siteId: number,
+  config: {
+    domain?: string;
+    public?: boolean;
+    saltUserIds?: boolean;
+    blockBots?: boolean;
+    excludedIPs?: string[];
+    sessionReplay?: boolean;
+    webVitals?: boolean;
+    trackErrors?: boolean;
+    trackOutbound?: boolean;
+    trackUrlParams?: boolean;
+    trackInitialPageView?: boolean;
+    trackSpaNavigation?: boolean;
+  }
+) {
+  return authedFetch("/update-site-config", undefined, {
     method: "POST",
     data: {
       siteId,
-      newDomain,
+      ...config,
     },
     headers: {
       "Content-Type": "application/json",
@@ -111,18 +128,6 @@ export function changeSiteDomain(siteId: number, newDomain: string) {
   });
 }
 
-export function changeSitePublic(siteId: number, isPublic: boolean) {
-  return authedFetch("/change-site-public", undefined, {
-    method: "POST",
-    data: {
-      siteId,
-      isPublic,
-    },
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
 
 export function useSiteHasData(siteId: string) {
   return useQuery({
@@ -159,31 +164,6 @@ export function useGetSite(siteId?: string | number) {
   });
 }
 
-export function changeSiteSalt(siteId: number, saltUserIds: boolean) {
-  return authedFetch("/change-site-salt", undefined, {
-    method: "POST",
-    data: {
-      siteId,
-      saltUserIds,
-    },
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
-
-export function changeSiteBlockBots(siteId: number, blockBots: boolean) {
-  return authedFetch("/change-site-block-bots", undefined, {
-    method: "POST",
-    data: {
-      siteId,
-      blockBots,
-    },
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
 
 export function useGetSiteIsPublic(siteId?: string | number) {
   return useQuery({

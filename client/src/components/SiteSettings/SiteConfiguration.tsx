@@ -22,12 +22,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import {
-  changeSiteBlockBots,
-  changeSiteDomain,
-  changeSitePublic,
-  changeSiteSalt,
   deleteSite,
   SiteResponse,
+  updateSiteConfig,
   useGetSitesFromOrg,
 } from "@/api/admin/sites";
 import { normalizeDomain } from "@/lib/utils";
@@ -62,7 +59,7 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
     try {
       setIsChangingDomain(true);
       const normalizedDomain = normalizeDomain(newDomain);
-      await changeSiteDomain(siteMetadata.siteId, normalizedDomain);
+      await updateSiteConfig(siteMetadata.siteId, { domain: normalizedDomain });
       toast.success("Domain updated successfully");
       router.refresh();
       refetch();
@@ -93,7 +90,7 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
   const handlePublicToggle = async (checked: boolean) => {
     try {
       setIsChangingPublic(true);
-      await changeSitePublic(siteMetadata.siteId, checked);
+      await updateSiteConfig(siteMetadata.siteId, { public: checked });
       setIsPublic(checked);
       toast.success(checked ? "Site analytics made public" : "Site analytics made private");
       refetch();
@@ -109,7 +106,7 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
   const handleSaltToggle = async (checked: boolean) => {
     try {
       setIsChangingSalt(true);
-      await changeSiteSalt(siteMetadata.siteId, checked);
+      await updateSiteConfig(siteMetadata.siteId, { saltUserIds: checked });
       setIsSalting(checked);
       toast.success(checked ? "User ID salting enabled" : "User ID salting disabled");
       refetch();
@@ -125,7 +122,7 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
   const handleBlockBotsToggle = async (checked: boolean) => {
     try {
       setIsChangingBlockBots(true);
-      await changeSiteBlockBots(siteMetadata.siteId, checked);
+      await updateSiteConfig(siteMetadata.siteId, { blockBots: checked });
       setIsBlockingBots(checked);
       toast.success(checked ? "Bot blocking enabled" : "Bot blocking disabled");
       refetch();
