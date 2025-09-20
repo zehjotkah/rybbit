@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { ReactNode } from "react";
@@ -16,13 +17,7 @@ declare global {
   }
 }
 
-export function TrackedButton({
-  children,
-  eventName,
-  eventData = {},
-  className,
-  onClick,
-}: TrackedButtonProps) {
+export function TrackedButton({ children, eventName, eventData = {}, className, onClick }: TrackedButtonProps) {
   const handleClick = () => {
     if (typeof window !== "undefined" && window.dataLayer) {
       window.dataLayer.push({
