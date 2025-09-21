@@ -179,7 +179,7 @@ export function PricingSection() {
         <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto justify-center items-stretch">
           {/* Free Plan Card */}
           <div className="w-full lg:w-96 flex-shrink-0 text-neutral-300">
-            <div className="bg-neutral-800/15 rounded-xl border border-neutral-700/60 overflow-hidden backdrop-blur-sm shadow-xl h-full">
+            <div className="bg-neutral-800/15 rounded-xl border border-neutral-800/60 overflow-hidden backdrop-blur-sm shadow-xl h-full">
               <div className="p-6">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold mb-2">Free</h3>
@@ -221,7 +221,7 @@ export function PricingSection() {
 
           {/* Standard Plan Card */}
           <div className="w-full lg:w-96 flex-shrink-0">
-            <div className="bg-neutral-800/50 rounded-xl border border-neutral-700 overflow-hidden backdrop-blur-sm shadow-xl">
+            <div className="bg-neutral-800/50 rounded-xl border border-neutral-800/90 overflow-hidden backdrop-blur-sm shadow-xl">
               <div className="p-6">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold mb-2">Standard</h3>
@@ -285,7 +285,7 @@ export function PricingSection() {
 
           {/* Pro Plan Card */}
           <div className="w-full lg:w-96 flex-shrink-0">
-            <div className="bg-neutral-800/50 rounded-xl border border-neutral-700 overflow-hidden backdrop-blur-sm shadow-xl h-full">
+            <div className="bg-neutral-800/50 rounded-xl border border-neutral-800/90 overflow-hidden backdrop-blur-sm shadow-xl h-full">
               <div className="p-6">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold mb-2">Pro</h3>
