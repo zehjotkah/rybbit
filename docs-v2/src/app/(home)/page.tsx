@@ -333,9 +333,9 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-neutral-800/20 backdrop-blur-sm border border-neutral-700 rounded-xl overflow-hidden">
+            <div className="bg-neutral-800/20 backdrop-blur-sm border border-neutral-800/50 rounded-xl overflow-hidden">
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-1" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     Is Rybbit GDPR and CCPA compliant?
                   </AccordionTrigger>
@@ -347,7 +347,7 @@ export default function HomePage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-2" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-2" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     Rybbit vs. Google Analytics
                   </AccordionTrigger>
@@ -368,7 +368,7 @@ export default function HomePage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-3" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-3" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     Rybbit vs. Plausible/Umami/Simple Analytics
                   </AccordionTrigger>
@@ -384,7 +384,7 @@ export default function HomePage() {
                     </p>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="item-4" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-4" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     Rybbit vs. Posthog/Mixpanel/Amplitude
                   </AccordionTrigger>
@@ -401,7 +401,7 @@ export default function HomePage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-5" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-5" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     Can I self-host Rybbit?
                   </AccordionTrigger>
@@ -415,7 +415,7 @@ export default function HomePage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-6" className="border-b border-neutral-700/50">
+                <AccordionItem value="item-6" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     How easy is it to set up Rybbit?
                   </AccordionTrigger>
@@ -451,7 +451,7 @@ export default function HomePage() {
                     for either personal or business use.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="item-9" className="border-t border-neutral-700/50">
+                <AccordionItem value="item-9" className="border-t border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
                     What counts as an event?
                   </AccordionTrigger>
