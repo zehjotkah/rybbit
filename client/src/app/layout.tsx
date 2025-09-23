@@ -11,6 +11,7 @@ import { useStopImpersonation } from "@/hooks/useStopImpersonation";
 import { ReactScan } from "./ReactScan";
 import { OrganizationInitializer } from "../components/OrganizationInitializer";
 import { AuthenticationGuard } from "../components/AuthenticationGuard";
+import { IS_CLOUD } from "../lib/const";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" className="dark">
-      {globalThis?.location?.hostname === "demo.rybbit.io" && (
+      {IS_CLOUD && (
         <head>
           <Script id="gtm-script" strategy="afterInteractive">
             {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <ReactScan />
       <TooltipProvider>
         <body className={cn("bg-background text-foreground h-full", inter.className)}>
-          {globalThis?.location?.hostname === "demo.rybbit.io" && (
+          {IS_CLOUD && (
             <noscript>
               <iframe
                 src="https://www.googletagmanager.com/ns.html?id=GTM-KWZ8K6K9"
