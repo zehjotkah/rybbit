@@ -299,16 +299,6 @@ services:
     labels:
       - traefik.enable=false
 
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: redis
-  #   ports:
-  #     - "127.0.0.1:6379:6379"
-  #   volumes:
-  #     - redis-data:/data
-  #   restart: unless-stopped
-  #   command: ["redis-server", "--appendonly", "yes"]
-
   backend:
     image: ghcr.io/rybbit-io/rybbit-backend:${IMAGE_TAG:-latest}
     container_name: backend
@@ -327,16 +317,11 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - DISABLE_SIGNUP=${DISABLE_SIGNUP}
       - DISABLE_TELEMETRY=${DISABLE_TELEMETRY}
-      # # Redis configuration
-      # - REDIS_HOST=redis
-      # - REDIS_PORT=6379
     depends_on:
       clickhouse:
         condition: service_healthy
       postgres:
         condition: service_started
-      # redis:
-      #   condition: service_started
     healthcheck:
       test:
         [
