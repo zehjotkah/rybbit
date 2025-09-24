@@ -62,7 +62,7 @@ export default function UserPage() {
             </div>
 
             <Avatar size={40} name={userId as string} />
-            {userId?.slice(0, 10)}
+            {userId?.slice(0, 12)}
           </div>
           {data?.ip && (
             <Badge variant="outline" className="flex gap-1 text-neutral-300">
