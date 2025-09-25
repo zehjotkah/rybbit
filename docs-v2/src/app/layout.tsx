@@ -96,6 +96,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             __html: `!function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','a2_hpzt3lz1c1f0');rdt('track', 'PageVisit');`,
           }}
         />
+        <Script
+          id="twitter-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+},s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+twq('config','qj0po');`,
+          }}
+        />
       </head>
       <Script
         src="https://demo.rybbit.io/api/script.js"
@@ -109,7 +119,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       />
-      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" strategy="afterInteractive" />
       <body className={`flex flex-col min-h-screen ${inter.variable} font-sans`}>
         <noscript>
           <iframe

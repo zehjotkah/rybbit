@@ -14,6 +14,7 @@ interface TrackedButtonProps {
 declare global {
   interface Window {
     dataLayer?: any[];
+    twq?: (action: string, eventId: string, data?: any) => void;
   }
 }
 
@@ -24,6 +25,16 @@ export function TrackedButton({ children, eventName, eventData = {}, className, 
         event: eventName,
         ...eventData,
       });
+    }
+
+    // Track X/Twitter lead event for signup-related buttons
+    if (typeof window !== "undefined" && window.twq) {
+      if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
+        window.twq("event", "tw-qj0po-qjdz6", {});
+      }
+      if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
+        window.twq("event", "tw-qj0po-qje0f", {});
+      }
     }
 
     if (onClick) {
