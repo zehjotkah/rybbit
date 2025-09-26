@@ -1,10 +1,10 @@
-import { CheckCircle, CircleMinus, CircleX } from "lucide-react";
-import { trackEvent } from "../../../lib/trackEvent";
-import Link from "next/link";
-import Image from "next/image";
-import { cn } from "../../../lib/utils";
+import { CheckCircle, CircleMinus } from "lucide-react";
 import { Tilt_Warp } from "next/font/google";
+import Image from "next/image";
+import Link from "next/link";
 import React from "react";
+import { trackAdEvent } from "../../../lib/trackAdEvent";
+import { cn } from "../../../lib/utils";
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],
@@ -24,19 +24,11 @@ export interface ComparisonSection {
 
 export interface ComparisonPageProps {
   competitorName: string;
-  competitorLogo?: React.ReactNode;
   sections: ComparisonSection[];
-  demoUrl?: string;
   comparisonContent?: React.ReactNode;
 }
 
-export function ComparisonPage({
-  competitorName,
-  competitorLogo,
-  sections,
-  demoUrl = "https://demo.rybbit.io/21",
-  comparisonContent,
-}: ComparisonPageProps) {
+export function ComparisonPage({ competitorName, sections, comparisonContent }: ComparisonPageProps) {
   const renderFeatureValue = (value: string | boolean) => {
     if (typeof value === "boolean") {
       return value ? (
@@ -83,7 +75,7 @@ export function ComparisonPage({
               data-rybbit-prop-location="hero"
             >
               <button
-                onClick={() => trackEvent("signup", { location: "hero", button_text: "Track your site" })}
+                onClick={() => trackAdEvent("signup", { location: "hero", button_text: "Track your site" })}
                 className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer"
               >
                 Track your site
@@ -91,7 +83,7 @@ export function ComparisonPage({
             </Link>
             <Link href="https://demo.rybbit.io/21" className="w-full sm:w-auto" data-rybbit-event="demo">
               <button
-                onClick={() => trackEvent("demo", { location: "hero", button_text: "See live demo" })}
+                onClick={() => trackAdEvent("demo", { location: "hero", button_text: "See live demo" })}
                 className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50 cursor-pointer"
               >
                 See live demo
@@ -212,7 +204,9 @@ export function ComparisonPage({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
               <Link href="https://app.rybbit.io/signup" className="w-full sm:w-auto">
                 <button
-                  onClick={() => trackEvent("signup", { location: "bottom_cta", button_text: "Track your site for free" })}
+                  onClick={() =>
+                    trackAdEvent("signup", { location: "bottom_cta", button_text: "Track your site for free" })
+                  }
                   className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-medium px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer"
                 >
                   Track your site for free

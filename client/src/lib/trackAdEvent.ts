@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-export function trackEvent(eventName: "signup" | "demo" | "login", eventData?: Record<string, any>) {
+export function trackAdEvent(eventName: "signup" | "checkout" | "login", eventData?: Record<string, any>) {
   // Track X/Twitter lead event for signup-related buttons
   if (typeof window !== "undefined" && window.twq) {
     if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
@@ -15,6 +15,9 @@ export function trackEvent(eventName: "signup" | "demo" | "login", eventData?: R
     if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
       window.twq("event", "tw-qj0po-qje0f", {});
     }
+    if (["checkout"].some(event => eventName.toLowerCase().includes(event))) {
+      window.twq("event", "tw-qj0po-qjju2", {});
+    }
   }
 
   // Track Facebook lead event
@@ -22,9 +25,9 @@ export function trackEvent(eventName: "signup" | "demo" | "login", eventData?: R
     if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("track", "Lead", eventData);
     }
-    // if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
-    //   window.fbq("track", "ViewContent", eventData);
-    // }
+    if (["checkout"].some(event => eventName.toLowerCase().includes(event))) {
+      window.fbq("track", "InitiateCheckout", eventData);
+    }
     // Track custom events for other button clicks
     if (!["signup", "demo"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("trackCustom", eventName, eventData);
