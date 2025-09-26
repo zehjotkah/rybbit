@@ -29,7 +29,7 @@ export function trackAdEvent(eventName: "signup" | "checkout" | "login", eventDa
       window.fbq("track", "InitiateCheckout", eventData);
     }
     // Track custom events for other button clicks
-    if (!["signup", "demo"].some(event => eventName.toLowerCase().includes(event))) {
+    if (!["demo"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("trackCustom", eventName, eventData);
     }
   }

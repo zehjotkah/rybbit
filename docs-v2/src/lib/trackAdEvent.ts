@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-export function trackAdEvent(eventName: "signup" | "demo" | "login", eventData?: Record<string, any>) {
+export function trackAdEvent(eventName: "signup" | "demo" | "login" | "github", eventData?: Record<string, any>) {
   // Track X/Twitter lead event for signup-related buttons
   if (typeof window !== "undefined" && window.twq) {
     if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
@@ -14,6 +14,9 @@ export function trackAdEvent(eventName: "signup" | "demo" | "login", eventData?:
     }
     if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
       window.twq("event", "tw-qj0po-qje0f", {});
+    }
+    if (["login"].some(event => eventName.toLowerCase().includes(event))) {
+      window.twq("event", "tw-qj0po-qjjy6", {});
     }
   }
 
@@ -26,8 +29,11 @@ export function trackAdEvent(eventName: "signup" | "demo" | "login", eventData?:
     //   window.fbq("track", "ViewContent", eventData);
     // }
     // Track custom events for other button clicks
-    if (!["signup", "demo"].some(event => eventName.toLowerCase().includes(event))) {
+    if (!["demo"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("trackCustom", eventName, eventData);
+    }
+    if (["github"].some(event => eventName.toLowerCase().includes(event))) {
+      window.fbq("trackCustom", "GitHub", eventData);
     }
   }
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface TrackedButtonProps {
   href: string;
-  eventName: "signup" | "demo" | "login";
+  eventName: "signup" | "demo" | "login" | "github";
   eventProps: Record<string, string | number | boolean>;
   className: string;
   children: React.ReactNode;
