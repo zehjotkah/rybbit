@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { TrackedButton } from "./TrackedButton";
+import { trackEvent } from "@/lib/trackEvent";
 
 export function CustomHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -72,13 +72,12 @@ export function CustomHeader() {
 
           {/* Login Button */}
           <a href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer">
-            <TrackedButton
-              eventName="login_click"
-              eventData={{ location: "header" }}
+            <button
+              onClick={() => trackEvent("login", { location: "header" })}
               className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium px-3 py-1.5 rounded-md border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50"
             >
               Login
-            </TrackedButton>
+            </button>
           </a>
         </div>
 
@@ -140,13 +139,12 @@ export function CustomHeader() {
             </a>
             <div className="pt-2 border-t border-neutral-800">
               <a href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer" className="block w-full">
-                <TrackedButton
-                  eventName="login_click"
-                  eventData={{ location: "header" }}
+                <button
+                  onClick={() => trackEvent("login", { location: "header" })}
                   className="w-full bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium px-3 py-2 rounded-md border border-neutral-600"
                 >
                   Login
-                </TrackedButton>
+                </button>
               </a>
             </div>
           </div>
