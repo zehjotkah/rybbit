@@ -14,7 +14,7 @@ import {
   formatEventTier,
 } from "./utils";
 import { getStripePrices } from "../../../lib/stripe";
-import { trackAdEvent } from "../../../lib/trackAdevent";
+import { trackAdEvent } from "../../../lib/trackAdEvent";
 
 export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
   const stripePrices = getStripePrices();
