@@ -3,6 +3,7 @@ declare global {
   interface Window {
     twq?: (action: string, eventId: string, data?: any) => void;
     fbq?: (action: string, eventName: string, data?: any) => void;
+    rdt?: (action: string, eventName: string, data?: any) => void;
   }
 }
 
@@ -11,9 +12,6 @@ export function trackAdEvent(eventName: "signup" | "checkout" | "login", eventDa
   if (typeof window !== "undefined" && window.twq) {
     if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
       window.twq("event", "tw-qj0po-qjdz6", {});
-    }
-    if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
-      window.twq("event", "tw-qj0po-qje0f", {});
     }
     if (["checkout"].some(event => eventName.toLowerCase().includes(event))) {
       window.twq("event", "tw-qj0po-qjju2", {});
@@ -28,9 +26,15 @@ export function trackAdEvent(eventName: "signup" | "checkout" | "login", eventDa
     if (["checkout"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("track", "InitiateCheckout", eventData);
     }
-    // Track custom events for other button clicks
-    if (!["demo"].some(event => eventName.toLowerCase().includes(event))) {
-      window.fbq("trackCustom", eventName, eventData);
+  }
+
+  // Track Reddit events
+  if (typeof window !== "undefined" && window.rdt) {
+    if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "SignUp", eventData);
+    }
+    if (["checkout"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "AddToCart", eventData);
     }
   }
 }

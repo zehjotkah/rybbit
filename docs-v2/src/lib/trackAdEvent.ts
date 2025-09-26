@@ -3,6 +3,7 @@ declare global {
   interface Window {
     twq?: (action: string, eventId: string, data?: any) => void;
     fbq?: (action: string, eventName: string, data?: any) => void;
+    rdt?: (action: string, eventName: string, data?: any) => void;
   }
 }
 
@@ -34,6 +35,22 @@ export function trackAdEvent(eventName: "signup" | "demo" | "login" | "github", 
     }
     if (["github"].some(event => eventName.toLowerCase().includes(event))) {
       window.fbq("trackCustom", "GitHub", eventData);
+    }
+  }
+
+  // Track Reddit events
+  if (typeof window !== "undefined" && window.rdt) {
+    if (["signup"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "SignUp", eventData);
+    }
+    if (["demo"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "ViewContent", eventData);
+    }
+    if (["login"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "Custom", { ...eventData, customEventName: "Login" });
+    }
+    if (["github"].some(event => eventName.toLowerCase().includes(event))) {
+      window.rdt("track", "Custom", { ...eventData, customEventName: "GitHub" });
     }
   }
 }
