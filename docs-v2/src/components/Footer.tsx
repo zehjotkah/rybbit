@@ -181,6 +181,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/terms-and-conditions" className="text-neutral-400 hover:text-white transition-colors">
+                  Terms and Conditions
+                </Link>
+              </li>
+              <li>
                 <a href="mailto:hello@rybbit.io" className="text-neutral-400 hover:text-white transition-colors">
                   Support
                 </a>
