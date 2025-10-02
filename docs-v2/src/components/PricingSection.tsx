@@ -278,7 +278,7 @@ export function PricingSection() {
                   ) : (
                     <>
                       <CheckCircle className="w-3 h-3" />
-                      We don&apos;t ask for your credit card
+                      We don&apos;t ask for your credit card. 60 day money back guarantee.
                     </>
                   )}
                 </p>
@@ -343,7 +343,7 @@ export function PricingSection() {
                   ) : (
                     <>
                       <CheckCircle className="w-3 h-3" />
-                      We don&apos;t ask for your credit card
+                      We don&apos;t ask for your credit card. 60 day money back guarantee.
                     </>
                   )}
                 </p>
