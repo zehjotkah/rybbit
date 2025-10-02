@@ -1,12 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { DateTime } from "luxon";
 import * as cron from "node-cron";
 import Stripe from "stripe";
 import { processResults } from "../api/analytics/utils.js";
 import { clickhouse } from "../db/clickhouse/clickhouse.js";
 import { db } from "../db/postgres/postgres.js";
-import { organization, sites } from "../db/postgres/schema.js";
+import { member, organization, sites, user } from "../db/postgres/schema.js";
 import { DEFAULT_EVENT_LIMIT, getStripePrices, IS_CLOUD, StripePlan } from "../lib/const.js";
+import { sendLimitExceededEmail } from "../lib/email/email.js";
 import { createServiceLogger } from "../lib/logger/logger.js";
 import { stripe } from "../lib/stripe.js";
 
@@ -59,6 +60,29 @@ class UsageService {
    */
   private getStartOfMonth(): string {
     return DateTime.now().startOf("month").toISODate() as string;
+  }
+
+  /**
+   * Gets the email of the organization owner
+   */
+  private async getOrganizationOwnerEmail(organizationId: string): Promise<string | null> {
+    try {
+      const owners = await db
+        .select({
+          email: user.email,
+        })
+        .from(member)
+        .innerJoin(user, eq(member.userId, user.id))
+        .where(and(
+          eq(member.organizationId, organizationId),
+          eq(member.role, "owner")
+        ));
+
+      return owners.length > 0 ? owners[0].email : null;
+    } catch (error) {
+      this.logger.error(error as Error, `Error getting owner email for organization ${organizationId}`);
+      return null;
+    }
   }
 
   /**
@@ -236,6 +260,7 @@ class UsageService {
           name: organization.name,
           stripeCustomerId: organization.stripeCustomerId,
           createdAt: organization.createdAt,
+          overMonthlyLimit: organization.overMonthlyLimit,
         })
         .from(organization);
 
@@ -257,6 +282,7 @@ class UsageService {
 
           // Check if over limit and update global set
           const isOverLimit = eventCount > eventLimit;
+          const wasOverLimit = orgData.overMonthlyLimit ?? false;
 
           // Update organization's monthlyEventCount and overMonthlyLimit fields
           await db
@@ -266,6 +292,35 @@ class UsageService {
               overMonthlyLimit: isOverLimit,
             })
             .where(eq(organization.id, orgData.id));
+
+          // Send email notification if transitioning from under limit to over limit
+          if (isOverLimit && !wasOverLimit) {
+            const ownerEmail = await this.getOrganizationOwnerEmail(orgData.id);
+
+            // Send email to the owner if found
+            if (ownerEmail) {
+              try {
+                await sendLimitExceededEmail(
+                  ownerEmail,
+                  orgData.name,
+                  eventCount,
+                  eventLimit
+                );
+                this.logger.info(
+                  `Sent limit exceeded email to owner ${ownerEmail} for organization ${orgData.name}`
+                );
+              } catch (error) {
+                this.logger.error(
+                  error as Error,
+                  `Failed to send limit exceeded email to owner ${ownerEmail} for organization ${orgData.name}`
+                );
+              }
+            } else {
+              this.logger.warn(
+                `No owner found for organization ${orgData.name}, skipping limit exceeded email`
+              );
+            }
+          }
 
           // If over the limit, add all this organization's sites to the global set
           if (isOverLimit) {
