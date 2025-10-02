@@ -165,9 +165,11 @@ class UsageService {
   }
 
   /**
-   * Gets monthly pageview count from ClickHouse for the given site IDs
+   * Gets monthly event count from ClickHouse for the given site IDs
+   * Sites with ID < 2000 are grandfathered in and only count pageviews
+   * Sites with ID >= 2000 count all event types (pageview, custom_event, performance)
    */
-  private async getMonthlyPageviews(siteIds: number[], startDate: string | null): Promise<number> {
+  private async getMonthlyEventCount(siteIds: number[], startDate: string | null): Promise<number> {
     if (!siteIds.length) {
       return 0;
     }
@@ -175,20 +177,47 @@ class UsageService {
     // If no startDate is provided (e.g., no subscription), default to start of month
     const periodStart = startDate || this.getStartOfMonth();
 
+    // Split sites into grandfathered (< 2000) and new (>= 2000)
+    const grandfatheredSites = siteIds.filter(id => id < 2000);
+    const newSites = siteIds.filter(id => id >= 2000);
+
     try {
-      const result = await clickhouse.query({
-        query: `
-          SELECT COUNT(*) as count
-          FROM events
-          WHERE site_id IN (${siteIds.join(",")}) AND type = 'pageview'
-          AND timestamp >= toDate('${periodStart}')
-        `,
-        format: "JSONEachRow",
-      });
-      const rows = await processResults<{ count: string }>(result);
-      return parseInt(rows[0].count, 10);
+      let totalCount = 0;
+
+      // Count pageviews only for grandfathered sites
+      if (grandfatheredSites.length > 0) {
+        const grandfatheredResult = await clickhouse.query({
+          query: `
+            SELECT COUNT(*) as count
+            FROM events
+            WHERE site_id IN (${grandfatheredSites.join(",")}) AND type = 'pageview'
+            AND timestamp >= toDate('${periodStart}')
+          `,
+          format: "JSONEachRow",
+        });
+        const grandfatheredRows = await processResults<{ count: string }>(grandfatheredResult);
+        totalCount += parseInt(grandfatheredRows[0].count, 10);
+      }
+
+      // Count all events (pageview, custom_event, performance) for new sites
+      if (newSites.length > 0) {
+        const newSitesResult = await clickhouse.query({
+          query: `
+            SELECT COUNT(*) as count
+            FROM events
+            WHERE site_id IN (${newSites.join(",")})
+            AND type IN ('pageview', 'custom_event', 'performance')
+            AND timestamp >= toDate('${periodStart}')
+          `,
+          format: "JSONEachRow",
+        });
+        const newSitesRows = await processResults<{ count: string }>(newSitesResult);
+        totalCount += parseInt(newSitesRows[0].count, 10);
+      }
+
+      return totalCount;
     } catch (error) {
-      this.logger.error(error as Error, `Error querying ClickHouse for pageviews for sites ${siteIds}`);
+      this.logger.error(error as Error, `Error querying ClickHouse for events for sites ${siteIds}`);
       return 0;
     }
   }
@@ -223,17 +252,17 @@ class UsageService {
           // Get organization's subscription information (limit and period start)
           const [eventLimit, periodStart] = await this.getOrganizationSubscriptionInfo(orgData);
 
-          // Get monthly pageview count from ClickHouse using the billing period start date
-          const pageviewCount = await this.getMonthlyPageviews(siteIds, periodStart);
+          // Get monthly event count from ClickHouse using the billing period start date
+          const eventCount = await this.getMonthlyEventCount(siteIds, periodStart);
 
           // Check if over limit and update global set
-          const isOverLimit = pageviewCount > eventLimit;
+          const isOverLimit = eventCount > eventLimit;
 
           // Update organization's monthlyEventCount and overMonthlyLimit fields
           await db
             .update(organization)
             .set({
-              monthlyEventCount: pageviewCount,
+              monthlyEventCount: eventCount,
               overMonthlyLimit: isOverLimit,
             })
             .where(eq(organization.id, orgData.id));
@@ -258,7 +287,7 @@ class UsageService {
           this.logger.info(
             `Updated organization ${
               orgData.name
-            }: ${pageviewCount.toLocaleString()} events, limit ${eventLimit.toLocaleString()}, ${periodInfo}`
+            }: ${eventCount.toLocaleString()} events, limit ${eventLimit.toLocaleString()}, ${periodInfo}`
           );
         } catch (error) {
           this.logger.error(error as Error, `Error processing organization ${orgData.id}`);
