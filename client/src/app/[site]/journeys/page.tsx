@@ -2,22 +2,17 @@
 
 import { useJourneys } from "@/api/analytics/useJourneys";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import * as d3 from "d3";
 import { AlertCircle } from "lucide-react";
-import { DateTime } from "luxon";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useGetSite } from "../../../api/admin/sites";
-import { DateSelector } from "../../../components/DateSelector/DateSelector";
-import { DateRangeMode, Time } from "../../../components/DateSelector/types";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { timeZone } from "../../../lib/dateTimeUtils";
-import { MobileSidebar } from "../components/Sidebar/MobileSidebar";
-
-const MAX_LINK_HEIGHT = 100;
+import { JOURNEY_PAGE_FILTERS, useStore } from "../../../lib/store";
+import { SubHeader } from "../components/SubHeader/SubHeader";
+import { SankeyDiagram } from "./components/SankeyDiagram";
 
 export default function JourneysPage() {
   useSetPageTitle("Rybbit · Journeys");
@@ -26,16 +21,9 @@ export default function JourneysPage() {
   const [maxJourneys, setMaxJourneys] = useState<number>(25);
 
   const { data: siteMetadata } = useGetSite();
+  const { time } = useStore();
 
-  const [time, setTime] = useState<Time>({
-    mode: "range",
-    startDate: DateTime.now().minus({ days: 7 }).toISODate(),
-    endDate: DateTime.now().toISODate(),
-    wellKnown: "Last 7 days",
-    timeZone: timeZone,
-  } as DateRangeMode);
-
-  const { data, isLoading, error } = useJourneys({
+  const { data, isLoading, isFetching, error } = useJourneys({
     siteId: siteMetadata?.siteId,
     steps,
     timeZone: timeZone,
@@ -43,412 +31,11 @@ export default function JourneysPage() {
     limit: maxJourneys,
   });
 
-  const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    if (!data?.journeys || !svgRef.current || !siteMetadata?.domain) return;
-
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
-
-    const containerWidth = svgRef.current.parentElement?.clientWidth || 1000;
-
-    // Build nodes and links
-    const nodes: any[] = [];
-    const links: any[] = [];
-
-    data?.journeys?.slice(0, maxJourneys).forEach(journey => {
-      for (let i = 0; i < journey.path.length; i++) {
-        const stepName = journey.path[i];
-        const stepKey = `${i}_${stepName}`;
-
-        if (!nodes.find(n => n.id === stepKey)) {
-          nodes.push({
-            id: stepKey,
-            name: stepName,
-            step: i,
-            incomingLinks: [],
-            outgoingLinks: [],
-          });
-        }
-
-        if (i < journey.path.length - 1) {
-          const sourceKey = stepKey;
-          const targetKey = `${i + 1}_${journey.path[i + 1]}`;
-
-          const existingLink = links.find(l => l.source === sourceKey && l.target === targetKey);
-
-          if (existingLink) {
-            existingLink.value += journey.count;
-          } else {
-            links.push({
-              source: sourceKey,
-              target: targetKey,
-              value: journey.count,
-            });
-          }
-        }
-      }
-    });
-
-    // Calculate dimensions
-    const nodesByStep = d3.group(nodes, d => d.step);
-    const maxNodesInAnyStep = Math.max(...Array.from(nodesByStep.values()).map(stepNodes => stepNodes.length));
-
-    const nodeWidth = 30;
-    const stepSpacing = 300;
-    const stepWidth = nodeWidth + stepSpacing;
-    const width = stepWidth * steps + nodeWidth;
-    const minHeight = 500;
-    const baseNodeHeight = 60;
-    const nodeSpacing = 20;
-    const height = Math.max(minHeight, (baseNodeHeight + nodeSpacing) * maxNodesInAnyStep + 100);
-
-    const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-    const innerHeight = height - margin.top - margin.bottom;
-
-    const g = svg
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Track incoming and outgoing links for each node
-    links.forEach(link => {
-      const sourceNode = nodes.find(n => n.id === link.source);
-      const targetNode = nodes.find(n => n.id === link.target);
-
-      if (sourceNode) sourceNode.outgoingLinks.push(link);
-      if (targetNode) targetNode.incomingLinks.push(link);
-    });
-
-    // Position nodes
-    nodesByStep.forEach((stepNodes, step) => {
-      const stepX = step * stepWidth;
-      const stepHeight = innerHeight / stepNodes.length;
-
-      stepNodes.forEach((node, i) => {
-        node.x = stepX;
-        node.y = i * stepHeight + stepHeight / 2;
-      });
-    });
-
-    // Calculate node heights and metadata
-    const maxLinkValue = d3.max(links, link => link.value) || 1;
-    const linkWidthScale = d3.scaleLinear().domain([0, maxLinkValue]).range([1, MAX_LINK_HEIGHT]);
-
-    nodes.forEach(node => {
-      const incomingValue = node.incomingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
-      const outgoingValue = node.outgoingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
-      const maxValue = Math.max(incomingValue, outgoingValue);
-
-      node.height = linkWidthScale(maxValue);
-      node.count = node.step === 0 ? outgoingValue : incomingValue;
-
-      const matchingJourney = data?.journeys?.find(journey => journey.path[node.step] === node.name);
-      node.percentage = matchingJourney ? matchingJourney.percentage : 0;
-    });
-
-    // Calculate link positions
-    nodes.forEach(node => {
-      node.incomingLinks.sort((a: any, b: any) => b.value - a.value);
-      node.outgoingLinks.sort((a: any, b: any) => b.value - a.value);
-
-      let currentOutY = 0;
-      node.outgoingLinks.forEach((link: any) => {
-        const linkHeight = linkWidthScale(link.value);
-        link.sourceY = currentOutY + linkHeight / 2;
-        currentOutY += linkHeight;
-      });
-
-      if (currentOutY > 0 && node.outgoingLinks.length > 0) {
-        node.outgoingLinks.forEach((link: any) => {
-          link.sourceY = (link.sourceY / currentOutY) * node.height - node.height / 2;
-          link.sourceY += node.y;
-        });
-      }
-
-      let currentInY = 0;
-      node.incomingLinks.forEach((link: any) => {
-        const linkHeight = linkWidthScale(link.value);
-        link.targetY = currentInY + linkHeight / 2;
-        currentInY += linkHeight;
-      });
-
-      if (currentInY > 0 && node.incomingLinks.length > 0) {
-        node.incomingLinks.forEach((link: any) => {
-          link.targetY = (link.targetY / currentInY) * node.height - node.height / 2;
-          link.targetY += node.y;
-        });
-      }
-    });
-
-    // Helper function to find all connected paths (all reachable nodes/edges)
-    const findAllConnectedPaths = (startLink: any, direction: "forward" | "backward"): any[] => {
-      const connectedLinks: any[] = [];
-      const queue: any[] = [startLink];
-      const visited = new Set<string>();
-
-      while (queue.length > 0) {
-        const currentLink = queue.shift();
-        const linkId = `${currentLink.source}|||${currentLink.target}`;
-
-        if (visited.has(linkId)) continue;
-        visited.add(linkId);
-        connectedLinks.push(currentLink);
-
-        if (direction === "forward") {
-          const targetNode = nodes.find(n => n.id === currentLink.target);
-          // Follow all outgoing links
-          if (targetNode && targetNode.outgoingLinks.length > 0) {
-            targetNode.outgoingLinks.forEach((link: any) => queue.push(link));
-          }
-        } else {
-          const sourceNode = nodes.find(n => n.id === currentLink.source);
-          // Follow all incoming links
-          if (sourceNode && sourceNode.incomingLinks.length > 0) {
-            sourceNode.incomingLinks.forEach((link: any) => queue.push(link));
-          }
-        }
-      }
-
-      return connectedLinks;
-    };
-
-    // Draw links
-    const linkElements = g
-      .selectAll(".link")
-      .data(links)
-      .join("path")
-      .attr("class", "link")
-      .attr("d", d => {
-        const source = nodes.find(n => n.id === d.source);
-        const target = nodes.find(n => n.id === d.target);
-
-        if (!source || !target) return "";
-
-        const sourceY = d.sourceY || source.y;
-        const targetY = d.targetY || target.y;
-        const sourceX = source.x + nodeWidth;
-        const targetX = target.x;
-
-        const controlPoint1X = sourceX + stepSpacing / 3;
-        const controlPoint2X = targetX - stepSpacing / 3;
-
-        return `M ${sourceX},${sourceY}
-                C ${controlPoint1X},${sourceY}
-                  ${controlPoint2X},${targetY}
-                  ${targetX},${targetY}`;
-      })
-      .attr("fill", "none")
-      .attr("stroke", "hsl(var(--neutral-500))")
-      .attr("stroke-width", d => linkWidthScale(d.value))
-      .attr("opacity", 0.2)
-      .attr("data-source", d => d.source)
-      .attr("data-target", d => d.target)
-      .style("cursor", "pointer")
-      .style("pointer-events", "visibleStroke")
-      .on("mouseenter", function (event, d) {
-        const forwardPaths = findAllConnectedPaths(d, "forward");
-        const backwardPaths = findAllConnectedPaths(d, "backward");
-        const allConnectedLinks = [d, ...forwardPaths, ...backwardPaths];
-
-        const connectedLinkIds = new Set<string>();
-        const connectedNodeIds = new Set<string>();
-
-        allConnectedLinks.forEach(link => {
-          const linkId = `${link.source}|||${link.target}`;
-          connectedLinkIds.add(linkId);
-          connectedNodeIds.add(link.source);
-          connectedNodeIds.add(link.target);
-        });
-
-        d3.selectAll(".link")
-          .attr("opacity", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
-          })
-          .attr("stroke", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : "hsl(var(--neutral-500))";
-          });
-
-        d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
-        });
-
-        d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
-        });
-
-        d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
-        });
-      })
-      .on("mouseleave", function () {
-        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
-        d3.selectAll(".node-rect").attr("opacity", 1);
-        d3.selectAll(".node-bubble").attr("opacity", 0.8);
-        d3.selectAll(".node-text").attr("opacity", 1);
-      })
-      .append("title")
-      .text(d => `Count: ${d.value}`);
-
-    // Draw nodes
-    const nodeGroups = g
-      .selectAll(".node")
-      .data(nodes)
-      .join("g")
-      .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${d.y - d.height / 2})`)
-      .style("cursor", "pointer");
-
-    // Thin bar
-    nodeGroups
-      .append("rect")
-      .attr("class", "node-rect")
-      .attr("width", nodeWidth)
-      .attr("height", d => d.height)
-      .attr("fill", "hsl(var(--emerald-600))")
-      .attr("rx", 2)
-      .attr("ry", 2);
-
-    // Bubble background
-    nodeGroups
-      .append("rect")
-      .attr("class", "node-bubble")
-      .attr("x", 12)
-      .attr("y", 4)
-      .attr("width", d => {
-        const pathText = d.name;
-        const statsText = `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`;
-        const maxLength = Math.max(pathText.length, statsText.length);
-        const textWidth = maxLength * 6.5;
-        return textWidth + 10;
-      })
-      .attr("height", 41)
-      .attr("fill", "hsl(var(--neutral-800))")
-      .attr("stroke", "hsl(var(--neutral-700))")
-      .attr("stroke-width", 1)
-      .attr("rx", 2)
-      .attr("ry", 2);
-
-    // Path text (clickable)
-    const pathLinks = nodeGroups
-      .append("a")
-      .attr("xlink:href", d => `https://${siteMetadata.domain}${d.name}`)
-      .attr("target", "_blank")
-      .attr("rel", "noopener noreferrer");
-
-    pathLinks
-      .append("text")
-      .attr("class", "node-text node-link-text")
-      .attr("x", 19)
-      .attr("y", 21)
-      .text(d => d.name)
-      .attr("font-size", "12px")
-      .attr("fill", "white")
-      .attr("text-anchor", "start")
-      .style("text-decoration", "none");
-
-    // Add hover effect to show underline on link text
-    pathLinks
-      .on("mouseenter", function () {
-        d3.select(this).select(".node-link-text").style("text-decoration", "underline");
-      })
-      .on("mouseleave", function () {
-        d3.select(this).select(".node-link-text").style("text-decoration", "none");
-      });
-
-    // Count text
-    nodeGroups
-      .append("text")
-      .attr("class", "node-text")
-      .attr("x", 19)
-      .attr("y", 37)
-      .text(d => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
-      .attr("font-size", "11px")
-      .attr("fill", "hsl(var(--neutral-300))")
-      .attr("text-anchor", "start");
-
-    // Node hover effects
-    nodeGroups
-      .on("mouseenter", function (event, d) {
-        const nodeId = d.id;
-        const connectedNodeIds = new Set<string>([nodeId]);
-
-        // Find all directly connected links
-        const directLinks = links.filter(link => link.source === nodeId || link.target === nodeId);
-
-        const allConnectedLinks: any[] = [];
-
-        // For each direct link, find all connected paths
-        directLinks.forEach(link => {
-          allConnectedLinks.push(link);
-
-          const forwardPaths = findAllConnectedPaths(link, "forward");
-          const backwardPaths = findAllConnectedPaths(link, "backward");
-
-          allConnectedLinks.push(...forwardPaths);
-          allConnectedLinks.push(...backwardPaths);
-        });
-
-        const connectedLinkIds = new Set<string>();
-
-        // Collect all connected link and node IDs
-        allConnectedLinks.forEach(link => {
-          const linkId = `${link.source}|||${link.target}`;
-          connectedLinkIds.add(linkId);
-          connectedNodeIds.add(link.source);
-          connectedNodeIds.add(link.target);
-        });
-
-        d3.selectAll(".link")
-          .attr("opacity", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
-          })
-          .attr("stroke", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : "hsl(var(--neutral-500))";
-          });
-
-        d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
-        });
-
-        d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
-        });
-
-        d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
-        });
-      })
-      .on("mouseleave", function () {
-        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
-        d3.selectAll(".node-rect").attr("opacity", 1);
-        d3.selectAll(".node-bubble").attr("opacity", 0.8);
-        d3.selectAll(".node-text").attr("opacity", 1);
-      });
-  }, [data, steps, maxJourneys, siteMetadata]);
-
   return (
     <DisabledOverlay message="User Journeys" featurePath="journeys">
       <div className="container mx-auto p-2 md:p-4">
-        <div className="md:hidden mb-2">
-          <MobileSidebar />
-        </div>
+        <SubHeader availableFilters={JOURNEY_PAGE_FILTERS} />
         <div className="flex justify-end items-center gap-2 mb-2">
-          <DateSelector time={time} setTime={setTime} pastMinutesEnabled={false} />
           <Select value={steps.toString()} onValueChange={value => setSteps(Number(value))}>
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Number of steps" />
@@ -474,41 +61,41 @@ export default function JourneysPage() {
             </SelectContent>
           </Select>
         </div>
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>User Journeys</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading && (
-              <div className="flex flex-col space-y-4">
-                <Skeleton className="h-[1000px] w-full rounded-md" />
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>Failed to load journey data. Please try again.</AlertDescription>
+          </Alert>
+        )}
+
+        {data?.journeys?.length === 0 && !isLoading && !error && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No Data</AlertTitle>
+            <AlertDescription>No journey data found for the selected criteria.</AlertDescription>
+          </Alert>
+        )}
+
+        {data?.journeys?.length && data?.journeys?.length > 0 && siteMetadata?.domain ? (
+          <div className="relative">
+            {(isLoading || isFetching) && (
+              <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-8 w-8 rounded-full border-2 border-accent-400 border-t-transparent animate-spin"></div>
+                  <span className="text-sm text-neutral-300">Loading journey data...</span>
+                </div>
               </div>
             )}
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>Failed to load journey data. Please try again.</AlertDescription>
-              </Alert>
-            )}
-
-            {data?.journeys?.length === 0 && !isLoading && !error && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>No Data</AlertTitle>
-                <AlertDescription>No journey data found for the selected criteria.</AlertDescription>
-              </Alert>
-            )}
-
-            {data?.journeys?.length && data?.journeys?.length > 0 ? (
-              <div className="overflow-x-auto w-full">
-                <svg ref={svgRef} className="min-w-full" />
-                {/* <svg ref={svgRef} className="w-full h-[1000px]" /> */}
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
+            <SankeyDiagram
+              journeys={data.journeys}
+              steps={steps}
+              maxJourneys={maxJourneys}
+              domain={siteMetadata.domain}
+            />
+          </div>
+        ) : null}
       </div>
     </DisabledOverlay>
   );

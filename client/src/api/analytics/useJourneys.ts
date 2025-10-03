@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { authedFetch, getStartAndEndDate } from "../utils";
 import { Time } from "../../components/DateSelector/types";
 import { timeZone } from "../../lib/dateTimeUtils";
+import { getFilteredFilters, JOURNEY_PAGE_FILTERS } from "../../lib/store";
+import { authedFetch, getStartAndEndDate } from "../utils";
 
 export interface JourneyParams {
   siteId?: number;
@@ -24,8 +25,10 @@ export interface JourneysResponse {
 export const useJourneys = ({ siteId, steps = 3, time, limit = 100 }: JourneyParams) => {
   const { startDate, endDate } = getStartAndEndDate(time);
 
+  const filteredFilters = getFilteredFilters(JOURNEY_PAGE_FILTERS);
+
   return useQuery<JourneysResponse>({
-    queryKey: ["journeys", siteId, steps, startDate, endDate, timeZone, limit],
+    queryKey: ["journeys", siteId, steps, startDate, endDate, timeZone, limit, filteredFilters],
     queryFn: async () => {
       const params: Record<string, any> = {};
 
@@ -34,9 +37,11 @@ export const useJourneys = ({ siteId, steps = 3, time, limit = 100 }: JourneyPar
       if (endDate) params.endDate = endDate;
       if (timeZone) params.timeZone = timeZone;
       if (limit) params.limit = limit;
+      if (filteredFilters) params.filters = filteredFilters;
 
       return authedFetch<JourneysResponse>(`/journeys/${siteId}`, params);
     },
     enabled: !!siteId,
+    placeholderData: (previousData) => previousData,
   });
 };
