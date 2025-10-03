@@ -95,7 +95,7 @@ export default function JourneysPage() {
     const nodesByStep = d3.group(nodes, d => d.step);
     const maxNodesInAnyStep = Math.max(...Array.from(nodesByStep.values()).map(stepNodes => stepNodes.length));
 
-    const nodeWidth = 10;
+    const nodeWidth = 30;
     const stepSpacing = 300;
     const stepWidth = nodeWidth + stepSpacing;
     const width = stepWidth * steps + nodeWidth;
@@ -249,7 +249,8 @@ export default function JourneysPage() {
       .attr("data-source", d => d.source)
       .attr("data-target", d => d.target)
       .style("cursor", "pointer")
-      .on("mouseover", function (event, d) {
+      .style("pointer-events", "visibleStroke")
+      .on("mouseenter", function (event, d) {
         const forwardPaths = findContinuousPaths(d, "forward");
         const backwardPaths = findContinuousPaths(d, "backward");
         const allConnectedLinks = [d, ...forwardPaths, ...backwardPaths];
@@ -265,41 +266,36 @@ export default function JourneysPage() {
         });
 
         d3.selectAll(".link")
-          .transition()
-          .duration(200)
           .attr("opacity", function () {
             const linkSource = d3.select(this).attr("data-source");
             const linkTarget = d3.select(this).attr("data-target");
             const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.9 : 0.1;
+            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
+          })
+          .attr("stroke", function () {
+            const linkSource = d3.select(this).attr("data-source");
+            const linkTarget = d3.select(this).attr("data-target");
+            const thisLinkId = `${linkSource}|||${linkTarget}`;
+            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : "hsl(var(--neutral-500))";
           });
 
-        d3.selectAll(".node-rect")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
-          });
+        d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
+        });
 
-        d3.selectAll(".node-bubble")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
-          });
+        d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
+        });
 
-        d3.selectAll(".node-text")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
-          });
+        d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
+        });
       })
-      .on("mouseout", function () {
-        d3.selectAll(".link").transition().duration(200).attr("opacity", 0.2);
-        d3.selectAll(".node-rect").transition().duration(200).attr("opacity", 1);
-        d3.selectAll(".node-bubble").transition().duration(200).attr("opacity", 0.8);
-        d3.selectAll(".node-text").transition().duration(200).attr("opacity", 1);
+      .on("mouseleave", function () {
+        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
+        d3.selectAll(".node-rect").attr("opacity", 1);
+        d3.selectAll(".node-bubble").attr("opacity", 0.8);
+        d3.selectAll(".node-text").attr("opacity", 1);
       })
       .append("title")
       .text(d => `Count: ${d.value}`);
@@ -327,8 +323,8 @@ export default function JourneysPage() {
     nodeGroups
       .append("rect")
       .attr("class", "node-bubble")
-      .attr("x", 18)
-      .attr("y", d => d.height / 2 - 17)
+      .attr("x", 12)
+      .attr("y", 4)
       .attr("width", d => {
         const pathText = d.name;
         const statsText = `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`;
@@ -336,13 +332,12 @@ export default function JourneysPage() {
         const textWidth = maxLength * 6.5;
         return textWidth + 10;
       })
-      .attr("height", 35)
+      .attr("height", 41)
       .attr("fill", "hsl(var(--neutral-800))")
       .attr("stroke", "hsl(var(--neutral-700))")
       .attr("stroke-width", 1)
       .attr("rx", 2)
-      .attr("ry", 2)
-      .attr("opacity", 0.8);
+      .attr("ry", 2);
 
     // Path text (clickable)
     const pathLinks = nodeGroups
@@ -353,21 +348,30 @@ export default function JourneysPage() {
 
     pathLinks
       .append("text")
-      .attr("class", "node-text")
-      .attr("x", 23)
-      .attr("y", d => d.height / 2 - 2)
+      .attr("class", "node-text node-link-text")
+      .attr("x", 19)
+      .attr("y", 21)
       .text(d => d.name)
       .attr("font-size", "12px")
       .attr("fill", "white")
       .attr("text-anchor", "start")
       .style("text-decoration", "none");
 
+    // Add hover effect to show underline on link text
+    pathLinks
+      .on("mouseenter", function () {
+        d3.select(this).select(".node-link-text").style("text-decoration", "underline");
+      })
+      .on("mouseleave", function () {
+        d3.select(this).select(".node-link-text").style("text-decoration", "none");
+      });
+
     // Count text
     nodeGroups
       .append("text")
       .attr("class", "node-text")
-      .attr("x", 23)
-      .attr("y", d => d.height / 2 + 12)
+      .attr("x", 19)
+      .attr("y", 37)
       .text(d => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
       .attr("font-size", "11px")
       .attr("fill", "hsl(var(--neutral-300))")
@@ -375,7 +379,7 @@ export default function JourneysPage() {
 
     // Node hover effects
     nodeGroups
-      .on("mouseover", function (event, d) {
+      .on("mouseenter", function (event, d) {
         const nodeId = d.id;
         const connectedNodeIds = new Set<string>([nodeId]);
 
@@ -406,41 +410,36 @@ export default function JourneysPage() {
         });
 
         d3.selectAll(".link")
-          .transition()
-          .duration(200)
           .attr("opacity", function () {
             const linkSource = d3.select(this).attr("data-source");
             const linkTarget = d3.select(this).attr("data-target");
             const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.9 : 0.1;
+            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
+          })
+          .attr("stroke", function () {
+            const linkSource = d3.select(this).attr("data-source");
+            const linkTarget = d3.select(this).attr("data-target");
+            const thisLinkId = `${linkSource}|||${linkTarget}`;
+            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : "hsl(var(--neutral-500))";
           });
 
-        d3.selectAll(".node-rect")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
-          });
+        d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
+        });
 
-        d3.selectAll(".node-bubble")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
-          });
+        d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
+        });
 
-        d3.selectAll(".node-text")
-          .transition()
-          .duration(200)
-          .attr("opacity", function (nodeData: any) {
-            return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
-          });
+        d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
+        });
       })
-      .on("mouseout", function () {
-        d3.selectAll(".link").transition().duration(200).attr("opacity", 0.2);
-        d3.selectAll(".node-rect").transition().duration(200).attr("opacity", 1);
-        d3.selectAll(".node-bubble").transition().duration(200).attr("opacity", 0.8);
-        d3.selectAll(".node-text").transition().duration(200).attr("opacity", 1);
+      .on("mouseleave", function () {
+        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
+        d3.selectAll(".node-rect").attr("opacity", 1);
+        d3.selectAll(".node-bubble").attr("opacity", 0.8);
+        d3.selectAll(".node-text").attr("opacity", 1);
       });
   }, [data, steps, maxJourneys, siteMetadata]);
 
