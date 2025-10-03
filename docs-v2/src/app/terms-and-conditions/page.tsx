@@ -9,9 +9,7 @@ export default function TermsAndConditions() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8">Terms and Conditions</h1>
 
       <div className="prose prose-invert max-w-none">
-        <p className="text-lg">
-          Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-        </p>
+        <p className="text-lg">Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Acceptance of Terms</h2>
         <p>
@@ -40,17 +38,77 @@ export default function TermsAndConditions() {
         <h3 className="text-xl font-semibold mt-6 mb-3">Account Responsibilities</h3>
         <p>For cloud service users:</p>
         <ul className="list-disc pl-6 space-y-2">
+          <li>You must be a human - accounts registered by bots or automated methods are not permitted</li>
+          <li>You must provide accurate, complete, and current information when creating an account</li>
           <li>You are responsible for maintaining the confidentiality of your account credentials</li>
           <li>You are responsible for all activities that occur under your account</li>
           <li>You must notify us immediately of any unauthorized use of your account</li>
-          <li>You must provide accurate and complete information when creating an account</li>
         </ul>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Open Source License</h2>
         <p>
-          Rybbit is open-source software released under the MIT License. The self-hosted version is free to use,
-          modify, and distribute according to the terms of that license. These Terms and Conditions apply specifically
-          to the use of our cloud-hosted service and website.
+          Rybbit is open-source software released under the MIT License. The self-hosted version is free to use, modify,
+          and distribute according to the terms of that license. These Terms and Conditions apply specifically to the
+          use of our cloud-hosted service and website.
+        </p>
+
+        <h2 className="text-2xl font-semibold mt-8 mb-4">Subscription and Billing</h2>
+        <h3 className="text-xl font-semibold mt-6 mb-3">Payment Terms</h3>
+        <p>For paid cloud subscriptions:</p>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>Payment is processed via credit card or other accepted payment methods</li>
+          <li>Subscriptions are billed on a monthly or annual basis as selected during signup</li>
+          <li>All fees are in USD unless otherwise stated</li>
+          <li>You authorize us to charge your payment method automatically on each billing cycle</li>
+          <li>No surprise fees - your card will never be charged unexpectedly</li>
+          <li>Unused page views do not roll over and are forfeited at the end of each billing period</li>
+          <li>Failed payments may result in service suspension or termination after notice</li>
+        </ul>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Auto-Renewal and Price Changes</h3>
+        <p>
+          Your subscription will automatically renew at the end of each billing period unless you cancel before the
+          renewal date. We reserve the right to modify subscription prices with at least 30 days advance notice. Price
+          changes will take effect on your next billing cycle. Continued use of the service after a price change
+          constitutes acceptance of the new pricing.
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Refund Policy</h3>
+        <p>
+          We offer a 60-day money-back guarantee for new paid subscriptions. Refund requests must be submitted within 60
+          days of your initial payment. After this period, payments are non-refundable. We do not provide prorated
+          refunds for mid-cycle cancellations, but you retain access to the service through the end of your paid billing
+          period.
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Usage Quotas and Overages</h3>
+        <p>
+          Each plan includes specific usage limits. If you exceed your plan&apos;s page view limit, you may be required
+          to upgrade to a higher tier. We will notify you when approaching your limits. Consistent overage may result in
+          automatic plan upgrades or service restrictions. We reserve the right to enforce fair use policies to prevent
+          abuse of unlimited plans.
+        </p>
+
+        <h2 className="text-2xl font-semibold mt-8 mb-4">Cancellation and Downgrade</h2>
+        <h3 className="text-xl font-semibold mt-6 mb-3">How to Cancel</h3>
+        <p>
+          You may cancel your subscription at any time through your account settings or by contacting support.
+          Cancellations take effect at the end of your current billing period. You will retain access to paid features
+          until that time.
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Downgrading Your Plan</h3>
+        <p>
+          You may downgrade to a lower-tier plan or the free tier at any time. Downgrades take effect at the end of your
+          current billing period. If your usage exceeds the limits of the downgraded plan, you may need to reduce your
+          websites or accept data retention limitations.
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Data After Cancellation</h3>
+        <p>
+          After cancellation or downgrade to free tier, your analytics data will be permanently deleted within 60 days.
+          We recommend exporting your data before cancellation if you wish to retain it. Once deleted, data cannot be
+          recovered.
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Service Availability</h2>
@@ -61,12 +119,28 @@ export default function TermsAndConditions() {
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Data and Privacy</h2>
+        <h3 className="text-xl font-semibold mt-6 mb-3">Your Data Ownership</h3>
         <p>
-          Our collection and use of data is governed by our
+          You retain all rights to your website analytics data. We will never sell or share your site data to any
+          third parties. Your data is yours, and we act only as a processor of that data on your behalf.
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Privacy Commitment</h3>
+        <p>
+          Rybbit does not collect personally identifiable information from your website visitors. Our service is
+          designed to be privacy-friendly and compliant with GDPR, CCPA, and other privacy regulations. Our full data
+          practices are described in our
           <a href="/privacy" className="text-emerald-400 hover:text-emerald-300 mx-1">
             Privacy Policy
           </a>
-          . By using Rybbit, you consent to our privacy practices as described in that policy.
+          .
+        </p>
+
+        <h3 className="text-xl font-semibold mt-6 mb-3">Your Compliance Obligations</h3>
+        <p>
+          You are responsible for ensuring your use of Rybbit complies with all applicable privacy laws and
+          regulations in your jurisdiction. You must obtain any necessary consents from your website visitors as
+          required by law.
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Intellectual Property</h2>

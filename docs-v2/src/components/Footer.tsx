@@ -186,6 +186,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/security" className="text-neutral-400 hover:text-white transition-colors">
+                  Security
+                </Link>
+              </li>
+              <li>
                 <a href="mailto:hello@rybbit.io" className="text-neutral-400 hover:text-white transition-colors">
                   Support
                 </a>
