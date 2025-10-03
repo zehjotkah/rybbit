@@ -51,10 +51,9 @@ export default function JourneysPage() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    // Get container width for responsive sizing
     const containerWidth = svgRef.current.parentElement?.clientWidth || 1000;
 
-    // Build nodes first to calculate dimensions properly
+    // Build nodes and links
     const nodes: any[] = [];
     const links: any[] = [];
 
@@ -92,40 +91,22 @@ export default function JourneysPage() {
       }
     });
 
-    // Calculate dimensions based on node distribution
+    // Calculate dimensions
     const nodesByStep = d3.group(nodes, d => d.step);
-
-    // Calculate max nodes per step for height calculation
     const maxNodesInAnyStep = Math.max(...Array.from(nodesByStep.values()).map(stepNodes => stepNodes.length));
 
-    // Width calculation that fills available space but doesn't shrink below minimum
-    const minStepWidth = 300; // Minimum width per step
-    const minTotalWidth = minStepWidth * steps; // Minimum total width
-
-    // Calculate step width based on available space
-    const stepWidth = Math.max(
-      minStepWidth,
-      containerWidth / steps // Use full container width if it's large enough
-    );
-
-    // Calculate total width based on step width
-    const width = stepWidth * steps;
-
+    const nodeWidth = 10;
+    const stepSpacing = 300;
+    const stepWidth = nodeWidth + stepSpacing;
+    const width = stepWidth * steps + nodeWidth;
     const minHeight = 500;
-
-    // Calculate height based on maximum node cardinality in any step
-    const baseNodeHeight = 60; // Height per node
-    const nodeSpacing = 20; // Spacing between nodes
-    const height = Math.max(
-      minHeight,
-      (baseNodeHeight + nodeSpacing) * maxNodesInAnyStep + 100 // 100px for margins
-    );
+    const baseNodeHeight = 60;
+    const nodeSpacing = 20;
+    const height = Math.max(minHeight, (baseNodeHeight + nodeSpacing) * maxNodesInAnyStep + 100);
 
     const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-    const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    // Create the main group element
     const g = svg
       .attr("width", width)
       .attr("height", height)
@@ -141,7 +122,7 @@ export default function JourneysPage() {
       if (targetNode) targetNode.incomingLinks.push(link);
     });
 
-    // Position nodes vertically within each step
+    // Position nodes
     nodesByStep.forEach((stepNodes, step) => {
       const stepX = step * stepWidth;
       const stepHeight = innerHeight / stepNodes.length;
@@ -152,85 +133,93 @@ export default function JourneysPage() {
       });
     });
 
-    // Find the maximum link value for scaling
+    // Calculate node heights and metadata
     const maxLinkValue = d3.max(links, link => link.value) || 1;
     const linkWidthScale = d3.scaleLinear().domain([0, maxLinkValue]).range([1, MAX_LINK_HEIGHT]);
 
-    // Calculate node heights based on connected links
     nodes.forEach(node => {
-      // Sum the values of incoming and outgoing links
       const incomingValue = node.incomingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
       const outgoingValue = node.outgoingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
-
-      // Use the larger value to determine height
       const maxValue = Math.max(incomingValue, outgoingValue);
+
       node.height = linkWidthScale(maxValue);
-
-      // Minimum height for visibility
-      node.height = Math.max(node.height, 3);
-
-      // Store count for this node (use incoming for all except first step)
       node.count = node.step === 0 ? outgoingValue : incomingValue;
 
-      // Store percentage - find the corresponding journey data
-      const matchingJourney = data?.journeys?.find(journey => {
-        // Compare path at this step with node name
-        return journey.path[node.step] === node.name;
-      });
-
-      // Use the percentage from journey data if available
+      const matchingJourney = data?.journeys?.find(journey => journey.path[node.step] === node.name);
       node.percentage = matchingJourney ? matchingJourney.percentage : 0;
     });
 
-    // Calculate link positions along each node
+    // Calculate link positions
     nodes.forEach(node => {
-      // Sort links by value (descending) for consistent ordering
       node.incomingLinks.sort((a: any, b: any) => b.value - a.value);
       node.outgoingLinks.sort((a: any, b: any) => b.value - a.value);
 
-      // Calculate positions for outgoing links
       let currentOutY = 0;
-      const totalOutgoing = node.outgoingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
-
       node.outgoingLinks.forEach((link: any) => {
         const linkHeight = linkWidthScale(link.value);
-        // Position at the middle of the allocated segment
         link.sourceY = currentOutY + linkHeight / 2;
-        // Update for next link
         currentOutY += linkHeight;
       });
 
-      // Normalize positions to fit within node height
-      if (totalOutgoing > 0 && node.outgoingLinks.length > 0) {
+      if (currentOutY > 0 && node.outgoingLinks.length > 0) {
         node.outgoingLinks.forEach((link: any) => {
           link.sourceY = (link.sourceY / currentOutY) * node.height - node.height / 2;
-          link.sourceY += node.y; // Adjust to node position
+          link.sourceY += node.y;
         });
       }
 
-      // Calculate positions for incoming links
       let currentInY = 0;
-      const totalIncoming = node.incomingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
-
       node.incomingLinks.forEach((link: any) => {
         const linkHeight = linkWidthScale(link.value);
-        // Position at the middle of the allocated segment
         link.targetY = currentInY + linkHeight / 2;
-        // Update for next link
         currentInY += linkHeight;
       });
 
-      // Normalize positions to fit within node height
-      if (totalIncoming > 0 && node.incomingLinks.length > 0) {
+      if (currentInY > 0 && node.incomingLinks.length > 0) {
         node.incomingLinks.forEach((link: any) => {
           link.targetY = (link.targetY / currentInY) * node.height - node.height / 2;
-          link.targetY += node.y; // Adjust to node position
+          link.targetY += node.y;
         });
       }
     });
 
-    // Create links as bezier curves
-    g.selectAll(".link")
+    // Helper function to find all connected paths (continuous non-forking paths)
+    const findContinuousPaths = (startLink: any, direction: "forward" | "backward"): any[] => {
+      const connectedLinks: any[] = [];
+      const queue: any[] = [startLink];
+      const visited = new Set<string>();
+
+      while (queue.length > 0) {
+        const currentLink = queue.shift();
+        const linkId = `${currentLink.source}|||${currentLink.target}`;
+
+        if (visited.has(linkId)) continue;
+        visited.add(linkId);
+        connectedLinks.push(currentLink);
+
+        if (direction === "forward") {
+          const targetNode = nodes.find(n => n.id === currentLink.target);
+          // Continue if there's exactly one outgoing link (non-forking)
+          // Terminal nodes (with 0 outgoing links) are already included via the current link
+          if (targetNode && targetNode.outgoingLinks.length === 1) {
+            queue.push(targetNode.outgoingLinks[0]);
+          }
+        } else {
+          const sourceNode = nodes.find(n => n.id === currentLink.source);
+          // Continue if there's exactly one incoming link (non-forking)
+          // Starting nodes (with 0 incoming links) are already included via the current link
+          if (sourceNode && sourceNode.incomingLinks.length === 1) {
+            queue.push(sourceNode.incomingLinks[0]);
+          }
+        }
+      }
+
+      return connectedLinks;
+    };
+
+    // Draw links
+    const linkElements = g
+      .selectAll(".link")
       .data(links)
       .join("path")
       .attr("class", "link")
@@ -240,133 +229,131 @@ export default function JourneysPage() {
 
         if (!source || !target) return "";
 
-        // Get the specific Y positions for this link
         const sourceY = d.sourceY || source.y;
         const targetY = d.targetY || target.y;
+        const sourceX = source.x + nodeWidth;
+        const targetX = target.x;
 
-        // Make links connect exactly to the bars (no gap)
-        const sourceX = source.x + 10; // End of source bar (x + width)
-        const targetX = target.x; // Start of target bar
+        const controlPoint1X = sourceX + stepSpacing / 3;
+        const controlPoint2X = targetX - stepSpacing / 3;
 
-        // Control points at 1/3 and 2/3 of the distance between nodes
-        const controlPoint1X = sourceX + stepWidth / 3;
-        const controlPoint2X = targetX - stepWidth / 3;
-
-        return `M ${sourceX},${sourceY} 
-                C ${controlPoint1X},${sourceY} 
-                  ${controlPoint2X},${targetY} 
+        return `M ${sourceX},${sourceY}
+                C ${controlPoint1X},${sourceY}
+                  ${controlPoint2X},${targetY}
                   ${targetX},${targetY}`;
       })
       .attr("fill", "none")
-      .attr("stroke", "hsl(var(--accent-500))")
+      .attr("stroke", "hsl(var(--neutral-500))")
       .attr("stroke-width", d => linkWidthScale(d.value))
-      .attr("opacity", 0.6)
-      .attr("data-id", (d, i) => `link-${i}`) // Add unique identifier for each link
-      // Add hover effects
+      .attr("opacity", 0.2)
+      .attr("data-source", d => d.source)
+      .attr("data-target", d => d.target)
+      .style("cursor", "pointer")
       .on("mouseover", function (event, d) {
-        const hoveredLink = d3.select(this);
-        const hoveredLinkId = hoveredLink.attr("data-id");
+        const forwardPaths = findContinuousPaths(d, "forward");
+        const backwardPaths = findContinuousPaths(d, "backward");
+        const allConnectedLinks = [d, ...forwardPaths, ...backwardPaths];
 
-        // Find source and target nodes for this link
-        const source = nodes.find(n => n.id === d.source);
-        const target = nodes.find(n => n.id === d.target);
+        const connectedLinkIds = new Set<string>();
+        const connectedNodeIds = new Set<string>();
 
-        // Make all other links more transparent
+        allConnectedLinks.forEach(link => {
+          const linkId = `${link.source}|||${link.target}`;
+          connectedLinkIds.add(linkId);
+          connectedNodeIds.add(link.source);
+          connectedNodeIds.add(link.target);
+        });
+
         d3.selectAll(".link")
           .transition()
           .duration(200)
           .attr("opacity", function () {
-            return d3.select(this).attr("data-id") === hoveredLinkId ? 0.9 : 0.1;
+            const linkSource = d3.select(this).attr("data-source");
+            const linkTarget = d3.select(this).attr("data-target");
+            const thisLinkId = `${linkSource}|||${linkTarget}`;
+            return connectedLinkIds.has(thisLinkId) ? 0.9 : 0.1;
           });
 
-        // Make all node bars more transparent except the connected ones
-        d3.selectAll(".node-bar")
+        d3.selectAll(".node-rect")
           .transition()
           .duration(200)
           .attr("opacity", function (nodeData: any) {
-            return nodeData.id === source?.id || nodeData.id === target?.id ? 1 : 0.2;
+            return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
           });
 
-        // Make all node cards more transparent except the connected ones
-        d3.selectAll(".node-card")
+        d3.selectAll(".node-bubble")
           .transition()
           .duration(200)
           .attr("opacity", function (nodeData: any) {
-            return nodeData.id === source?.id || nodeData.id === target?.id ? 0.9 : 0.2;
+            return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
           });
 
-        // Highlight connected node text
         d3.selectAll(".node-text")
           .transition()
           .duration(200)
           .attr("opacity", function (nodeData: any) {
-            return nodeData.id === source?.id || nodeData.id === target?.id ? 1 : 0.3;
+            return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
           });
       })
       .on("mouseout", function () {
-        // Reset all opacities
-        d3.selectAll(".link").transition().duration(200).attr("opacity", 0.6);
-
-        d3.selectAll(".node-bar").transition().duration(200).attr("opacity", 1);
-
-        d3.selectAll(".node-card").transition().duration(200).attr("opacity", 0.8);
-
+        d3.selectAll(".link").transition().duration(200).attr("opacity", 0.2);
+        d3.selectAll(".node-rect").transition().duration(200).attr("opacity", 1);
+        d3.selectAll(".node-bubble").transition().duration(200).attr("opacity", 0.8);
         d3.selectAll(".node-text").transition().duration(200).attr("opacity", 1);
       })
-      // Add tooltips showing the exact count
       .append("title")
       .text(d => `Count: ${d.value}`);
 
+    // Draw nodes
     const nodeGroups = g
       .selectAll(".node")
       .data(nodes)
       .join("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${d.y - d.height / 2})`);
+      .attr("transform", d => `translate(${d.x},${d.y - d.height / 2})`)
+      .style("cursor", "pointer");
 
+    // Thin bar
     nodeGroups
       .append("rect")
-      .attr("class", "node-bar")
-      .attr("width", 10)
+      .attr("class", "node-rect")
+      .attr("width", nodeWidth)
       .attr("height", d => d.height)
-      .attr("fill", "hsl(var(--neutral-500))")
-      .attr("rx", 2) // Rounded corners
+      .attr("fill", "hsl(var(--emerald-600))")
+      .attr("rx", 2)
       .attr("ry", 2);
 
-    // Add a card background for text
-    const textBackgrounds = nodeGroups
+    // Bubble background
+    nodeGroups
       .append("rect")
-      .attr("class", "node-card")
+      .attr("class", "node-bubble")
       .attr("x", 18)
-      .attr("y", d => d.height / 2 - 17) // Position above the vertical center, taller card
+      .attr("y", d => d.height / 2 - 17)
       .attr("width", d => {
-        // Find the width needed for both lines
         const pathText = d.name;
-        const statsText = `${d.count} (${d.percentage.toFixed(1)}%)`;
-        // Use whichever is longer
+        const statsText = `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`;
         const maxLength = Math.max(pathText.length, statsText.length);
         const textWidth = maxLength * 6.5;
-        return textWidth + 10; // Add padding
+        return textWidth + 10;
       })
-      .attr("height", 35) // Taller for two lines of text
+      .attr("height", 35)
       .attr("fill", "hsl(var(--neutral-800))")
       .attr("stroke", "hsl(var(--neutral-700))")
       .attr("stroke-width", 1)
-      .attr("rx", 2) // Rounded corners
+      .attr("rx", 2)
       .attr("ry", 2)
       .attr("opacity", 0.8);
 
-    // Path text (first line) - Now wrapped in a link
+    // Path text (clickable)
     const pathLinks = nodeGroups
-      .append("a") // Append 'a' element for the link
-      // Construct the URL using the domain from siteMetadata and the path from the node name
+      .append("a")
       .attr("xlink:href", d => `https://${siteMetadata.domain}${d.name}`)
-      .attr("target", "_blank") // Open link in a new tab
-      .attr("rel", "noopener noreferrer"); // Security best practice for target="_blank"
+      .attr("target", "_blank")
+      .attr("rel", "noopener noreferrer");
 
-    pathLinks // Append text inside the link element
+    pathLinks
       .append("text")
-      .attr("class", "node-text node-link-text")
+      .attr("class", "node-text")
       .attr("x", 23)
       .attr("y", d => d.height / 2 - 2)
       .text(d => d.name)
@@ -375,19 +362,86 @@ export default function JourneysPage() {
       .attr("text-anchor", "start")
       .style("text-decoration", "none");
 
-    // Count text (second line) - Remains unchanged
+    // Count text
     nodeGroups
       .append("text")
-      .attr("class", "node-text node-count-text")
-      .attr("x", 23) // Same left padding
-      .attr("y", d => d.height / 2 + 12) // Position for second line
-      .text(d => `${d.count.toLocaleString()}`)
-      .attr("font-size", "11px") // Slightly smaller font
+      .attr("class", "node-text")
+      .attr("x", 23)
+      .attr("y", d => d.height / 2 + 12)
+      .text(d => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
+      .attr("font-size", "11px")
       .attr("fill", "hsl(var(--neutral-300))")
       .attr("text-anchor", "start");
 
-    // Note: The percentage text is commented out in the original code, kept it that way.
-    //   .text((d) => `${d.count.toLocaleString()} (${d.percentage.toFixed(1)}%)`)
+    // Node hover effects
+    nodeGroups
+      .on("mouseover", function (event, d) {
+        const nodeId = d.id;
+        const connectedNodeIds = new Set<string>([nodeId]);
+
+        // Find all directly connected links
+        const directLinks = links.filter(link => link.source === nodeId || link.target === nodeId);
+
+        const allConnectedLinks: any[] = [];
+
+        // For each direct link, find continuous paths
+        directLinks.forEach(link => {
+          allConnectedLinks.push(link);
+
+          const forwardPaths = findContinuousPaths(link, "forward");
+          const backwardPaths = findContinuousPaths(link, "backward");
+
+          allConnectedLinks.push(...forwardPaths);
+          allConnectedLinks.push(...backwardPaths);
+        });
+
+        const connectedLinkIds = new Set<string>();
+
+        // Collect all connected link and node IDs
+        allConnectedLinks.forEach(link => {
+          const linkId = `${link.source}|||${link.target}`;
+          connectedLinkIds.add(linkId);
+          connectedNodeIds.add(link.source);
+          connectedNodeIds.add(link.target);
+        });
+
+        d3.selectAll(".link")
+          .transition()
+          .duration(200)
+          .attr("opacity", function () {
+            const linkSource = d3.select(this).attr("data-source");
+            const linkTarget = d3.select(this).attr("data-target");
+            const thisLinkId = `${linkSource}|||${linkTarget}`;
+            return connectedLinkIds.has(thisLinkId) ? 0.9 : 0.1;
+          });
+
+        d3.selectAll(".node-rect")
+          .transition()
+          .duration(200)
+          .attr("opacity", function (nodeData: any) {
+            return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
+          });
+
+        d3.selectAll(".node-bubble")
+          .transition()
+          .duration(200)
+          .attr("opacity", function (nodeData: any) {
+            return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
+          });
+
+        d3.selectAll(".node-text")
+          .transition()
+          .duration(200)
+          .attr("opacity", function (nodeData: any) {
+            return connectedNodeIds.has(nodeData.id) ? 1 : 0.3;
+          });
+      })
+      .on("mouseout", function () {
+        d3.selectAll(".link").transition().duration(200).attr("opacity", 0.2);
+        d3.selectAll(".node-rect").transition().duration(200).attr("opacity", 1);
+        d3.selectAll(".node-bubble").transition().duration(200).attr("opacity", 0.8);
+        d3.selectAll(".node-text").transition().duration(200).attr("opacity", 1);
+      });
   }, [data, steps, maxJourneys, siteMetadata]);
 
   return (
