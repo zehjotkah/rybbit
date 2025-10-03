@@ -183,8 +183,8 @@ export default function JourneysPage() {
       }
     });
 
-    // Helper function to find all connected paths (continuous non-forking paths)
-    const findContinuousPaths = (startLink: any, direction: "forward" | "backward"): any[] => {
+    // Helper function to find all connected paths (all reachable nodes/edges)
+    const findAllConnectedPaths = (startLink: any, direction: "forward" | "backward"): any[] => {
       const connectedLinks: any[] = [];
       const queue: any[] = [startLink];
       const visited = new Set<string>();
@@ -199,17 +199,15 @@ export default function JourneysPage() {
 
         if (direction === "forward") {
           const targetNode = nodes.find(n => n.id === currentLink.target);
-          // Continue if there's exactly one outgoing link (non-forking)
-          // Terminal nodes (with 0 outgoing links) are already included via the current link
-          if (targetNode && targetNode.outgoingLinks.length === 1) {
-            queue.push(targetNode.outgoingLinks[0]);
+          // Follow all outgoing links
+          if (targetNode && targetNode.outgoingLinks.length > 0) {
+            targetNode.outgoingLinks.forEach((link: any) => queue.push(link));
           }
         } else {
           const sourceNode = nodes.find(n => n.id === currentLink.source);
-          // Continue if there's exactly one incoming link (non-forking)
-          // Starting nodes (with 0 incoming links) are already included via the current link
-          if (sourceNode && sourceNode.incomingLinks.length === 1) {
-            queue.push(sourceNode.incomingLinks[0]);
+          // Follow all incoming links
+          if (sourceNode && sourceNode.incomingLinks.length > 0) {
+            sourceNode.incomingLinks.forEach((link: any) => queue.push(link));
           }
         }
       }
@@ -251,8 +249,8 @@ export default function JourneysPage() {
       .style("cursor", "pointer")
       .style("pointer-events", "visibleStroke")
       .on("mouseenter", function (event, d) {
-        const forwardPaths = findContinuousPaths(d, "forward");
-        const backwardPaths = findContinuousPaths(d, "backward");
+        const forwardPaths = findAllConnectedPaths(d, "forward");
+        const backwardPaths = findAllConnectedPaths(d, "backward");
         const allConnectedLinks = [d, ...forwardPaths, ...backwardPaths];
 
         const connectedLinkIds = new Set<string>();
@@ -388,12 +386,12 @@ export default function JourneysPage() {
 
         const allConnectedLinks: any[] = [];
 
-        // For each direct link, find continuous paths
+        // For each direct link, find all connected paths
         directLinks.forEach(link => {
           allConnectedLinks.push(link);
 
-          const forwardPaths = findContinuousPaths(link, "forward");
-          const backwardPaths = findContinuousPaths(link, "backward");
+          const forwardPaths = findAllConnectedPaths(link, "forward");
+          const backwardPaths = findAllConnectedPaths(link, "backward");
 
           allConnectedLinks.push(...forwardPaths);
           allConnectedLinks.push(...backwardPaths);
