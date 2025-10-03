@@ -72,9 +72,9 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
     const maxNodesInAnyStep = Math.max(...Array.from(nodesByStep.values()).map(stepNodes => stepNodes.length));
 
     const nodeWidth = 30;
-    const stepSpacing = 300;
+    const width = containerWidth;
+    const stepSpacing = (width - nodeWidth * (steps + 1)) / steps;
     const stepWidth = nodeWidth + stepSpacing;
-    const width = stepWidth * steps + nodeWidth;
     const minHeight = 500;
     const baseNodeHeight = 60;
     const nodeSpacing = 20;
@@ -258,7 +258,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
         });
 
         d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
         });
 
         d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
@@ -268,7 +268,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       .on("mouseleave", function () {
         d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
         d3.selectAll(".node-rect").attr("opacity", 1);
-        d3.selectAll(".node-bubble").attr("opacity", 0.8);
+        d3.selectAll(".node-bubble").attr("opacity", 1);
         d3.selectAll(".node-text").attr("opacity", 1);
       })
       .append("title")
@@ -280,8 +280,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       .data(nodes)
       .join("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${d.y - d.height / 2})`)
-      .style("cursor", "pointer");
+      .attr("transform", d => `translate(${d.x},${d.y - d.height / 2})`);
 
     // Thin bar
     nodeGroups
@@ -307,11 +306,12 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
         return textWidth + 10;
       })
       .attr("height", 41)
-      .attr("fill", "hsl(var(--neutral-800))")
+      .attr("fill", "hsl(var(--neutral-850))")
       .attr("stroke", "hsl(var(--neutral-700))")
       .attr("stroke-width", 1)
-      .attr("rx", 2)
-      .attr("ry", 2);
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .attr("opacity", 1);
 
     // Path text (clickable)
     const pathLinks = nodeGroups
@@ -402,7 +402,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
         });
 
         d3.selectAll(".node-bubble").attr("opacity", function (nodeData: any) {
-          return connectedNodeIds.has(nodeData.id) ? 0.9 : 0.2;
+          return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
         });
 
         d3.selectAll(".node-text").attr("opacity", function (nodeData: any) {
@@ -412,7 +412,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       .on("mouseleave", function () {
         d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", "hsl(var(--neutral-500))");
         d3.selectAll(".node-rect").attr("opacity", 1);
-        d3.selectAll(".node-bubble").attr("opacity", 0.8);
+        d3.selectAll(".node-bubble").attr("opacity", 1);
         d3.selectAll(".node-text").attr("opacity", 1);
       });
   }, [journeys, steps, maxJourneys, domain]);
