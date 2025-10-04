@@ -135,6 +135,12 @@ fbq('track', 'PageView');`,
           "data-api-key": process.env.NEXT_PUBLIC_RYBBIT_API_KEY,
         })}
       />
+      <script
+        defer
+        data-website-id="68e0a805cbd31e9b4a24cca1"
+        data-domain="rybbit.io"
+        src="https://datafa.st/js/script.js"
+      ></script>
       <body className={`flex flex-col min-h-screen ${inter.variable} font-sans`}>
         <noscript>
           <iframe
