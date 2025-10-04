@@ -3,7 +3,7 @@
 import { useJourneys } from "@/api/analytics/useJourneys";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useGetSite } from "../../../api/admin/sites";
@@ -37,31 +37,29 @@ export default function JourneysPage() {
     <DisabledOverlay message="User Journeys" featurePath="journeys">
       <div className="container mx-auto p-2 md:p-4">
         <SubHeader availableFilters={JOURNEY_PAGE_FILTERS} />
-        <div className="flex justify-end items-center gap-2 mb-2">
-          <Select value={steps.toString()} onValueChange={value => setSteps(Number(value))}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Number of steps" />
-            </SelectTrigger>
-            <SelectContent>
-              {[2, 3, 4, 5, 6].map(step => (
-                <SelectItem key={step} value={step.toString()}>
-                  {step} steps
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={maxJourneys.toString()} onValueChange={value => setMaxJourneys(Number(value))}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Max journeys" />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 25, 50, 100, 150, 200].map(count => (
-                <SelectItem key={count} value={count.toString()}>
-                  {count} journeys
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-6 mb-2">
+          <div className="flex items-center gap-3 w-[180px]">
+            <span className="text-sm text-neutral-300 whitespace-nowrap">{steps} steps</span>
+            <Slider
+              value={[steps]}
+              onValueChange={([value]) => setSteps(value)}
+              min={2}
+              max={6}
+              step={1}
+              className="flex-1"
+            />
+          </div>
+          <div className="flex items-center gap-3 w-[200px]">
+            <span className="text-sm text-neutral-300 whitespace-nowrap">{maxJourneys} journeys</span>
+            <Slider
+              value={[maxJourneys]}
+              onValueChange={([value]) => setMaxJourneys(value)}
+              min={10}
+              max={200}
+              step={10}
+              className="flex-1"
+            />
+          </div>
         </div>
 
         {siteMetadata?.domain ? (
