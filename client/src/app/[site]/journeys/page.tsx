@@ -2,6 +2,7 @@
 
 import { useJourneys } from "@/api/analytics/useJourneys";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
 import { useState } from "react";
@@ -18,6 +19,7 @@ export default function JourneysPage() {
 
   const [steps, setSteps] = useState<number>(3);
   const [maxJourneys, setMaxJourneys] = useState<number>(25);
+  const [stepFilters, setStepFilters] = useState<Record<number, string>>({});
 
   const { data: siteMetadata } = useGetSite();
   const { time } = useStore();
@@ -28,6 +30,7 @@ export default function JourneysPage() {
     timeZone: timeZone,
     time,
     limit: maxJourneys,
+    stepFilters,
   });
 
   return (
@@ -40,7 +43,7 @@ export default function JourneysPage() {
               <SelectValue placeholder="Number of steps" />
             </SelectTrigger>
             <SelectContent>
-              {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(step => (
+              {[2, 3, 4, 5, 6].map(step => (
                 <SelectItem key={step} value={step.toString()}>
                   {step} steps
                 </SelectItem>
@@ -61,23 +64,7 @@ export default function JourneysPage() {
           </Select>
         </div>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>Failed to load journey data. Please try again.</AlertDescription>
-          </Alert>
-        )}
-
-        {data?.journeys?.length === 0 && !isLoading && !error && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>No Data</AlertTitle>
-            <AlertDescription>No journey data found for the selected criteria.</AlertDescription>
-          </Alert>
-        )}
-
-        {data?.journeys?.length && data?.journeys?.length > 0 && siteMetadata?.domain ? (
+        {siteMetadata?.domain ? (
           <div className="relative">
             {isLoading && (
               <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm z-10 flex items-center justify-center">
@@ -91,21 +78,53 @@ export default function JourneysPage() {
               {Array.from({ length: steps }, (_, i) => (
                 <div
                   key={i}
-                  className="flex-1 h-10 bg-neutral-800 flex items-center text-white text-sm relative"
+                  className="flex-1 h-10 bg-neutral-800 flex items-center text-white text-sm relative px-3"
                   style={{
                     clipPath: "polygon(0 0, 10px 50%, 0 100%, calc(100% - 10px) 100%, 100% 50%, calc(100% - 10px) 0)",
                   }}
                 >
-                  <span className="pl-6">Step {i + 1}</span>
+                  <span className="ml-2 whitespace-nowrap text-neutral-200">Step {i + 1}</span>
+                  <Input
+                    inputSize="sm"
+                    placeholder="path filter"
+                    value={stepFilters[i] || ""}
+                    onChange={e => {
+                      const newFilters = { ...stepFilters };
+                      if (e.target.value) {
+                        newFilters[i] = e.target.value;
+                      } else {
+                        delete newFilters[i];
+                      }
+                      setStepFilters(newFilters);
+                    }}
+                    className="h-7 bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 ml-3 mr-3"
+                  />
                 </div>
               ))}
             </div>
-            <SankeyDiagram
-              journeys={data.journeys}
-              steps={steps}
-              maxJourneys={maxJourneys}
-              domain={siteMetadata.domain}
-            />
+            {data?.journeys?.length && data?.journeys?.length > 0 ? (
+              <SankeyDiagram
+                journeys={data.journeys}
+                steps={steps}
+                maxJourneys={maxJourneys}
+                domain={siteMetadata.domain}
+              />
+            ) : null}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>Failed to load journey data. Please try again.</AlertDescription>
+              </Alert>
+            )}
+
+            {data?.journeys?.length === 0 && !isLoading && !error && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>No Data</AlertTitle>
+                <AlertDescription>No journey data found for the selected criteria.</AlertDescription>
+              </Alert>
+            )}
           </div>
         ) : null}
       </div>

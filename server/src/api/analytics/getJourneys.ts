@@ -10,13 +10,14 @@ export const getJourneys = async (
     Querystring: FilterParams<{
       steps?: string;
       limit?: string;
+      stepFilters?: string;
     }>;
   }>,
   reply: FastifyReply
 ) => {
   try {
     const { site } = request.params;
-    const { steps = "3", startDate, endDate, timeZone = "UTC", limit = "100", filters } = request.query;
+    const { steps = "3", startDate, endDate, timeZone = "UTC", limit = "100", filters, stepFilters } = request.query;
 
     const maxSteps = parseInt(steps, 10);
     const journeyLimit = parseInt(limit, 10);
@@ -36,6 +37,26 @@ export const getJourneys = async (
     // Time conditions using getTimeStatement
     const timeStatement = getTimeStatement(request.query);
     const filterStatement = getFilterStatement(filters);
+
+    // Parse step filters
+    let parsedStepFilters: Record<number, string> = {};
+    if (stepFilters) {
+      try {
+        parsedStepFilters = JSON.parse(stepFilters);
+      } catch (error) {
+        return reply.status(400).send({
+          error: "Invalid stepFilters format",
+        });
+      }
+    }
+
+    // Build step filter conditions for the HAVING clause
+    const stepFilterConditions = Object.entries(parsedStepFilters)
+      .map(([step, path]) => {
+        const stepIndex = parseInt(step, 10) + 1; // ClickHouse arrays are 1-indexed
+        return `journey[${stepIndex}] = '${path.replace(/'/g, "''")}'`;
+      })
+      .join(" AND ");
 
     // Query to find sequences of events (journeys) for each user
     const result = await clickhouse.query({
@@ -67,6 +88,7 @@ export const getJourneys = async (
             count() AS sessions_count
           FROM user_paths
           GROUP BY journey
+          ${stepFilterConditions ? `HAVING ${stepFilterConditions}` : ""}
           ORDER BY sessions_count DESC
           LIMIT {journeyLimit:Int32}
         )

@@ -10,6 +10,7 @@ export interface JourneyParams {
   timeZone?: string;
   time: Time;
   limit?: number;
+  stepFilters?: Record<number, string>;
 }
 
 export interface Journey {
@@ -22,13 +23,13 @@ export interface JourneysResponse {
   journeys: Journey[];
 }
 
-export const useJourneys = ({ siteId, steps = 3, time, limit = 100 }: JourneyParams) => {
+export const useJourneys = ({ siteId, steps = 3, time, limit = 100, stepFilters }: JourneyParams) => {
   const { startDate, endDate } = getStartAndEndDate(time);
 
   const filteredFilters = getFilteredFilters(JOURNEY_PAGE_FILTERS);
 
   return useQuery<JourneysResponse>({
-    queryKey: ["journeys", siteId, steps, startDate, endDate, timeZone, limit, filteredFilters],
+    queryKey: ["journeys", siteId, steps, startDate, endDate, timeZone, limit, filteredFilters, stepFilters],
     queryFn: async () => {
       const params: Record<string, any> = {};
 
@@ -38,6 +39,9 @@ export const useJourneys = ({ siteId, steps = 3, time, limit = 100 }: JourneyPar
       if (timeZone) params.timeZone = timeZone;
       if (limit) params.limit = limit;
       if (filteredFilters) params.filters = filteredFilters;
+      if (stepFilters && Object.keys(stepFilters).length > 0) {
+        params.stepFilters = JSON.stringify(stepFilters);
+      }
 
       return authedFetch<JourneysResponse>(`/journeys/${siteId}`, params);
     },
