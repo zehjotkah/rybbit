@@ -3,7 +3,6 @@
 import { useJourneys } from "@/api/analytics/useJourneys";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useGetSite } from "../../../api/admin/sites";
@@ -23,7 +22,7 @@ export default function JourneysPage() {
   const { data: siteMetadata } = useGetSite();
   const { time } = useStore();
 
-  const { data, isLoading, isFetching, error } = useJourneys({
+  const { data, isLoading, error } = useJourneys({
     siteId: siteMetadata?.siteId,
     steps,
     timeZone: timeZone,
@@ -80,7 +79,7 @@ export default function JourneysPage() {
 
         {data?.journeys?.length && data?.journeys?.length > 0 && siteMetadata?.domain ? (
           <div className="relative">
-            {(isLoading || isFetching) && (
+            {isLoading && (
               <div className="absolute inset-0 bg-neutral-900/30 backdrop-blur-sm z-10 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <div className="h-8 w-8 rounded-full border-2 border-accent-400 border-t-transparent animate-spin"></div>
@@ -88,6 +87,19 @@ export default function JourneysPage() {
                 </div>
               </div>
             )}
+            <div className="flex gap-1 mb-4 mt-4">
+              {Array.from({ length: steps }, (_, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-10 bg-neutral-800 flex items-center text-white text-sm relative"
+                  style={{
+                    clipPath: "polygon(0 0, 10px 50%, 0 100%, calc(100% - 10px) 100%, 100% 50%, calc(100% - 10px) 0)",
+                  }}
+                >
+                  <span className="pl-6">Step {i + 1}</span>
+                </div>
+              ))}
+            </div>
             <SankeyDiagram
               journeys={data.journeys}
               steps={steps}

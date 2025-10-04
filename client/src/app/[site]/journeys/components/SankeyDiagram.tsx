@@ -73,8 +73,8 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
 
     const nodeWidth = 30;
     const width = containerWidth;
-    const stepSpacing = (width - nodeWidth * (steps + 1)) / steps;
-    const stepWidth = nodeWidth + stepSpacing;
+    const stepWidth = width / steps;
+    const stepSpacing = stepWidth - nodeWidth;
     const minHeight = 500;
     const baseNodeHeight = 60;
     const nodeSpacing = 20;
