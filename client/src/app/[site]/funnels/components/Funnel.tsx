@@ -37,31 +37,7 @@ export function Funnel({ data, isError, error, isPending }: FunnelProps) {
   const maxBarWidth = 100; // as percentage
 
   return (
-    <div>
-      <div className="flex justify-between items-center gap-2 mb-6 ml-8">
-        <div className="flex items-center gap-4 mt-3 text-xs text-neutral-400">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-emerald-500/70 rounded-sm mr-1"></div>
-            <span>Overall conversion</span>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-3 h-3 rounded-sm mr-1"
-              style={{
-                background: `repeating-linear-gradient(
-                      45deg,
-                      rgba(16, 185, 129, 0.25),
-                      rgba(16, 185, 129, 0.25) 3px,
-                      rgba(16, 185, 129, 0.15) 3px,
-                      rgba(16, 185, 129, 0.15) 6px
-                    )`,
-              }}
-            ></div>
-            <span>Conversion from previous step</span>
-          </div>
-        </div>
-      </div>
-
+    <div className="mt-2">
       {isError ? (
         <div className="h-[400px] flex items-center justify-center">
           <div className="text-red-500">
@@ -160,6 +136,29 @@ export function Funnel({ data, isError, error, isPending }: FunnelProps) {
           </div>
         </div>
       )}
+      <div className="flex justify-between items-center gap-2 ml-4">
+        <div className="flex items-center gap-4 mt-3 text-xs text-neutral-400">
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-emerald-500/70 rounded-sm mr-1"></div>
+            <span>Overall conversion</span>
+          </div>
+          <div className="flex items-center">
+            <div
+              className="w-3 h-3 rounded-sm mr-1"
+              style={{
+                background: `repeating-linear-gradient(
+                      45deg,
+                      rgba(16, 185, 129, 0.25),
+                      rgba(16, 185, 129, 0.25) 3px,
+                      rgba(16, 185, 129, 0.15) 3px,
+                      rgba(16, 185, 129, 0.15) 6px
+                    )`,
+              }}
+            ></div>
+            <span>Conversion from previous step</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
