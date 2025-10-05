@@ -4,7 +4,7 @@ import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowRight, ChevronDown, ChevronUp, Edit, FileText, MousePointerClick, Trash2 } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Edit, Eye, MousePointerClick, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteFunnel } from "../../../../api/analytics/funnels/useDeleteFunnel";
@@ -77,7 +77,7 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
                     <TooltipTrigger asChild>
                       <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
                         {step.type === "page" ? (
-                          <FileText className="h-3 w-3 mr-1 text-blue-400" />
+                          <Eye className="h-3 w-3 mr-1 text-blue-400" />
                         ) : (
                           <MousePointerClick className="h-3 w-3 mr-1 text-amber-400" />
                         )}

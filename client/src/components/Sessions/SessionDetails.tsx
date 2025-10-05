@@ -3,11 +3,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   ArrowRight,
   Clock,
   ExternalLink,
-  FileText,
+  Eye,
   Loader2,
   Monitor,
   MousePointerClick,
@@ -23,13 +24,11 @@ import { GetSessionsResponse, SessionEvent, useGetSessionDetailsInfinite } from 
 import { Browser } from "../../app/[site]/components/shared/icons/Browser";
 import { CountryFlag } from "../../app/[site]/components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../app/[site]/components/shared/icons/OperatingSystem";
-import { cn, getCountryName, getLanguageName } from "../../lib/utils";
-import { formatDuration } from "../../lib/dateTimeUtils";
-import { Button } from "../ui/button";
-import { hour12 } from "../../lib/dateTimeUtils";
+import { formatDuration, hour12 } from "../../lib/dateTimeUtils";
 import { useGetRegionName } from "../../lib/geo";
+import { cn, getCountryName, getLanguageName } from "../../lib/utils";
 import { Avatar } from "../Avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "../ui/button";
 
 // Component to display a single pageview or event
 function PageviewItem({
@@ -97,7 +96,7 @@ function PageviewItem({
             ) : isOutbound ? (
               <ExternalLink className="w-4 h-4 text-purple-500" />
             ) : (
-              <FileText className="w-4 h-4 text-blue-500" />
+              <Eye className="w-4 h-4 text-blue-500" />
             )}
           </div>
 

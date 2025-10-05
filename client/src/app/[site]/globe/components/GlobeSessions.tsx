@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, ChevronUp, ExternalLink, FileText, MousePointerClick } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, ExternalLink, Eye, MousePointerClick } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -13,10 +13,10 @@ import {
   OperatingSystemTooltipIcon,
 } from "../../../../components/TooltipIcons/TooltipIcons";
 import { Badge } from "../../../../components/ui/badge";
+import { Button } from "../../../../components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { formatShortDuration, hour12, userLocale } from "../../../../lib/dateTimeUtils";
 import { cn, formatter } from "../../../../lib/utils";
-import { Button } from "../../../../components/ui/button";
 
 // Function to truncate path for display
 function truncatePath(path: string, maxLength: number = 32) {
@@ -115,7 +115,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
-              <FileText className="w-4 h-4 text-blue-500" />
+              <Eye className="w-4 h-4 text-blue-500" />
               <span>{formatter(session.pageviews)}</span>
             </Badge>
           </TooltipTrigger>

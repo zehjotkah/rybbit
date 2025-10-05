@@ -1,12 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, MousePointerClick } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Eye, MousePointerClick } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useCreateGoal } from "../../../../api/analytics/goals/useCreateGoal";
 import { Goal } from "../../../../api/analytics/goals/useGetGoals";
+import { useUpdateGoal } from "../../../../api/analytics/goals/useUpdateGoal";
+import { useSingleCol } from "../../../../api/analytics/useSingleCol";
 import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
@@ -18,12 +20,10 @@ import {
 } from "../../../../components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../../components/ui/form";
 import { Input } from "../../../../components/ui/input";
+import { InputWithSuggestions, SuggestionOption } from "../../../../components/ui/input-with-suggestions";
 import { Label } from "../../../../components/ui/label";
 import { Switch } from "../../../../components/ui/switch";
 import { cn } from "../../../../lib/utils";
-import { useUpdateGoal } from "../../../../api/analytics/goals/useUpdateGoal";
-import { InputWithSuggestions, SuggestionOption } from "../../../../components/ui/input-with-suggestions";
-import { useSingleCol } from "../../../../api/analytics/useSingleCol";
 
 // Define form schema
 const formSchema = z
@@ -229,7 +229,7 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
                     <div className="flex items-center gap-2 mt-1">
                       {field.value === "path" ? (
                         <div className="flex items-center gap-1 bg-neutral-800/50 py-2 px-3 rounded">
-                          <FileText className="w-4 h-4 text-blue-500" />
+                          <Eye className="w-4 h-4 text-blue-500" />
                           <span>Page Goal</span>
                         </div>
                       ) : (
@@ -251,7 +251,7 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
                           )}
                           onClick={() => field.onChange("path")}
                         >
-                          <FileText className="w-4 h-4 text-blue-500" />
+                          <Eye className="w-4 h-4 text-blue-500" />
                           <span>Page Goal</span>
                         </Button>
                         <Button

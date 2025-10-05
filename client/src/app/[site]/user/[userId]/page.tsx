@@ -6,8 +6,8 @@ import {
   Calendar,
   CalendarCheck,
   Clock,
+  Eye,
   Files,
-  FileText,
   Monitor,
   MousePointerClick,
   Smartphone,
@@ -17,19 +17,19 @@ import { DateTime } from "luxon";
 import { useParams, useRouter } from "next/navigation";
 import { useUserInfo } from "../../../../api/analytics/userInfo";
 import { useGetUserSessionCount } from "../../../../api/analytics/userSessions";
+import { Avatar } from "../../../../components/Avatar";
+import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { useSetPageTitle } from "../../../../hooks/useSetPageTitle";
+import { formatDuration } from "../../../../lib/dateTimeUtils";
 import { useGetRegionName } from "../../../../lib/geo";
 import { getCountryName, getLanguageName } from "../../../../lib/utils";
-import { formatDuration } from "../../../../lib/dateTimeUtils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
-import { VisitCalendar } from "./components/Calendar";
-import { Avatar } from "../../../../components/Avatar";
 import { MobileSidebar } from "../../components/Sidebar/MobileSidebar";
-import { Badge } from "../../../../components/ui/badge";
+import { VisitCalendar } from "./components/Calendar";
 
 export default function UserPage() {
   useSetPageTitle("Rybbit · User");
@@ -177,7 +177,7 @@ export default function UserPage() {
               </div>
               <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
                 <div className="text-xs text-neutral-400 flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
+                  <Eye className="w-4 h-4" />
                   Pageviews
                 </div>
                 <div className="font-semibold">{data?.pageviews}</div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { FileText, MousePointerClick, Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, MousePointerClick, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDeleteGoal } from "../../../../api/analytics/goals/useDeleteGoal";
+import { Goal } from "../../../../api/analytics/goals/useGetGoals";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +15,8 @@ import {
   AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
 import { Button } from "../../../../components/ui/button";
-import GoalFormModal from "./GoalFormModal";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
-import { Goal } from "../../../../api/analytics/goals/useGetGoals";
+import GoalFormModal from "./GoalFormModal";
 
 interface GoalCardProps {
   goal: Goal;
@@ -46,7 +46,7 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
               {goal.goalType === "path" ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <FileText className="w-4 h-4 text-blue-400" />
+                    <Eye className="w-4 h-4 text-blue-400" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Page Goal</p>

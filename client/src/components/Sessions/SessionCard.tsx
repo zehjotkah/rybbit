@@ -1,19 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  ArrowRight,
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
-  FileText,
-  MousePointerClick,
-  TriangleAlert,
-} from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronRight, Eye, MousePointerClick } from "lucide-react";
 import { DateTime } from "luxon";
 import { memo, useState } from "react";
 import { GetSessionsResponse } from "../../api/analytics/userSessions";
 import { formatDuration, hour12, userLocale } from "../../lib/dateTimeUtils";
 import { cn, formatter } from "../../lib/utils";
+import { Avatar } from "../Avatar";
+import { Channel } from "../Channel";
 import {
   BrowserTooltipIcon,
   CountryFlagTooltipIcon,
@@ -22,8 +16,6 @@ import {
 } from "../TooltipIcons/TooltipIcons";
 import { Badge } from "../ui/badge";
 import { SessionDetails } from "./SessionDetails";
-import { Avatar } from "../Avatar";
-import { Channel } from "../Channel";
 
 interface SessionCardProps {
   session: GetSessionsResponse[number];
@@ -84,7 +76,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
-                  <FileText className="w-4 h-4 text-blue-500" />
+                  <Eye className="w-4 h-4 text-blue-500" />
                   <span>{formatter(session.pageviews)}</span>
                 </Badge>
               </TooltipTrigger>

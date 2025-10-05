@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileText, Laptop, MousePointerClick, Smartphone } from "lucide-react";
+import { Eye, Laptop, MousePointerClick, Smartphone } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { Event, useGetEvents } from "../../../../api/analytics/events/useGetEvents";
@@ -46,7 +46,7 @@ function EventCard({ event }: { event: Event }) {
         <div className="flex items-center gap-2 text-sm text-neutral-100 mb-2">
           <div className="flex items-center gap-2">
             {isPageview ? (
-              <FileText className="w-4 h-4 text-blue-500" />
+              <Eye className="w-4 h-4 text-blue-500" />
             ) : (
               <MousePointerClick className="w-4 h-4 text-amber-500" />
             )}

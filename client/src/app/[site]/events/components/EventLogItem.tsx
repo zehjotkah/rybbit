@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ExternalLink, FileText, Laptop, MousePointerClick, Smartphone } from "lucide-react";
+import { ExternalLink, Eye, Laptop, MousePointerClick, Smartphone } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -71,7 +71,7 @@ export function EventLogItem({ event }: EventLogItemProps) {
             {/* Event type icon */}
             <div className="flex-shrink-0">
               {isPageview ? (
-                <FileText className="w-4 h-4 text-blue-500" />
+                <Eye className="w-4 h-4 text-blue-500" />
               ) : isOutbound ? (
                 <ExternalLink className="w-4 h-4 text-purple-500" />
               ) : (
