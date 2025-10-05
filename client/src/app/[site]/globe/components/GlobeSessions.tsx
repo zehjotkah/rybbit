@@ -32,9 +32,9 @@ function SessionCardSkeleton() {
   return (
     <div className="rounded-lg bg-neutral-850 border border-neutral-800 overflow-hidden p-2 space-y-2 animate-pulse">
       <div className="flex justify-between border-b border-neutral-700 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-24 bg-neutral-700 rounded" />
-          <div className="h-4 w-4 bg-neutral-700 rounded" />
+        <div className="flex items-center gap-1.5">
+          <div className="h-4 w-4 bg-neutral-700 rounded-full" />
+          <div className="h-3 w-24 bg-neutral-700 rounded" />
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-3 w-20 bg-neutral-700 rounded" />
@@ -43,13 +43,13 @@ function SessionCardSkeleton() {
         </div>
       </div>
       <div className="flex space-x-2 items-center">
-        <div className="h-6 w-6 bg-neutral-700 rounded" />
-        <div className="h-6 w-6 bg-neutral-700 rounded" />
-        <div className="h-6 w-6 bg-neutral-700 rounded" />
-        <div className="h-6 w-6 bg-neutral-700 rounded" />
-        <div className="h-6 w-16 bg-neutral-700 rounded" />
-        <div className="h-6 w-16 bg-neutral-700 rounded" />
-        <div className="h-6 w-20 bg-neutral-700 rounded" />
+        <div className="h-4 w-4 bg-neutral-700 rounded-sm" />
+        <div className="h-4 w-4 bg-neutral-700 rounded-sm" />
+        <div className="h-4 w-4 bg-neutral-700 rounded-sm" />
+        <div className="h-4 w-4 bg-neutral-700 rounded-sm" />
+        <div className="h-[21px] w-12 bg-neutral-700 rounded-sm" />
+        <div className="h-[21px] w-12 bg-neutral-700 rounded-sm" />
+        <div className="h-[21px] w-16 bg-neutral-700 rounded-sm" />
       </div>
       <div className="items-center flex-1 min-w-0 hidden md:flex gap-2">
         <div className="h-3 w-32 bg-neutral-700 rounded" />

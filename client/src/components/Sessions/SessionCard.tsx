@@ -182,19 +182,19 @@ export const SessionCardSkeleton = memo(() => {
         <div className="flex items-center gap-2">
           {/* Avatar and User ID */}
           <div className="hidden md:flex items-center gap-2">
-            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-6 w-6 rounded-full" />
+            <Skeleton className="h-3 w-24" />
           </div>
 
-          {/* Icons */}
-          <div className="flex space-x-2 items-center md:ml-3">
+          {/* Icons section */}
+          <div className="flex space-x-2 items-center">
             <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-4 rounded-sm flex-shrink-0" />
-            <Skeleton className="h-4 w-4 rounded-sm flex-shrink-0" />
+            <Skeleton className="h-4 w-4 rounded-sm" />
+            <Skeleton className="h-4 w-4 rounded-sm" />
             <Skeleton className="h-4 w-4 rounded-sm" />
             <Skeleton className="h-[21px] w-12 rounded-sm" />
             <Skeleton className="h-[21px] w-12 rounded-sm" />
-            <Skeleton className="h-[21px] w-12 rounded-sm" />
-            <Skeleton className="h-[21px] w-12 rounded-sm" />
+            <Skeleton className="h-[21px] w-16 rounded-sm" />
           </div>
 
           {/* Entry/Exit paths with randomized widths */}
@@ -206,13 +206,11 @@ export const SessionCardSkeleton = memo(() => {
             <Skeleton className={cn("h-3 max-w-[200px]", getRandomWidth())} />
           </div>
 
-          {/* Time */}
-          <div className="flex items-center gap-4">
-            {/* Date/time skeleton */}
+          {/* Time information */}
+          <div className="flex items-center gap-1.5">
             <Skeleton className={cn("h-3", getRandomTimeWidth())} />
-
-            {/* Duration skeleton */}
-            <Skeleton className={cn("h-3", getRandomDurationWidth(), "hidden md:block")} />
+            <Skeleton className="h-3 w-1" />
+            <Skeleton className={cn("h-3 hidden md:block", getRandomDurationWidth())} />
           </div>
 
           {/* Expand icon */}
