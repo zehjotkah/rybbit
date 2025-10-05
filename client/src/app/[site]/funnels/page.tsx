@@ -2,7 +2,7 @@
 
 import { SavedFunnel, useGetFunnels } from "../../../api/analytics/funnels/useGetFunnels";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useStore } from "@/lib/store";
+import { GOALS_PAGE_FILTERS, useStore } from "@/lib/store";
 import { ArrowRight, FilterIcon, Funnel } from "lucide-react";
 import { NothingFound } from "../../../components/NothingFound";
 import { CreateFunnelDialog } from "./components/CreateFunnel";
@@ -10,6 +10,7 @@ import { FunnelRow } from "./components/FunnelRow";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { MobileSidebar } from "../components/Sidebar/MobileSidebar";
+import { SubHeader } from "../components/SubHeader/SubHeader";
 
 // Skeleton for the funnel row component
 const FunnelRowSkeleton = () => (
@@ -85,10 +86,8 @@ export default function FunnelsPage() {
   return (
     <DisabledOverlay message="Funnels" featurePath="funnels">
       <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
-        <div className="flex justify-between items-center mb-3">
-          <div>
-            <MobileSidebar />
-          </div>
+        <SubHeader availableFilters={GOALS_PAGE_FILTERS} />
+        <div className="flex justify-end">
           <CreateFunnelDialog />
         </div>
 
@@ -98,8 +97,8 @@ export default function FunnelsPage() {
           </div>
         ) : funnels?.length ? (
           <div className="space-y-4">
-            {funnels.map((funnel: SavedFunnel) => (
-              <FunnelRow key={funnel.id} funnel={funnel} />
+            {funnels.map((funnel: SavedFunnel, index: number) => (
+              <FunnelRow key={funnel.id} funnel={funnel} index={index} />
             ))}
           </div>
         ) : (
