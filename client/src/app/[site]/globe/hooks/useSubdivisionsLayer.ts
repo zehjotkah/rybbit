@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FilterParameter } from "@rybbit/shared";
 import { addFilter } from "../../../../lib/store";
@@ -9,7 +9,6 @@ interface UseSubdivisionsLayerProps {
   processedSubdivisionData: any;
   colorScale: (value: number) => string;
   subdivisionData: any;
-  setTooltipContent: (content: any) => void;
   mapLoaded: boolean;
   mapView: string;
 }
@@ -20,12 +19,22 @@ export function useSubdivisionsLayer({
   processedSubdivisionData,
   colorScale,
   subdivisionData,
-  setTooltipContent,
   mapLoaded,
   mapView,
 }: UseSubdivisionsLayerProps) {
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
+
   useEffect(() => {
     if (!map.current || !subdivisionsGeoData || !processedSubdivisionData || !mapLoaded) return;
+
+    // Initialize popup once
+    if (!popupRef.current) {
+      popupRef.current = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: "globe-tooltip",
+      });
+    }
 
     const addSubdivisionsLayer = () => {
       if (!map.current) return;
@@ -75,8 +84,8 @@ export function useSubdivisionsLayer({
           },
         });
 
-        map.current.on("mousemove", "subdivisions-fill", (e) => {
-          if (!map.current || !e.features || e.features.length === 0) return;
+        map.current.on("mousemove", "subdivisions-fill", e => {
+          if (!map.current || !e.features || e.features.length === 0 || !popupRef.current) return;
           map.current.getCanvas().style.cursor = "pointer";
 
           const feature = e.features[0];
@@ -88,21 +97,27 @@ export function useSubdivisionsLayer({
           const foundData = currentData?.find((d: any) => d.value === code);
           const percentage = foundData?.percentage || 0;
 
-          setTooltipContent({
-            name,
-            code,
-            count,
-            percentage,
-          });
+          const coordinates = e.lngLat;
+          const html = `
+            <div class="flex items-center gap-1 mb-1">
+              <span class="text-sm font-medium">${name}</span>
+            </div>
+            <div class="text-sm">
+              <span class="font-bold text-accent-400">${count.toLocaleString()}</span>
+              <span class="text-neutral-300"> (${percentage.toFixed(1)}%) sessions</span>
+            </div>
+          `;
+
+          popupRef.current.setLngLat(coordinates).setHTML(html).addTo(map.current);
         });
 
         map.current.on("mouseleave", "subdivisions-fill", () => {
-          if (!map.current) return;
+          if (!map.current || !popupRef.current) return;
           map.current.getCanvas().style.cursor = "";
-          setTooltipContent(null);
+          popupRef.current.remove();
         });
 
-        map.current.on("click", "subdivisions-fill", (e) => {
+        map.current.on("click", "subdivisions-fill", e => {
           if (!e.features || e.features.length === 0) return;
 
           const feature = e.features[0];
@@ -118,5 +133,5 @@ export function useSubdivisionsLayer({
     };
 
     addSubdivisionsLayer();
-  }, [subdivisionsGeoData, processedSubdivisionData, colorScale, map, subdivisionData, setTooltipContent, mapLoaded]);
+  }, [subdivisionsGeoData, processedSubdivisionData, colorScale, map, subdivisionData, mapLoaded]);
 }
