@@ -6,7 +6,7 @@ import { memo, useState } from "react";
 import { GetSessionsResponse } from "../../api/analytics/userSessions";
 import { formatDuration, hour12, userLocale } from "../../lib/dateTimeUtils";
 import { cn, formatter } from "../../lib/utils";
-import { Avatar } from "../Avatar";
+import { Avatar, generateName } from "../Avatar";
 import { Channel } from "../Channel";
 import { EventIcon, PageviewIcon } from "../EventIcons";
 import {
@@ -50,17 +50,19 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
     }
   };
 
+  const name = generateName(session.user_id);
+
   return (
     <div className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
       <div className="p-3 cursor-pointer" onClick={handleCardClick}>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
-            {/* <span className="text-xs font-mono text-gray-400">{session.user_id.slice(0, 12)}</span> */}
-            <Avatar size={24} name={session.user_id.slice(0, 12)} />
+            <Avatar size={24} id={session.user_id} />
+            <span className="text-xs text-neutral-200 w-24 truncate">{name}</span>
           </div>
 
           {/* Icons section */}
-          <div className="flex space-x-2 items-center md:ml-3">
+          <div className="flex space-x-2 items-center">
             {session.country && (
               <CountryFlagTooltipIcon country={session.country} city={session.city} region={session.region} />
             )}

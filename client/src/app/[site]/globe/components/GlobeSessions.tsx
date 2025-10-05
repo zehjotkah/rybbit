@@ -2,9 +2,9 @@ import { ArrowRight, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { animals, colors, uniqueNamesGenerator } from "unique-names-generator";
 import { useCurrentSite } from "../../../../api/admin/sites";
 import { GetSessionsResponse, useGetSessionsInfinite } from "../../../../api/analytics/userSessions";
+import { Avatar, generateName } from "../../../../components/Avatar";
 import { Channel } from "../../../../components/Channel";
 import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 import {
@@ -68,25 +68,23 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
   const duration = formatShortDuration(totalSeconds);
   const siteId = useCurrentSite();
 
-  const name = uniqueNamesGenerator({
-    dictionaries: [colors, animals],
-    separator: " ",
-    style: "capital",
-    seed: session.user_id,
-  });
+  const name = generateName(session.user_id);
 
   return (
     <div className="rounded-lg bg-neutral-850 border border-neutral-800 overflow-hidden p-2 space-y-2">
       <div className="flex justify-between border-b border-neutral-700 pb-2">
-        <div className="text-sm text-neutral-100 flex items-center gap-2">
-          {name}{" "}
-          <Link href={`/${siteId.site?.id}/user/${session.user_id}`}>
-            <ExternalLink className="w-4 h-4 text-gray-400" />
+        <div className="text-sm text-neutral-100 flex items-center gap-1.5">
+          <Avatar id={session.user_id} size={16} />
+          <Link
+            href={`/${siteId.site?.siteId}/user/${session.user_id}`}
+            className="text-xs text-neutral-200 max-w-32 truncate hover:underline"
+          >
+            {name}
           </Link>
         </div>
         <div className="flex space-x-2 items-center pr-2">
-          <div className="flex items-center gap-1.5 text-xs text-gray-300">
-            <span className="text-gray-400">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-300">
+            <span className="text-neutral-400">
               {DateTime.fromSQL(session.session_start, {
                 zone: "utc",
               })
@@ -94,7 +92,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
                 .toLocal()
                 .toFormat(hour12 ? "MMM d, h:mm a" : "dd MMM, HH:mm")}
             </span>
-            <span className="text-gray-400">•</span>
+            <span className="text-neutral-400">•</span>
             <span className="hidden md:block">{duration}</span>
           </div>
         </div>
@@ -115,7 +113,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
         />
         <Tooltip>
           <TooltipTrigger asChild>
-            <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
+            <Badge className="flex items-center gap-1 bg-neutral-800 text-neutral-300">
               <PageviewIcon />
               <span>{formatter(session.pageviews)}</span>
             </Badge>
@@ -124,7 +122,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
+            <Badge className="flex items-center gap-1 bg-neutral-800 text-neutral-300">
               <EventIcon />
               <span>{formatter(session.events)}</span>
             </Badge>
@@ -136,7 +134,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
       <div className="items-center flex-1 min-w-0 hidden md:flex">
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
+            <span className="text-xs text-neutral-400 truncate max-w-[200px] inline-block">
               {truncatePath(session.entry_page)}
             </span>
           </TooltipTrigger>
@@ -145,11 +143,11 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
           </TooltipContent>
         </Tooltip>
 
-        <ArrowRight className="mx-2 w-3 h-3 flex-shrink-0 text-gray-400" />
+        <ArrowRight className="mx-2 w-3 h-3 flex-shrink-0 text-neutral-400" />
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="text-xs text-gray-400 truncate max-w-[200px] inline-block">
+            <span className="text-xs text-neutral-400 truncate max-w-[200px] inline-block">
               {truncatePath(session.exit_page)}
             </span>
           </TooltipTrigger>

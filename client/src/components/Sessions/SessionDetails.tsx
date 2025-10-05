@@ -399,8 +399,8 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                 <div className="space-y-3">
                   {sessionDetails?.user_id && (
                     <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 bg-neutral-800 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Avatar size={24} name={sessionDetails.user_id} />
+                      <div className="h-10 w-10 bg-neutral-800 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Avatar size={40} id={sessionDetails.user_id} />
                       </div>
                       <div>
                         <div className="text-sm text-neutral-400 flex items-center">

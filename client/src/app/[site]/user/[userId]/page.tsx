@@ -17,7 +17,7 @@ import { DateTime } from "luxon";
 import { useParams, useRouter } from "next/navigation";
 import { useUserInfo } from "../../../../api/analytics/userInfo";
 import { useGetUserSessionCount } from "../../../../api/analytics/userSessions";
-import { Avatar } from "../../../../components/Avatar";
+import { Avatar, generateName } from "../../../../components/Avatar";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { Skeleton } from "../../../../components/ui/skeleton";
@@ -49,21 +49,23 @@ export default function UserPage() {
     router.push(`/${site}/users`);
   };
 
+  const name = generateName(userId as string);
+
   return (
     <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
-      <Button onClick={handleBackClick} className="w-full sm:w-max">
+      <MobileSidebar />
+      <Button onClick={handleBackClick} className="w-max" variant="ghost">
         <ArrowLeft className="h-4 w-4" />
         Back to Users
       </Button>
       <div className="mb-4">
-        <h1 className="mb-4 flex items-center gap-2 justify-between">
-          <div className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar size={48} id={userId as string} />
             <div>
-              <MobileSidebar />
+              <div className="text-lg font-bold">{name}</div>
+              <span className="text-neutral-300 text-sm">ID: {userId}</span>
             </div>
-
-            <Avatar size={40} name={userId as string} />
-            {userId?.slice(0, 12)}
           </div>
           {data?.ip && (
             <Badge variant="outline" className="flex gap-1 text-neutral-300">
