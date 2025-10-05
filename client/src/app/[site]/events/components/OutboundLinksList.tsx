@@ -1,12 +1,12 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { ExternalLink, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { DateTime } from "luxon";
 import { memo } from "react";
 import { OutboundLink } from "../../../../api/analytics/events/useGetOutboundLinks";
-import { cn } from "../../../../lib/utils";
 import { Favicon } from "../../../../components/Favicon";
+import { cn } from "../../../../lib/utils";
 
 // Skeleton component for OutboundLinksList
 const OutboundLinksListSkeleton = memo(({ size = "small" }: { size?: "small" | "large" }) => {

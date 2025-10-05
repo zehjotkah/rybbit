@@ -1,14 +1,10 @@
 "use client";
 
-import { FunnelStep, useGetFunnel, useSaveFunnel } from "../../../../api/analytics/funnels/useGetFunnel";
-import { SavedFunnel } from "../../../../api/analytics/funnels/useGetFunnels";
-import { Time } from "@/components/DateSelector/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { getStartAndEndDate } from "../../../../api/utils";
-import { Filter } from "@rybbit/shared";
+import { FunnelStep, useGetFunnel, useSaveFunnel } from "../../../../api/analytics/funnels/useGetFunnel";
+import { SavedFunnel } from "../../../../api/analytics/funnels/useGetFunnels";
 import { FunnelForm } from "./FunnelForm";
 
 interface EditFunnelDialogProps {
@@ -18,24 +14,11 @@ interface EditFunnelDialogProps {
 }
 
 export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogProps) {
-  // Time state - initialized from funnel configuration
-  const [time, setTime] = useState<Time>({
-    mode: "range",
-    startDate: DateTime.now().minus({ days: 7 }).toISODate(),
-    endDate: DateTime.now().toISODate(),
-    wellKnown: "Last 7 days",
-  });
-
   // Funnel steps state - initialized from funnel
   const [steps, setSteps] = useState<FunnelStep[]>(funnel.steps);
 
-  // Funnel filters state - initialized from funnel
-  const [filters, setFilters] = useState<Filter[]>(funnel.filters || []);
-
   // Funnel name - initialized from funnel
   const [name, setName] = useState(funnel.name);
-
-  const { startDate, endDate } = getStartAndEndDate(time);
 
   // Funnel analysis query
   const {
@@ -46,9 +29,6 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
   } = useGetFunnel(
     {
       steps,
-      startDate,
-      endDate,
-      filters,
     },
     true
   );
@@ -81,43 +61,12 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
       return;
     }
 
-    // Get dates based on time selection
-    let startDate = "",
-      endDate = "";
-
-    if (time.mode === "range") {
-      startDate = time.startDate;
-      endDate = time.endDate;
-    } else if (time.mode === "day") {
-      startDate = time.day;
-      endDate = time.day;
-    } else if (time.mode === "week") {
-      startDate = time.week;
-      const endDateValue = DateTime.fromISO(time.week).plus({ days: 6 }).toISODate();
-      endDate = endDateValue || DateTime.now().toISODate();
-    } else if (time.mode === "month") {
-      startDate = time.month;
-      const endDateValue = DateTime.fromISO(time.month).endOf("month").toISODate();
-      endDate = endDateValue || DateTime.now().toISODate();
-    } else if (time.mode === "year") {
-      startDate = time.year;
-      const endDateValue = DateTime.fromISO(time.year).endOf("year").toISODate();
-      endDate = endDateValue || DateTime.now().toISODate();
-    } else {
-      // Fall back to last 7 days for all-time
-      startDate = DateTime.now().minus({ days: 7 }).toISODate();
-      endDate = DateTime.now().toISODate();
-    }
-
     // Update funnel with the report ID
     saveFunnel(
       {
         steps,
-        startDate,
-        endDate,
         name,
         reportId: funnel.id,
-        filters: filters.length > 0 ? filters : undefined,
       },
       {
         onSuccess: () => {
@@ -152,10 +101,6 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
           setName={setName}
           steps={steps}
           setSteps={setSteps}
-          time={time}
-          setTime={setTime}
-          filters={filters}
-          setFilters={setFilters}
           onSave={handleUpdateFunnel}
           onCancel={onClose}
           onQuery={handleQueryFunnel}
