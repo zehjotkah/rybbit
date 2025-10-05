@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, MousePointerClick } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -9,6 +8,7 @@ import { useCreateGoal } from "../../../../api/analytics/goals/useCreateGoal";
 import { Goal } from "../../../../api/analytics/goals/useGetGoals";
 import { useUpdateGoal } from "../../../../api/analytics/goals/useUpdateGoal";
 import { useSingleCol } from "../../../../api/analytics/useSingleCol";
+import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
@@ -229,12 +229,12 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
                     <div className="flex items-center gap-2 mt-1">
                       {field.value === "path" ? (
                         <div className="flex items-center gap-1 bg-neutral-800/50 py-2 px-3 rounded">
-                          <Eye className="w-4 h-4 text-blue-500" />
+                          <PageviewIcon />
                           <span>Page Goal</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1 bg-neutral-800/50 py-2 px-3 rounded">
-                          <MousePointerClick className="w-4 h-4 text-amber-500" />
+                          <EventIcon />
                           <span>Event Goal</span>
                         </div>
                       )}
@@ -251,7 +251,7 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
                           )}
                           onClick={() => field.onChange("path")}
                         >
-                          <Eye className="w-4 h-4 text-blue-500" />
+                          <PageviewIcon />
                           <span>Page Goal</span>
                         </Button>
                         <Button
@@ -263,7 +263,7 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
                           )}
                           onClick={() => field.onChange("event")}
                         >
-                          <MousePointerClick className="w-4 h-4 text-amber-500" />
+                          <EventIcon />
                           <span>Event Goal</span>
                         </Button>
                       </div>

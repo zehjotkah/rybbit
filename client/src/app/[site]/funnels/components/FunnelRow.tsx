@@ -13,6 +13,7 @@ import { SavedFunnel } from "../../../../api/analytics/funnels/useGetFunnels";
 import { ThreeDotLoader } from "../../../../components/Loaders";
 import { EditFunnelDialog } from "./EditFunnel";
 import { Funnel } from "./Funnel";
+import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 
 interface FunnelRowProps {
   funnel: SavedFunnel;
@@ -77,9 +78,9 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
                     <TooltipTrigger asChild>
                       <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis flex items-center cursor-default">
                         {step.type === "page" ? (
-                          <Eye className="h-3 w-3 mr-1 text-blue-400" />
+                          <PageviewIcon className="h-3 w-3 mr-1" />
                         ) : (
-                          <MousePointerClick className="h-3 w-3 mr-1 text-amber-400" />
+                          <EventIcon className="h-3 w-3 mr-1" />
                         )}
                         <span className="max-w-[120px] overflow-hidden text-ellipsis inline-block">
                           {step.name || step.value}
@@ -156,7 +157,7 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
                 Error loading funnel: {error instanceof Error ? error.message : "Unknown error"}
               </div>
             ) : data && data.length > 0 ? (
-              <Funnel data={data} isError={isError} error={error} isPending={isPending} />
+              <Funnel data={data} steps={funnel.steps} isError={isError} error={error} isPending={isPending} />
             ) : (
               <div className="text-center p-6 text-neutral-500">No funnel data available</div>
             )}

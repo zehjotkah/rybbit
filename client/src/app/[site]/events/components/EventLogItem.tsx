@@ -12,6 +12,7 @@ import { getCountryName } from "../../../../lib/utils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
+import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 
 // DeviceIcon component for displaying mobile/desktop icons
 function DeviceIcon({ deviceType }: { deviceType: string }) {
@@ -71,11 +72,11 @@ export function EventLogItem({ event }: EventLogItemProps) {
             {/* Event type icon */}
             <div className="flex-shrink-0">
               {isPageview ? (
-                <Eye className="w-4 h-4 text-blue-500" />
+                <PageviewIcon />
               ) : isOutbound ? (
                 <ExternalLink className="w-4 h-4 text-purple-500" />
               ) : (
-                <MousePointerClick className="w-4 h-4 text-amber-500" />
+                <EventIcon />
               )}
             </div>
 

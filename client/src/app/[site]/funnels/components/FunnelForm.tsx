@@ -140,7 +140,7 @@ export function FunnelForm({
 
   let funnelArea = null;
   if (funnelData && funnelData.length) {
-    funnelArea = <Funnel data={funnelData} isError={isError} error={error} isPending={isPending} />;
+    funnelArea = <Funnel data={funnelData} isError={isError} error={error} isPending={isPending} steps={steps} />;
   }
 
   if (steps.some(step => !step.value)) {

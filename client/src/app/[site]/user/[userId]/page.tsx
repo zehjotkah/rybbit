@@ -30,6 +30,7 @@ import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { MobileSidebar } from "../../components/Sidebar/MobileSidebar";
 import { VisitCalendar } from "./components/Calendar";
+import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 
 export default function UserPage() {
   useSetPageTitle("Rybbit · User");
@@ -177,14 +178,14 @@ export default function UserPage() {
               </div>
               <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
                 <div className="text-xs text-neutral-400 flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
+                  <PageviewIcon />
                   Pageviews
                 </div>
                 <div className="font-semibold">{data?.pageviews}</div>
               </div>
               <div className="bg-neutral-900 p-3 rounded-lg flex flex-col gap-1 border border-neutral-800  flex-grow">
                 <div className="text-xs text-neutral-400 flex items-center gap-1">
-                  <MousePointerClick className="w-4 h-4" />
+                  <EventIcon />
                   Events
                 </div>
                 <div className="font-semibold">{data?.events}</div>

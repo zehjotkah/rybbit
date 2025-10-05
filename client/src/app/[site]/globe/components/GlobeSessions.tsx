@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, ChevronUp, ExternalLink, Eye, MousePointerClick } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -6,6 +6,7 @@ import { animals, colors, uniqueNamesGenerator } from "unique-names-generator";
 import { useCurrentSite } from "../../../../api/admin/sites";
 import { GetSessionsResponse, useGetSessionsInfinite } from "../../../../api/analytics/userSessions";
 import { Channel } from "../../../../components/Channel";
+import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 import {
   BrowserTooltipIcon,
   CountryFlagTooltipIcon,
@@ -115,7 +116,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
-              <Eye className="w-4 h-4 text-blue-500" />
+              <PageviewIcon />
               <span>{formatter(session.pageviews)}</span>
             </Badge>
           </TooltipTrigger>
@@ -124,7 +125,7 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Badge className="flex items-center gap-1 bg-neutral-800 text-gray-300">
-              <MousePointerClick className="w-4 h-4 text-amber-500" />
+              <EventIcon />
               <span>{formatter(session.events)}</span>
             </Badge>
           </TooltipTrigger>
