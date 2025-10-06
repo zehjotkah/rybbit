@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
+import { Copy, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDeleteGoal } from "../../../../api/analytics/goals/useDeleteGoal";
 import { Goal } from "../../../../api/analytics/goals/useGetGoals";
@@ -103,14 +103,39 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
               siteId={siteId}
               goal={goal}
               trigger={
-                <Button variant="ghost" size="smIcon">
-                  <Edit className="h-4 w-4" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="smIcon">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit Goal</TooltipContent>
+                </Tooltip>
               }
             />
-            <Button onClick={() => setIsDeleteDialogOpen(true)} variant="ghost" size="smIcon">
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={() => setIsDeleteDialogOpen(true)} variant="ghost" size="smIcon">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete Goal</TooltipContent>
+            </Tooltip>
+            <GoalFormModal
+              siteId={siteId}
+              goal={goal}
+              isCloneMode={true}
+              trigger={
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="smIcon">
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Clone Goal</TooltipContent>
+                </Tooltip>
+              }
+            />
           </div>
         </div>
         <div className="bg-neutral-700 h-1.5 w-full absolute bottom-0 left-0"></div>

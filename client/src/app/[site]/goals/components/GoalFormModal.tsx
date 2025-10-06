@@ -58,9 +58,10 @@ interface GoalFormModalProps {
   siteId: number;
   goal?: Goal; // Optional goal for editing mode
   trigger: React.ReactNode;
+  isCloneMode?: boolean; // Optional clone mode flag
 }
 
-export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalProps) {
+export default function GoalFormModal({ siteId, goal, trigger, isCloneMode = false }: GoalFormModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [useProperties, setUseProperties] = useState(
     !!goal?.config.eventPropertyKey && !!goal?.config.eventPropertyValue
@@ -103,16 +104,16 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
     setIsOpen(false);
   };
 
-  const isEditMode = !!goal;
+  const isEditMode = !!goal && !isCloneMode;
   const createGoal = useCreateGoal();
   const updateGoal = useUpdateGoal();
 
   // Initialize form with default values or existing goal
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: isEditMode
+    defaultValues: (isEditMode || isCloneMode) && goal
       ? {
-          name: goal.name || "",
+          name: isCloneMode ? `${goal.name || `Goal #${goal.goalId}`} (Copy)` : (goal.name || ""),
           goalType: goal.goalType,
           config: {
             pathPattern: goal.config.pathPattern || "",
@@ -192,13 +193,17 @@ export default function GoalFormModal({ siteId, goal, trigger }: GoalFormModalPr
         }
       }}
     >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild>
+        <div onClick={() => setIsOpen(true)}>{trigger}</div>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? "Edit Goal" : "Create Goal"}</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Goal" : isCloneMode ? "Clone Goal" : "Create Goal"}</DialogTitle>
           <DialogDescription>
             {isEditMode
               ? "Update the goal details below."
+              : isCloneMode
+              ? "Clone this goal with the same configuration."
               : "Set up a new conversion goal to track specific user actions."}
           </DialogDescription>
         </DialogHeader>
