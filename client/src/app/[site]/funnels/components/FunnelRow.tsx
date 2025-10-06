@@ -4,7 +4,7 @@ import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowRight, ChevronDown, ChevronUp, Edit, Eye, MousePointerClick, Trash2 } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Copy, Edit, Eye, MousePointerClick, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteFunnel } from "../../../../api/analytics/funnels/useDeleteFunnel";
@@ -24,6 +24,7 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
   const [expanded, setExpanded] = useState(index === 0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCloneModalOpen, setIsCloneModalOpen] = useState(false);
 
   // Funnel data fetching
   const {
@@ -116,28 +117,55 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
         <div className="flex items-center gap-4">
           <div className="flex">
             {/* Edit button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={e => {
-                e.stopPropagation();
-                setIsEditModalOpen(true);
-              }}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit Funnel</TooltipContent>
+            </Tooltip>
+
+            {/* Clone button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsCloneModalOpen(true);
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Clone Funnel</TooltipContent>
+            </Tooltip>
 
             {/* Delete button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={e => {
-                e.stopPropagation();
-                setIsDeleteModalOpen(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsDeleteModalOpen(true);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete Funnel</TooltipContent>
+            </Tooltip>
 
             <Button variant="ghost" size="icon" onClick={handleExpand}>
               {expanded ? <ChevronUp strokeWidth={3} /> : <ChevronDown strokeWidth={3} />}
@@ -181,6 +209,16 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
       {/* Edit Funnel Modal */}
       {isEditModalOpen && (
         <EditFunnelDialog funnel={funnel} isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+      )}
+
+      {/* Clone Funnel Modal */}
+      {isCloneModalOpen && (
+        <EditFunnelDialog
+          funnel={funnel}
+          isOpen={isCloneModalOpen}
+          onClose={() => setIsCloneModalOpen(false)}
+          isCloneMode={true}
+        />
       )}
     </Card>
   );

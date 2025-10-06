@@ -11,14 +11,15 @@ interface EditFunnelDialogProps {
   funnel: SavedFunnel;
   isOpen: boolean;
   onClose: () => void;
+  isCloneMode?: boolean;
 }
 
-export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogProps) {
+export function EditFunnelDialog({ funnel, isOpen, onClose, isCloneMode = false }: EditFunnelDialogProps) {
   // Funnel steps state - initialized from funnel
   const [steps, setSteps] = useState<FunnelStep[]>(funnel.steps);
 
-  // Funnel name - initialized from funnel
-  const [name, setName] = useState(funnel.name);
+  // Funnel name - initialized from funnel, with "(Copy)" suffix for clone mode
+  const [name, setName] = useState(isCloneMode ? `${funnel.name} (Copy)` : funnel.name);
 
   // Funnel analysis query
   const {
@@ -46,7 +47,7 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
     }
   };
 
-  // Update funnel
+  // Update or clone funnel
   const handleUpdateFunnel = () => {
     // Validate name
     if (!name.trim()) {
@@ -61,23 +62,23 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
       return;
     }
 
-    // Update funnel with the report ID
+    // Update funnel with the report ID (or create new if cloning)
     saveFunnel(
       {
         steps,
         name,
-        reportId: funnel.id,
+        reportId: isCloneMode ? undefined : funnel.id,
       },
       {
         onSuccess: () => {
           // Close dialog on successful save
           onClose();
           // Show success message
-          toast?.success("Funnel updated successfully");
+          toast?.success(isCloneMode ? "Funnel cloned successfully" : "Funnel updated successfully");
         },
         onError: error => {
           // Show error but don't close dialog
-          toast?.error(`Failed to update funnel: ${error.message}`);
+          toast?.error(`Failed to ${isCloneMode ? "clone" : "update"} funnel: ${error.message}`);
         },
       }
     );
@@ -93,7 +94,7 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-[95vw]">
         <DialogHeader>
-          <DialogTitle>Edit Funnel</DialogTitle>
+          <DialogTitle>{isCloneMode ? "Clone Funnel" : "Edit Funnel"}</DialogTitle>
         </DialogHeader>
 
         <FunnelForm
@@ -104,7 +105,7 @@ export function EditFunnelDialog({ funnel, isOpen, onClose }: EditFunnelDialogPr
           onSave={handleUpdateFunnel}
           onCancel={onClose}
           onQuery={handleQueryFunnel}
-          saveButtonText="Update Funnel"
+          saveButtonText={isCloneMode ? "Clone Funnel" : "Update Funnel"}
           isSaving={isSaving}
           isError={isError}
           isPending={isPending}

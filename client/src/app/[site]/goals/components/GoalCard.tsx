@@ -113,14 +113,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
                 </Tooltip>
               }
             />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={() => setIsDeleteDialogOpen(true)} variant="ghost" size="smIcon">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete Goal</TooltipContent>
-            </Tooltip>
             <GoalFormModal
               siteId={siteId}
               goal={goal}
@@ -136,6 +128,14 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
                 </Tooltip>
               }
             />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={() => setIsDeleteDialogOpen(true)} variant="ghost" size="smIcon">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete Goal</TooltipContent>
+            </Tooltip>
           </div>
         </div>
         <div className="bg-neutral-700 h-1.5 w-full absolute bottom-0 left-0"></div>
