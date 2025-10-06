@@ -1,16 +1,12 @@
 "use client";
 
-import { FunnelStep, useGetFunnel, useSaveFunnel } from "../../../../api/analytics/funnels/useGetFunnel";
-import { Time } from "@/components/DateSelector/types";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { DateTime } from "luxon";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getStartAndEndDate } from "../../../../api/utils";
+import { FunnelStep, useGetFunnel, useSaveFunnel } from "../../../../api/analytics/funnels/useGetFunnel";
 import { FunnelForm } from "./FunnelForm";
-import { Filter } from "@rybbit/shared";
 
 export function CreateFunnelDialog() {
   const [open, setOpen] = useState(false);

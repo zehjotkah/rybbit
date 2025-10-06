@@ -11,6 +11,8 @@ import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { MobileSidebar } from "../components/Sidebar/MobileSidebar";
 import { SubHeader } from "../components/SubHeader/SubHeader";
+import { Input } from "@/components/ui/input";
+import { useMemo, useState } from "react";
 
 // Skeleton for the funnel row component
 const FunnelRowSkeleton = () => (
@@ -66,6 +68,24 @@ export default function FunnelsPage() {
 
   const { site } = useStore();
   const { data: funnels, isLoading, error } = useGetFunnels(site);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter funnels based on search query
+  const filteredFunnels = useMemo(() => {
+    if (!funnels) return [];
+    if (!searchQuery.trim()) return funnels;
+
+    const query = searchQuery.toLowerCase();
+    return funnels.filter((funnel: SavedFunnel) => {
+      // Search in funnel name
+      if (funnel.name.toLowerCase().includes(query)) return true;
+
+      // Search in step values
+      return funnel.steps.some(
+        step => step.value.toLowerCase().includes(query) || step.name?.toLowerCase().includes(query)
+      );
+    });
+  }, [funnels, searchQuery]);
 
   if (isLoading) {
     return (
@@ -87,7 +107,14 @@ export default function FunnelsPage() {
     <DisabledOverlay message="Funnels" featurePath="funnels">
       <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
         <SubHeader availableFilters={GOALS_PAGE_FILTERS} />
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <Input
+            placeholder="Filter funnels"
+            className="w-48"
+            isSearch
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
           <CreateFunnelDialog />
         </div>
 
@@ -95,12 +122,18 @@ export default function FunnelsPage() {
           <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
             Failed to load funnels: {error instanceof Error ? error.message : "Unknown error"}
           </div>
-        ) : funnels?.length ? (
+        ) : filteredFunnels?.length ? (
           <div className="space-y-4">
-            {funnels.map((funnel: SavedFunnel, index: number) => (
+            {filteredFunnels.map((funnel: SavedFunnel, index: number) => (
               <FunnelRow key={funnel.id} funnel={funnel} index={index} />
             ))}
           </div>
+        ) : funnels?.length ? (
+          <NothingFound
+            icon={<Funnel className="w-10 h-10" />}
+            title={"No funnels found"}
+            description={`No funnels match "${searchQuery}"`}
+          />
         ) : (
           <NothingFound
             icon={<Funnel className="w-10 h-10" />}
