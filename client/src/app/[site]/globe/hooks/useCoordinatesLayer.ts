@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl";
 import { scaleSequentialSqrt } from "d3-scale";
 import { interpolateYlOrRd } from "d3-scale-chromatic";
 import { LiveSessionLocation } from "../../../../api/analytics/useGetSessionLocations";
-import { addFilter, useStore } from "../../../../lib/store";
+import { addFilter, removeFilter, useStore } from "../../../../lib/store";
 import { FilterParameter } from "@rybbit/shared/dist/filters";
 import { round } from "lodash";
 
@@ -183,6 +183,7 @@ export function useCoordinatesLayer({
           const feature = e.features[0];
           const city = feature.properties?.city || "Unknown";
           const count = feature.properties?.count || 0;
+          const isCurrentlyFiltered = feature.properties?.isFiltered;
 
           // Use the stored lat/lon properties instead of geometry coordinates
           // to avoid Mapbox coordinate transformations at different zoom levels
@@ -191,17 +192,28 @@ export function useCoordinatesLayer({
 
           if (lat === undefined || lon === undefined) return;
 
-          addFilter({
-            parameter: "lat" as FilterParameter,
-            value: [lat],
-            type: "equals",
-          });
+          // If this location is already filtered, remove the filters
+          if (isCurrentlyFiltered) {
+            const { filters } = useStore.getState();
+            const latFilter = filters.find(f => f.parameter === "lat");
+            const lonFilter = filters.find(f => f.parameter === "lon");
 
-          addFilter({
-            parameter: "lon" as FilterParameter,
-            value: [lon],
-            type: "equals",
-          });
+            if (latFilter) removeFilter(latFilter);
+            if (lonFilter) removeFilter(lonFilter);
+          } else {
+            // Otherwise, add the filters
+            addFilter({
+              parameter: "lat" as FilterParameter,
+              value: [lat],
+              type: "equals",
+            });
+
+            addFilter({
+              parameter: "lon" as FilterParameter,
+              value: [lon],
+              type: "equals",
+            });
+          }
         });
       }
 
