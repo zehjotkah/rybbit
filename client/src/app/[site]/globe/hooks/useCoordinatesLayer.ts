@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl";
 import { scaleSequentialSqrt } from "d3-scale";
 import { interpolateYlOrRd } from "d3-scale-chromatic";
 import { LiveSessionLocation } from "../../../../api/analytics/useGetSessionLocations";
-import { addFilter } from "../../../../lib/store";
+import { addFilter, useStore } from "../../../../lib/store";
 import { FilterParameter } from "@rybbit/shared/dist/filters";
 import { round } from "lodash";
 
@@ -28,6 +28,7 @@ export function useCoordinatesLayer({
   mapView: string;
 }) {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const filters = useStore(state => state.filters);
 
   useEffect(() => {
     if (!map.current || !liveSessionLocations || !mapLoaded) return;
@@ -54,20 +55,41 @@ export function useCoordinatesLayer({
 
       const sizeMultiplier = getSizeMultiplier(totalLocations);
 
+      // Get filtered lat/lon from filters
+      const latFilter = filters.find(f => f.parameter === "lat");
+      const lonFilter = filters.find(f => f.parameter === "lon");
+      const filteredLat = latFilter?.value[0];
+      const filteredLon = lonFilter?.value[0];
+
       // Create GeoJSON points from live session locations
       const geojsonData: GeoJSON.FeatureCollection<GeoJSON.Point> = {
         type: "FeatureCollection",
-        features: liveSessionLocations.map(location => ({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [location.lon, location.lat],
-          },
-          properties: {
-            count: location.count,
-            city: location.city,
-          },
-        })),
+        features: liveSessionLocations.map(location => {
+          const roundedLat = round(location.lat, 4);
+          const roundedLon = round(location.lon, 4);
+
+          // Check if this location matches the filter with a small tolerance for floating point precision
+          const isFiltered =
+            filteredLat !== undefined &&
+            filteredLon !== undefined &&
+            Math.abs(roundedLat - Number(filteredLat)) < 0.00001 &&
+            Math.abs(roundedLon - Number(filteredLon)) < 0.00001;
+
+          return {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [roundedLon, roundedLat],
+            },
+            properties: {
+              count: location.count,
+              city: location.city,
+              isFiltered,
+              lat: roundedLat,
+              lon: roundedLon,
+            },
+          };
+        }),
       };
 
       // Add or update source
@@ -111,11 +133,11 @@ export function useCoordinatesLayer({
             //   15,
             //   ["interpolate", ["linear"], ["get", "count"], 1, 8 * sizeMultiplier, highest, 20 * sizeMultiplier],
             // ],
-            "circle-color": singleColor,
-            "circle-opacity": 0.7,
-            "circle-stroke-width": 1,
-            "circle-stroke-color": "#fff",
-            "circle-stroke-opacity": 0.3,
+            "circle-color": ["case", ["get", "isFiltered"], "#3b82f6", singleColor],
+            "circle-opacity": ["case", ["get", "isFiltered"], 0.9, 0.7],
+            "circle-stroke-width": ["case", ["get", "isFiltered"], 2, 1],
+            "circle-stroke-color": ["case", ["get", "isFiltered"], "#60a5fa", "#fff"],
+            "circle-stroke-opacity": ["case", ["get", "isFiltered"], 1, 0.3],
           },
           layout: {
             visibility: mapView === "coordinates" ? "visible" : "none",
@@ -162,18 +184,22 @@ export function useCoordinatesLayer({
           const city = feature.properties?.city || "Unknown";
           const count = feature.properties?.count || 0;
 
-          // Get the feature's coordinates
-          const coordinates = (feature.geometry as any).coordinates.slice().map((c: number) => round(c, 4));
+          // Use the stored lat/lon properties instead of geometry coordinates
+          // to avoid Mapbox coordinate transformations at different zoom levels
+          const lat = feature.properties?.lat;
+          const lon = feature.properties?.lon;
+
+          if (lat === undefined || lon === undefined) return;
 
           addFilter({
             parameter: "lat" as FilterParameter,
-            value: [coordinates[1]],
+            value: [lat],
             type: "equals",
           });
 
           addFilter({
             parameter: "lon" as FilterParameter,
-            value: [coordinates[0]],
+            value: [lon],
             type: "equals",
           });
         });
@@ -181,10 +207,39 @@ export function useCoordinatesLayer({
 
       // Update colors when data changes
       if (map.current.getLayer("realtime-coordinates-layer")) {
-        map.current.setPaintProperty("realtime-coordinates-layer", "circle-color", singleColor);
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-color", [
+          "case",
+          ["get", "isFiltered"],
+          "#3b82f6",
+          singleColor,
+        ]);
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-opacity", [
+          "case",
+          ["get", "isFiltered"],
+          0.9,
+          0.7,
+        ]);
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-stroke-width", [
+          "case",
+          ["get", "isFiltered"],
+          2,
+          1,
+        ]);
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-stroke-color", [
+          "case",
+          ["get", "isFiltered"],
+          "#60a5fa",
+          "#fff",
+        ]);
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-stroke-opacity", [
+          "case",
+          ["get", "isFiltered"],
+          1,
+          0.3,
+        ]);
       }
     };
 
     addCoordinatesLayer();
-  }, [liveSessionLocations, mapLoaded, map, minutes]);
+  }, [liveSessionLocations, mapLoaded, map, minutes, filters]);
 }

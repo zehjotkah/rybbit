@@ -76,12 +76,12 @@ export const filterTypeToLabel = (type: FilterType) => {
 };
 
 export function getParameterValueLabel(filter: Filter, getRegionName: (region: string) => string | undefined) {
-  const formatValue = (value: string) => {
+  const formatValue = (value: string | number) => {
     if (filter.parameter === "country") {
-      return getCountryName(value);
+      return getCountryName(value as string);
     }
     if (filter.parameter === "region") {
-      return getRegionName(value);
+      return getRegionName(value as string);
     }
     return value;
   };

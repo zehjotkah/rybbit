@@ -31,6 +31,6 @@ export type FilterParameter =
 
 export interface Filter {
   parameter: FilterParameter;
-  value: string[];
+  value: (string | number)[];
   type: FilterType;
 }
