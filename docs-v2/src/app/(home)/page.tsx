@@ -171,6 +171,17 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
               <div className="flex items-center justify-center">
+                <Link href="https://onyx.app" target="_blank">
+                  <Image
+                    src="/logos/onyx.webp"
+                    alt="Onyx"
+                    width={100}
+                    height={40}
+                    className="opacity-60 hover:opacity-100 transition-opacity invert"
+                  />
+                </Link>
+              </div>
+              <div className="flex items-center justify-center">
                 <Image
                   src="/logos/vanguard.webp"
                   alt="Vanguard"
@@ -224,15 +235,7 @@ export default function HomePage() {
                   className="opacity-60 hover:opacity-100 transition-opacity grayscale"
                 />
               </div>
-              <div className="flex items-center justify-center">
-                <Image
-                  src="/logos/onyx.webp"
-                  alt="Onyx"
-                  width={100}
-                  height={40}
-                  className="opacity-60 hover:opacity-100 transition-opacity invert"
-                />
-              </div>
+
               <div className="flex items-center justify-center">
                 <Image
                   src="/logos/apc.webp"
