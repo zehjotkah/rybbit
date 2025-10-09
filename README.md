@@ -105,7 +105,7 @@ There are two ways to start using Rybbit:
 <table align="center">
   <tr>
     <td>
-      <a href="https://www.coderabbit.ai/?via=tanstack&dub_id=aCcEEdAOqqutX6OS" >
+      <a href="https://onyx.app" >
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/d945a61b-3588-4ca1-bc03-abf41bcda867" height="70" />
           <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/d945a61b-3588-4ca1-bc03-abf41bcda867" height="70" />
