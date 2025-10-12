@@ -20,6 +20,7 @@ import { processCountryData, processSubdivisionData } from "./utils/processData"
 import { useGetSessionLocations } from "../../../api/analytics/useGetSessionLocations";
 import { GlobeSessions } from "./components/GlobeSessions";
 import { useGlobeStore } from "./globeStore";
+import { NothingFound } from "../../../components/NothingFound";
 
 export default function GlobePage() {
   useSetPageTitle("Rybbit · Globe");
@@ -81,10 +82,33 @@ export default function GlobePage() {
           <SubHeader />
         </div>
         <div className="absolute top-0 left-0 right-0 bottom-0 z-10">
-          <div
-            ref={mapContainer}
-            className="w-full h-full [&_.mapboxgl-ctrl-bottom-left]:!hidden [&_.mapboxgl-ctrl-logo]:!hidden"
-          />
+          {process.env.NEXT_PUBLIC_MAPBOX_TOKEN ? (
+            <div
+              ref={mapContainer}
+              className="w-full h-full [&_.mapboxgl-ctrl-bottom-left]:!hidden [&_.mapboxgl-ctrl-logo]:!hidden"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <NothingFound
+                title="Mapbox access token not found"
+                description={
+                  <p className="text-sm max-w-[600px] text-center">
+                    Please set the <code>NEXT_PUBLIC_MAPBOX_TOKEN</code> environment variable and rebuild all
+                    containers. To get a Mapbox token, please visit{" "}
+                    <a
+                      href="https://docs.mapbox.com/help/dive-deeper/access-tokens/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:underline"
+                    >
+                      Mapbox
+                    </a>{" "}
+                    and create an account.
+                  </p>
+                }
+              />
+            </div>
+          )}
           <div className="absolute bottom-0 left-4 z-99999">
             <MapViewSelector />
           </div>

@@ -6,7 +6,9 @@ export function useMapbox(containerRef: React.RefObject<HTMLDivElement | null>) 
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+      return;
+    }
 
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
