@@ -63,6 +63,7 @@ import { handleWebhook } from "./api/stripe/webhook.js";
 import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
 import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
+import { updateAccountSettings } from "./api/user/updateAccountSettings.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
 import { getSessionFromReq, mapHeaders } from "./lib/auth-utils.js";
@@ -72,6 +73,7 @@ import { siteConfig } from "./lib/siteConfig.js";
 import { trackEvent } from "./services/tracker/trackEvent.js";
 // need to import telemetry service here to start it
 import { telemetryService } from "./services/telemetryService.js";
+import { weeklyReportService } from "./services/weekyReports/weeklyReportService.js";
 import { extractSiteId } from "./utils.js";
 import { getTrackingConfig } from "./api/sites/getTrackingConfig.js";
 
@@ -341,43 +343,44 @@ server.get("/api/site/:siteId/excluded-ips", getSiteExcludedIPs);
 server.get("/api/list-organization-members/:organizationId", listOrganizationMembers);
 server.get("/api/user/organizations", getUserOrganizations);
 server.post("/api/add-user-to-organization", addUserToOrganization);
+server.post("/api/user/account-settings", updateAccountSettings);
 
 // UPTIME MONITORING
 // Only register uptime routes when IS_CLOUD is true (Redis is available)
-if (IS_CLOUD) {
-  // Dynamically import uptime modules only when needed
-  const { getMonitors } = await import("./api/uptime/getMonitors.js");
-  const { getMonitor } = await import("./api/uptime/getMonitor.js");
-  const { createMonitor } = await import("./api/uptime/createMonitor.js");
-  const { updateMonitor } = await import("./api/uptime/updateMonitor.js");
-  const { deleteMonitor } = await import("./api/uptime/deleteMonitor.js");
-  const { getMonitorEvents } = await import("./api/uptime/getMonitorEvents.js");
-  const { getMonitorStats } = await import("./api/uptime/getMonitorStats.js");
-  const { getMonitorUptimeBuckets } = await import("./api/uptime/getMonitorUptimeBuckets.js");
-  const { getMonitorStatus } = await import("./api/uptime/getMonitorStatus.js");
-  const { getMonitorUptime } = await import("./api/uptime/getMonitorUptime.js");
-  const { getRegions } = await import("./api/uptime/getRegions.js");
-  const { incidentsRoutes } = await import("./api/uptime/incidents.js");
-  const { notificationRoutes } = await import("./api/uptime/notifications.js");
+// if (IS_CLOUD) {
+//   // Dynamically import uptime modules only when needed
+//   const { getMonitors } = await import("./api/uptime/getMonitors.js");
+//   const { getMonitor } = await import("./api/uptime/getMonitor.js");
+//   const { createMonitor } = await import("./api/uptime/createMonitor.js");
+//   const { updateMonitor } = await import("./api/uptime/updateMonitor.js");
+//   const { deleteMonitor } = await import("./api/uptime/deleteMonitor.js");
+//   const { getMonitorEvents } = await import("./api/uptime/getMonitorEvents.js");
+//   const { getMonitorStats } = await import("./api/uptime/getMonitorStats.js");
+//   const { getMonitorUptimeBuckets } = await import("./api/uptime/getMonitorUptimeBuckets.js");
+//   const { getMonitorStatus } = await import("./api/uptime/getMonitorStatus.js");
+//   const { getMonitorUptime } = await import("./api/uptime/getMonitorUptime.js");
+//   const { getRegions } = await import("./api/uptime/getRegions.js");
+//   const { incidentsRoutes } = await import("./api/uptime/incidents.js");
+//   const { notificationRoutes } = await import("./api/uptime/notifications.js");
 
-  server.get("/api/uptime/monitors", getMonitors);
-  server.get("/api/uptime/monitors/:monitorId", getMonitor);
-  server.post("/api/uptime/monitors", createMonitor);
-  server.put("/api/uptime/monitors/:monitorId", updateMonitor);
-  server.delete("/api/uptime/monitors/:monitorId", deleteMonitor);
-  server.get("/api/uptime/monitors/:monitorId/events", getMonitorEvents);
-  server.get("/api/uptime/monitors/:monitorId/stats", getMonitorStats);
-  server.get("/api/uptime/monitors/:monitorId/status", getMonitorStatus);
-  server.get("/api/uptime/monitors/:monitorId/uptime", getMonitorUptime);
-  server.get("/api/uptime/monitors/:monitorId/buckets", getMonitorUptimeBuckets);
-  server.get("/api/uptime/regions", getRegions);
+//   server.get("/api/uptime/monitors", getMonitors);
+//   server.get("/api/uptime/monitors/:monitorId", getMonitor);
+//   server.post("/api/uptime/monitors", createMonitor);
+//   server.put("/api/uptime/monitors/:monitorId", updateMonitor);
+//   server.delete("/api/uptime/monitors/:monitorId", deleteMonitor);
+//   server.get("/api/uptime/monitors/:monitorId/events", getMonitorEvents);
+//   server.get("/api/uptime/monitors/:monitorId/stats", getMonitorStats);
+//   server.get("/api/uptime/monitors/:monitorId/status", getMonitorStatus);
+//   server.get("/api/uptime/monitors/:monitorId/uptime", getMonitorUptime);
+//   server.get("/api/uptime/monitors/:monitorId/buckets", getMonitorUptimeBuckets);
+//   server.get("/api/uptime/regions", getRegions);
 
-  // Register incidents routes
-  server.register(incidentsRoutes);
+//   // Register incidents routes
+//   server.register(incidentsRoutes);
 
-  // Register notification routes
-  server.register(notificationRoutes);
-}
+//   // Register notification routes
+//   server.register(notificationRoutes);
+// }
 
 // STRIPE & ADMIN
 
@@ -407,6 +410,9 @@ const start = async () => {
     await Promise.all([initializeClickhouse(), initPostgres()]);
 
     telemetryService.startTelemetryCron();
+    if (IS_CLOUD) {
+      weeklyReportService.startWeeklyReportCron();
+    }
 
     // Start the server first
     await server.listen({ port: 3001, host: "0.0.0.0" });

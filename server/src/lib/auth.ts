@@ -110,6 +110,14 @@ export let auth: AuthType | null = betterAuth({
     },
   },
   user: {
+    additionalFields: {
+      sendAutoEmailReports: {
+        type: "boolean",
+        required: true,
+        defaultValue: true,
+        input: true,
+      },
+    },
     deleteUser: {
       enabled: true,
     },
@@ -184,10 +192,11 @@ export function initAuth(allowedOrigins: string[]) {
     },
     user: {
       additionalFields: {
-        monthlyEventCount: {
-          type: "number",
-          defaultValue: 0,
-          required: false,
+        sendAutoEmailReports: {
+          type: "boolean",
+          required: true,
+          defaultValue: true,
+          input: true,
         },
       },
       changeEmail: {

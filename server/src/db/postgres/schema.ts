@@ -31,9 +31,13 @@ export const user = pgTable(
     banned: boolean(),
     banReason: text(),
     banExpires: timestamp({ mode: "string" }),
+    // deprecated
     stripeCustomerId: text(),
+    // deprecated
     overMonthlyLimit: boolean().default(false),
+    // deprecated
     monthlyEventCount: integer().default(0),
+    sendAutoEmailReports: boolean().default(true),
   },
   table => [unique("user_username_unique").on(table.username), unique("user_email_unique").on(table.email)]
 );
