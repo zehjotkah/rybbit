@@ -34,30 +34,31 @@ export const InvitationEmail = ({ email, invitedBy, organizationName, inviteLink
             extend: {
               colors: {
                 brand: "#10b981",
-                darkBg: "#0c0c0c",
-                lightText: "#e5e5e5",
-                mutedText: "#a3a3a3",
-                borderColor: "#27272a",
+                lightBg: "#ffffff",
+                cardBg: "#f9fafb",
+                darkText: "#111827",
+                mutedText: "#6b7280",
+                borderColor: "#e5e7eb",
               },
             },
           },
         }}
       >
-        <Body className="bg-darkBg font-sans">
+        <Body className="bg-lightBg font-sans">
           <Container className="mx-auto py-10 px-6 max-w-[600px]">
             <Section className="text-center">
-              <div className="inline-block bg-brand/20 text-brand px-3 py-1.5 rounded-full text-sm font-medium mb-4">
+              <div className="inline-block bg-brand/10 text-brand px-3 py-1.5 rounded-full text-sm font-medium mb-4">
                 New Invitation
               </div>
-              <Heading className="text-white text-3xl font-semibold mb-6">You've Been Invited!</Heading>
+              <Heading className="text-darkText text-3xl font-semibold mb-6">You've Been Invited!</Heading>
             </Section>
 
             <Section className="mb-8">
-              <Text className="text-lightText text-base leading-relaxed mb-4">
+              <Text className="text-darkText text-base leading-relaxed mb-4">
                 {invitedBy} has invited you to join <span className="font-bold text-brand">{organizationName}</span> on
                 Rybbit Analytics.
               </Text>
-              <Text className="text-lightText text-base leading-relaxed">
+              <Text className="text-darkText text-base leading-relaxed">
                 Rybbit is an open-source analytics platform that helps you understand your website traffic while
                 respecting user privacy.
               </Text>

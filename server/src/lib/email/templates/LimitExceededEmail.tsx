@@ -39,38 +39,39 @@ export const LimitExceededEmail = ({
             extend: {
               colors: {
                 brand: "#10b981",
-                darkBg: "#0c0c0c",
-                lightText: "#e5e5e5",
-                mutedText: "#a3a3a3",
-                borderColor: "#27272a",
+                lightBg: "#ffffff",
+                cardBg: "#f9fafb",
+                darkText: "#111827",
+                mutedText: "#6b7280",
+                borderColor: "#e5e7eb",
                 warningBg: "#dc2626",
               },
             },
           },
         }}
       >
-        <Body className="bg-darkBg font-sans">
+        <Body className="bg-lightBg font-sans">
           <Container className="mx-auto py-10 px-6 max-w-[600px]">
             <Section className="text-center">
               <div className="inline-block bg-warningBg/20 text-warningBg px-3 py-1.5 rounded-full text-sm font-medium mb-4">
                 Event Limit Exceeded
               </div>
-              <Heading className="text-white text-3xl font-semibold mb-6">
+              <Heading className="text-darkText text-3xl font-semibold mb-6">
                 Monthly Event Limit Reached
               </Heading>
             </Section>
 
             <Section className="mb-8">
-              <Text className="text-lightText text-base leading-relaxed mb-4">
+              <Text className="text-darkText text-base leading-relaxed mb-4">
                 Your organization <span className="font-bold text-brand">{organizationName}</span> has
                 exceeded its monthly event limit.
               </Text>
-              <Text className="text-lightText text-base leading-relaxed mb-4">
+              <Text className="text-darkText text-base leading-relaxed mb-4">
                 <strong>Current usage:</strong> {eventCount.toLocaleString()} events
                 <br />
                 <strong>Monthly limit:</strong> {eventLimit.toLocaleString()} events
               </Text>
-              <Text className="text-lightText text-base leading-relaxed">
+              <Text className="text-darkText text-base leading-relaxed">
                 Your analytics tracking has been paused. To continue tracking events and accessing
                 your analytics data, please upgrade your plan.
               </Text>
