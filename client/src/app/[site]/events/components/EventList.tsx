@@ -114,11 +114,14 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
 
   // Find the total count to calculate percentages
   const totalCount = events.reduce((sum, event) => sum + event.count, 0);
+  const maxCount = Math.max(...events.map(event => event.count));
 
   return (
     <div className="flex flex-col gap-2">
       {events.map(event => {
+        const percentageOfMax = (event.count / maxCount) * 100;
         const percentage = (event.count / totalCount) * 100;
+
         const isExpanded = expandedEvent === event.eventName;
 
         return (
@@ -133,7 +136,7 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
             >
               <div
                 className="absolute inset-0 bg-dataviz py-2 opacity-25 rounded-md"
-                style={{ width: `${percentage}%` }}
+                style={{ width: `${percentageOfMax}%` }}
               ></div>
               <div
                 className={cn(
