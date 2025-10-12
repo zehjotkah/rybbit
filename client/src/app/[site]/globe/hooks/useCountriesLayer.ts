@@ -1,27 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FilterParameter } from "@rybbit/shared";
 import { addFilter } from "../../../../lib/store";
+import { useSingleCol } from "../../../../api/analytics/useSingleCol";
+import { useCountries } from "../../../../lib/geo";
+import { processCountryData } from "../utils/processData";
+import { createColorScale } from "../utils/colorScale";
 
 interface UseCountriesLayerProps {
   map: React.RefObject<mapboxgl.Map | null>;
-  countriesGeoData: any;
-  processedCountryData: any;
-  colorScale: (value: number) => string;
-  countryData: any;
   mapLoaded: boolean;
   mapView: string;
 }
 
-export function useCountriesLayer({
-  map,
-  countriesGeoData,
-  processedCountryData,
-  colorScale,
-  countryData,
-  mapLoaded,
-  mapView,
-}: UseCountriesLayerProps) {
+export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayerProps) {
+  const { data: countryData } = useSingleCol({ parameter: "country" });
+  const { data: countriesGeoData } = useCountries();
+  const processedCountryData = useMemo(() => processCountryData(countryData), [countryData]);
+  const colorScale = useMemo(() => createColorScale(processedCountryData), [processedCountryData]);
+
   const popupRef = useRef<mapboxgl.Popup | null>(null);
 
   useEffect(() => {

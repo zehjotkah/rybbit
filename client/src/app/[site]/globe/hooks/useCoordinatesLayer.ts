@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
+import { FilterParameter } from "@rybbit/shared/dist/filters";
 import { scaleSequentialSqrt } from "d3-scale";
 import { interpolateYlOrRd } from "d3-scale-chromatic";
-import { LiveSessionLocation } from "../../../../api/analytics/useGetSessionLocations";
-import { addFilter, removeFilter, useStore } from "../../../../lib/store";
-import { FilterParameter } from "@rybbit/shared/dist/filters";
 import { round } from "lodash";
+import mapboxgl from "mapbox-gl";
+import { useEffect, useRef } from "react";
+import { useGetSessionLocations } from "../../../../api/analytics/useGetSessionLocations";
+import { addFilter, removeFilter, useStore } from "../../../../lib/store";
 
 const getSizeMultiplier = (total: number) => {
   if (total <= 50) return 3; // Large dots
@@ -16,17 +16,17 @@ const getSizeMultiplier = (total: number) => {
 
 export function useCoordinatesLayer({
   map,
-  liveSessionLocations,
   mapLoaded,
   minutes,
   mapView,
 }: {
   map: React.RefObject<mapboxgl.Map | null>;
-  liveSessionLocations: LiveSessionLocation[] | undefined;
   mapLoaded: boolean;
   minutes: number;
   mapView: string;
 }) {
+  const { data: liveSessionLocations } = useGetSessionLocations();
+
   const popupRef = useRef<mapboxgl.Popup | null>(null);
   const filters = useStore(state => state.filters);
 

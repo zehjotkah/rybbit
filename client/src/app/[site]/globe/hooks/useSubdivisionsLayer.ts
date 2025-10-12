@@ -1,28 +1,25 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FilterParameter } from "@rybbit/shared";
 import { addFilter } from "../../../../lib/store";
+import { useSingleCol } from "../../../../api/analytics/useSingleCol";
+import { useSubdivisions } from "../../../../lib/geo";
+import { processSubdivisionData } from "../utils/processData";
+import { createColorScale } from "../utils/colorScale";
 
 interface UseSubdivisionsLayerProps {
   map: React.RefObject<mapboxgl.Map | null>;
-  subdivisionsGeoData: any;
-  processedSubdivisionData: any;
-  colorScale: (value: number) => string;
-  subdivisionData: any;
   mapLoaded: boolean;
   mapView: string;
 }
 
-export function useSubdivisionsLayer({
-  map,
-  subdivisionsGeoData,
-  processedSubdivisionData,
-  colorScale,
-  subdivisionData,
-  mapLoaded,
-  mapView,
-}: UseSubdivisionsLayerProps) {
+export function useSubdivisionsLayer({ map, mapLoaded, mapView }: UseSubdivisionsLayerProps) {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
+
+  const { data: subdivisionData } = useSingleCol({ parameter: "region", limit: 10000 });
+  const { data: subdivisionsGeoData } = useSubdivisions();
+  const processedSubdivisionData = useMemo(() => processSubdivisionData(subdivisionData), [subdivisionData]);
+  const colorScale = useMemo(() => createColorScale(processedSubdivisionData), [processedSubdivisionData]);
 
   useEffect(() => {
     if (!map.current || !subdivisionsGeoData || !processedSubdivisionData || !mapLoaded) return;
