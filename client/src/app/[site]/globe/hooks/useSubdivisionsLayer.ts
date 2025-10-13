@@ -6,6 +6,7 @@ import { useSingleCol } from "../../../../api/analytics/useSingleCol";
 import { useSubdivisions } from "../../../../lib/geo";
 import { processSubdivisionData } from "../utils/processData";
 import { createColorScale } from "../utils/colorScale";
+import { renderCountryFlag } from "../utils/renderCountryFlag";
 
 interface UseSubdivisionsLayerProps {
   map: React.RefObject<mapboxgl.Map | null>;
@@ -94,10 +95,15 @@ export function useSubdivisionsLayer({ map, mapLoaded, mapView }: UseSubdivision
           const foundData = currentData?.find((d: any) => d.value === code);
           const percentage = foundData?.percentage || 0;
 
+          // Extract country code from iso_3166_2 (e.g., "US-CA" -> "US")
+          const countryCode = code?.split("-")[0] || "";
+          const flagSVG = renderCountryFlag(countryCode);
+
           const coordinates = e.lngLat;
           const html = `
-            <div class="bg-neutral-850 border border-neutral-700 rounded-lg p-3">
-              <div class="flex items-center gap-1 mb-1">
+            <div class="bg-neutral-850 border border-neutral-700 rounded-lg p-2">
+              <div class="flex items-center gap-2 mb-1">
+                ${flagSVG}
                 <span class="text-sm font-medium text-white">${name}</span>
               </div>
               <div class="text-sm">

@@ -24,7 +24,8 @@ WITH stuff AS (
         session_id,
         any(lat) AS lat,
         any(lon) AS lon,
-        any(city) AS city
+        any(city) AS city,
+        any(country) AS country
     FROM
         events
     WHERE
@@ -38,13 +39,15 @@ SELECT
     lat,
     lon,
     city,
+    country,
     count() as count
 from
     stuff
 GROUP BY
     lat,
     lon,
-    city`,
+    city,
+    country`,
     query_params: {
       site,
     },

@@ -4,6 +4,7 @@ import mapboxgl from "mapbox-gl";
 import { useEffect, useRef } from "react";
 import { useGetSessionLocations } from "../../../../api/analytics/useGetSessionLocations";
 import { addFilter, removeFilter, useStore } from "../../../../lib/store";
+import { renderCountryFlag } from "../utils/renderCountryFlag";
 
 const getSizeMultiplier = (total: number) => {
   if (total <= 50) return 3; // Large dots
@@ -83,6 +84,7 @@ export function useCoordinatesLayer({
             properties: {
               count: location.count,
               city: location.city,
+              country: location.country,
               isFiltered,
               lat: roundedLat,
               lon: roundedLon,
@@ -156,10 +158,14 @@ export function useCoordinatesLayer({
           const city = feature.properties?.city || "Unknown";
           const count = feature.properties?.count || 0;
 
+          const countryCode = feature.properties?.country?.length === 2 ? feature.properties?.country : "";
+          const flagSVG = renderCountryFlag(countryCode);
+
           const coordinates = e.lngLat;
           const html = `
             <div class="bg-neutral-850 border border-neutral-750 rounded-lg p-2">
-              <div class="flex items-center gap-1 mb-1">
+              <div class="flex items-center gap-2 mb-1">
+                ${flagSVG}
                 <span class="text-sm font-medium text-white">${city}</span>
               </div>
               <div class="text-sm">

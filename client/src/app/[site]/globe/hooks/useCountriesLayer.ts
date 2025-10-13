@@ -6,6 +6,7 @@ import { useSingleCol } from "../../../../api/analytics/useSingleCol";
 import { useCountries } from "../../../../lib/geo";
 import { processCountryData } from "../utils/processData";
 import { createColorScale } from "../utils/colorScale";
+import { renderCountryFlag } from "../utils/renderCountryFlag";
 
 interface UseCountriesLayerProps {
   map: React.RefObject<mapboxgl.Map | null>;
@@ -94,11 +95,14 @@ export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayer
           const foundData = currentData?.find((d: any) => d.value === code);
           const percentage = foundData?.percentage || 0;
 
+          const flagSVG = renderCountryFlag(code);
+
           // Use Mapbox native popup
           const coordinates = e.lngLat;
           const html = `
-            <div class="bg-neutral-850 border border-neutral-700 rounded-lg p-3">
-              <div class="flex items-center gap-1 mb-1">
+            <div class="bg-neutral-850 border border-neutral-700 rounded-lg p-2">
+              <div class="flex items-center gap-2 mb-1">
+                ${flagSVG}
                 <span class="text-sm font-medium text-white">${name}</span>
               </div>
               <div class="text-sm">
