@@ -105,11 +105,11 @@ export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: 
       GROUP BY
           session_id,
           user_id
+      ORDER BY session_end DESC
   )
   SELECT *
   FROM AggregatedSessions
   WHERE 1 = 1 ${filterStatement}
-  ORDER BY session_end DESC
   LIMIT {limit:Int32} OFFSET {offset:Int32}
   `;
 

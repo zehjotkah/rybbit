@@ -7,21 +7,18 @@ import { GetSessionsResponse } from "../../../api/analytics/userSessions";
 export function calculateWindowSize(startTime: DateTime, endTime: DateTime): number {
   const diffInMinutes = endTime.diff(startTime, "minutes").minutes;
 
-  if (diffInMinutes <= 1440) {
-    // 1 day or less: 1 hour windows
-    return 60;
-  } else if (diffInMinutes <= 4320) {
+  if (diffInMinutes <= 4320) {
     // 3 days or less: 3 hour windows
-    return 180;
+    return 60;
   } else if (diffInMinutes <= 10080) {
-    // 1 week or less: 6 hour windows
-    return 360;
+    // 1 week or less: 3 hour windows
+    return 180;
   } else if (diffInMinutes <= 43200) {
-    // 30 days or less: 1 day windows
-    return 1440;
+    // 30 days or less: 6 hour windows
+    return 360;
   } else {
-    // More than 30 days: 3 day windows
-    return 4320;
+    // More than 30 days: 1 day windows
+    return 1440;
   }
 }
 

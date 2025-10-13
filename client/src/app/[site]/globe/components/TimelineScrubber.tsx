@@ -1,15 +1,16 @@
 import { debounce } from "lodash";
-import { Pause, Play } from "lucide-react";
+import { AlertTriangle, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
 import { TimelineSlider } from "../../../../components/ui/timeline-slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { useTimelineSessions } from "../hooks/useTimelineSessions";
 import { useTimelineStore } from "../timelineStore";
 import { formatTimelineTime, generateTimeWindows, getActiveSessions, WINDOW_SIZE_OPTIONS } from "../timelineUtils";
 
 export function TimelineScrubber() {
   const { currentTime, timeRange, windowSize, setCurrentTime, setManualWindowSize } = useTimelineStore();
-  const { activeSessions, allSessions, isLoading } = useTimelineSessions();
+  const { activeSessions, allSessions, isLoading, hasMoreData } = useTimelineSessions();
   const [isPlaying, setIsPlaying] = useState(false);
   const [localSliderIndex, setLocalSliderIndex] = useState(0);
 
@@ -107,7 +108,16 @@ export function TimelineScrubber() {
     return sessionCounts.length > 0 ? Math.max(...sessionCounts, 1) : 1;
   }, [sessionCounts]);
 
-  if (isLoading || !timeRange || timeWindows.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2 text-xs text-neutral-400 h-[66px] w-full">
+        <div className="w-4 h-4 border-2 border-neutral-600 border-t-accent-500 rounded-full animate-spin" />
+        <span>Loading sessions...</span>
+      </div>
+    );
+  }
+
+  if (!timeRange || timeWindows.length === 0) {
     return null;
   }
 
@@ -172,6 +182,18 @@ export function TimelineScrubber() {
               {activeSessions.length} / {allSessions.length}
             </span>{" "}
             sessions
+            {hasMoreData && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 ml-1" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Showing only the first 50,000 sessions. More data may be available.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         </div>
       </div>

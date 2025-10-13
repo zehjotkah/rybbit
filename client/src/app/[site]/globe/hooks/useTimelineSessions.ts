@@ -14,18 +14,47 @@ export function useTimelineSessions() {
 
   const filteredFilters = getFilteredFilters(SESSION_PAGE_FILTERS);
 
-  // Fetch all sessions with a large page size (10000) without pagination
-  const { data, isLoading, isError } = useQuery<APIResponse<GetSessionsResponse>>({
+  // Fetch all sessions with pagination (up to 5 pages, 50k sessions total)
+  const { data, isLoading, isError } = useQuery<APIResponse<GetSessionsResponse> & { hasMoreData?: boolean }>({
     queryKey: ["timeline-sessions", time, site, filteredFilters],
-    queryFn: () => {
-      const requestParams = {
-        ...getQueryParams(time),
-        filters: filteredFilters,
-        page: 1,
-        limit: 10000,
-      };
+    queryFn: async () => {
+      const allSessions = [];
+      const maxPages = 5;
+      const limit = 10000;
+      let reachedMaxPages = false;
 
-      return authedFetch<APIResponse<GetSessionsResponse>>(`/sessions/${site}`, requestParams);
+      for (let page = 1; page <= maxPages; page++) {
+        const requestParams = {
+          ...getQueryParams(time),
+          filters: filteredFilters,
+          page,
+          limit,
+        };
+
+        const response = await authedFetch<APIResponse<GetSessionsResponse>>(`/sessions/${site}`, requestParams);
+
+        if (response?.data) {
+          allSessions.push(...response.data);
+
+          // If we got fewer results than the limit, we've reached the end
+          if (response.data.length < limit) {
+            break;
+          }
+
+          // If we're on the last page and got a full page, there might be more
+          if (page === maxPages && response.data.length === limit) {
+            reachedMaxPages = true;
+          }
+        } else {
+          break;
+        }
+      }
+
+      // Return in the same format as the original API response
+      return {
+        data: allSessions,
+        hasMoreData: reachedMaxPages,
+      } as APIResponse<GetSessionsResponse> & { hasMoreData: boolean };
     },
     staleTime: Infinity,
   });
@@ -63,7 +92,7 @@ export function useTimelineSessions() {
       }
       setTimeRange(earliest, latest);
     }
-  }, [allSessions, setTimeRange, setWindowSize, manualWindowSize]);
+  }, [allSessions, setTimeRange, setWindowSize, manualWindowSize, time]);
 
   // Filter sessions based on current time window
   const activeSessions = useMemo(() => {
@@ -76,5 +105,6 @@ export function useTimelineSessions() {
     activeSessions,
     isLoading,
     isError,
+    hasMoreData: data?.hasMoreData || false,
   };
 }
