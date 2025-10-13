@@ -14,6 +14,8 @@ export type UsersResponse = {
   browser: string;
   operating_system: string;
   device_type: string;
+  referrer: string;
+  channel: string;
   pageviews: number;
   events: number;
   sessions: number;

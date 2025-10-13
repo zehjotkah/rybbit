@@ -16,7 +16,9 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useGetUsers, UsersResponse } from "../../../api/analytics/users";
 import { Avatar, generateName } from "../../../components/Avatar";
+import { extractDomain, getChannelIcon, getDisplayName } from "../../../components/Channel";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
+import { Favicon } from "../../../components/Favicon";
 import { Pagination } from "../../../components/pagination";
 import { Button } from "../../../components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
@@ -123,6 +125,31 @@ export default function UsersPage() {
         );
       },
     }),
+    columnHelper.accessor("referrer", {
+      header: ({ column }) => <SortHeader column={column}>Channel</SortHeader>,
+      cell: info => {
+        const channel = info.row.original.channel;
+        const referrer = info.getValue();
+        const domain = extractDomain(referrer);
+
+        if (domain) {
+          const displayName = getDisplayName(domain);
+          return (
+            <div className="flex items-center gap-2">
+              <Favicon domain={domain} className="w-4 h-4" />
+              <span>{displayName}</span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="flex items-center gap-2">
+            {getChannelIcon(channel)}
+            <span>{channel}</span>
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor("browser", {
       header: "Browser",
       cell: info => (
@@ -150,6 +177,7 @@ export default function UsersPage() {
             {deviceType === "Desktop" && <Monitor className="w-4 h-4" />}
             {deviceType === "Mobile" && <Smartphone className="w-4 h-4" />}
             {deviceType === "Tablet" && <Tablet className="w-4 h-4" />}
+            {deviceType}
           </div>
         );
       },
@@ -166,6 +194,7 @@ export default function UsersPage() {
       header: ({ column }) => <SortHeader column={column}>Sessions</SortHeader>,
       cell: info => <div className="whitespace-nowrap">{info.getValue().toLocaleString()}</div>,
     }),
+
     columnHelper.accessor("last_seen", {
       header: ({ column }) => <SortHeader column={column}>Last Seen</SortHeader>,
       cell: info => {
@@ -285,7 +314,7 @@ export default function UsersPage() {
                     const href = `/${site}/user/${userId}`;
 
                     return (
-                      <tr key={row.id} className="border-b border-neutral-800  group">
+                      <tr key={row.id} className="border-b border-neutral-800 group">
                         {row.getVisibleCells().map(cell => (
                           <td key={cell.id} className="px-3 py-3 relative">
                             {/* <Link
