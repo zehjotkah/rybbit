@@ -35,6 +35,8 @@ export type GetSessionsResponse = {
   errors: number;
   outbound: number;
   ip: string;
+  lat: number;
+  lon: number;
 }[];
 
 export interface GetSessionsRequest {
@@ -42,13 +44,14 @@ export interface GetSessionsRequest {
     site: string;
   };
   Querystring: FilterParams<{
+    limit: number;
     page: number;
     userId?: string;
   }>;
 }
 
 export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: FastifyReply) {
-  const { filters, page, userId } = req.query;
+  const { filters, page, userId, limit } = req.query;
   const site = req.params.site;
   const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
   if (!userHasAccessToSite) {
@@ -117,8 +120,8 @@ export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: 
       query_params: {
         siteId: Number(site),
         userId,
-        limit: 100,
-        offset: (page - 1) * 100,
+        limit: limit || 100,
+        offset: (page - 1) * (limit || 100),
       },
     });
 

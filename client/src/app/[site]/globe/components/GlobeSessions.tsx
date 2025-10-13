@@ -2,11 +2,13 @@ import { ArrowRight, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { VisuallyHidden } from "radix-ui";
 import { useCurrentSite } from "../../../../api/admin/sites";
 import { GetSessionsResponse, useGetSessionsInfinite } from "../../../../api/analytics/userSessions";
 import { Avatar, generateName } from "../../../../components/Avatar";
 import { Channel } from "../../../../components/Channel";
 import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
+import { SessionCard as FullSessionCard } from "../../../../components/Sessions/SessionCard";
 import {
   BrowserTooltipIcon,
   CountryFlagTooltipIcon,
@@ -15,6 +17,7 @@ import {
 } from "../../../../components/TooltipIcons/TooltipIcons";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "../../../../components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { formatShortDuration, hour12, userLocale } from "../../../../lib/dateTimeUtils";
 import { cn, formatter } from "../../../../lib/utils";
@@ -60,7 +63,7 @@ function SessionCardSkeleton() {
   );
 }
 
-function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
+function SessionCard({ session, onClick }: { session: GetSessionsResponse[number]; onClick?: () => void }) {
   // Calculate session duration in minutes
   const start = DateTime.fromSQL(session.session_start);
   const end = DateTime.fromSQL(session.session_end);
@@ -71,16 +74,14 @@ function SessionCard({ session }: { session: GetSessionsResponse[number] }) {
   const name = generateName(session.user_id);
 
   return (
-    <div className="rounded-lg bg-neutral-850 border border-neutral-800 overflow-hidden p-2 space-y-2">
+    <div
+      className="rounded-lg bg-neutral-850 border border-neutral-800 overflow-hidden p-2 space-y-2 cursor-pointer hover:bg-neutral-800 transition-colors"
+      onClick={onClick}
+    >
       <div className="flex justify-between border-b border-neutral-700 pb-2">
         <div className="text-sm text-neutral-100 flex items-center gap-1.5">
           <Avatar id={session.user_id} size={16} />
-          <Link
-            href={`/${siteId.site?.siteId}/user/${session.user_id}`}
-            className="text-xs text-neutral-200 max-w-32 truncate hover:underline"
-          >
-            {name}
-          </Link>
+          <span className="text-xs text-neutral-200 max-w-32 truncate hover:underline">{name}</span>
         </div>
         <div className="flex space-x-2 items-center pr-2">
           <div className="flex items-center gap-1.5 text-xs text-neutral-300">
@@ -164,6 +165,7 @@ export function GlobeSessions() {
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetSessionsInfinite();
 
   const [expanded, setExpanded] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<GetSessionsResponse[number] | null>(null);
 
   // Combine all pages of data
   const flattenedData = useMemo(() => {
@@ -172,24 +174,37 @@ export function GlobeSessions() {
   }, [data]);
 
   return (
-    <div className="space-y-2 bg-neutral-900 p-2 rounded-lg w-[371px]">
-      <div className="text-sm text-neutral-300 font-medium flex items-center justify-between">
-        SESSIONS
-        <Button variant="ghost" size="smIcon" onClick={() => setExpanded(!expanded)}>
-          {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-        </Button>
+    <>
+      <div className="space-y-2 bg-neutral-900 p-2 rounded-lg w-[371px]">
+        <div className="text-sm text-neutral-300 font-medium flex items-center justify-between">
+          SESSIONS
+          <Button variant="ghost" size="smIcon" onClick={() => setExpanded(!expanded)}>
+            {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          </Button>
+        </div>
+        <div className={cn("space-y-2 overflow-y-auto", expanded ? "max-h-[calc(100vh-210px)]" : "max-h-[210px]")}>
+          {isLoading ? (
+            <>
+              <SessionCardSkeleton />
+              <SessionCardSkeleton />
+              <SessionCardSkeleton />
+            </>
+          ) : (
+            flattenedData.map(session => (
+              <SessionCard key={session.session_id} session={session} onClick={() => setSelectedSession(session)} />
+            ))
+          )}
+        </div>
       </div>
-      <div className={cn("space-y-2 overflow-y-auto", expanded ? "max-h-[calc(100vh-210px)]" : "max-h-[210px]")}>
-        {isLoading ? (
-          <>
-            <SessionCardSkeleton />
-            <SessionCardSkeleton />
-            <SessionCardSkeleton />
-          </>
-        ) : (
-          flattenedData.map(session => <SessionCard key={session.session_id} session={session} />)
-        )}
-      </div>
-    </div>
+
+      <Dialog open={!!selectedSession} onOpenChange={open => !open && setSelectedSession(null)}>
+        <VisuallyHidden.Root>
+          <DialogTitle>Session Details</DialogTitle>
+        </VisuallyHidden.Root>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-transparent border-0 p-0 shadow-none gap-0 [&>button]:hidden">
+          {selectedSession && <FullSessionCard session={selectedSession} expandedByDefault />}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -6,16 +6,21 @@ import "./globe.css";
 
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { NothingFound } from "../../../components/NothingFound";
+import { SessionCard } from "../../../components/Sessions/SessionCard";
+import { Dialog, DialogContent, DialogTitle } from "../../../components/ui/dialog";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { GlobeSessions } from "./components/GlobeSessions";
 import MapViewSelector from "./components/ModeSelector";
+import { TimelineScrubber } from "./components/TimelineScrubber";
 import { useGlobeStore } from "./globeStore";
 import { useCoordinatesLayer } from "./hooks/useCoordinatesLayer";
 import { useCountriesLayer } from "./hooks/useCountriesLayer";
 import { useLayerVisibility } from "./hooks/useLayerVisibility";
 import { useMapbox } from "./hooks/useMapbox";
 import { useSubdivisionsLayer } from "./hooks/useSubdivisionsLayer";
+import { useTimelineLayer } from "./hooks/useTimelineLayer";
+import { VisuallyHidden } from "radix-ui";
 
 export default function GlobePage() {
   useSetPageTitle("Rybbit · Globe");
@@ -44,11 +49,17 @@ export default function GlobePage() {
     mapView,
   });
 
+  const { selectedSession, setSelectedSession } = useTimelineLayer({
+    map,
+    mapLoaded,
+    mapView,
+  });
+
   useLayerVisibility(map, mapView, mapLoaded);
 
   return (
     <DisabledOverlay message="Globe" featurePath="globe">
-      <div className="relative w-full h-dvh">
+      <div className="relative w-full h-dvh overflow-hidden">
         <div className="p-2 md:p-4 relative z-50">
           <SubHeader />
         </div>
@@ -80,14 +91,22 @@ export default function GlobePage() {
               />
             </div>
           )}
-          <div className="absolute bottom-0 left-4 z-99999">
+          <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2">
+            {mapView !== "timeline" && <GlobeSessions />}
             <MapViewSelector />
-          </div>
-          <div className="absolute bottom-[60px] left-4 z-99999">
-            <GlobeSessions />
+            {mapView === "timeline" && <TimelineScrubber />}
           </div>
         </div>
       </div>
+
+      <Dialog open={!!selectedSession} onOpenChange={open => !open && setSelectedSession(null)}>
+        <VisuallyHidden.Root>
+          <DialogTitle>Session Details</DialogTitle>
+        </VisuallyHidden.Root>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-transparent border-0 p-0 shadow-none [&>button]:hidden">
+          {selectedSession && <SessionCard session={selectedSession} expandedByDefault />}
+        </DialogContent>
+      </Dialog>
     </DisabledOverlay>
   );
 }

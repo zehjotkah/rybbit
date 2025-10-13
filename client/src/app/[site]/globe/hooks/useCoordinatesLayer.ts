@@ -1,6 +1,4 @@
 import { FilterParameter } from "@rybbit/shared/dist/filters";
-import { scaleSequentialSqrt } from "d3-scale";
-import { interpolateYlOrRd } from "d3-scale-chromatic";
 import { round } from "lodash";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef } from "react";
@@ -46,9 +44,6 @@ export function useCoordinatesLayer({
       if (!map.current) return;
 
       const highest = liveSessionLocations.reduce((acc, curr) => Math.max(acc, curr.count), 0) || 1;
-      const normalized = 5 / Number(minutes);
-      const weightColor = scaleSequentialSqrt(interpolateYlOrRd).domain([0, highest * normalized * 15]);
-      const singleColor = weightColor(0); // Use the start color for all hexbins
 
       // Calculate size scale based on total number of locations
       const totalLocations = liveSessionLocations.length;
@@ -133,7 +128,7 @@ export function useCoordinatesLayer({
             //   15,
             //   ["interpolate", ["linear"], ["get", "count"], 1, 8 * sizeMultiplier, highest, 20 * sizeMultiplier],
             // ],
-            "circle-color": ["case", ["get", "isFiltered"], "#3b82f6", singleColor],
+            "circle-color": ["case", ["get", "isFiltered"], "#3b82f6", "#fff4d6"],
             "circle-opacity": ["case", ["get", "isFiltered"], 0.9, 0.7],
             "circle-stroke-width": ["case", ["get", "isFiltered"], 2, 1],
             "circle-stroke-color": ["case", ["get", "isFiltered"], "#60a5fa", "#fff"],
@@ -159,12 +154,14 @@ export function useCoordinatesLayer({
 
           const coordinates = e.lngLat;
           const html = `
-            <div class="flex items-center gap-1 mb-1">
-              <span class="text-sm font-medium">${city}</span>
-            </div>
-            <div class="text-sm">
-              <span class="font-bold text-accent-400">${count.toLocaleString()}</span>
-              <span class="text-neutral-300"> sessions</span>
+            <div class="bg-neutral-850 border border-neutral-750 rounded-lg p-2">
+              <div class="flex items-center gap-1 mb-1">
+                <span class="text-sm font-medium text-white">${city}</span>
+              </div>
+              <div class="text-sm">
+                <span class="font-bold text-accent-400">${count.toLocaleString()}</span>
+                <span class="text-neutral-300"> sessions</span>
+              </div>
             </div>
           `;
 
@@ -223,7 +220,7 @@ export function useCoordinatesLayer({
           "case",
           ["get", "isFiltered"],
           "#3b82f6",
-          singleColor,
+          "#fff4d6",
         ]);
         map.current.setPaintProperty("realtime-coordinates-layer", "circle-opacity", [
           "case",

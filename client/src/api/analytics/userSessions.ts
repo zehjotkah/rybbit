@@ -35,6 +35,8 @@ export type GetSessionsResponse = {
   errors: number;
   outbound: number;
   ip: string;
+  lat: number;
+  lon: number;
 }[];
 
 export function useGetSessionsInfinite(userId?: string) {

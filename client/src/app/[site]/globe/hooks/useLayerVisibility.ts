@@ -45,5 +45,6 @@ export function useLayerVisibility(
         mapView === "coordinates" ? "visible" : "none"
       );
     }
+    // Note: Timeline view uses HTML markers instead of layers, visibility is handled in useTimelineLayer
   }, [mapView, mapLoaded, map]);
 }

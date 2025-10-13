@@ -18,7 +18,7 @@ import {
 import { Badge } from "./ui/badge";
 import { Favicon } from "./Favicon";
 
-const getChannelIcon = (channel: string) => {
+export const getChannelIcon = (channel: string) => {
   switch (channel) {
     case "Direct":
       return <Link className="w-4 h-4 text-gray-400" />;
@@ -57,7 +57,7 @@ const getChannelIcon = (channel: string) => {
   }
 };
 
-const getDisplayName = (hostname: string): string => {
+export const getDisplayName = (hostname: string): string => {
   // Handle Google domains with startsWith
   if (hostname.startsWith("google.") || hostname.startsWith("www.google.")) {
     return "Google";
@@ -119,7 +119,7 @@ const getDisplayName = (hostname: string): string => {
   return commonSites[hostname] || hostname;
 };
 
-const extractDomain = (url: string): string | null => {
+export const extractDomain = (url: string): string | null => {
   try {
     if (!url || url === "direct") return null;
     if (url.startsWith("android-app://")) {

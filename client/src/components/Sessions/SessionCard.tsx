@@ -22,6 +22,7 @@ interface SessionCardProps {
   session: GetSessionsResponse[number];
   userId?: string;
   onClick?: () => void;
+  expandedByDefault?: boolean;
 }
 
 // Function to truncate path for display
@@ -33,9 +34,8 @@ function truncatePath(path: string, maxLength: number = 32) {
   return `${path.substring(0, maxLength)}...`;
 }
 
-export function SessionCard({ session, onClick, userId }: SessionCardProps) {
-  const [expanded, setExpanded] = useState(false);
-
+export function SessionCard({ session, onClick, userId, expandedByDefault }: SessionCardProps) {
+  const [expanded, setExpanded] = useState(expandedByDefault || false);
   // Calculate session duration in minutes
   const start = DateTime.fromSQL(session.session_start);
   const end = DateTime.fromSQL(session.session_end);
@@ -53,7 +53,7 @@ export function SessionCard({ session, onClick, userId }: SessionCardProps) {
   const name = generateName(session.user_id);
 
   return (
-    <div className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
+    <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden">
       <div className="p-3 cursor-pointer" onClick={handleCardClick}>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
@@ -177,7 +177,7 @@ export const SessionCardSkeleton = memo(() => {
 
   // Create multiple skeletons for a realistic loading state
   const skeletons = Array.from({ length: 10 }).map((_, index) => (
-    <div className="mb-3 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden" key={index}>
+    <div className="rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden" key={index}>
       <div className="p-3">
         <div className="flex items-center gap-2">
           {/* Avatar and User ID */}
