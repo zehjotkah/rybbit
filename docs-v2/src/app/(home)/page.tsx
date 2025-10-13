@@ -230,20 +230,22 @@ export default function HomePage() {
                 <Image
                   src="/logos/dtelecom.svg"
                   alt="DTelecom"
-                  width={100}
+                  width={120}
                   height={40}
                   className="opacity-60 hover:opacity-100 transition-opacity grayscale"
                 />
               </div>
 
               <div className="flex items-center justify-center">
-                <Image
-                  src="/logos/apc.webp"
-                  alt="Apc"
-                  width={90}
-                  height={30}
-                  className="opacity-60 hover:opacity-100 transition-opacity invert grayscale"
-                />
+                <Link href="https://dpm.lol" target="_blank">
+                  <Image
+                    src="/logos/dpm.webp"
+                    alt="DPM.lol"
+                    width={120}
+                    height={40}
+                    className="opacity-60 hover:opacity-100 transition-opacity grayscale"
+                  />
+                </Link>
               </div>
             </div>
           </div>
