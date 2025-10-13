@@ -175,8 +175,8 @@ export function GlobeSessions() {
 
   return (
     <>
-      <div className="space-y-2 bg-neutral-800/40 p-2 rounded-lg w-[371px] backdrop-blur-sm">
-        <div className="text-sm text-neutral-300 font-medium flex items-center justify-between">
+      <div className="space-y-2 bg-neutral-850/60 p-2 rounded-lg w-[371px] backdrop-blur-sm">
+        <div className="text-sm text-neutral-200 font-medium flex items-center justify-between">
           SESSIONS
           <Button variant="ghost" size="smIcon" onClick={() => setExpanded(!expanded)}>
             {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}

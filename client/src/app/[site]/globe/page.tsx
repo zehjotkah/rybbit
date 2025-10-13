@@ -91,12 +91,22 @@ export default function GlobePage() {
               />
             </div>
           )}
-          <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2">
+          <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2 pointer-events-none">
             <div className="flex items-end gap-2 justify-between">
-              <MapViewSelector />
-              {mapView !== "timeline" && <GlobeSessions />}
+              <div className="pointer-events-auto">
+                <MapViewSelector />
+              </div>
+              {mapView !== "timeline" && (
+                <div className="pointer-events-auto">
+                  <GlobeSessions />
+                </div>
+              )}
             </div>
-            {mapView === "timeline" && <TimelineScrubber />}
+            {mapView === "timeline" && (
+              <div className="pointer-events-auto">
+                <TimelineScrubber />
+              </div>
+            )}
           </div>
         </div>
       </div>
