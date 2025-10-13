@@ -92,8 +92,10 @@ export default function GlobePage() {
             </div>
           )}
           <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2">
-            {mapView !== "timeline" && <GlobeSessions />}
-            <MapViewSelector />
+            <div className="flex items-end gap-2 justify-between">
+              <MapViewSelector />
+              {mapView !== "timeline" && <GlobeSessions />}
+            </div>
             {mapView === "timeline" && <TimelineScrubber />}
           </div>
         </div>
