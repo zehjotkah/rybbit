@@ -174,17 +174,19 @@ export function UsageChart({ organizationId, startDate, endDate, timeZone = "UTC
             return (
               <div className="text-sm bg-neutral-850 p-3 rounded-md min-w-[100px] border border-neutral-750">
                 <div className="font-medium mb-1">{currentTime.toLocaleString(DateTime.DATE_MED)}</div>
-                {slice.points.reverse().map((point: any) => {
-                  return (
-                    <div key={point.serieId} className="flex justify-between gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-neutral-300">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: point.seriesColor }} />
-                        <span>{point.seriesId.charAt(0).toUpperCase() + point.seriesId.slice(1)}</span>
+                {slice.points
+                  .sort((a: any, b: any) => a.seriesId.localeCompare(b.seriesId))
+                  .map((point: any) => {
+                    return (
+                      <div key={point.serieId} className="flex justify-between gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-neutral-300">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: point.seriesColor }} />
+                          <span>{point.seriesId.charAt(0).toUpperCase() + point.seriesId.slice(1)}</span>
+                        </div>
+                        <div>{Number(point.data.yFormatted).toLocaleString()}</div>
                       </div>
-                      <div>{Number(point.data.yFormatted).toLocaleString()}</div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
                 <div className="text-sm mt-2 flex justify-between">
                   <div className="text-neutral-300">Total</div>
                   <div className="font-semibold">{total.toLocaleString()}</div>

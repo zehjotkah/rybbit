@@ -43,7 +43,11 @@ export function useCoordinatesLayer({
     const addCoordinatesLayer = () => {
       if (!map.current) return;
 
-      const highest = liveSessionLocations.reduce((acc, curr) => Math.max(acc, curr.count), 0) || 1;
+      const topSize =
+        Math.pow(
+          liveSessionLocations.reduce((acc, curr) => Math.max(acc, curr.count), 0),
+          0.5
+        ) || 1;
 
       // Calculate size scale based on total number of locations
       const totalLocations = liveSessionLocations.length;
@@ -107,13 +111,13 @@ export function useCoordinatesLayer({
               ["exponential", 2],
               ["zoom"],
               0,
-              ["interpolate", ["linear"], ["get", "count"], 1, 1 * sizeMultiplier, highest, 3 * sizeMultiplier],
+              ["interpolate", ["linear"], ["get", "count"], 1, 1 * sizeMultiplier, topSize, 5 * sizeMultiplier],
               5,
-              ["interpolate", ["linear"], ["get", "count"], 1, 3 * sizeMultiplier, highest, 7 * sizeMultiplier],
+              ["interpolate", ["linear"], ["get", "count"], 1, 3 * sizeMultiplier, topSize, 10 * sizeMultiplier],
               10,
-              ["interpolate", ["linear"], ["get", "count"], 1, 7 * sizeMultiplier, highest, 15 * sizeMultiplier],
+              ["interpolate", ["linear"], ["get", "count"], 1, 7 * sizeMultiplier, topSize, 20 * sizeMultiplier],
               15,
-              ["interpolate", ["linear"], ["get", "count"], 1, 15 * sizeMultiplier, highest, 30 * sizeMultiplier],
+              ["interpolate", ["linear"], ["get", "count"], 1, 15 * sizeMultiplier, topSize, 40 * sizeMultiplier],
             ],
             // "circle-radius": [
             //   "interpolate",
@@ -214,8 +218,21 @@ export function useCoordinatesLayer({
         });
       }
 
-      // Update colors when data changes
+      // Update paint properties when data changes
       if (map.current.getLayer("realtime-coordinates-layer")) {
+        map.current.setPaintProperty("realtime-coordinates-layer", "circle-radius", [
+          "interpolate",
+          ["exponential", 2],
+          ["zoom"],
+          0,
+          ["interpolate", ["linear"], ["get", "count"], 1, 1 * sizeMultiplier, topSize, 5 * sizeMultiplier],
+          5,
+          ["interpolate", ["linear"], ["get", "count"], 1, 3 * sizeMultiplier, topSize, 10 * sizeMultiplier],
+          10,
+          ["interpolate", ["linear"], ["get", "count"], 1, 7 * sizeMultiplier, topSize, 20 * sizeMultiplier],
+          15,
+          ["interpolate", ["linear"], ["get", "count"], 1, 15 * sizeMultiplier, topSize, 40 * sizeMultiplier],
+        ]);
         map.current.setPaintProperty("realtime-coordinates-layer", "circle-color", [
           "case",
           ["get", "isFiltered"],
