@@ -1,8 +1,8 @@
 import mapboxgl from "mapbox-gl";
-import type { GetSessionsResponse } from "../../../../../api/analytics/userSessions";
+import type { GetSessionsResponse } from "../../../../../../api/analytics/userSessions";
 import { generateAvatarSVG } from "./timelineMarkerHelpers";
-import { buildTooltipHTML } from "./timelineTooltipBuilder";
 import { getUnclusteredFeatures } from "./timelineClusterUtils";
+import { buildTooltipHTML } from "../../../utils/timelineTooltipBuilder";
 
 export type MarkerData = {
   marker: mapboxgl.Marker;
@@ -108,9 +108,7 @@ export async function updateMarkers(
   );
 
   // Build set of current session IDs
-  const currentSessionIds = new Set(
-    unclusteredFeatures.map(f => f.properties?.session_id).filter(Boolean)
-  );
+  const currentSessionIds = new Set(unclusteredFeatures.map(f => f.properties?.session_id).filter(Boolean));
 
   // Remove markers that are no longer unclustered
   const toRemove: string[] = [];

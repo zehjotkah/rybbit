@@ -5,7 +5,7 @@ import { TimelineSlider } from "../../../../components/ui/timeline-slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { useTimelineStore, useActiveSessions } from "../timelineStore";
 import { formatTimelineTime, generateTimeWindows, getSessionCountsPerWindow } from "../timelineUtils";
-import { MAX_PAGES, PAGE_SIZE } from "../hooks/timelineLayer/timelineLayerConstants";
+import { MAX_PAGES, PAGE_SIZE } from "../3d/hooks/timelineLayer/timelineLayerConstants";
 
 export function TimelineScrubber() {
   const { currentTime, timeRange, windowSize, setCurrentTime, allSessions, isLoading, hasMoreData } =

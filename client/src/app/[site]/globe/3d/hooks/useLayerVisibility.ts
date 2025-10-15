@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
-import { MapView } from "../components/ModeSelector";
+import { MapView } from "../../components/ModeSelector";
 
 export function useLayerVisibility(
   map: React.RefObject<mapboxgl.Map | null>,

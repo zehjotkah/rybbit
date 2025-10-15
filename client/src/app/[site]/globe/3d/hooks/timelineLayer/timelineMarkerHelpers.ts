@@ -20,7 +20,7 @@ import {
   Calendar,
   Headphones,
 } from "lucide-react";
-import { AVATAR_COLORS } from "../../../../../components/Avatar";
+import { AVATAR_COLORS } from "../../../../../../components/Avatar";
 
 // Generate avatar SVG using boring-avatars
 export function generateAvatarSVG(userId: string, size: number): string {

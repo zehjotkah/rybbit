@@ -175,7 +175,7 @@ export function GlobeSessions() {
 
   return (
     <>
-      <div className="space-y-2 bg-neutral-850/60 p-2 rounded-lg w-[371px] backdrop-blur-sm">
+      <div className="space-y-2 bg-neutral-850/60 p-2 rounded-lg w-[371px] backdrop-blur-sm border border-neutral-800">
         <div className="text-sm text-neutral-200 font-medium flex items-center justify-between">
           SESSIONS
           <Button variant="ghost" size="smIcon" onClick={() => setExpanded(!expanded)}>

@@ -3,10 +3,10 @@ import { createElement } from "react";
 // @ts-ignore - React 19 has built-in types
 import { renderToStaticMarkup } from "react-dom/server";
 import { Eye, MousePointerClick } from "lucide-react";
-import { generateName } from "../../../../../components/Avatar";
-import { formatShortDuration, hour12, userLocale } from "../../../../../lib/dateTimeUtils";
-import type { GetSessionsResponse } from "../../../../../api/analytics/userSessions";
-import { extractDomain, getDisplayName } from "../../../../../components/Channel";
+import { generateName } from "../../../../components/Avatar";
+import { formatShortDuration, hour12, userLocale } from "../../../../lib/dateTimeUtils";
+import type { GetSessionsResponse } from "../../../../api/analytics/userSessions";
+import { extractDomain, getDisplayName } from "../../../../components/Channel";
 import {
   generateAvatarSVG,
   renderCountryFlag,
@@ -14,16 +14,12 @@ import {
   renderChannelIcon,
   getBrowserIconPath,
   getOSIconPath,
-} from "./timelineMarkerHelpers";
+} from "../3d/hooks/timelineLayer/timelineMarkerHelpers";
 
 /**
  * Build the HTML content for a session tooltip
  */
-export function buildTooltipHTML(
-  session: GetSessionsResponse[number],
-  lng: number,
-  lat: number
-): string {
+export function buildTooltipHTML(session: GetSessionsResponse[number], lng: number, lat: number): string {
   const avatarSVG = generateAvatarSVG(session.user_id, 36);
   const countryCode = session.country?.length === 2 ? session.country : "";
   const flagSVG = renderCountryFlag(countryCode);
@@ -77,7 +73,7 @@ export function buildTooltipHTML(
           </div>
         </div>
       </div>
-      <div class="flex flex-wrap items-center gap-1.5">
+      <div class="flex flex-wrap items-center gap-1.5 whitespace-nowrap">
         ${browserIconPath ? `<img src="${browserIconPath}" alt="${session.browser}" title="${session.browser}" class="w-4 h-4" />` : ""}
         ${osIconPath ? `<img src="${osIconPath}" alt="${session.operating_system}" title="${session.operating_system}" class="w-4 h-4" />` : ""}
         <span class="flex items-center" title="${session.device_type}">${deviceIconSVG}</span>

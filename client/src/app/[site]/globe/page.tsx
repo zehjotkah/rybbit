@@ -6,7 +6,6 @@ import "./globe.css";
 
 import { VisuallyHidden } from "radix-ui";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
-import { NothingFound } from "../../../components/NothingFound";
 import { SessionCard } from "../../../components/Sessions/SessionCard";
 import { Dialog, DialogContent, DialogTitle } from "../../../components/ui/dialog";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
@@ -14,18 +13,19 @@ import { SubHeader } from "../components/SubHeader/SubHeader";
 import { GlobeSessions } from "./components/GlobeSessions";
 import MapViewSelector from "./components/ModeSelector";
 import { TimelineScrubber } from "./components/TimelineScrubber";
+import { OpenLayersMap } from "./2d/components/OpenLayersMap";
+import { MapboxMap } from "./3d/components/MapboxMap";
 import { useGlobeStore } from "./globeStore";
-import { useTimelineLayer } from "./hooks/timelineLayer/useTimelineLayer";
-import { useCoordinatesLayer } from "./hooks/useCoordinatesLayer";
-import { useCountriesLayer } from "./hooks/useCountriesLayer";
-import { useLayerVisibility } from "./hooks/useLayerVisibility";
-import { useMapbox } from "./hooks/useMapbox";
-import { useSubdivisionsLayer } from "./hooks/useSubdivisionsLayer";
+import { useTimelineLayer } from "./3d/hooks/timelineLayer/useTimelineLayer";
+import { useCoordinatesLayer } from "./3d/hooks/useCoordinatesLayer";
+import { useCountriesLayer } from "./3d/hooks/useCountriesLayer";
+import { useLayerVisibility } from "./3d/hooks/useLayerVisibility";
+import { useMapbox } from "./3d/hooks/useMapbox";
+import { useSubdivisionsLayer } from "./3d/hooks/useSubdivisionsLayer";
 import { useTimelineStore } from "./timelineStore";
-import { useTimelineSessions } from "./hooks/timelineLayer/useTimelineSessions";
+import { useTimelineSessions } from "./3d/hooks/timelineLayer/useTimelineSessions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { WINDOW_SIZE_OPTIONS } from "./timelineUtils";
-import { useConfigs } from "../../../lib/configs";
 
 export default function GlobePage() {
   useSetPageTitle("Rybbit · Globe");
@@ -35,44 +35,36 @@ export default function GlobePage() {
   // Fetch timeline sessions and update store
   useTimelineSessions();
 
-  // Handle window size change
-  const handleWindowSizeChange = (value: string) => {
-    const newSize = parseInt(value, 10);
-    setManualWindowSize(newSize);
-  };
+  const { mapView, mapMode } = useGlobeStore();
 
-  const mapView = useGlobeStore(state => state.mapView);
-
-  const { map, mapLoaded } = useMapbox(mapContainer);
+  const { map, mapLoaded } = useMapbox(mapContainer, mapMode === "3D");
 
   useCountriesLayer({
     map,
-    mapLoaded,
+    mapLoaded: mapMode === "3D" && mapLoaded,
     mapView,
   });
 
   useSubdivisionsLayer({
     map,
-    mapLoaded,
+    mapLoaded: mapMode === "3D" && mapLoaded,
     mapView,
   });
 
   useCoordinatesLayer({
     map,
-    mapLoaded,
+    mapLoaded: mapMode === "3D" && mapLoaded,
     minutes: 30,
     mapView,
   });
 
   const { selectedSession, setSelectedSession } = useTimelineLayer({
     map,
-    mapLoaded,
+    mapLoaded: mapMode === "3D" && mapLoaded,
     mapView,
   });
 
-  useLayerVisibility(map, mapView, mapLoaded);
-
-  const { configs, isLoading } = useConfigs();
+  useLayerVisibility(map, mapView, mapMode === "3D" && mapLoaded);
 
   return (
     <DisabledOverlay message="Globe" featurePath="globe">
@@ -81,41 +73,25 @@ export default function GlobePage() {
           <SubHeader />
         </div>
         <div className="absolute top-0 left-0 right-0 bottom-0 z-10">
-          {configs?.mapboxToken ? (
-            <div
-              ref={mapContainer}
-              className="w-full h-full [&_.mapboxgl-ctrl-bottom-left]:!hidden [&_.mapboxgl-ctrl-logo]:!hidden"
-            />
-          ) : isLoading ? null : (
-            <div className="w-full h-full flex items-center justify-center">
-              <NothingFound
-                title="Mapbox access token not found"
-                description={
-                  <p className="text-sm max-w-[600px] text-center">
-                    Please set the <code>MAPBOX_TOKEN</code> environment variable and rebuild all containers. To get a
-                    Mapbox token, please visit{" "}
-                    <a
-                      href="https://docs.mapbox.com/help/dive-deeper/access-tokens/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline"
-                    >
-                      Mapbox
-                    </a>{" "}
-                    and create an account.
-                  </p>
-                }
-              />
-            </div>
+          {mapMode === "3D" ? (
+            <MapboxMap mapContainer={mapContainer} />
+          ) : (
+            <OpenLayersMap key="openlayers-map" mapView={mapView} onSessionSelect={setSelectedSession} />
           )}
-          <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2 pointer-events-none">
-            <div className="flex items-end gap-2 justify-between">
+          <div className="absolute bottom-2 left-2 right-2  md:right-4 md:left-4 z-99999 flex flex-col gap-2 pointer-events-none ">
+            <div className="flex items-end gap-2 justify-between overflow-x-auto">
               <div className="pointer-events-auto">
                 <MapViewSelector />
               </div>
               {mapView === "timeline" ? (
                 <div className="pointer-events-auto">
-                  <Select value={windowSize.toString()} onValueChange={handleWindowSizeChange}>
+                  <Select
+                    value={windowSize.toString()}
+                    onValueChange={(value: string) => {
+                      const newSize = parseInt(value, 10);
+                      setManualWindowSize(newSize);
+                    }}
+                  >
                     <SelectTrigger className="w-[100px]" size="sm">
                       <SelectValue />
                     </SelectTrigger>
@@ -129,7 +105,7 @@ export default function GlobePage() {
                   </Select>
                 </div>
               ) : (
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto hidden md:block">
                   <GlobeSessions />
                 </div>
               )}

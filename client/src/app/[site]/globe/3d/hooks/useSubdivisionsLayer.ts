@@ -1,29 +1,27 @@
-import { useEffect, useMemo, useRef } from "react";
-import mapboxgl from "mapbox-gl";
 import { FilterParameter } from "@rybbit/shared";
-import { addFilter } from "../../../../lib/store";
-import { useSingleCol } from "../../../../api/analytics/useSingleCol";
-import { useCountries } from "../../../../lib/geo";
-import { processCountryData } from "../utils/processData";
-import { createColorScale } from "../utils/colorScale";
-import { renderCountryFlag } from "../utils/renderCountryFlag";
+import mapboxgl from "mapbox-gl";
+import { useEffect, useMemo, useRef } from "react";
+import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { useSubdivisions } from "../../../../../lib/geo";
+import { addFilter } from "../../../../../lib/store";
+import { createColorScale } from "../../utils/colorScale";
+import { renderCountryFlag } from "../../utils/renderCountryFlag";
 
-interface UseCountriesLayerProps {
+interface UseSubdivisionsLayerProps {
   map: React.RefObject<mapboxgl.Map | null>;
   mapLoaded: boolean;
   mapView: string;
 }
 
-export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayerProps) {
-  const { data: countryData } = useSingleCol({ parameter: "country" });
-  const { data: countriesGeoData } = useCountries();
-  const processedCountryData = useMemo(() => processCountryData(countryData), [countryData]);
-  const colorScale = useMemo(() => createColorScale(processedCountryData), [processedCountryData]);
-
+export function useSubdivisionsLayer({ map, mapLoaded, mapView }: UseSubdivisionsLayerProps) {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
 
+  const { data: subdivisionData } = useSingleCol({ parameter: "region", limit: 10000 });
+  const { data: subdivisionsGeoData } = useSubdivisions();
+  const colorScale = useMemo(() => createColorScale(subdivisionData?.data), [subdivisionData?.data]);
+
   useEffect(() => {
-    if (!map.current || !countriesGeoData || !processedCountryData || !mapLoaded) return;
+    if (!map.current || !subdivisionsGeoData || !subdivisionData?.data || !mapLoaded) return;
 
     // Initialize popup once
     if (!popupRef.current) {
@@ -34,70 +32,71 @@ export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayer
       });
     }
 
-    const addCountriesLayer = () => {
+    const addSubdivisionsLayer = () => {
       if (!map.current) return;
 
-      const geoDataCopy = JSON.parse(JSON.stringify(countriesGeoData));
+      const geoDataCopy = JSON.parse(JSON.stringify(subdivisionsGeoData));
       geoDataCopy.features.forEach((feature: any) => {
-        const code = feature.properties?.ISO_A2;
-        const foundData = processedCountryData.find((d: any) => d.value === code);
+        const code = feature.properties?.iso_3166_2;
+        const foundData = subdivisionData?.data?.find((d: any) => d.value === code);
         const count = foundData?.count || 0;
-        const color = count > 0 ? colorScale(count) : "rgba(140, 140, 140, 0.5)";
+        const color = count > 0 ? colorScale(count) : "rgba(0, 0, 0, 0)";
         feature.properties.fillColor = color;
         feature.properties.count = count;
       });
 
-      if (map.current.getSource("countries")) {
-        (map.current.getSource("countries") as mapboxgl.GeoJSONSource).setData(geoDataCopy);
+      if (map.current.getSource("subdivisions")) {
+        (map.current.getSource("subdivisions") as mapboxgl.GeoJSONSource).setData(geoDataCopy);
       } else {
-        map.current.addSource("countries", {
+        map.current.addSource("subdivisions", {
           type: "geojson",
           data: geoDataCopy,
         });
 
         map.current.addLayer({
-          id: "countries-fill",
+          id: "subdivisions-fill",
           type: "fill",
-          source: "countries",
+          source: "subdivisions",
           paint: {
             "fill-color": ["get", "fillColor"],
             "fill-opacity": 0.6,
           },
           layout: {
-            visibility: mapView === "countries" ? "visible" : "none",
+            visibility: mapView === "subdivisions" ? "visible" : "none",
           },
         });
 
         map.current.addLayer({
-          id: "countries-outline",
+          id: "subdivisions-outline",
           type: "line",
-          source: "countries",
+          source: "subdivisions",
           paint: {
             "line-color": "#ffffff",
             "line-width": 0.5,
-            "line-opacity": 0.3,
+            "line-opacity": 0.2,
           },
           layout: {
-            visibility: mapView === "countries" ? "visible" : "none",
+            visibility: mapView === "subdivisions" ? "visible" : "none",
           },
         });
 
-        map.current.on("mousemove", "countries-fill", e => {
+        map.current.on("mousemove", "subdivisions-fill", e => {
           if (!map.current || !e.features || e.features.length === 0 || !popupRef.current) return;
           map.current.getCanvas().style.cursor = "pointer";
 
           const feature = e.features[0];
-          const code = feature.properties?.ISO_A2;
-          const name = feature.properties?.ADMIN;
+          const code = feature.properties?.iso_3166_2;
+          const name = feature.properties?.name;
           const count = feature.properties?.count || 0;
 
-          const currentData = countryData?.data;
+          const currentData = subdivisionData?.data;
           const foundData = currentData?.find((d: any) => d.value === code);
           const percentage = foundData?.percentage || 0;
 
-          const flagSVG = renderCountryFlag(code);
+          // Extract country code from iso_3166_2 (e.g., "US-CA" -> "US")
+          const countryCode = code?.split("-")[0] || "";
+          const flagSVG = renderCountryFlag(countryCode);
 
-          // Use Mapbox native popup
           const coordinates = e.lngLat;
           const html = `
             <div class="bg-neutral-850 border border-neutral-700 rounded-lg p-2">
@@ -115,20 +114,20 @@ export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayer
           popupRef.current.setLngLat(coordinates).setHTML(html).addTo(map.current);
         });
 
-        map.current.on("mouseleave", "countries-fill", () => {
+        map.current.on("mouseleave", "subdivisions-fill", () => {
           if (!map.current || !popupRef.current) return;
           map.current.getCanvas().style.cursor = "";
           popupRef.current.remove();
         });
 
-        map.current.on("click", "countries-fill", e => {
+        map.current.on("click", "subdivisions-fill", e => {
           if (!e.features || e.features.length === 0) return;
 
           const feature = e.features[0];
-          const code = feature.properties?.ISO_A2;
+          const code = feature.properties?.iso_3166_2;
 
           addFilter({
-            parameter: "country" as FilterParameter,
+            parameter: "region" as FilterParameter,
             value: [code],
             type: "equals",
           });
@@ -136,6 +135,6 @@ export function useCountriesLayer({ map, mapLoaded, mapView }: UseCountriesLayer
       }
     };
 
-    addCountriesLayer();
-  }, [countriesGeoData, processedCountryData, colorScale, map, countryData, mapLoaded]);
+    addSubdivisionsLayer();
+  }, [subdivisionsGeoData, subdivisionData?.data, colorScale, map, mapLoaded]);
 }

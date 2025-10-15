@@ -2,9 +2,9 @@ import { FilterParameter } from "@rybbit/shared/dist/filters";
 import { round } from "lodash";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef } from "react";
-import { useGetSessionLocations } from "../../../../api/analytics/useGetSessionLocations";
-import { addFilter, removeFilter, useStore } from "../../../../lib/store";
-import { renderCountryFlag } from "../utils/renderCountryFlag";
+import { useGetSessionLocations } from "../../../../../api/analytics/useGetSessionLocations";
+import { addFilter, removeFilter, useStore } from "../../../../../lib/store";
+import { renderCountryFlag } from "../../utils/renderCountryFlag";
 
 const getSizeMultiplier = (total: number) => {
   if (total <= 50) return 3; // Large dots
