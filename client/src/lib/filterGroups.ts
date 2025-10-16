@@ -37,7 +37,7 @@ export const EVENT_FILTERS: FilterParameter[] = [
   "exit_page",
 ];
 
-export const GOALS_PAGE_FILTERS: FilterParameter[] = [...BASE_FILTERS, "event_name"];
+export const GOALS_PAGE_FILTERS: FilterParameter[] = [...BASE_FILTERS];
 
 export const USER_PAGE_FILTERS: FilterParameter[] = [
   "hostname",
@@ -57,6 +57,7 @@ export const USER_PAGE_FILTERS: FilterParameter[] = [
 ];
 
 export const JOURNEY_PAGE_FILTERS: FilterParameter[] = [
+  "hostname",
   "browser",
   "operating_system",
   "language",
@@ -65,7 +66,6 @@ export const JOURNEY_PAGE_FILTERS: FilterParameter[] = [
   "city",
   "device_type",
   "referrer",
-  "hostname",
   // "channel",
   // "utm_source",
   // "utm_medium",

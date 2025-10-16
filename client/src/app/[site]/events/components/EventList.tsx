@@ -8,6 +8,7 @@ import { useGetEventProperties } from "../../../../api/analytics/events/useGetEv
 import { NothingFound } from "../../../../components/NothingFound";
 import { cn } from "../../../../lib/utils";
 import { EventProperties } from "./EventProperties";
+import { addFilter } from "../../../../lib/store";
 
 // Skeleton component for EventList
 const EventListSkeleton = memo(({ size = "small" }: { size?: "small" | "large" }) => {
@@ -132,7 +133,13 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
                 "relative flex items-center cursor-pointer hover:bg-neutral-850 group px-2 rounded-md",
                 size === "small" ? "h-6" : "h-9"
               )}
-              onClick={() => handleEventClick(event.eventName)}
+              onClick={() =>
+                addFilter({
+                  parameter: "event_name",
+                  value: [event.eventName],
+                  type: "equals",
+                })
+              }
             >
               <div
                 className="absolute inset-0 bg-dataviz py-2 opacity-25 rounded-md"
@@ -145,11 +152,18 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
                 )}
               >
                 <div className="font-medium truncate max-w-[70%] flex items-center gap-1">
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-neutral-400 hover:text-neutral-100" strokeWidth={3} />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-neutral-400 hover:text-neutral-100" strokeWidth={3} />
-                  )}
+                  <div
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleEventClick(event.eventName);
+                    }}
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4 text-neutral-400 hover:text-neutral-100" strokeWidth={3} />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-neutral-400 hover:text-neutral-100" strokeWidth={3} />
+                    )}
+                  </div>
                   {event.eventName}
                 </div>
                 <div className={cn("text-sm flex gap-2", size === "small" ? "text-xs" : "text-sm")}>
