@@ -61,7 +61,17 @@ export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: 
     return res.status(403).send({ error: "Forbidden" });
   }
 
-  const filterStatement = getFilterStatement(filters);
+  let filterStatement = getFilterStatement(filters);
+
+  // Transform filter statement to use extracted UTM columns instead of map access
+  // since the CTE already extracts utm_source, utm_medium, etc. as separate columns
+  filterStatement = filterStatement
+    .replace(/url_parameters\['utm_source'\]/g, 'utm_source')
+    .replace(/url_parameters\['utm_medium'\]/g, 'utm_medium')
+    .replace(/url_parameters\['utm_campaign'\]/g, 'utm_campaign')
+    .replace(/url_parameters\['utm_term'\]/g, 'utm_term')
+    .replace(/url_parameters\['utm_content'\]/g, 'utm_content');
+
   const timeStatement = getTimeStatement(req.query);
 
   const query = `
@@ -83,7 +93,6 @@ export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: 
           argMin(referrer, timestamp) AS referrer,
           argMin(channel, timestamp) AS channel,
           argMin(hostname, timestamp) AS hostname,
-          /* UTM parameters from url_parameters map */
           argMin(url_parameters, timestamp)['utm_source'] AS utm_source,
           argMin(url_parameters, timestamp)['utm_medium'] AS utm_medium,
           argMin(url_parameters, timestamp)['utm_campaign'] AS utm_campaign,
