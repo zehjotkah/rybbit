@@ -186,30 +186,32 @@ export const SessionCardSkeleton = memo(() => {
             <Skeleton className="h-3 w-24" />
           </div>
 
-          {/* Icons section */}
+          {/* Icons section - matching actual component structure */}
           <div className="flex space-x-2 items-center">
+            {/* Country, Browser, OS, Device icons */}
             <Skeleton className="h-4 w-4 rounded-sm" />
             <Skeleton className="h-4 w-4 rounded-sm" />
             <Skeleton className="h-4 w-4 rounded-sm" />
             <Skeleton className="h-4 w-4 rounded-sm" />
+            {/* Pageviews badge */}
             <Skeleton className="h-[21px] w-12 rounded-sm" />
+            {/* Events badge */}
             <Skeleton className="h-[21px] w-12 rounded-sm" />
+            {/* Channel badge */}
             <Skeleton className="h-[21px] w-16 rounded-sm" />
           </div>
 
           {/* Entry/Exit paths with randomized widths */}
           <div className="items-center ml-3 flex-1 min-w-0 hidden md:flex">
             <Skeleton className={cn("h-3 max-w-[200px]", getRandomWidth())} />
-            <div className="mx-2 flex-shrink-0">
-              <Skeleton className="h-3 w-3" />
-            </div>
+            <ArrowRight className="mx-2 w-3 h-3 flex-shrink-0 text-gray-400 opacity-20" />
             <Skeleton className={cn("h-3 max-w-[200px]", getRandomWidth())} />
           </div>
 
           {/* Time information */}
           <div className="flex items-center gap-1.5">
             <Skeleton className={cn("h-3", getRandomTimeWidth())} />
-            <Skeleton className="h-3 w-1" />
+            <span className="text-gray-400 opacity-20">•</span>
             <Skeleton className={cn("h-3 hidden md:block", getRandomDurationWidth())} />
           </div>
 
