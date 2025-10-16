@@ -157,6 +157,28 @@ export function getFilterStatement(filters: string) {
         const x = filter.type === "contains" || filter.type === "not_contains" ? "%" : "";
         const isNumericParam = filter.parameter === "lat" || filter.parameter === "lon";
 
+        // Handle event_name as a session-level filter
+        // This ensures we filter to sessions containing the event, but still count all pageviews in those sessions
+        if (filter.parameter === "event_name") {
+          if (filter.value.length === 1) {
+            return `session_id IN (
+              SELECT DISTINCT session_id
+              FROM events
+              WHERE event_name ${filterTypeToOperator(filter.type)} ${SqlString.escape(x + filter.value[0] + x)}
+            )`;
+          }
+
+          const valuesWithOperator = filter.value.map(
+            value => `event_name ${filterTypeToOperator(filter.type)} ${SqlString.escape(x + value + x)}`
+          );
+
+          return `session_id IN (
+            SELECT DISTINCT session_id
+            FROM events
+            WHERE (${valuesWithOperator.join(" OR ")})
+          )`;
+        }
+
         if (filter.parameter === "entry_page") {
           if (filter.value.length === 1) {
             return `session_id IN (
