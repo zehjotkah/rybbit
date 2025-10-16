@@ -126,7 +126,7 @@ export default function UsersPage() {
       },
     }),
     columnHelper.accessor("referrer", {
-      header: ({ column }) => <SortHeader column={column}>Channel</SortHeader>,
+      header: "Channel",
       cell: info => {
         const channel = info.row.original.channel;
         const referrer = info.getValue();
