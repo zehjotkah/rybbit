@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Time } from "../../components/DateSelector/types";
 import { timeZone } from "../../lib/dateTimeUtils";
-import { getFilteredFilters, JOURNEY_PAGE_FILTERS } from "../../lib/store";
+import { getFilteredFilters } from "../../lib/store";
+import { JOURNEY_PAGE_FILTERS } from "../../lib/filterGroups";
 import { authedFetch, getStartAndEndDate } from "../utils";
 
 export interface JourneyParams {

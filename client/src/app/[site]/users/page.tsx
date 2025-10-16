@@ -23,7 +23,7 @@ import { Pagination } from "../../../components/pagination";
 import { Button } from "../../../components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
-import { USER_PAGE_FILTERS } from "../../../lib/store";
+import { USER_PAGE_FILTERS } from "../../../lib/filterGroups";
 import { getCountryName } from "../../../lib/utils";
 import { Browser } from "../components/shared/icons/Browser";
 import { CountryFlag } from "../components/shared/icons/CountryFlag";

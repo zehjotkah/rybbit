@@ -10,7 +10,8 @@ import { useGetSite } from "../../../api/admin/sites";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { timeZone } from "../../../lib/dateTimeUtils";
-import { JOURNEY_PAGE_FILTERS, useStore } from "../../../lib/store";
+import { useStore } from "../../../lib/store";
+import { JOURNEY_PAGE_FILTERS } from "../../../lib/filterGroups";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { SankeyDiagram } from "./components/SankeyDiagram";
 

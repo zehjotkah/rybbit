@@ -16,6 +16,7 @@ export type GetUsersResponse = {
   pageviews: number;
   events: number;
   sessions: number;
+  hostname: string;
   last_seen: string;
   first_seen: string;
 }[];
@@ -80,6 +81,7 @@ WITH AggregatedUsers AS (
         argMax(screen_height, timestamp) AS screen_height,
         argMin(referrer, timestamp) AS referrer,
         argMax(channel, timestamp) AS channel,
+        argMin(hostname, timestamp) AS hostname,
         countIf(type = 'pageview') AS pageviews,
         countIf(type = 'custom_event') AS events,
         count(distinct session_id) AS sessions,

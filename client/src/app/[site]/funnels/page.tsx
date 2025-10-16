@@ -2,7 +2,8 @@
 
 import { SavedFunnel, useGetFunnels } from "../../../api/analytics/funnels/useGetFunnels";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GOALS_PAGE_FILTERS, useStore } from "@/lib/store";
+import { useStore } from "@/lib/store";
+import { GOALS_PAGE_FILTERS } from "@/lib/filterGroups";
 import { ArrowRight, FilterIcon, Funnel } from "lucide-react";
 import { NothingFound } from "../../../components/NothingFound";
 import { CreateFunnelDialog } from "./components/CreateFunnel";

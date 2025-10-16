@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EVENT_FILTERS } from "@/lib/store";
+import { EVENT_FILTERS } from "@/lib/filterGroups";
 import { useGetEventNames } from "../../../api/analytics/events/useGetEventNames";
 import { DisabledOverlay } from "../../../components/DisabledOverlay";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";

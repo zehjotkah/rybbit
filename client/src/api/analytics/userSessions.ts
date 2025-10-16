@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { timeZone } from "../../lib/dateTimeUtils";
-import { getFilteredFilters, SESSION_PAGE_FILTERS, useStore } from "../../lib/store";
+import { getFilteredFilters, useStore } from "../../lib/store";
+import { SESSION_PAGE_FILTERS } from "../../lib/filterGroups";
 import { APIResponse } from "../types";
 import { authedFetch, getQueryParams } from "../utils";
 
@@ -20,6 +21,9 @@ export type GetSessionsResponse = {
   screen_height: number;
   referrer: string;
   channel: string;
+  hostname: string;
+  page_title: string;
+  querystring: string;
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;

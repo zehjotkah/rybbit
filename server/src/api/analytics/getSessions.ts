@@ -20,6 +20,9 @@ export type GetSessionsResponse = {
   screen_height: number;
   referrer: string;
   channel: string;
+  hostname: string;
+  page_title: string;
+  querystring: string;
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
@@ -79,6 +82,7 @@ export async function getSessions(req: FastifyRequest<GetSessionsRequest>, res: 
           argMax(screen_height, timestamp) AS screen_height,
           argMin(referrer, timestamp) AS referrer,
           argMin(channel, timestamp) AS channel,
+          argMin(hostname, timestamp) AS hostname,
           /* UTM parameters from url_parameters map */
           argMin(url_parameters, timestamp)['utm_source'] AS utm_source,
           argMin(url_parameters, timestamp)['utm_medium'] AS utm_medium,

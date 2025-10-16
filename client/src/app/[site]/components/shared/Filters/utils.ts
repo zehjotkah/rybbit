@@ -55,6 +55,8 @@ export function getParameterNameLabel(parameter: FilterParameter) {
       return "Lat";
     case "lon":
       return "Lon";
+    case "hostname":
+      return "Hostname";
     default:
       return parameter;
   }

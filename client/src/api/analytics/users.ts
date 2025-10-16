@@ -1,7 +1,8 @@
 import { Filter } from "@rybbit/shared";
 import { useQuery } from "@tanstack/react-query";
 import { timeZone } from "../../lib/dateTimeUtils";
-import { USER_PAGE_FILTERS, getFilteredFilters, useStore } from "../../lib/store";
+import { getFilteredFilters, useStore } from "../../lib/store";
+import { USER_PAGE_FILTERS } from "../../lib/filterGroups";
 import { APIResponse } from "../types";
 import { authedFetch, getQueryParams } from "../utils";
 
