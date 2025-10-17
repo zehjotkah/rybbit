@@ -20,10 +20,14 @@ Available options:
 - `--no-webserver`: Disable the built-in Caddy webserver
 - `--backend-port <port>`: Set custom host port for backend (default: 3001)
 - `--client-port <port>`: Set custom host port for client (default: 3002)
+- `--mapbox-token <token>`: Set Mapbox API token (optional but recommended for globe visualizations)
 - `--help`: Show help message
 
 Examples:
 ```bash
+# With Mapbox token
+./setup.sh tracking.example.com --mapbox-token YOUR_MAPBOX_TOKEN
+
 # Custom ports with built-in webserver
 ./setup.sh tracking.example.com --backend-port 8080 --client-port 8081
 
@@ -66,6 +70,9 @@ DISABLE_SIGNUP=false
 Optional variables that can be added:
 
 ```bash
+# Mapbox token for 3D map visualizations
+MAPBOX_TOKEN=your_mapbox_token
+
 # Database configuration (uses defaults if not specified)
 CLICKHOUSE_PASSWORD=frog
 POSTGRES_USER=frog
