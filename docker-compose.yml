@@ -84,6 +84,7 @@ services:
       - BASE_URL=${BASE_URL}
       - DISABLE_SIGNUP=${DISABLE_SIGNUP}
       - DISABLE_TELEMETRY=${DISABLE_TELEMETRY}
+      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
     depends_on:
       clickhouse:
         condition: service_healthy
