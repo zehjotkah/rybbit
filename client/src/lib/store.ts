@@ -41,12 +41,14 @@ export const useStore = create<Store>(set => ({
         : {
             mode: "day",
             day: DateTime.now().toISODate(),
+            wellKnown: "today",
           },
       previousTime: hasTimeInUrl
         ? state.previousTime
         : {
             mode: "day",
             day: DateTime.now().minus({ days: 1 }).toISODate(),
+            wellKnown: "yesterday",
           },
       bucket: hasBucketInUrl ? state.bucket : "hour",
       selectedStat: hasStatInUrl ? state.selectedStat : "users",
@@ -55,10 +57,12 @@ export const useStore = create<Store>(set => ({
   time: {
     mode: "day",
     day: DateTime.now().toISODate(),
+    wellKnown: "today",
   },
   previousTime: {
     mode: "day",
     day: DateTime.now().minus({ days: 1 }).toISODate(),
+    wellKnown: "yesterday",
   },
   setTime: (time, changeBucket = true) => {
     let bucketToUse: TimeBucket = "hour";
@@ -142,7 +146,7 @@ export const useStore = create<Store>(set => ({
 export const resetStore = () => {
   const { setSite, setTime, setBucket, setSelectedStat, setFilters } = useStore.getState();
   setSite("");
-  setTime({ mode: "day", day: DateTime.now().toISODate() });
+  setTime({ mode: "day", day: DateTime.now().toISODate(), wellKnown: "today" });
   setBucket("hour");
   setSelectedStat("users");
   setFilters([]);

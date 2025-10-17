@@ -151,7 +151,7 @@ export default function HomePage() {
           <div className="relative z-10 rounded-lg overflow-hidden border-8 border-neutral-100/5 shadow-2xl shadow-emerald-900/10">
             {/* Remove mobile message and show iframe on all devices */}
             <iframe
-              src="https://demo.rybbit.io/21"
+              src="https://demo.rybbit.io/21/globe?timeMode=range&wellKnown=last-7-days&bucket=day&stat=users"
               width="1300"
               height="750"
               className="w-full h-[600px] md:h-[700px] lg:h-[750px]"
