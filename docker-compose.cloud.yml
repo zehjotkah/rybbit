@@ -1,3 +1,5 @@
+# DON'T USE THIS FILE, USE docker-compose.yml instead
+
 services:
   caddy:
     image: caddy:2.10.0
