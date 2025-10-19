@@ -5,12 +5,28 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { trackAdEvent } from "@/lib/trackAdEvent";
+import { Banner } from "fumadocs-ui/components/banner";
 
 export function CustomHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-background/80 backdrop-blur-md">
+      <Banner id="banner" changeLayout height="45px" variant="rainbow">
+        <div className="flex items-center justify-center">
+          <p className="text-sm font-medium">
+            Rybbit is launching on Product Hunt today!{" "}
+            <a
+              href="https://www.producthunt.com/products/rybbit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-white"
+            >
+              Check it out and vote for us!
+            </a>
+          </p>
+        </div>
+      </Banner>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3" aria-label="Global">
         {/* Logo */}
         <div className="flex items-center">

@@ -91,7 +91,20 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="flex flex-col items-center justify-center overflow-x-hidden pt-16 md:pt-24">
-        <GitHubStarButton />
+        {/* <GitHubStarButton /> */}
+
+        <a
+          href="https://www.producthunt.com/products/rybbit?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-rybbit&#0045;2"
+          target="_blank"
+        >
+          <img
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1028220&theme=light&t=1760858602053"
+            alt="Rybbit - Open&#0032;Source&#0032;Google&#0032;Analytics&#0032;Replacement | Product Hunt"
+            style={{ width: "250px", height: "54px", marginBottom: "40px" }}
+            width="250"
+            height="54"
+          />
+        </a>
 
         <h1
           className={cn(
