@@ -114,19 +114,11 @@ Create your admin account. You can then log in and start adding your websites!
 
 ## Managing Your Installation
 
-Rybbit comes with several helper scripts to manage your installation:
+### Helper Scripts
 
-- **start.sh**: Start all services after they've been stopped
-  ```bash
-  ./start.sh
-  ```
+Rybbit comes with helper scripts to manage your installation:
 
-- **stop.sh**: Stop all running services
-  ```bash
-  ./stop.sh
-  ```
-
-- **restart.sh**: Restart all services
+- **restart.sh**: Restart all services (useful when you've changed .env settings)
   ```bash
   ./restart.sh
   ```
@@ -135,6 +127,35 @@ Rybbit comes with several helper scripts to manage your installation:
   ```bash
   git pull
   ./update.sh
+  ```
+
+### Docker Compose Commands
+
+You can also manage services directly with Docker Compose:
+
+- **Stop all services**:
+  ```bash
+  docker compose stop
+  ```
+
+- **Stop and remove containers** (preserves data):
+  ```bash
+  docker compose down
+  ```
+
+- **Start services** (if you used setup.sh with default webserver):
+  ```bash
+  docker compose --profile with-webserver up -d
+  ```
+
+- **Start services** (if you used setup.sh with --no-webserver):
+  ```bash
+  docker compose up -d
+  ```
+
+- **View logs**:
+  ```bash
+  docker compose logs -f
   ```
 
 <Callout>
