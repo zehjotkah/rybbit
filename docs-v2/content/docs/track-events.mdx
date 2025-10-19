@@ -163,7 +163,7 @@ interface Rybbit {
      * @returns The current user ID or null if not set
      */
     getUserId: () => string | null;
-    
+
     /**
      * Manually tracks outbound link clicks
      * @param url The URL of the outbound link
@@ -181,3 +181,14 @@ declare global {
 
 export {};
 ```
+
+## Server-Side Tracking
+
+For tracking events from server-side applications, mobile apps, or any platform outside the browser, you can use the HTTP API. This is useful for:
+
+- Server-side event tracking (Node.js, Python, Go, etc.)
+- Mobile app analytics (iOS, Android, Flutter)
+- Backend integrations and webhooks
+- Scenarios where the JavaScript snippet can't be used
+
+See the [API documentation](/docs/api) for detailed examples in multiple languages including authentication, parameters, and rate limiting information.
