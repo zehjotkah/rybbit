@@ -20,6 +20,7 @@ const platforms = [
   { name: "GTM", logo: "/platforms/gtm.svg", path: "/docs/guides/google-tag-manager" },
   { name: "Docusaurus", logo: "/platforms/docusaurus.svg", path: "/docs/guides/docusaurus" },
   { name: "WooCommerce", logo: "/platforms/woocommerce.svg", path: "/docs/guides/woocommerce" },
+  { name: "Mintlify", logo: "/platforms/mintlify.svg", path: "/docs/guides/mintlify" },
 ];
 
 // Shuffle function to randomize array order

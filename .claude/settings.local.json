@@ -6,7 +6,10 @@
       "Bash([ -d hooks ])",
       "WebFetch(domain:carto.com)",
       "Bash(npx tsc:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "WebFetch(domain:www.mintlify.com)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
