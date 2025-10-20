@@ -1,32 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { trackAdEvent } from "../lib/trackAdEvent";
+import { useGithubStarCount } from "../lib/useGithubStarCount";
 
 export function GitHubStarButton() {
-  const [starCount, setStarCount] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchStarCount = async () => {
-      try {
-        const response = await fetch("https://api.github.com/repos/rybbit-io/rybbit");
-        const data = await response.json();
-
-        if (data.stargazers_count) {
-          setStarCount(data.stargazers_count.toLocaleString());
-        }
-      } catch (error) {
-        console.log("Could not fetch GitHub stars:", error);
-        setStarCount(null); // Explicitly set to null on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStarCount();
-  }, []);
+  const { starCount, isLoading } = useGithubStarCount();
 
   return (
     <div className="mb-6 md:mb-8" onClick={() => trackAdEvent("github")}>
