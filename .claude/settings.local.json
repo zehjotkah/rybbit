@@ -9,7 +9,9 @@
       "Bash(npm run lint)",
       "WebFetch(domain:www.mintlify.com)",
       "WebSearch",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npm install @marsidev/react-turnstile)",
+      "Bash(npm install @marsidev/react-turnstile --legacy-peer-deps)"
     ],
     "deny": [],
     "ask": []
