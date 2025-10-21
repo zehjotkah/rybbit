@@ -92,7 +92,7 @@ export default function GlobePage() {
                       setManualWindowSize(newSize);
                     }}
                   >
-                    <SelectTrigger className="w-[100px]" size="sm">
+                    <SelectTrigger className="w-[60px]" size="sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
