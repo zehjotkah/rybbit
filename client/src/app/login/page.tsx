@@ -32,8 +32,8 @@ export default function Page() {
 
     setError("");
 
-    // Validate Turnstile token if in cloud mode
-    if (IS_CLOUD && !turnstileToken) {
+    // Validate Turnstile token if in cloud mode and production
+    if (IS_CLOUD && process.env.NODE_ENV === "production" && !turnstileToken) {
       setError("Please complete the captcha verification");
       setIsLoading(false);
       return;
@@ -47,7 +47,7 @@ export default function Page() {
         },
         {
           onRequest: context => {
-            if (IS_CLOUD && turnstileToken) {
+            if (IS_CLOUD && process.env.NODE_ENV === "production" && turnstileToken) {
               context.headers.set("x-captcha-response", turnstileToken);
             }
           },
@@ -68,6 +68,8 @@ export default function Page() {
     }
     setIsLoading(false);
   };
+
+  const turnstileEnabled = IS_CLOUD && process.env.NODE_ENV === "production";
 
   return (
     <div className="flex flex-col justify-between items-center h-dvh w-full p-4">
@@ -105,7 +107,7 @@ export default function Page() {
                 }
               />
 
-              {IS_CLOUD && (
+              {turnstileEnabled && (
                 <Turnstile
                   onSuccess={token => setTurnstileToken(token)}
                   onError={() => setTurnstileToken("")}
@@ -117,7 +119,7 @@ export default function Page() {
               <AuthButton
                 isLoading={isLoading}
                 loadingText="Logging in..."
-                disabled={IS_CLOUD ? !turnstileToken || isLoading : isLoading}
+                disabled={turnstileEnabled ? !turnstileToken || isLoading : isLoading}
               >
                 Login
               </AuthButton>

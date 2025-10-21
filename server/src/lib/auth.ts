@@ -83,7 +83,7 @@ const pluginList = [
     },
   }),
   // Add Cloudflare Turnstile captcha (cloud only)
-  ...(IS_CLOUD && process.env.TURNSTILE_SECRET_KEY
+  ...(IS_CLOUD && process.env.TURNSTILE_SECRET_KEY && process.env.NODE_ENV === "production"
     ? [
         captcha({
           provider: "cloudflare-turnstile",
