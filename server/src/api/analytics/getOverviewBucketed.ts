@@ -101,13 +101,12 @@ FROM
             session_id,
             MIN(timestamp) AS start_time,
             MAX(timestamp) AS end_time,
-            COUNT(*) AS pages_in_session
+            countIf(type = 'pageview') AS pages_in_session
         FROM events
-        WHERE 
+        WHERE
             site_id = {siteId:Int32}
             ${filterStatement}
             ${getTimeStatement(params)}
-            AND type = 'pageview'
         GROUP BY session_id
     )
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
@@ -115,15 +114,14 @@ FROM
 FULL JOIN
 (
     SELECT
-         toDateTime(${TimeBucketToFn[bucket]}(toTimeZone(timestamp, ${SqlString.escape(timeZone)}))) AS time,
-        COUNT(*) AS pageviews,
+        toDateTime(${TimeBucketToFn[bucket]}(toTimeZone(timestamp, ${SqlString.escape(timeZone)}))) AS time,
+        countIf(type = 'pageview') AS pageviews,
         COUNT(DISTINCT user_id) AS users
     FROM events
     WHERE
         site_id = {siteId:Int32}
         ${filterStatement}
         ${getTimeStatement(params)}
-        AND type = 'pageview'
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
 ) AS page_stats
 USING time
