@@ -2,13 +2,13 @@
 import { ChevronRight, Expand, Globe } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/basic-tabs";
+import { Button } from "../../../../../components/ui/button";
 import { Card, CardContent } from "../../../../../components/ui/card";
+import { useSubdivisions } from "../../../../../lib/geo";
 import { getCountryName, getLanguageName } from "../../../../../lib/utils";
+import { MapComponent } from "../../../components/shared/Map/MapComponent";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
-import { useSubdivisions } from "../../../../../lib/geo";
-import { Button } from "../../../../../components/ui/button";
-import { MapComponent } from "../../../components/shared/Map/MapComponent";
 
 type Tab = "countries" | "regions" | "languages" | "cities" | "map";
 

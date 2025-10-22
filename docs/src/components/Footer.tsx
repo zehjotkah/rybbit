@@ -161,6 +161,11 @@ export function Footer() {
                   API Reference
                 </Link>
               </li>
+              <li>
+                <Link href="https://ipapi.is/" className="text-neutral-400 hover:text-white transition-colors">
+                  Geolocation by ipapi.is
+                </Link>
+              </li>
             </ul>
           </div>
 
