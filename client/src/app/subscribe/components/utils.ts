@@ -1,5 +1,7 @@
 // Common utility functions and constants for subscription components
 
+import { STRIPE_TIERS } from "../../../lib/stripe";
+
 export interface StripePrice {
   priceId: string;
   price: number;
@@ -10,7 +12,7 @@ export interface StripePrice {
   };
 }
 
-export const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, "Custom"];
+export const EVENT_TIERS = [STRIPE_TIERS.map(tier => tier.events), "Custom"];
 
 export const STANDARD_FEATURES = [
   "Up to 10 websites",

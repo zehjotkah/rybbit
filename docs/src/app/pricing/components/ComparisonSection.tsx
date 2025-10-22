@@ -10,8 +10,8 @@ const COMPARISON_FEATURES = [
       {
         name: "Monthly events",
         free: "10,000",
-        standard: "100K - 10M+",
-        pro: "100K - 10M+",
+        standard: "100K - 20M+",
+        pro: "100K - 20M+",
       },
       {
         name: "Number of websites",

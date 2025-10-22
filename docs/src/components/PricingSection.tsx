@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { trackAdEvent } from "@/lib/trackAdEvent";
 
 // Available event tiers for the slider
-const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, "Custom"];
+const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000, "Custom"];
 
 // Define standard plan features
 const STANDARD_FEATURES = [
@@ -66,6 +66,7 @@ function getFormattedPrice(eventLimit: number | string, planType: "standard" | "
     else if (eventLimit <= 2_000_000) monthlyPrice = 99;
     else if (eventLimit <= 5_000_000) monthlyPrice = 149;
     else if (eventLimit <= 10_000_000) monthlyPrice = 249;
+    else if (eventLimit <= 20_000_000) monthlyPrice = 399;
     else return { custom: true };
   } else {
     // Pro tier prices (roughly double)
@@ -76,6 +77,7 @@ function getFormattedPrice(eventLimit: number | string, planType: "standard" | "
     else if (eventLimit <= 2_000_000) monthlyPrice = 199;
     else if (eventLimit <= 5_000_000) monthlyPrice = 299;
     else if (eventLimit <= 10_000_000) monthlyPrice = 499;
+    else if (eventLimit <= 20_000_000) monthlyPrice = 799;
     else return { custom: true };
   }
 
@@ -165,7 +167,7 @@ export function PricingSection() {
             {EVENT_TIERS.map((tier, index) => (
               <span key={index} className={cn(eventLimitIndex === index && "font-bold text-emerald-400")}>
                 {index === EVENT_TIERS.length - 1
-                  ? "10M+"
+                  ? "20M+"
                   : typeof tier === "number" && tier >= 1_000_000
                   ? `${tier / 1_000_000}M`
                   : typeof tier === "number"
@@ -278,7 +280,7 @@ export function PricingSection() {
                   ) : (
                     <>
                       <CheckCircle className="w-3 h-3" />
-                      We don&apos;t ask for your credit card. 60 day money back guarantee.
+                      We don&apos;t ask for your credit card.
                     </>
                   )}
                 </p>
@@ -343,7 +345,7 @@ export function PricingSection() {
                   ) : (
                     <>
                       <CheckCircle className="w-3 h-3" />
-                      We don&apos;t ask for your credit card. 60 day money back guarantee.
+                      We don&apos;t ask for your credit card.
                     </>
                   )}
                 </p>
