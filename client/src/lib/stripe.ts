@@ -1,4 +1,13 @@
-const STRIPE_PRICES = [
+export interface StripePrice {
+  priceId: string;
+  price: number;
+  name: string;
+  interval: string;
+  events: number;
+  shortName: string;
+}
+
+const STRIPE_PRICES: StripePrice[] = [
   // Standard tiers
   {
     price: 19,
