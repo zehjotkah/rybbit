@@ -7,6 +7,8 @@ interface GlobeStore {
   setMapView: (view: MapView) => void;
   mapMode: "3D" | "2D";
   setMapMode: (mode: "3D" | "2D") => void;
+  mapStyle: string;
+  setMapStyle: (style: string) => void;
 }
 
 export const useGlobeStore = create<GlobeStore>(set => ({
@@ -14,4 +16,6 @@ export const useGlobeStore = create<GlobeStore>(set => ({
   setMapView: view => set({ mapView: view }),
   mapMode: IS_CLOUD ? "3D" : "2D",
   setMapMode: mode => set({ mapMode: mode }),
+  mapStyle: "mapbox://styles/mapbox/standard",
+  setMapStyle: style => set({ mapStyle: style }),
 }));

@@ -12,6 +12,7 @@ import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { GlobeSessions } from "./components/GlobeSessions";
 import MapViewSelector from "./components/ModeSelector";
+import MapStyleSelector from "./components/MapStyleSelector";
 import { TimelineScrubber } from "./components/TimelineScrubber";
 import { OpenLayersMap } from "./2d/components/OpenLayersMap";
 import { MapboxMap } from "./3d/components/MapboxMap";
@@ -84,7 +85,8 @@ export default function GlobePage() {
                 <MapViewSelector />
               </div>
               {mapView === "timeline" ? (
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto flex gap-2">
+                  {mapMode === "3D" && <MapStyleSelector />}
                   <Select
                     value={windowSize.toString()}
                     onValueChange={(value: string) => {
@@ -92,7 +94,7 @@ export default function GlobePage() {
                       setManualWindowSize(newSize);
                     }}
                   >
-                    <SelectTrigger className="w-[60px]" size="sm">
+                    <SelectTrigger className="w-[60px] h-[30px]" size="sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
