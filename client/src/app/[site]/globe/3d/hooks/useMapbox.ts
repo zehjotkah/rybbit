@@ -15,7 +15,7 @@ export function useMapbox(containerRef: React.RefObject<HTMLDivElement | null>, 
     // Customize water/ocean color if the layer exists
     try {
       if (mapInstance.getLayer("water")) {
-        // mapInstance.setPaintProperty("water", "fill-color", "#0a1929");
+        mapInstance.setPaintProperty("water", "fill-color", "#0a1929");
       }
     } catch (error) {
       console.warn("Could not set water color:", error);
@@ -90,8 +90,13 @@ export function useMapbox(containerRef: React.RefObject<HTMLDivElement | null>, 
       // Wait for map to be idle (fully rendered) before applying custom styling
       mapInstance.once("idle", () => {
         applyCustomStyling(mapInstance);
+        // Re-enable mapLoaded so other layers can re-add themselves
+        setMapLoaded(true);
       });
     };
+
+    // Set mapLoaded to false to trigger other layers to clean up
+    setMapLoaded(false);
 
     mapInstance.once("style.load", handleStyleLoad);
     mapInstance.setStyle(mapStyle);
@@ -100,7 +105,8 @@ export function useMapbox(containerRef: React.RefObject<HTMLDivElement | null>, 
     return () => {
       mapInstance.off("style.load", handleStyleLoad);
     };
-  }, [mapStyle, mapLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapStyle]); // Only depend on mapStyle, not mapLoaded
 
   return { map, mapLoaded };
 }

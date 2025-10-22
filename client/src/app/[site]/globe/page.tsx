@@ -1,7 +1,7 @@
 "use client";
 
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import "./globe.css";
 
 import { VisuallyHidden } from "radix-ui";
@@ -36,7 +36,22 @@ export default function GlobePage() {
   // Fetch timeline sessions and update store
   useTimelineSessions();
 
-  const { mapView, mapMode } = useGlobeStore();
+  const { mapView, mapMode, mapStyle, setMapStyle, timelineStyle, setTimelineStyle } = useGlobeStore();
+
+  // Automatically switch styles based on view
+  useEffect(() => {
+    if (mapView === "timeline") {
+      // Restore timeline style when switching back to timeline view
+      if (mapStyle !== timelineStyle) {
+        setMapStyle(timelineStyle);
+      }
+    } else {
+      // Force dark-v11 for non-timeline views
+      if (mapStyle !== "mapbox://styles/mapbox/dark-v11") {
+        setMapStyle("mapbox://styles/mapbox/dark-v11");
+      }
+    }
+  }, [mapView, mapStyle, timelineStyle, setMapStyle]);
 
   const { map, mapLoaded } = useMapbox(mapContainer, mapMode === "3D");
 

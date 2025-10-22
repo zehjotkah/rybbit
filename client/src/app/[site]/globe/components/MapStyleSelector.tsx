@@ -25,9 +25,15 @@ const MAP_STYLES: MapStyle[] = [
 ];
 
 export default function MapStyleSelector() {
-  const { mapStyle, setMapStyle } = useGlobeStore();
+  const { mapStyle, setMapStyle, setTimelineStyle } = useGlobeStore();
 
   const currentStyle = MAP_STYLES.find(style => style.url === mapStyle);
+
+  const handleStyleChange = (styleUrl: string) => {
+    setMapStyle(styleUrl);
+    // Also update timelineStyle so it persists when switching views
+    setTimelineStyle(styleUrl);
+  };
 
   return (
     <DropdownMenu>
@@ -42,7 +48,7 @@ export default function MapStyleSelector() {
         {MAP_STYLES.map(style => (
           <DropdownMenuItem
             key={style.url}
-            onClick={() => setMapStyle(style.url)}
+            onClick={() => handleStyleChange(style.url)}
             className={mapStyle === style.url ? "bg-neutral-100 dark:bg-neutral-800" : ""}
           >
             {style.name}

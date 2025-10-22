@@ -9,6 +9,8 @@ interface GlobeStore {
   setMapMode: (mode: "3D" | "2D") => void;
   mapStyle: string;
   setMapStyle: (style: string) => void;
+  timelineStyle: string;
+  setTimelineStyle: (style: string) => void;
 }
 
 export const useGlobeStore = create<GlobeStore>(set => ({
@@ -18,4 +20,6 @@ export const useGlobeStore = create<GlobeStore>(set => ({
   setMapMode: mode => set({ mapMode: mode }),
   mapStyle: "mapbox://styles/mapbox/standard",
   setMapStyle: style => set({ mapStyle: style }),
+  timelineStyle: "mapbox://styles/mapbox/standard",
+  setTimelineStyle: style => set({ timelineStyle: style }),
 }));
