@@ -42,7 +42,7 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
 
   return (
     <div>
-      <div className="flex gap-2 mb-3 justify-between">
+      <div className="flex gap-2 justify-between">
         <div className="flex items-center gap-2">
           <MobileSidebar />
           <div className="hidden md:block">
@@ -58,7 +58,7 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
               size="icon"
               onClick={goBack}
               disabled={time.mode === "past-minutes"}
-              className="rounded-r-none h-8 w-8 sm:h-9 sm:w-9"
+              className="rounded-r-none h-8 w-8"
             >
               <ChevronLeft />
             </Button>
@@ -67,18 +67,20 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
               size="icon"
               onClick={goForward}
               disabled={!canGoForward(time)}
-              className="rounded-l-none -ml-px h-8 w-8 sm:h-9 sm:w-9"
+              className="rounded-l-none -ml-px h-8 w-8"
             >
               <ChevronRight />
             </Button>
           </div>
         </div>
       </div>
-      <div className="flex gap-2">
-        <div className="md:hidden">
+      <div>
+        <div className="md:hidden mt-3">
           <NewFilterButton availableFilters={availableFilters} />
         </div>
-        <Filters availableFilters={availableFilters} />
+        <div className="mt-2">
+          <Filters availableFilters={availableFilters} />
+        </div>
       </div>
     </div>
   );
