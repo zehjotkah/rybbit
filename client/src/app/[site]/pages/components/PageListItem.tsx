@@ -2,7 +2,7 @@
 
 import { useGetSite } from "@/api/admin/sites";
 import { useGetOverviewBucketed } from "@/api/analytics/useGetOverviewBucketed";
-import { SingleColResponse } from "@/api/analytics/useSingleCol";
+import { SingleColResponse } from "@/api/analytics/singleCol/useSingleCol";
 import { usePageMetadata } from "@/api/usePageMetadata";
 import { Card, CardContent } from "@/components/ui/card";
 import { Filter } from "@rybbit/shared";

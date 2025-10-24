@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useCreateGoal } from "../../../../api/analytics/goals/useCreateGoal";
 import { Goal } from "../../../../api/analytics/goals/useGetGoals";
 import { useUpdateGoal } from "../../../../api/analytics/goals/useUpdateGoal";
-import { useSingleCol } from "../../../../api/analytics/useSingleCol";
+import { useSingleCol } from "../../../../api/analytics/singleCol/useSingleCol";
 import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 import { Button } from "../../../../components/ui/button";
 import {
@@ -111,28 +111,29 @@ export default function GoalFormModal({ siteId, goal, trigger, isCloneMode = fal
   // Initialize form with default values or existing goal
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: (isEditMode || isCloneMode) && goal
-      ? {
-          name: isCloneMode ? `${goal.name || `Goal #${goal.goalId}`} (Copy)` : (goal.name || ""),
-          goalType: goal.goalType,
-          config: {
-            pathPattern: goal.config.pathPattern || "",
-            eventName: goal.config.eventName || "",
-            eventPropertyKey: goal.config.eventPropertyKey || "",
-            eventPropertyValue:
-              goal.config.eventPropertyValue !== undefined ? String(goal.config.eventPropertyValue) : "",
+    defaultValues:
+      (isEditMode || isCloneMode) && goal
+        ? {
+            name: isCloneMode ? `${goal.name || `Goal #${goal.goalId}`} (Copy)` : goal.name || "",
+            goalType: goal.goalType,
+            config: {
+              pathPattern: goal.config.pathPattern || "",
+              eventName: goal.config.eventName || "",
+              eventPropertyKey: goal.config.eventPropertyKey || "",
+              eventPropertyValue:
+                goal.config.eventPropertyValue !== undefined ? String(goal.config.eventPropertyValue) : "",
+            },
+          }
+        : {
+            name: "",
+            goalType: "path",
+            config: {
+              pathPattern: "",
+              eventName: "",
+              eventPropertyKey: "",
+              eventPropertyValue: "",
+            },
           },
-        }
-      : {
-          name: "",
-          goalType: "path",
-          config: {
-            pathPattern: "",
-            eventName: "",
-            eventPropertyKey: "",
-            eventPropertyValue: "",
-          },
-        },
   });
 
   const goalType = form.watch("goalType");
@@ -203,8 +204,8 @@ export default function GoalFormModal({ siteId, goal, trigger, isCloneMode = fal
             {isEditMode
               ? "Update the goal details below."
               : isCloneMode
-              ? "Clone this goal with the same configuration."
-              : "Set up a new conversion goal to track specific user actions."}
+                ? "Clone this goal with the same configuration."
+                : "Set up a new conversion goal to track specific user actions."}
           </DialogDescription>
         </DialogHeader>
 

@@ -1,15 +1,8 @@
-import { FilterParameter } from "@rybbit/shared";
-import { useInfiniteQuery, UseInfiniteQueryResult, InfiniteData } from "@tanstack/react-query";
-import { SingleColResponse } from "@/api/analytics/useSingleCol";
+import { SingleColResponse } from "@/api/analytics/singleCol/useSingleCol";
 import { authedFetch, getQueryParams } from "@/api/utils";
-import { timeZone } from "@/lib/dateTimeUtils";
 import { useStore } from "@/lib/store";
-
-type UseInfiniteSingleColOptions = {
-  parameter: FilterParameter;
-  limit?: number;
-  useFilters?: boolean;
-};
+import { FilterParameter } from "@rybbit/shared";
+import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from "@tanstack/react-query";
 
 export type InfinitePaginatedResponse = {
   data: SingleColResponse[];
@@ -20,7 +13,11 @@ export function useInfiniteSingleCol({
   parameter,
   limit = 25,
   useFilters = true,
-}: UseInfiniteSingleColOptions): UseInfiniteQueryResult<InfiniteData<InfinitePaginatedResponse>> {
+}: {
+  parameter: FilterParameter;
+  limit?: number;
+  useFilters?: boolean;
+}): UseInfiniteQueryResult<InfiniteData<InfinitePaginatedResponse>> {
   const { time, site, filters } = useStore();
 
   return useInfiniteQuery({

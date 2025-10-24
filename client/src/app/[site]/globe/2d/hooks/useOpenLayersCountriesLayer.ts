@@ -5,7 +5,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { Fill, Stroke, Style } from "ol/style";
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
-import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { useSingleCol } from "../../../../../api/analytics/singleCol/useSingleCol";
 import { useCountries } from "../../../../../lib/geo";
 import { addFilter } from "../../../../../lib/store";
 import { createColorScale } from "../../utils/colorScale";

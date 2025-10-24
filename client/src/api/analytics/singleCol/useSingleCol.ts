@@ -1,8 +1,8 @@
 import { FilterParameter } from "@rybbit/shared";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { useStore } from "../../lib/store";
-import { APIResponse } from "../types";
-import { authedFetch, getQueryParams } from "../utils";
+import { useStore } from "../../../lib/store";
+import { APIResponse } from "../../types";
+import { authedFetch, getQueryParams } from "../../utils";
 
 type PeriodTime = "current" | "previous";
 

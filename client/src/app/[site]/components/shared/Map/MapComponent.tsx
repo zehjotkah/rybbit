@@ -3,7 +3,7 @@
 import { useMeasure } from "@uidotdev/usehooks";
 import "ol/ol.css";
 import { useEffect, useState } from "react";
-import { useSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { useSingleCol } from "../../../../../api/analytics/singleCol/useSingleCol";
 import { useCountries, useSubdivisions } from "../../../../../lib/geo";
 import { CountryFlag } from "../icons/CountryFlag";
 import { useMapInstance } from "./hooks/useMapInstance";

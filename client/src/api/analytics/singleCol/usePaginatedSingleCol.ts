@@ -1,17 +1,8 @@
-import { SingleColResponse } from "@/api/analytics/useSingleCol";
+import { SingleColResponse } from "@/api/analytics/singleCol/useSingleCol";
 import { authedFetch, getQueryParams } from "@/api/utils";
 import { useStore } from "@/lib/store";
 import { Filter, FilterParameter } from "@rybbit/shared";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-
-type UsePaginatedSingleColOptions = {
-  parameter: FilterParameter;
-  limit?: number;
-  page?: number;
-  useFilters?: boolean;
-  enabled?: boolean;
-  additionalFilters?: Filter[];
-};
 
 type PaginatedResponse = {
   data: SingleColResponse[];
@@ -25,7 +16,14 @@ export function usePaginatedSingleCol({
   useFilters = true,
   enabled = true,
   additionalFilters = [],
-}: UsePaginatedSingleColOptions): UseQueryResult<PaginatedResponse> {
+}: {
+  parameter: FilterParameter;
+  limit?: number;
+  page?: number;
+  useFilters?: boolean;
+  enabled?: boolean;
+  additionalFilters?: Filter[];
+}): UseQueryResult<PaginatedResponse> {
   const { time, site, filters } = useStore();
 
   const queryParams = {
