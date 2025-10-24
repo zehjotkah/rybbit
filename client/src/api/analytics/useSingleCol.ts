@@ -20,6 +20,7 @@ export type SingleColResponse = {
   pageviews?: number;
   pageviews_percentage?: number;
   time_on_page_seconds?: number;
+  bounce_rate?: number;
 };
 
 export function useSingleCol({

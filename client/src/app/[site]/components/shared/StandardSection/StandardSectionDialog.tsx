@@ -148,6 +148,18 @@ export function StandardSectionDialog({
           }) as any
         );
       }
+
+      const hasBounceRate = filteredData[0]?.bounce_rate !== undefined;
+      if (hasBounceRate) {
+        cols.push(
+          columnHelper.accessor("bounce_rate", {
+            header: "Bounce Rate",
+            cell: info => (
+              <div className="flex flex-row gap-1 items-center sm:justify-end">{info.getValue()?.toFixed(1)}%</div>
+            ),
+          }) as any
+        );
+      }
     }
 
     return cols;

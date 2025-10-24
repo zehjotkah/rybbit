@@ -78,6 +78,41 @@ const getQuery = (params: FilterParams<{ bucket: TimeBucket }>) => {
   const isAllTime = !startDate && !endDate && !pastMinutesRange;
 
   const query = `
+WITH
+-- First, calculate total pageviews per session (no parameter filters)
+AllSessionPageviews AS (
+    SELECT
+        session_id,
+        countIf(type = 'pageview') AS total_pageviews_in_session
+    FROM events
+    WHERE
+        site_id = {siteId:Int32}
+        ${getTimeStatement(params)}
+    GROUP BY session_id
+),
+-- Then get session data with filters applied
+FilteredSessions AS (
+    SELECT
+        session_id,
+        MIN(timestamp) AS start_time,
+        MAX(timestamp) AS end_time
+    FROM events
+    WHERE
+        site_id = {siteId:Int32}
+        ${filterStatement}
+        ${getTimeStatement(params)}
+    GROUP BY session_id
+),
+-- Join to get sessions with their total pageviews
+SessionsWithPageviews AS (
+    SELECT
+        fs.session_id,
+        fs.start_time,
+        fs.end_time,
+        asp.total_pageviews_in_session
+    FROM FilteredSessions fs
+    LEFT JOIN AllSessionPageviews asp ON fs.session_id = asp.session_id
+)
 SELECT
     session_stats.time AS time,
     session_stats.sessions,
@@ -86,29 +121,15 @@ SELECT
     session_stats.session_duration,
     page_stats.pageviews,
     page_stats.users
-FROM 
+FROM
 (
     SELECT
          toDateTime(${TimeBucketToFn[bucket]}(toTimeZone(start_time, ${SqlString.escape(timeZone)}))) AS time,
         COUNT() AS sessions,
-        AVG(pages_in_session) AS pages_per_session,
-        sumIf(1, pages_in_session = 1) / COUNT() AS bounce_rate,
+        AVG(total_pageviews_in_session) AS pages_per_session,
+        sumIf(1, total_pageviews_in_session = 1) / COUNT() AS bounce_rate,
         AVG(end_time - start_time) AS session_duration
-    FROM
-    (
-        /* One row per session */
-        SELECT
-            session_id,
-            MIN(timestamp) AS start_time,
-            MAX(timestamp) AS end_time,
-            countIf(type = 'pageview') AS pages_in_session
-        FROM events
-        WHERE
-            site_id = {siteId:Int32}
-            ${filterStatement}
-            ${getTimeStatement(params)}
-        GROUP BY session_id
-    )
+    FROM SessionsWithPageviews
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
 ) AS session_stats
 FULL JOIN
