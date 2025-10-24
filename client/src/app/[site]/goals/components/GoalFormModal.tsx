@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useCreateGoal } from "../../../../api/analytics/goals/useCreateGoal";
 import { Goal } from "../../../../api/analytics/goals/useGetGoals";
 import { useUpdateGoal } from "../../../../api/analytics/goals/useUpdateGoal";
-import { useSingleCol } from "../../../../api/analytics/singleCol/useSingleCol";
+import { useSingleCol } from "../../../../api/analytics/useSingleCol";
 import { EventIcon, PageviewIcon } from "../../../../components/EventIcons";
 import { Button } from "../../../../components/ui/button";
 import {

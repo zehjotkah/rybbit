@@ -11,8 +11,8 @@ import {
 import { useDebounce, useIntersectionObserver } from "@uidotdev/usehooks";
 import { ChevronDown, ChevronUp, Loader2, Search, SquareArrowOutUpRight } from "lucide-react";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { useInfiniteSingleCol } from "../../../../../api/analytics/singleCol/useInfiniteSingleCol";
-import { SingleColResponse } from "../../../../../api/analytics/singleCol/useSingleCol";
+import { useInfiniteSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
 import { FilterParameter } from "@rybbit/shared";
 import { addFilter } from "../../../../../lib/store";
 import { cn, formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
