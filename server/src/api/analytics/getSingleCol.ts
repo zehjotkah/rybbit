@@ -143,7 +143,7 @@ const getQuery = (request: FastifyRequest<GetSingleColRequest>, isCountQuery: bo
       TitleStatsWithSessions AS (
           SELECT
               e.page_title as value,
-              argMax(e.pathname, e.timestamp) as pathname,
+              e.pathname as pathname,
               e.session_id,
               spc.pageviews_in_session
           FROM events e
