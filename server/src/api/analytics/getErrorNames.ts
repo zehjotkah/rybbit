@@ -140,7 +140,6 @@ export async function getErrorNames(req: FastifyRequest<GetErrorNamesRequest>, r
       return res.send({ data: { data: items, totalCount } });
     } else {
       // For non-paginated (StandardSection default) use, return the simpler structure
-      console.info(items);
       return res.send({ data: items });
     }
   } catch (error) {
