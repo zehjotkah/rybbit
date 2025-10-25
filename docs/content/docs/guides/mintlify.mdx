@@ -17,7 +17,7 @@ Mintlify allows you to add custom JavaScript files to your documentation by plac
 <Step>
 ### Retrieve Your Tracking Script Details
 
-Navigate to your Rybbit dashboard to obtain your **Site ID**. The script source will be `https://app.rybbit.io/api/script.js` (or your self-hosted URL if applicable).
+Navigate to your Rybbit dashboard to obtain your **Site ID**. The script source will be `https://app.rybbit.com/api/script.js` (or your self-hosted URL if applicable).
 </Step>
 
 <Step>
@@ -30,7 +30,7 @@ Create a new JavaScript file in your Mintlify content directory (typically where
 (function() {
   // Create the script element
   const script = document.createElement('script');
-  script.src = 'https://app.rybbit.io/api/script.js';
+  script.src = 'https://app.rybbit.com/api/script.js';
   script.async = true;
   script.defer = true;
   script.setAttribute('data-site-id', 'YOUR_SITE_ID'); // Replace with your actual Site ID
@@ -42,7 +42,7 @@ Create a new JavaScript file in your Mintlify content directory (typically where
 
 Make sure to replace `YOUR_SITE_ID` with your actual Site ID from your Rybbit dashboard.
 
-If you're self-hosting Rybbit, replace `https://app.rybbit.io/api/script.js` with your self-hosted URL (e.g., `https://your-domain.com/api/script.js`).
+If you're self-hosting Rybbit, replace `https://app.rybbit.com/api/script.js` with your self-hosted URL (e.g., `https://your-domain.com/api/script.js`).
 </Step>
 
 <Step>
@@ -69,7 +69,7 @@ You can customize the Rybbit script behavior by adding data attributes to the sc
 ```javascript filename="rybbit-analytics.js"
 (function() {
   const script = document.createElement('script');
-  script.src = 'https://app.rybbit.io/api/script.js';
+  script.src = 'https://app.rybbit.com/api/script.js';
   script.async = true;
   script.defer = true;
   script.setAttribute('data-site-id', 'YOUR_SITE_ID');

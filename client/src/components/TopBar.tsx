@@ -64,7 +64,7 @@ export function TopBar() {
           <Link
             href={
               typeof window !== "undefined" && globalThis.location.hostname === DEMO_HOSTNAME
-                ? "https://app.rybbit.io/signup"
+                ? "https://app.rybbit.com/signup"
                 : "/signup"
             }
             passHref

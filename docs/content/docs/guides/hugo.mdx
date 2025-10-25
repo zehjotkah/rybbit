@@ -14,7 +14,7 @@ Integrating Rybbit Analytics with your Hugo static site involves adding the trac
 First, you'll need your Rybbit tracking script. You can find this in your Rybbit dashboard under **Site Settings > Tracking Code**. It will look something like this:
 
 ```html
-<script async defer src="https://app.rybbit.io/api/script.js" data-site-id="YOUR_SITE_ID"></script>
+<script async defer src="https://app.rybbit.com/api/script.js" data-site-id="YOUR_SITE_ID"></script>
 ```
 
 Replace `YOUR_SITE_ID` with your actual Site ID from your Rybbit dashboard.
@@ -32,13 +32,13 @@ Paste your Rybbit tracking script into this new file:
 ```html
 {{/* layouts/partials/rybbit-analytics.html */}}
 {{ if not .Site.IsServer }} {{/* Only include in production builds */}}
-  <script async defer src="https://app.rybbit.io/api/script.js" data-site-id="YOUR_SITE_ID"></script>
+  <script async defer src="https://app.rybbit.com/api/script.js" data-site-id="YOUR_SITE_ID"></script>
 {{ end }}
 ```
 
 **Explanation:**
 - `{{ if not .Site.IsServer }}`: This Hugo condition ensures that the tracking script is only included when you build your site for production (`hugo`) and not during local development (`hugo server`). This prevents tracking your own local page views.
-- Replace `https://app.rybbit.io` and `YOUR_SITE_ID` with your actual details.
+- Replace `https://app.rybbit.com` and `YOUR_SITE_ID` with your actual details.
 </Step>
 
 <Step>
@@ -74,7 +74,7 @@ Modify `layouts/partials/rybbit-analytics.html` to use a site parameter:
 ```html
 {{/* layouts/partials/rybbit-analytics.html */}}
 {{ if and (not .Site.IsServer) .Site.Params.rybbitSiteID }}
-  <script async defer src="{{ .Site.Params.rybbitInstanceURL | default "https://app.rybbit.io" }}/api/script.js" data-site-id="{{ .Site.Params.rybbitSiteID }}"></script>
+  <script async defer src="{{ .Site.Params.rybbitInstanceURL | default "https://app.rybbit.com" }}/api/script.js" data-site-id="{{ .Site.Params.rybbitSiteID }}"></script>
 {{ end }}
 ```
 </Step>
@@ -86,7 +86,7 @@ Open your Hugo configuration file (e.g., `config.toml`) and add:
 
 ```toml
 [params]
-  rybbitInstanceURL = "https://app.rybbit.io" # Your Rybbit instance URL
+  rybbitInstanceURL = "https://app.rybbit.com" # Your Rybbit instance URL
   rybbitSiteID = "YOUR_SITE_ID" # Your Rybbit Site ID
 ```
 

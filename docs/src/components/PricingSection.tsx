@@ -197,7 +197,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <Link href="https://app.rybbit.io/signup" className="w-full block">
+                <Link href="https://app.rybbit.com/signup" className="w-full block">
                   <button
                     onClick={() => trackAdEvent("signup", { location: "pricing" })}
                     data-rybbit-event="signup"
@@ -253,7 +253,7 @@ export function PricingSection() {
                     </button>
                   </Link>
                 ) : (
-                  <Link href="https://app.rybbit.io/signup" className="w-full block">
+                  <Link href="https://app.rybbit.com/signup" className="w-full block">
                     <button
                       onClick={() => trackAdEvent("signup", { location: "pricing" })}
                       data-rybbit-event="signup"
@@ -318,7 +318,7 @@ export function PricingSection() {
                     </button>
                   </Link>
                 ) : (
-                  <Link href="https://app.rybbit.io/signup" className="w-full block">
+                  <Link href="https://app.rybbit.com/signup" className="w-full block">
                     <button
                       onClick={() => trackAdEvent("signup", { location: "pricing" })}
                       data-rybbit-event="signup"
