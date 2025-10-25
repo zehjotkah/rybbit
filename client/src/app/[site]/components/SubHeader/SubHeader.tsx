@@ -54,7 +54,6 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
         </div>
         <div className="flex items-center gap-2">
           <LiveUserCount />
-          <ShareSite />
           {session.data && <ShareSite />}
           <DateSelector time={time} setTime={setTime} />
           <div className="flex items-center">
