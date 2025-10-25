@@ -175,14 +175,9 @@ async function getLocationFromIPAPI(ips: string[]): Promise<Record<string, Locat
           continue;
         }
 
+        const localInfo = await (reader as ExtendedReader).city(ip);
         const locationData: LocationResponse = {
-          city: item.location?.city,
-          country: item.location?.country,
-          countryIso: item.location?.country_code,
-          region: localInfo[ip]?.region,
-          latitude: item.location?.latitude,
-          longitude: item.location?.longitude,
-          timeZone: item.location?.timezone,
+          ...extractLocationData(localInfo),
           vpn: item.vpn?.service,
           crawler: typeof item.is_crawler === "string" ? item.is_crawler : undefined,
           datacenter: item.datacenter?.datacenter,
