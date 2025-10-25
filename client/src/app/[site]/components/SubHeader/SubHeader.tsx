@@ -12,6 +12,7 @@ import { NewFilterButton } from "./Filters/NewFilterButton";
 import { LiveUserCount } from "./LiveUserCount";
 import { MobileSidebar } from "../Sidebar/MobileSidebar";
 import { ShareSite } from "./ShareSite";
+import { authClient } from "../../../../lib/auth";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -40,6 +41,7 @@ const canGoForward = (time: Time) => {
 
 export function SubHeader({ availableFilters }: { availableFilters?: FilterParameter[] }) {
   const { time, setTime } = useStore();
+  const session = authClient.useSession();
 
   return (
     <div>
@@ -53,6 +55,7 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
         <div className="flex items-center gap-2">
           <LiveUserCount />
           <ShareSite />
+          {session.data && <ShareSite />}
           <DateSelector time={time} setTime={setTime} />
           <div className="flex items-center">
             <Button
