@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {isAppProduction && (
         <>
           <Script
-            src="https://demo.rybbit.io/api/script.js"
+            src="https://demo.rybbit.com/api/script.js"
             data-site-id="21"
             strategy="afterInteractive"
             data-web-vitals="true"

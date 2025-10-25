@@ -3,9 +3,9 @@
     <p align="center">Open Source Web & Product Analytics</p>
 
 <p align="center">
-    <a href="https://rybbit.io" target="_blank">Website</a> |
-    <a href="https://demo.rybbit.io/1" target="_blank">Demo</a> |
-    <a href="https://rybbit.io/docs" target="_blank">Documentation</a> |
+    <a href="https://rybbit.com" target="_blank">Website</a> |
+    <a href="https://demo.rybbit.com/1" target="_blank">Demo</a> |
+    <a href="https://rybbit.com/docs" target="_blank">Documentation</a> |
     <a href="https://discord.gg/DEhGb4hYBj" target="_blank">Discord</a> |
     <a href="https://github.com/rybbit-io/rybbit?tab=AGPL-3.0-1-ov-file" target="_blank">License (AGPL-3)</a> |
     <a href="https://github.com/rybbit-io/rybbit/blob/master/CONTRIBUTE.md" target="_blank">Contribute</a>
@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <strong><a href="https://demo.rybbit.io/1">🔍 View Live Demo</a></strong> - See Rybbit running on a real-life production site with over a million visits a month.
+  <strong><a href="https://demo.rybbit.com/1">🔍 View Live Demo</a></strong> - See Rybbit running on a real-life production site with over a million visits a month.
 </p>
 
 <img width="1299" height="797" alt="Screenshot 2025-10-16 at 7 25 20 PM" src="https://github.com/user-attachments/assets/7988ba04-64ee-4410-9972-847d278efa2f" />

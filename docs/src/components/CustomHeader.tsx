@@ -51,7 +51,7 @@ export function CustomHeader() {
               Blog
             </Link>
             <a
-              href="https://demo.rybbit.io/21"
+              href="https://demo.rybbit.com/21"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-base text-neutral-400 hover:text-white transition-colors"
@@ -152,7 +152,7 @@ export function CustomHeader() {
               Blog
             </Link>
             <a
-              href="https://demo.rybbit.io/21"
+              href="https://demo.rybbit.com/21"
               target="_blank"
               rel="noopener noreferrer"
               className="block rounded-md px-3 py-2 text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white"

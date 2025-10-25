@@ -78,7 +78,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <Script
-        src="https://demo.rybbit.io/api/script.js"
+        src="https://demo.rybbit.com/api/script.js"
         data-site-id="21"
         strategy="afterInteractive"
         data-session-replay="true"

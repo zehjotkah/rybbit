@@ -128,7 +128,7 @@ export default function HomePage() {
               Track your site
             </TrackedButton>
             <TrackedButton
-              href="https://demo.rybbit.io/21"
+              href="https://demo.rybbit.com/21"
               eventName="demo"
               eventProps={{ location: "hero", button_text: "See live demo" }}
               className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-5 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50 cursor-pointer"
@@ -163,7 +163,7 @@ export default function HomePage() {
           <div className="relative z-10 rounded-lg overflow-hidden border-8 border-neutral-100/5 shadow-2xl shadow-emerald-900/10">
             {/* Remove mobile message and show iframe on all devices */}
             <iframe
-              src="https://demo.rybbit.io/21/globe?timeMode=range&wellKnown=last-7-days&bucket=day&stat=users"
+              src="https://demo.rybbit.com/21/globe?timeMode=range&wellKnown=last-7-days&bucket=day&stat=users"
               width="1300"
               height="750"
               className="w-full h-[600px] md:h-[700px] lg:h-[750px]"
@@ -370,7 +370,7 @@ export default function HomePage() {
                     <br />
                     <p>
                       You can see for yourself by checking out our{" "}
-                      <Link href="https://demo.rybbit.io/21" className="text-emerald-400 hover:text-emerald-300">
+                      <Link href="https://demo.rybbit.com/21" className="text-emerald-400 hover:text-emerald-300">
                         demo site
                       </Link>
                       . The difference in usability is night and day.
