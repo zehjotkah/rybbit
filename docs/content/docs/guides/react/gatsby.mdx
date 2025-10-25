@@ -16,7 +16,7 @@ The recommended way to add a script that should appear on every page in a Gatsby
 <Steps>
 ### Retrieve Your Tracking Script Details
 
-Navigate to your Rybbit dashboard to obtain your **Site ID**. The script source will be `https://app.rybbit.com/api/script.js`.
+Navigate to your Rybbit dashboard to obtain your **Site ID**. The script source will be `https://app.rybbit.io/api/script.js`.
 
 ### Modify `gatsby-ssr.js`
 
@@ -31,7 +31,7 @@ export const onRenderBody = ({ setHeadComponents }) => {
   setHeadComponents([
     <script
       key="rybbit-analytics-script" // A unique key for React
-      src="https://app.rybbit.com/api/script.js"
+      src="https://app.rybbit.io/api/script.js"
       data-site-id={rybbitSiteId}
       async
       defer
@@ -60,7 +60,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-script`,
       options: {
-        src: `https://app.rybbit.com/api/script.js`,
+        src: `https://app.rybbit.io/api/script.js`,
         async: true,
         defer: true,
         ['data-site-id']: `YOUR_SITE_ID`, // Replace with your Site ID
