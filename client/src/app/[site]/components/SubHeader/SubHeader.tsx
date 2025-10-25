@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { goBack, goForward, useStore } from "@/lib/store";
 import { FilterParameter } from "@rybbit/shared";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Share } from "lucide-react";
 import { DateTime } from "luxon";
 import { Filters } from "./Filters/Filters";
 
@@ -11,6 +11,7 @@ import { Time } from "../../../../components/DateSelector/types";
 import { NewFilterButton } from "./Filters/NewFilterButton";
 import { LiveUserCount } from "./LiveUserCount";
 import { MobileSidebar } from "../Sidebar/MobileSidebar";
+import { ShareSite } from "./ShareSite";
 
 const canGoForward = (time: Time) => {
   const currentDay = DateTime.now().startOf("day");
@@ -51,6 +52,7 @@ export function SubHeader({ availableFilters }: { availableFilters?: FilterParam
         </div>
         <div className="flex items-center gap-2">
           <LiveUserCount />
+          <ShareSite />
           <DateSelector time={time} setTime={setTime} />
           <div className="flex items-center">
             <Button

@@ -95,10 +95,6 @@ export interface OverviewRequest {
 export async function getOverview(req: FastifyRequest<OverviewRequest>, res: FastifyReply) {
   const { startDate, endDate, timeZone, filters, pastMinutesStart, pastMinutesEnd } = req.query;
   const site = req.params.site;
-  const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
-  if (!userHasAccessToSite) {
-    return res.status(403).send({ error: "Forbidden" });
-  }
 
   const query = getQuery({
     startDate,

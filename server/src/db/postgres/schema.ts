@@ -80,6 +80,7 @@ export const sites = pgTable(
     trackSpaNavigation: boolean().default(true),
     trackIp: boolean().default(false),
     apiKey: text("api_key"), // Format: rb_{32_hex_chars} = 35 chars total
+    privateLinkKey: text("private_link_key"),
   },
   table => [
     foreignKey({

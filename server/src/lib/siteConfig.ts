@@ -15,6 +15,7 @@ export interface SiteConfigData {
   excludedIPs: string[];
   excludedCountries: string[];
   apiKey?: string | null;
+  privateLinkKey?: string | null;
   sessionReplay: boolean;
   webVitals: boolean;
   trackErrors: boolean;
@@ -61,6 +62,7 @@ class SiteConfig {
           excludedIPs: sites.excludedIPs,
           excludedCountries: sites.excludedCountries,
           apiKey: sites.apiKey,
+          privateLinkKey: sites.privateLinkKey,
           sessionReplay: sites.sessionReplay,
           webVitals: sites.webVitals,
           trackErrors: sites.trackErrors,
@@ -88,6 +90,7 @@ class SiteConfig {
         excludedIPs: Array.isArray(site.excludedIPs) ? site.excludedIPs : [],
         excludedCountries: Array.isArray(site.excludedCountries) ? site.excludedCountries : [],
         apiKey: site.apiKey,
+        privateLinkKey: site.privateLinkKey,
         sessionReplay: site.sessionReplay || false,
         webVitals: site.webVitals || false,
         trackErrors: site.trackErrors || false,

@@ -2,7 +2,6 @@ import { FilterParams } from "@rybbit/shared";
 import { FastifyReply, FastifyRequest } from "fastify";
 import SqlString from "sqlstring";
 import { clickhouse } from "../../db/clickhouse/clickhouse.js";
-import { getUserHasAccessToSitePublic } from "../../lib/auth-utils.js";
 import { validateTimeStatementFillParams } from "./query-validation.js";
 import { getFilterStatement, getTimeStatement, processResults, TimeBucketToFn, bucketIntervalMap } from "./utils.js";
 import { TimeBucket } from "./types.js";
@@ -166,11 +165,6 @@ export async function getOverviewBucketed(
 ) {
   const { startDate, endDate, timeZone, bucket, filters, pastMinutesStart, pastMinutesEnd } = req.query;
   const site = req.params.site;
-
-  const userHasAccessToSite = await getUserHasAccessToSitePublic(req, site);
-  if (!userHasAccessToSite) {
-    return res.status(403).send({ error: "Forbidden" });
-  }
 
   const query = getQuery({
     startDate,
