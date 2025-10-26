@@ -155,6 +155,19 @@ export let auth: AuthType | null = betterAuth({
           }
         },
       },
+      update: {
+        before: async userUpdate => {
+          // Security: Prevent role field from being updated via regular update-user endpoint
+          // Role changes should only go through the admin setRole endpoint
+          if (userUpdate && typeof userUpdate === "object" && "role" in userUpdate) {
+            // Remove role from the update data
+            const { role: _, ...dataWithoutRole } = userUpdate;
+            return {
+              data: dataWithoutRole,
+            };
+          }
+        },
+      },
     },
   },
 });
@@ -230,6 +243,19 @@ export function initAuth(allowedOrigins: string[]) {
             // If this is the first user, make them an admin
             if (users.length === 1) {
               await db.update(user).set({ role: "admin" }).where(eq(user.id, users[0].id));
+            }
+          },
+        },
+        update: {
+          before: async userUpdate => {
+            // Security: Prevent role field from being updated via regular update-user endpoint
+            // Role changes should only go through the admin setRole endpoint
+            if (userUpdate && typeof userUpdate === "object" && "role" in userUpdate) {
+              // Remove role from the update data
+              const { role: _, ...dataWithoutRole } = userUpdate;
+              return {
+                data: dataWithoutRole,
+              };
             }
           },
         },
