@@ -91,19 +91,7 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="flex flex-col items-center justify-center overflow-x-hidden pt-16 md:pt-24">
-        {/* <GitHubStarButton /> */}
-        <a
-          href="https://www.producthunt.com/products/rybbit?embed=true&utm_source=badge-top-post-badge&utm_medium=badge&utm_source=badge-rybbit&#0045;2"
-          target="_blank"
-        >
-          <img
-            src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1028220&theme=neutral&period=daily&t=1761001525479"
-            alt="Rybbit - Open&#0032;Source&#0032;Google&#0032;Analytics&#0032;Replacement | Product Hunt"
-            style={{ width: "210px", height: "54px", marginBottom: "35px" }}
-            width="250"
-            height="54"
-          />
-        </a>
+        <GitHubStarButton />
 
         <h1
           className={cn(
@@ -141,7 +129,6 @@ export default function HomePage() {
             First 10,000 events/m are free. No credit card required.
           </p>
         </div>
-
         <div className="relative w-full max-w-[1300px] mb-10 px-4">
           {/* Background gradients - overlapping circles for organic feel */}
           <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-emerald-500/40 rounded-full blur-[80px] opacity-70"></div>

@@ -14,21 +14,18 @@ export function Footer() {
               Open source, privacy-focused web analytics platform that respects
               user privacy.
             </p> */}
-            {/* <div className="mt-4">
-              <a
-                href="https://www.producthunt.com/products/rybbit?embed=true&utm_source=badge-top-post-badge&utm_medium=badge&utm_source=badge-rybbit"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1028220&theme=dark&period=daily&t=1761000444319"
-                  alt="Rybbit - The open source Google Analytics replacement | Product Hunt"
-                  style={{ width: "200px", height: "43px" }}
-                  width="200"
-                  height="43"
-                />
-              </a>
-            </div> */}
+            <a
+              href="https://www.producthunt.com/products/rybbit?embed=true&utm_source=badge-top-post-badge&utm_medium=badge&utm_source=badge-rybbit&#0045;2"
+              target="_blank"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1028220&theme=neutral&period=daily&t=1761001525479"
+                alt="Rybbit - Open&#0032;Source&#0032;Google&#0032;Analytics&#0032;Replacement | Product Hunt"
+                style={{ width: "250px", height: "54px", margin: "20px 0px" }}
+                width="250"
+                height="54"
+              />
+            </a>
             {/* Social Media Links */}
             <div className="flex gap-4">
               <a
