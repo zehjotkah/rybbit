@@ -1,20 +1,20 @@
 "use client";
 
+import { useGetAdminServiceEventCount } from "@/api/admin/useGetAdminServiceEventCount";
+import { timeZone, userLocale } from "@/lib/dateTimeUtils";
 import { nivoTheme } from "@/lib/nivo";
+import { formatter } from "@/lib/utils";
 import { ResponsiveLine } from "@nivo/line";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { DateTime } from "luxon";
-import { useGetAdminServiceEventCount } from "@/api/admin/useGetAdminServiceEventCount";
-import { userLocale, timeZone } from "@/lib/dateTimeUtils";
-import { formatter } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 interface ServiceUsageChartProps {
   startDate?: string;
   endDate?: string;
+  title?: string;
 }
 
-export function ServiceUsageChart({ startDate, endDate }: ServiceUsageChartProps) {
+export function ServiceUsageChart({ startDate, endDate, title }: ServiceUsageChartProps) {
   const { width } = useWindowSize();
 
   // Fetch the data inside the component

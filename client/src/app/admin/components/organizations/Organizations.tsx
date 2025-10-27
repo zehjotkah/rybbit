@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { parseUtcTimestamp } from "@/lib/dateTimeUtils";
 import { formatter } from "@/lib/utils";
+import { DateTime } from "luxon";
 import {
   ChevronDown,
   ChevronRight,
@@ -60,6 +61,26 @@ export function Organizations() {
   const [showZeroEvents, setShowZeroEvents] = useState(true);
   const [showFreeUsers, setShowFreeUsers] = useState(true);
   const [showOnlyOverLimit, setShowOnlyOverLimit] = useState(false);
+
+  // Time period for service usage chart
+  const [timePeriod, setTimePeriod] = useState<"30d" | "60d" | "120d" | "all">("30d");
+
+  // Calculate date range based on time period
+  const { startDate, endDate } = useMemo(() => {
+    const now = DateTime.now();
+    const end = now.toFormat("yyyy-MM-dd");
+
+    if (timePeriod === "all") {
+      // For all time, use a date far in the past (e.g., 5 years ago)
+      const start = now.minus({ years: 5 }).toFormat("yyyy-MM-dd");
+      return { startDate: start, endDate: end };
+    }
+
+    const days = timePeriod === "30d" ? 30 : timePeriod === "60d" ? 60 : 120;
+    const start = now.minus({ days }).toFormat("yyyy-MM-dd");
+
+    return { startDate: start, endDate: end };
+  }, [timePeriod]);
 
   // Calculate stats from organizations data
   const stats = useMemo(() => {
@@ -247,13 +268,13 @@ export function Organizations() {
         id: "sites",
         header: ({ column }) => <SortableHeader column={column}>Sites</SortableHeader>,
         accessorFn: row => row.sites.length,
-        cell: ({ row }) => <Badge variant="outline">{row.original.sites.length}</Badge>,
+        cell: ({ row }) => row.original.sites.length,
       },
       {
         id: "members",
         header: ({ column }) => <SortableHeader column={column}>Members</SortableHeader>,
         accessorFn: row => row.members.length,
-        cell: ({ row }) => <Badge variant="outline">{row.original.members.length}</Badge>,
+        cell: ({ row }) => row.original.members.length,
       },
     ],
     [toggleExpand]
@@ -343,15 +364,56 @@ export function Organizations() {
       />
 
       <Tabs defaultValue="growth" className="mb-6">
-        <TabsList>
-          <TabsTrigger value="growth">Organization Growth</TabsTrigger>
-          <TabsTrigger value="usage">Service Usage</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between mb-2">
+          <TabsList>
+            <TabsTrigger value="growth">Organization Growth</TabsTrigger>
+            <TabsTrigger value="usage">Service Usage</TabsTrigger>
+          </TabsList>
+
+          <div className="flex items-center gap-1 bg-neutral-800 p-1 rounded-lg">
+            <Button
+              size="sm"
+              variant={timePeriod === "30d" ? "default" : "ghost"}
+              onClick={() => setTimePeriod("30d")}
+              className="h-7 text-xs"
+            >
+              30d
+            </Button>
+            <Button
+              size="sm"
+              variant={timePeriod === "60d" ? "default" : "ghost"}
+              onClick={() => setTimePeriod("60d")}
+              className="h-7 text-xs"
+            >
+              60d
+            </Button>
+            <Button
+              size="sm"
+              variant={timePeriod === "120d" ? "default" : "ghost"}
+              onClick={() => setTimePeriod("120d")}
+              className="h-7 text-xs"
+            >
+              120d
+            </Button>
+            <Button
+              size="sm"
+              variant={timePeriod === "all" ? "default" : "ghost"}
+              onClick={() => setTimePeriod("all")}
+              className="h-7 text-xs"
+            >
+              All Time
+            </Button>
+          </div>
+        </div>
         <TabsContent value="growth">
           <GrowthChart data={organizations} color="#8b5cf6" title="Organizations" />
         </TabsContent>
         <TabsContent value="usage">
-          <ServiceUsageChart />
+          <ServiceUsageChart
+            startDate={startDate}
+            endDate={endDate}
+            title={`Service-wide Usage - ${timePeriod === "all" ? "All Time" : `Last ${timePeriod}`}`}
+          />
         </TabsContent>
       </Tabs>
 
@@ -531,13 +593,13 @@ export function Organizations() {
                                     className="p-3 border border-neutral-700 rounded flex items-center justify-between"
                                   >
                                     <div>
-                                      <div className="font-medium">{member.name}</div>
-                                      <div className="text-sm text-neutral-400">{member.email}</div>
-                                      <div className="text-xs text-neutral-500 mt-1">
+                                      <div className="font-medium flex items-center gap-2">
+                                        {member.name}{" "}
                                         <Badge variant="outline" className="text-xs">
                                           {member.role}
                                         </Badge>
                                       </div>
+                                      <div className="text-sm text-neutral-400">{member.email}</div>
                                     </div>
                                     <Button
                                       onClick={() => handleImpersonate(member.userId)}

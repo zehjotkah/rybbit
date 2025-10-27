@@ -50,20 +50,10 @@ export async function getAdminServiceEventCount(
         )
       )`;
 
-      // Set up WITH FILL parameters
-      fillFromDate = `FROM toTimeZone(
-        toStartOfDay(toDateTime(${SqlString.escape(startDate)}, ${SqlString.escape(timeZone)})),
-        'UTC'
-      )`;
+      // Set up WITH FILL parameters - use UTC midnight boundaries
+      fillFromDate = `FROM toStartOfDay(toDateTime(${SqlString.escape(startDate)}))`;
 
-      fillToDate = `TO if(
-        toDate(${SqlString.escape(endDate)}) = toDate(now(), ${SqlString.escape(timeZone)}),
-        toStartOfDay(now()) + INTERVAL 1 DAY,
-        toTimeZone(
-          toStartOfDay(toDateTime(${SqlString.escape(endDate)}, ${SqlString.escape(timeZone)})) + INTERVAL 1 DAY,
-          'UTC'
-        )
-      )`;
+      fillToDate = `TO toStartOfDay(toDateTime(${SqlString.escape(endDate)})) + INTERVAL 1 DAY`;
     } else {
       // Default to last 30 days if no date range provided
       timeFilter = "AND event_hour >= toStartOfDay(now()) - INTERVAL 30 DAY";
