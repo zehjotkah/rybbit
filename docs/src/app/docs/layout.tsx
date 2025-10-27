@@ -2,6 +2,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 import { baseOptions } from "@/app/layout.config";
 import { source } from "@/lib/source";
+import { GithubInfo } from "fumadocs-ui/components/github-info";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,18 @@ export default function Layout({ children }: { children: ReactNode }) {
       {...baseOptions}
       githubUrl="https://github.com/rybbit-io/rybbit"
       themeSwitch={{ enabled: false }}
+      links={[
+        {
+          type: "custom",
+          children: (
+            <GithubInfo
+              owner="rybbit-io"
+              repo="rybbit"
+              className="lg:-mx-2"
+            />
+          ),
+        },
+      ]}
     >
       {children}
     </DocsLayout>
