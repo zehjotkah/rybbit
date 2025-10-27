@@ -14,6 +14,7 @@ import {
   formatEventTier,
 } from "./utils";
 import { trackAdEvent } from "../../../lib/trackAdEvent";
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/subscription/constants";
 
 export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [eventLimitIndex, setEventLimitIndex] = useState<number>(0);
@@ -175,7 +176,7 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
             {/* Price display */}
             <div className="mb-6">
               <div>
-                <span className="text-3xl font-bold">10,000</span>
+                <span className="text-3xl font-bold">{DEFAULT_EVENT_LIMIT.toLocaleString()}</span>
                 <span className="ml-1 text-neutral-400">/month events</span>
               </div>
             </div>

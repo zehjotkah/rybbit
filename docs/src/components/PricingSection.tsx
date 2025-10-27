@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { trackAdEvent } from "@/lib/trackAdEvent";
+import { DEFAULT_EVENT_LIMIT } from "../lib/const";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000, "Custom"];
@@ -192,7 +193,7 @@ export function PricingSection() {
                 {/* Price display */}
                 <div className="mb-6">
                   <div>
-                    <span className="text-3xl font-bold">10,000</span>
+                    <span className="text-3xl font-bold">{DEFAULT_EVENT_LIMIT.toLocaleString()}</span>
                     <span className="ml-1 text-neutral-400">/month events</span>
                   </div>
                 </div>

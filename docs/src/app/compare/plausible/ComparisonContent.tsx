@@ -1,3 +1,5 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
+
 export function PlausibleComparisonContent() {
   return (
     <div className="space-y-6 text-neutral-350 font-light">
@@ -20,16 +22,16 @@ export function PlausibleComparisonContent() {
           Both Rybbit and Plausible share the same core values: respect user privacy, avoid cookies, and comply with
           GDPR by default. We're both open source (AGPL v3), both self-hostable, and both store data in EU servers.
           Neither of us will ever sell your data or use it for advertising. The privacy community doesn't need to pick
-          sides here. We're fighting the same fight against surveillance capitalism. The difference is that Rybbit proves
-          you can be privacy-first while still offering advanced features that help businesses grow.
+          sides here. We're fighting the same fight against surveillance capitalism. The difference is that Rybbit
+          proves you can be privacy-first while still offering advanced features that help businesses grow.
         </p>
       </div>
 
       <div className="space-y-4">
         <h3 className="text-xl text-white font-medium">See How Users Really Behave</h3>
         <p className="leading-relaxed">
-          Plausible tells you what pages users visit. Rybbit shows you how they actually interact with those pages.
-          Our session replay feature lets you watch real user sessions, understand confusion points, identify bugs, and
+          Plausible tells you what pages users visit. Rybbit shows you how they actually interact with those pages. Our
+          session replay feature lets you watch real user sessions, understand confusion points, identify bugs, and
           optimize user experience. See users rage-clicking, getting stuck in forms, or abandoning carts. Combine this
           with our funnel analysis and user journey visualization, and you have a complete picture of user behavior that
           Plausible simply can't provide. It's the difference between knowing your bounce rate and understanding why
@@ -65,10 +67,11 @@ export function PlausibleComparisonContent() {
         <h3 className="text-xl text-white font-medium">A Free Tier That Actually Helps</h3>
         <p className="leading-relaxed">
           Plausible requires payment from day one, even for small personal projects. We believe analytics should be
-          accessible to everyone, which is why Rybbit offers a generous free tier with 10,000 events per month. Perfect
-          for personal blogs, side projects, or testing before you commit. When you're ready to upgrade, our pricing is
-          competitive and transparent. Both companies are bootstrapped and independent, but we've chosen to make getting
-          started easier for developers and small businesses who are just beginning their journey.
+          accessible to everyone, which is why Rybbit offers a generous free tier with{" "}
+          {DEFAULT_EVENT_LIMIT.toLocaleString()} events per month. Perfect for personal blogs, side projects, or testing
+          before you commit. When you're ready to upgrade, our pricing is competitive and transparent. Both companies
+          are bootstrapped and independent, but we've chosen to make getting started easier for developers and small
+          businesses who are just beginning their journey.
         </p>
       </div>
 

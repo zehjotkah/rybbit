@@ -12,7 +12,7 @@ export const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 // export const TRIAL_DURATION_DAYS = 14;
 // export const TRIAL_EVENT_LIMIT = 100000;
 
-export const DEFAULT_EVENT_LIMIT = 10_000;
+export const DEFAULT_EVENT_LIMIT = 3_000;
 
 // AppSumo tier limits (lifetime plans with standard features, no replays)
 export const APPSUMO_TIER_LIMITS = {

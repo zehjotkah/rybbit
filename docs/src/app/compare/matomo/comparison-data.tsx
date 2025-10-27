@@ -1,3 +1,4 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
 import { ComparisonSection } from "../components/ComparisonPage";
 
 export const matomoComparisonData: ComparisonSection[] = [
@@ -226,7 +227,7 @@ export const matomoComparisonData: ComparisonSection[] = [
       },
       {
         name: "Free tier",
-        rybbitValue: "10k events",
+        rybbitValue: DEFAULT_EVENT_LIMIT.toLocaleString() + " events",
         competitorValue: "Self-host only",
       },
       {

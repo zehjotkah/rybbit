@@ -1,3 +1,4 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
 import { ComparisonSection } from "../components/ComparisonPage";
 
 export const plausibleComparisonData: ComparisonSection[] = [
@@ -221,7 +222,7 @@ export const plausibleComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Free tier",
-        rybbitValue: "10k events",
+        rybbitValue: DEFAULT_EVENT_LIMIT.toLocaleString() + " events",
         competitorValue: false,
       },
       {

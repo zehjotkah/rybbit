@@ -2,6 +2,7 @@
 
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
 
 const COMPARISON_FEATURES = [
   {
@@ -9,7 +10,7 @@ const COMPARISON_FEATURES = [
     features: [
       {
         name: "Monthly events",
-        free: "10,000",
+        free: DEFAULT_EVENT_LIMIT.toLocaleString(),
         standard: "100K - 20M+",
         pro: "100K - 20M+",
       },

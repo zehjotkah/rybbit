@@ -1,3 +1,5 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
+
 export function FathomComparisonContent() {
   return (
     <div className="space-y-6 text-neutral-350 font-light">
@@ -67,11 +69,11 @@ export function FathomComparisonContent() {
         <h3 className="text-xl text-white font-medium">Accessible to Everyone</h3>
         <p className="leading-relaxed">
           Fathom requires payment from day one, even for personal projects or testing. Their cheapest plan starts at
-          $15/month with no free tier. Rybbit believes analytics should be accessible to everyone, offering 10,000 free
-          events monthly, perfect for side projects, personal blogs, or evaluation. When you do upgrade, you get
-          significantly more features for a comparable price. Both companies are bootstrapped and independent, but we've
-          chosen to lower the barrier to entry. Great analytics shouldn't be limited to those who can afford it
-          immediately.
+          $15/month with no free tier. Rybbit believes analytics should be accessible to everyone, offering
+          {DEFAULT_EVENT_LIMIT.toLocaleString()} free events monthly, perfect for side projects, personal blogs, or
+          evaluation. When you do upgrade, you get significantly more features for a comparable price. Both companies
+          are bootstrapped and independent, but we've chosen to lower the barrier to entry. Great analytics shouldn't be
+          limited to those who can afford it immediately.
         </p>
       </div>
 
@@ -79,11 +81,11 @@ export function FathomComparisonContent() {
         <h3 className="text-xl text-white font-medium">The Power of Choice</h3>
         <p className="leading-relaxed">
           With Fathom, you get what you get. No self-hosting option. No code transparency. No advanced features. It's a
-          take-it-or-leave-it proposition. Rybbit gives you choices. Run our cloud service for zero maintenance. Self-host
-          for complete control. Use basic features for simple sites. Enable advanced features for complex applications.
-          Contribute to our open source project. Build custom integrations with our API. Your analytics platform should
-          adapt to your needs, not force you into a box. That flexibility is the difference between a simple tool and a
-          comprehensive platform.
+          take-it-or-leave-it proposition. Rybbit gives you choices. Run our cloud service for zero maintenance.
+          Self-host for complete control. Use basic features for simple sites. Enable advanced features for complex
+          applications. Contribute to our open source project. Build custom integrations with our API. Your analytics
+          platform should adapt to your needs, not force you into a box. That flexibility is the difference between a
+          simple tool and a comprehensive platform.
         </p>
       </div>
 

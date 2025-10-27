@@ -1,3 +1,5 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
+
 export function SimpleAnalyticsComparisonContent() {
   return (
     <div className="space-y-6 text-neutral-350 font-light">
@@ -68,9 +70,10 @@ export function SimpleAnalyticsComparisonContent() {
         <p className="leading-relaxed">
           SimpleAnalytics offers unlimited pageviews on their free tier, but with a major catch: they delete all data
           older than 30 days. This makes historical comparisons impossible and limits the free tier's usefulness for any
-          serious analysis. Rybbit's free tier provides 10,000 events per month with full data retention. You can track
-          seasonal trends, compare year-over-year growth, and build a complete picture of your site's performance over
-          time. A truly useful free tier shouldn't delete your history just when it becomes valuable.
+          serious analysis. Rybbit's free tier provides {DEFAULT_EVENT_LIMIT.toLocaleString()} events per month with
+          full data retention. You can track seasonal trends, compare year-over-year growth, and build a complete
+          picture of your site's performance over time. A truly useful free tier shouldn't delete your history just when
+          it becomes valuable.
         </p>
       </div>
 
@@ -89,12 +92,12 @@ export function SimpleAnalyticsComparisonContent() {
       <div className="space-y-4">
         <h3 className="text-xl text-white font-medium">Choose Power Without Sacrificing Simplicity</h3>
         <p className="leading-relaxed">
-          Both Rybbit and SimpleAnalytics are bootstrapped companies fighting against surveillance capitalism. We respect
-          their commitment to privacy and transparency. But we believe users shouldn't have to choose between simplicity
-          and functionality. Rybbit maintains the same clean, intuitive interface that makes SimpleAnalytics appealing,
-          while adding the advanced features that modern businesses need. Think of us as the next evolution: all the
-          privacy and simplicity you expect, plus the power and insights you deserve. With our live demo, you can see
-          the difference immediately, no implementation required.
+          Both Rybbit and SimpleAnalytics are bootstrapped companies fighting against surveillance capitalism. We
+          respect their commitment to privacy and transparency. But we believe users shouldn't have to choose between
+          simplicity and functionality. Rybbit maintains the same clean, intuitive interface that makes SimpleAnalytics
+          appealing, while adding the advanced features that modern businesses need. Think of us as the next evolution:
+          all the privacy and simplicity you expect, plus the power and insights you deserve. With our live demo, you
+          can see the difference immediately, no implementation required.
         </p>
       </div>
     </div>

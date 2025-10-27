@@ -1,3 +1,5 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
+
 export function GoogleAnalyticsComparisonContent() {
   return (
     <div className="space-y-6 text-neutral-350 font-light">
@@ -79,10 +81,10 @@ export function GoogleAnalyticsComparisonContent() {
         <p className="leading-relaxed">
           Google Analytics is "free" because you're the product. Your data feeds their advertising empire. Rybbit has a
           transparent, sustainable business model: we charge fair prices for our service. Starting at just $19/month for
-          100k events after a generous free tier (10k events), scaling up to $499/month for 10M events with all features
-          including session replay. No hidden costs, no data mining, no advertising network. We're independently
-          bootstrapped and aligned with your success, not venture capital demands. You know exactly what you're paying
-          for and why.
+          {DEFAULT_EVENT_LIMIT.toLocaleString()} events after a generous free tier, scaling up to $499/month for 10M
+          events with all features including session replay. No hidden costs, no data mining, no advertising network.
+          We're independently bootstrapped and aligned with your success, not venture capital demands. You know exactly
+          what you're paying for and why.
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+import { DEFAULT_EVENT_LIMIT } from "../../../lib/const";
 import { ComparisonSection } from "../components/ComparisonPage";
 
 export const fathomComparisonData: ComparisonSection[] = [
@@ -191,7 +192,7 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Free tier",
-        rybbitValue: "10k events",
+        rybbitValue: DEFAULT_EVENT_LIMIT.toLocaleString() + " events",
         competitorValue: false,
       },
       {
