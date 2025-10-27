@@ -59,7 +59,7 @@ export default function AdminPage() {
         <AdminLayout>
           <div className="text-2xl font-bold mb-4">Admin Dashboard</div>
           <Tabs defaultValue="organizations" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="">
+            <TabsList className="mb-4">
               <TabsTrigger value="organizations">Organizations</TabsTrigger>
               <TabsTrigger value="sites">Sites</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>

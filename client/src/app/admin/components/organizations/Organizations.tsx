@@ -9,7 +9,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { parseUtcTimestamp } from "@/lib/dateTimeUtils";
 import { formatter } from "@/lib/utils";
-import { ChevronDown, ChevronRight, User, Building2, CreditCard, UserCheck, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  User,
+  Building2,
+  CreditCard,
+  UserCheck,
+  ExternalLink,
+  Activity,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/pagination";
@@ -28,6 +38,7 @@ import { SearchInput } from "../shared/SearchInput";
 import { ErrorAlert } from "../shared/ErrorAlert";
 import { AdminLayout } from "../shared/AdminLayout";
 import { GrowthChart } from "../shared/GrowthChart";
+import { OverviewCards } from "../shared/OverviewCards";
 
 export function Organizations() {
   const router = useRouter();
@@ -40,6 +51,41 @@ export function Organizations() {
     pageIndex: 0,
     pageSize: 50,
   });
+
+  // Calculate stats from organizations data
+  const stats = useMemo(() => {
+    if (!organizations) {
+      return {
+        totalOrganizations: 0,
+        activeOrganizations: 0,
+        paidOrganizations: 0,
+        totalEventsLast30Days: 0,
+      };
+    }
+
+    const totalOrganizations = organizations.length;
+
+    // Count organizations with at least 1 event in past 30 days
+    const activeOrganizations = organizations.filter(org => org.sites.some(site => site.eventsLast30Days > 0)).length;
+
+    // Count paid organizations (with a subscription)
+    const paidOrganizations = organizations.filter(org => org.subscription.planName !== "free").length;
+
+    // Sum all events from past 30 days
+    const totalEventsLast30Days = organizations.reduce(
+      (total, org) => total + org.sites.reduce((sum, site) => sum + Number(site.eventsLast30Days), 0),
+      0
+    );
+
+    console.log(totalEventsLast30Days);
+
+    return {
+      totalOrganizations,
+      activeOrganizations,
+      paidOrganizations,
+      totalEventsLast30Days,
+    };
+  }, [organizations]);
 
   const toggleExpand = useCallback(
     (orgId: string) => {
@@ -242,6 +288,33 @@ export function Organizations() {
 
   return (
     <AdminLayout>
+      <OverviewCards
+        isLoading={isLoading}
+        cards={[
+          {
+            title: "Total Organizations",
+            value: stats.totalOrganizations,
+            icon: Building2,
+          },
+          {
+            title: "Active Organizations",
+            value: stats.activeOrganizations,
+            icon: Activity,
+            description: "With events in past 30 days",
+          },
+          {
+            title: "Paid Organizations",
+            value: stats.paidOrganizations,
+            icon: CreditCard,
+          },
+          {
+            title: "Total Events (30d)",
+            value: stats.totalEventsLast30Days,
+            icon: Zap,
+          },
+        ]}
+      />
+
       <GrowthChart data={organizations} color="#8b5cf6" title="Organizations" />
 
       <div className="mb-4">
@@ -330,7 +403,9 @@ export function Organizations() {
                               <div>
                                 <div className="text-xs text-neutral-400 uppercase tracking-wide">Event Limit</div>
                                 <div className="font-medium">
-                                  {row.original.subscription.eventLimit ? formatter(row.original.subscription.eventLimit) : "Unlimited"}
+                                  {row.original.subscription.eventLimit
+                                    ? formatter(row.original.subscription.eventLimit)
+                                    : "Unlimited"}
                                 </div>
                               </div>
                               {row.original.subscription.currentPeriodEnd && (
@@ -370,7 +445,8 @@ export function Organizations() {
                                     <div className="flex flex-col">
                                       <span className="font-medium">{site.domain}</span>
                                       <span className="text-xs text-neutral-400">
-                                        {formatter(site.eventsLast24Hours)} events (24h) · {formatter(site.eventsLast30Days)} (30d)
+                                        {formatter(site.eventsLast24Hours)} events (24h) ·{" "}
+                                        {formatter(site.eventsLast30Days)} (30d)
                                       </span>
                                     </div>
                                     <ExternalLink className="h-3 w-3" />
