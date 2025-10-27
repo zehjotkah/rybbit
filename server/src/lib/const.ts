@@ -14,6 +14,13 @@ export const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 
 export const DEFAULT_EVENT_LIMIT = 10_000;
 
+// AppSumo tier limits (lifetime plans with standard features, no replays)
+export const APPSUMO_TIER_LIMITS = {
+  "1": 20_000,
+  "2": 100_000,
+  "3": 250_000,
+} as const;
+
 // Define a type for the plan objects
 export interface StripePlan {
   priceId: string;

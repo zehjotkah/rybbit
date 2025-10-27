@@ -16,5 +16,5 @@ export default defineConfig({
     ssl: false,
   },
   verbose: true,
-  tablesFilter: ['!pg_*'],
+  tablesFilter: ['!pg_*', '!as_*'],
 });

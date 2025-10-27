@@ -202,6 +202,7 @@ const PUBLIC_ROUTES: string[] = [
   "/api/auth/callback/google",
   "/api/auth/callback/github",
   "/api/stripe/webhook",
+  "/api/as/webhook",
   "/api/session-replay/record",
   "/api/admin/telemetry",
   "/api/site/:siteId/tracking-config",
@@ -409,6 +410,13 @@ if (IS_CLOUD) {
   server.get("/api/admin/sites", getAdminSites);
   server.get("/api/admin/organizations", getAdminOrganizations);
   server.post("/api/admin/telemetry", collectTelemetry);
+
+  // AppSumo Routes
+  const { activateAppSumoLicense } = await import("./api/as/activate.js");
+  const { handleAppSumoWebhook } = await import("./api/as/webhook.js");
+
+  server.post("/api/as/activate", activateAppSumoLicense);
+  server.post("/api/as/webhook", handleAppSumoWebhook);
 }
 
 server.post("/track", trackEvent);
