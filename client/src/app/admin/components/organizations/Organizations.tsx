@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { parseUtcTimestamp } from "@/lib/dateTimeUtils";
+import { formatter } from "@/lib/utils";
 import { ChevronDown, ChevronRight, User, Building2, CreditCard, UserCheck, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -139,7 +140,7 @@ export function Organizations() {
           const isOverLimit = row.original.overMonthlyLimit;
           return (
             <div className={`font-medium ${isOverLimit ? "text-red-400" : ""}`}>
-              {count?.toLocaleString() || 0}
+              {formatter(count || 0)}
               {isOverLimit && <span className="text-red-400 ml-1">⚠️</span>}
             </div>
           );
@@ -151,7 +152,16 @@ export function Organizations() {
         accessorFn: row => row.sites.reduce((total, site) => total + Number(site.eventsLast24Hours || 0), 0),
         cell: ({ row }) => {
           const total = row.original.sites.reduce((sum, site) => sum + Number(site.eventsLast24Hours || 0), 0);
-          return total.toLocaleString();
+          return formatter(total);
+        },
+      },
+      {
+        id: "eventsLast30Days",
+        header: ({ column }) => <SortableHeader column={column}>30d Events</SortableHeader>,
+        accessorFn: row => row.sites.reduce((total, site) => total + Number(site.eventsLast30Days || 0), 0),
+        cell: ({ row }) => {
+          const total = row.original.sites.reduce((sum, site) => sum + Number(site.eventsLast30Days || 0), 0);
+          return formatter(total);
         },
       },
       {
@@ -280,6 +290,9 @@ export function Organizations() {
                       <Skeleton className="h-5 w-20" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-5 w-20" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton className="h-5 w-16" />
                     </TableCell>
                     <TableCell>
@@ -317,7 +330,7 @@ export function Organizations() {
                               <div>
                                 <div className="text-xs text-neutral-400 uppercase tracking-wide">Event Limit</div>
                                 <div className="font-medium">
-                                  {row.original.subscription.eventLimit?.toLocaleString() || "Unlimited"}
+                                  {row.original.subscription.eventLimit ? formatter(row.original.subscription.eventLimit) : "Unlimited"}
                                 </div>
                               </div>
                               {row.original.subscription.currentPeriodEnd && (
@@ -357,7 +370,7 @@ export function Organizations() {
                                     <div className="flex flex-col">
                                       <span className="font-medium">{site.domain}</span>
                                       <span className="text-xs text-neutral-400">
-                                        {site.eventsLast24Hours.toLocaleString()} events (24h)
+                                        {formatter(site.eventsLast24Hours)} events (24h) · {formatter(site.eventsLast30Days)} (30d)
                                       </span>
                                     </div>
                                     <ExternalLink className="h-3 w-3" />

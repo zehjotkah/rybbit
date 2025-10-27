@@ -71,7 +71,7 @@ export function GrowthChart({ data, color = "#3b82f6", title }: GrowthChartProps
           stacked: false,
         }}
         enableSlices="x"
-        curve="monotoneX"
+        curve="linear"
         axisTop={null}
         axisRight={null}
         axisBottom={{

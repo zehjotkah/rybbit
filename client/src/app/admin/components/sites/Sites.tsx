@@ -24,6 +24,7 @@ import { GrowthChart } from "../shared/GrowthChart";
 import Link from "next/link";
 import { Favicon } from "../../../../components/Favicon";
 import { parseUtcTimestamp } from "../../../../lib/dateTimeUtils";
+import { formatter } from "../../../../lib/utils";
 
 export function Sites() {
   const { data: sites, isLoading, isError } = useAdminSites();
@@ -88,12 +89,12 @@ export function Sites() {
       {
         accessorKey: "eventsLast24Hours",
         header: ({ column }) => <SortableHeader column={column}>Events (24h)</SortableHeader>,
-        cell: ({ row }) => <div>{Number(row.getValue("eventsLast24Hours")).toLocaleString()}</div>,
+        cell: ({ row }) => <div>{formatter(Number(row.getValue("eventsLast24Hours")))}</div>,
       },
       {
         accessorKey: "eventsLast30Days",
         header: ({ column }) => <SortableHeader column={column}>Events (30d)</SortableHeader>,
-        cell: ({ row }) => <div>{Number(row.getValue("eventsLast30Days")).toLocaleString()}</div>,
+        cell: ({ row }) => <div>{formatter(Number(row.getValue("eventsLast30Days")))}</div>,
       },
       {
         id: "subscription",
