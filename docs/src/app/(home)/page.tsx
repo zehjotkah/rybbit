@@ -127,7 +127,7 @@ export default function HomePage() {
           </div>
           <p className="text-neutral-400 text-xs md:text-sm flex items-center justify-center gap-2 mt-6">
             <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
-            First {DEFAULT_EVENT_LIMIT.toLocaleString()} events/m are free. No credit card required.
+            First {DEFAULT_EVENT_LIMIT.toLocaleString()} pageviews/m are free. No credit card required.
           </p>
         </div>
         <div className="relative w-full max-w-[1300px] mb-10 px-4">
@@ -474,7 +474,7 @@ export default function HomePage() {
                 It&apos;s time to switch to analytics that&apos;s made for you
               </h2>
               <p className="text-base md:text-xl text-neutral-300 mb-6 md:mb-10 max-w-3xl mx-auto font-light">
-                The first {DEFAULT_EVENT_LIMIT.toLocaleString()} events a month are free
+                The first {DEFAULT_EVENT_LIMIT.toLocaleString()} pageviews a month are free
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-6 md:mb-8 w-full sm:w-auto">
