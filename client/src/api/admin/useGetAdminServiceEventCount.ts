@@ -16,11 +16,11 @@ export type GetServiceEventCountResponse = {
 async function getAdminServiceEventCount({
   startDate,
   endDate,
-  timeZone = "UTC",
+  timeZone,
 }: {
   startDate?: string;
   endDate?: string;
-  timeZone?: string;
+  timeZone: string;
 }): Promise<GetServiceEventCountResponse> {
   const params = new URLSearchParams();
   if (startDate) params.append("startDate", startDate);
@@ -33,12 +33,12 @@ async function getAdminServiceEventCount({
 export function useGetAdminServiceEventCount({
   startDate,
   endDate,
-  timeZone = "UTC",
+  timeZone,
   enabled = true,
 }: {
   startDate?: string;
   endDate?: string;
-  timeZone?: string;
+  timeZone: string;
   enabled?: boolean;
 }) {
   return useQuery({

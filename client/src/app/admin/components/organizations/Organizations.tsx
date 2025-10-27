@@ -41,6 +41,8 @@ import { GrowthChart } from "../shared/GrowthChart";
 import { OverviewCards } from "../shared/OverviewCards";
 import { ServiceUsageChart } from "../shared/ServiceUsageChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export function Organizations() {
   const router = useRouter();
@@ -53,6 +55,11 @@ export function Organizations() {
     pageIndex: 0,
     pageSize: 50,
   });
+
+  // Filter states
+  const [showZeroEvents, setShowZeroEvents] = useState(true);
+  const [showFreeUsers, setShowFreeUsers] = useState(true);
+  const [showOnlyOverLimit, setShowOnlyOverLimit] = useState(false);
 
   // Calculate stats from organizations data
   const stats = useMemo(() => {
@@ -100,25 +107,45 @@ export function Organizations() {
     [expandedOrgs]
   );
 
-  // Filter organizations based on search query
+  // Filter organizations based on search query and filter toggles
   const filteredOrganizations = useMemo(() => {
     if (!organizations) return [];
 
-    if (!searchQuery.trim()) return organizations;
+    let filtered = organizations;
 
-    const lowerSearchQuery = searchQuery.toLowerCase();
-    return organizations.filter(org => {
-      return (
-        org.name.toLowerCase().includes(lowerSearchQuery) ||
-        org.sites.some(site => site.domain.toLowerCase().includes(lowerSearchQuery)) ||
-        org.members.some(
-          member =>
-            member.email.toLowerCase().includes(lowerSearchQuery) ||
-            member.name.toLowerCase().includes(lowerSearchQuery)
-        )
-      );
-    });
-  }, [organizations, searchQuery]);
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const lowerSearchQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(org => {
+        return (
+          org.name.toLowerCase().includes(lowerSearchQuery) ||
+          org.sites.some(site => site.domain.toLowerCase().includes(lowerSearchQuery)) ||
+          org.members.some(
+            member =>
+              member.email.toLowerCase().includes(lowerSearchQuery) ||
+              member.name.toLowerCase().includes(lowerSearchQuery)
+          )
+        );
+      });
+    }
+
+    // Filter out organizations with 0 events in last 30 days
+    if (!showZeroEvents) {
+      filtered = filtered.filter(org => org.sites.some(site => site.eventsLast30Days > 0));
+    }
+
+    // Filter out free users
+    if (!showFreeUsers) {
+      filtered = filtered.filter(org => org.subscription.planName !== "free");
+    }
+
+    // Show only organizations over their event limit
+    if (showOnlyOverLimit) {
+      filtered = filtered.filter(org => org.overMonthlyLimit);
+    }
+
+    return filtered;
+  }, [organizations, searchQuery, showZeroEvents, showFreeUsers, showOnlyOverLimit]);
 
   // Impersonation handler
   const handleImpersonate = useCallback(
@@ -334,6 +361,27 @@ export function Organizations() {
           value={searchQuery}
           onChange={setSearchQuery}
         />
+      </div>
+
+      <div className="flex items-center gap-6 mb-4 p-4 bg-neutral-900 border border-neutral-700 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Switch id="show-zero-events" checked={showZeroEvents} onCheckedChange={setShowZeroEvents} />
+          <Label htmlFor="show-zero-events" className="text-sm cursor-pointer">
+            Show orgs with 0 events (30d)
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch id="show-free-users" checked={showFreeUsers} onCheckedChange={setShowFreeUsers} />
+          <Label htmlFor="show-free-users" className="text-sm cursor-pointer">
+            Show free users
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch id="show-only-over-limit" checked={showOnlyOverLimit} onCheckedChange={setShowOnlyOverLimit} />
+          <Label htmlFor="show-only-over-limit" className="text-sm cursor-pointer">
+            Only over limit
+          </Label>
+        </div>
       </div>
 
       <div className="rounded-md border border-neutral-700">

@@ -2,7 +2,11 @@
 
 import { useMemo } from "react";
 import { ResponsiveLine } from "@nivo/line";
-import { parseUtcTimestamp } from "@/lib/dateTimeUtils";
+import { parseUtcTimestamp, userLocale } from "@/lib/dateTimeUtils";
+import { nivoTheme } from "@/lib/nivo";
+import { formatter } from "@/lib/utils";
+import { DateTime } from "luxon";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 interface GrowthChartProps {
   data?: Array<{ createdAt: string }>;
@@ -11,6 +15,9 @@ interface GrowthChartProps {
 }
 
 export function GrowthChart({ data, color = "#3b82f6", title }: GrowthChartProps) {
+  const { width } = useWindowSize();
+  const maxTicks = Math.round((width ?? Infinity) / 200);
+
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -39,126 +46,80 @@ export function GrowthChart({ data, color = "#3b82f6", title }: GrowthChartProps
   }, [data]);
 
   if (data === undefined) {
-    return <div className="h-48 sm:h-64 flex items-center justify-center text-neutral-400 text-sm">Loading...</div>;
+    return <div className="h-64 flex items-center justify-center text-neutral-400 text-sm">Loading...</div>;
   }
 
   if (!data || data.length === 0) {
-    return (
-      <div className="h-48 sm:h-64 flex items-center justify-center text-neutral-400 text-sm">No data available</div>
-    );
+    return <div className="h-64 flex items-center justify-center text-neutral-400 text-sm">No data available</div>;
   }
 
   return (
-    <div className="h-48 sm:h-64">
+    <div className="h-64">
       <ResponsiveLine
         data={chartData}
-        margin={{
-          top: 10,
-          right: 10,
-          bottom: 40,
-          left: 25,
-        }}
+        theme={nivoTheme}
+        margin={{ top: 10, right: 10, bottom: 25, left: 50 }}
         xScale={{
           type: "time",
           format: "%Y-%m-%d",
           precision: "day",
+          useUTC: true,
         }}
-        xFormat="time:%Y-%m-%d"
         yScale={{
           type: "linear",
           min: 0,
-          max: "auto",
           stacked: false,
+          reverse: false,
         }}
-        enableSlices="x"
-        curve="linear"
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          format: "%m/%d",
-          tickValues: "every 14 days",
-          tickRotation: -45,
-          tickSize: 5,
-          tickPadding: 5,
-        }}
-        axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-        }}
-        colors={[color]}
-        pointSize={4}
-        pointColor={{ theme: "background" }}
-        pointBorderWidth={2}
-        pointBorderColor={{ from: "serieColor" }}
-        pointLabelYOffset={-12}
-        useMesh={true}
         enableGridX={false}
         enableGridY={true}
         gridYValues={5}
-        theme={{
-          background: "transparent",
-          text: {
-            fontSize: 11,
-            fill: "#a3a3a3",
-          },
-          axis: {
-            domain: {
-              line: {
-                stroke: "#525252",
-                strokeWidth: 1,
-              },
-            },
-            legend: {
-              text: {
-                fontSize: 11,
-                fill: "#a3a3a3",
-              },
-            },
-            ticks: {
-              line: {
-                stroke: "#525252",
-                strokeWidth: 1,
-              },
-              text: {
-                fontSize: 10,
-                fill: "#a3a3a3",
-              },
-            },
-          },
-          grid: {
-            line: {
-              stroke: "#404040",
-              strokeWidth: 1,
-            },
-          },
-          crosshair: {
-            line: {
-              stroke: "#ffffff",
-              strokeWidth: 1,
-              strokeOpacity: 0.35,
-            },
-          },
-          tooltip: {
-            container: {
-              background: "#262626",
-              color: "#ffffff",
-              fontSize: "11px",
-              borderRadius: "4px",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              border: "1px solid #404040",
-              padding: "6px 8px",
-            },
+        yFormat=" >-.0f"
+        axisTop={null}
+        axisRight={null}
+        axisBottom={{
+          tickSize: 0,
+          tickPadding: 10,
+          tickRotation: 0,
+          truncateTickAt: 0,
+          tickValues: Math.min(maxTicks, 10),
+          format: value => {
+            const dt = DateTime.fromJSDate(value).setLocale(userLocale);
+            return dt.toFormat("MMM d");
           },
         }}
-        tooltip={({ point }) => (
-          <div className="bg-neutral-800 border border-neutral-600 rounded px-2 py-1 text-xs sm:text-sm">
-            <div className="font-medium text-white">{point.data.xFormatted}</div>
-            <div className="text-neutral-300">
-              {point.data.y} new {title.toLowerCase()}
+        axisLeft={{
+          tickSize: 0,
+          tickPadding: 10,
+          tickRotation: 0,
+          truncateTickAt: 0,
+          tickValues: 5,
+          format: formatter,
+        }}
+        enableTouchCrosshair={true}
+        enablePoints={false}
+        useMesh={true}
+        animate={false}
+        enableSlices={"x"}
+        colors={[color]}
+        enableArea={false}
+        sliceTooltip={({ slice }: any) => {
+          const point = slice.points[0];
+          const currentTime = DateTime.fromSQL(point.data.x as string);
+
+          return (
+            <div className="text-sm bg-neutral-850 p-3 rounded-md min-w-[100px] border border-neutral-750">
+              <div className="font-medium mb-1">{currentTime.toLocaleString(DateTime.DATE_MED)}</div>
+              <div className="flex justify-between gap-4 text-sm">
+                <div className="flex items-center gap-2 text-neutral-300">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: point.seriesColor }} />
+                  <span>New {title}</span>
+                </div>
+                <div>{formatter(Number(point.data.yFormatted))}</div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        }}
       />
     </div>
   );
