@@ -6,6 +6,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { collectTelemetry } from "./api/admin/collectTelemetry.js";
 import { getAdminOrganizations } from "./api/admin/getAdminOrganizations.js";
+import { getAdminServiceEventCount } from "./api/admin/getAdminServiceEventCount.js";
 import { getAdminSites } from "./api/admin/getAdminSites.js";
 import { getEventNames } from "./api/analytics/events/getEventNames.js";
 import { getEventProperties } from "./api/analytics/events/getEventProperties.js";
@@ -409,6 +410,7 @@ if (IS_CLOUD) {
   // Admin Routes
   server.get("/api/admin/sites", getAdminSites);
   server.get("/api/admin/organizations", getAdminOrganizations);
+  server.get("/api/admin/service-event-count", getAdminServiceEventCount);
   server.post("/api/admin/telemetry", collectTelemetry);
 
   // AppSumo Routes
