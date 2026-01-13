@@ -117,10 +117,13 @@ export const auth = betterAuth({
     },
   },
   plugins: pluginList,
-  // For self-hosted, allow all origins. For cloud, restrict to specific domains.
+  // For self-hosted, support manual configuration via TRUSTED_ORIGINS
+  // If not provided, better-auth defaults to stricter checks (usually just BASE_URL)
   trustedOrigins: IS_CLOUD
     ? ["http://localhost:3002", "https://rybbit.com", "https://www.rybbit.com"]
-    : undefined, // undefined = allow all origins
+    : process.env.TRUSTED_ORIGINS
+      ? process.env.TRUSTED_ORIGINS.split(",").map(o => o.trim().replace(/\/$/, ""))
+      : undefined,
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
     defaultCookieAttributes: {
