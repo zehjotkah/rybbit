@@ -203,21 +203,17 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
           } as ToggleConfig,
         ]
       : []),
-    ...(IS_CLOUD
-      ? [
-          {
-            id: "webVitals",
-            label: "Web Vitals",
-            description: "Track Core Web Vitals metrics (LCP, CLS, INP, FCP, TTFB)",
-            value: toggleStates.webVitals,
-            key: "webVitals" as keyof SiteResponse,
-            enabledMessage: "Web Vitals enabled",
-            disabledMessage: "Web Vitals disabled",
-            disabled: webVitalsDisabled,
-            badge: <Badge variant="success">Standard</Badge>,
-          } as ToggleConfig,
-        ]
-      : []),
+    {
+      id: "webVitals",
+      label: "Web Vitals",
+      description: "Track Core Web Vitals metrics (LCP, CLS, INP, FCP, TTFB)",
+      value: toggleStates.webVitals,
+      key: "webVitals" as keyof SiteResponse,
+      enabledMessage: "Web Vitals enabled",
+      disabledMessage: "Web Vitals disabled",
+      disabled: webVitalsDisabled,
+      badge: <Badge variant="success">Standard</Badge>,
+    },
     {
       id: "trackErrors",
       label: "Error Tracking",
