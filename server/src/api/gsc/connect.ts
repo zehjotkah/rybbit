@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { ConnectGSCRequest } from "./types.js";
 import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { logger } from "../../lib/logger/logger.js";
+import { getOriginFromRequest } from "../../lib/request-utils.js";
 
 /**
  * Initiates the OAuth flow for Google Search Console
@@ -29,9 +30,16 @@ export async function connectGSC(req: FastifyRequest<ConnectGSCRequest>, res: Fa
       return res.status(500).send({ error: "Google OAuth not configured" });
     }
 
+    // Get the origin from the request to pass through OAuth flow
+    const origin = getOriginFromRequest(req);
+    
+    // Log for debugging
+    logger.info(`GSC OAuth initiated for site ${numericSiteId} with redirect_uri: ${redirectUri}, origin: ${origin}`);
+
     // Build OAuth URL
     const scope = "https://www.googleapis.com/auth/webmasters.readonly";
-    const state = numericSiteId.toString(); // Pass siteId in state to retrieve after OAuth
+    // Encode both siteId and origin in state parameter (format: siteId|origin)
+    const state = `${numericSiteId}|${origin}`;
 
     const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     authUrl.searchParams.set("client_id", clientId);

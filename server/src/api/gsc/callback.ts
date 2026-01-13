@@ -24,12 +24,24 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
   try {
     const { code, state, error } = req.query;
     
-    // Get the origin from the request for multi-domain support
-    const origin = getOriginFromRequest(req);
+    // Parse state parameter (format: siteId|origin)
+    let siteId: number;
+    let origin: string;
+    
+    if (state && state.includes("|")) {
+      const [siteIdStr, encodedOrigin] = state.split("|");
+      siteId = Number(siteIdStr);
+      origin = encodedOrigin;
+    } else {
+      // Fallback for old format (just siteId) or missing state
+      siteId = Number(state);
+      origin = getOriginFromRequest(req);
+    }
+    
+    logger.info(`GSC callback received - origin: ${origin}, siteId: ${siteId}, hasCode: ${!!code}, error: ${error}`);
 
     if (error) {
       logger.info(`OAuth cancelled or failed: ${error}`);
-      const siteId = state;
       return res.redirect(`${origin}/${siteId}/main`);
     }
 
@@ -37,7 +49,6 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
       return res.status(400).send({ error: "Missing code or state parameter" });
     }
 
-    const siteId = Number(state);
     if (isNaN(siteId)) {
       return res.status(400).send({ error: "Invalid site ID in state" });
     }
