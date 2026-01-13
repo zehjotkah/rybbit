@@ -6,6 +6,7 @@ import { getGSCProperties } from "./utils.js";
 import { getSessionFromReq } from "../../lib/auth-utils.js";
 import { db } from "../../db/postgres/postgres.js";
 import { logger } from "../../lib/logger/logger.js";
+import { getOriginFromRequest } from "../../lib/request-utils.js";
 
 interface TokenResponse {
   access_token: string;
@@ -22,11 +23,14 @@ interface TokenResponse {
 export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: FastifyReply) {
   try {
     const { code, state, error } = req.query;
+    
+    // Get the origin from the request for multi-domain support
+    const origin = getOriginFromRequest(req);
 
     if (error) {
       logger.info(`OAuth cancelled or failed: ${error}`);
       const siteId = state;
-      return res.redirect(`${process.env.BASE_URL}/${siteId}/main`);
+      return res.redirect(`${origin}/${siteId}/main`);
     }
 
     if (!code || !state) {
@@ -69,7 +73,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
 
     if (!tokenResponse.ok) {
       logger.error(`Token exchange failed: ${await tokenResponse.text()}`);
-      return res.redirect(`${process.env.BASE_URL}/error?message=Token exchange failed`);
+      return res.redirect(`${origin}/error?message=Token exchange failed`);
     }
 
     const tokens: TokenResponse = await tokenResponse.json();
@@ -78,7 +82,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
     const properties = await getGSCProperties(tokens.access_token);
 
     if (properties.length === 0) {
-      return res.redirect(`${process.env.CLIENT_URL}/error?message=No GSC properties found`);
+      return res.redirect(`${origin}/error?message=No GSC properties found`);
     }
 
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
@@ -113,9 +117,11 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
 
     // Redirect to property selection page with properties as query params
     const propertiesParam = encodeURIComponent(JSON.stringify(properties));
-    return res.redirect(`${process.env.BASE_URL}/${siteId}/gsc/select-property?properties=${propertiesParam}`);
+    return res.redirect(`${origin}/${siteId}/gsc/select-property?properties=${propertiesParam}`);
   } catch (error) {
     logger.error(error, "Error handling GSC callback");
-    return res.redirect(`${process.env.BASE_URL}/error?message=Callback failed`);
+    // Get origin for error redirect (may not be available in catch block)
+    const origin = getOriginFromRequest(req);
+    return res.redirect(`${origin}/error?message=Callback failed`);
   }
 }

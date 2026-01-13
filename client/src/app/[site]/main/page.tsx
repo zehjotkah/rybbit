@@ -38,7 +38,7 @@ function MainPageContent() {
         <Events />
         <Weekdays />
         {IS_CLOUD && <Network />}
-        {IS_CLOUD && <SearchConsole />}
+        <SearchConsole />
       </div>
     </div>
   );
