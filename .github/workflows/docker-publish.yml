@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
+      - production
     tags:
       - "v*"
   pull_request:
     branches:
       - master
+      - production
 
 jobs:
   build-client:
