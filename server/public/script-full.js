@@ -75,6 +75,7 @@
       console.error("Please provide a valid site ID using the data-site-id attribute");
       return null;
     }
+    const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
     const skipPatterns = parseJsonSafely(scriptTag.getAttribute("data-skip-patterns"), []);
     const maskPatterns = parseJsonSafely(scriptTag.getAttribute("data-mask-patterns"), []);
     const sessionReplayMaskTextSelectors = parseJsonSafely(
@@ -102,6 +103,7 @@
     const sampleRateAttr = scriptTag.getAttribute("data-replay-sample-rate");
     const sessionReplaySampleRate = sampleRateAttr ? Math.min(100, Math.max(0, parseInt(sampleRateAttr, 10))) : void 0;
     const defaultConfig = {
+      namespace,
       analyticsHost,
       siteId,
       debounceDuration,
@@ -374,7 +376,7 @@
     }
     loadUserId() {
       try {
-        const storedUserId = localStorage.getItem("rybbit-user-id");
+        const storedUserId = localStorage.getItem(`${this.config.namespace}-user-id`);
         if (storedUserId) {
           this.customUserId = storedUserId;
         }
@@ -545,7 +547,7 @@
       }
       this.customUserId = userId.trim();
       try {
-        localStorage.setItem("rybbit-user-id", this.customUserId);
+        localStorage.setItem(`${this.config.namespace}-user-id`, this.customUserId);
       } catch (e2) {
         console.warn("Could not persist user ID to localStorage");
       }
@@ -589,7 +591,7 @@
     clearUserId() {
       this.customUserId = null;
       try {
-        localStorage.removeItem("rybbit-user-id");
+        localStorage.removeItem(`${this.config.namespace}-user-id`);
       } catch (e2) {
       }
     }
@@ -930,8 +932,10 @@
       console.error("Could not find current script tag");
       return;
     }
-    if (window.__RYBBIT_OPTOUT__ || localStorage.getItem("disable-rybbit") !== null) {
-      window.rybbit = {
+    const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
+    const optOutKey = `disable-${namespace}`;
+    if (window.__RYBBIT_OPTOUT__ || localStorage.getItem(optOutKey) !== null) {
+      window[namespace] = {
         pageview: () => {
         },
         event: () => {
@@ -1033,7 +1037,7 @@
         });
       }
     }
-    window.rybbit = {
+    window[config.namespace] = {
       pageview: () => tracker.trackPageview(),
       event: (name, properties = {}) => tracker.trackEvent(name, properties),
       error: (error, properties = {}) => tracker.trackError(error, properties),

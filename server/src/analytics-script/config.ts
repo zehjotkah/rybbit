@@ -24,6 +24,8 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
     return null;
   }
 
+  const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
+
   // These can be overridden via data attributes for testing/debugging
   const skipPatterns = parseJsonSafely<string[]>(scriptTag.getAttribute("data-skip-patterns"), []);
   const maskPatterns = parseJsonSafely<string[]>(scriptTag.getAttribute("data-mask-patterns"), []);
@@ -83,6 +85,7 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
 
   // Default config with minimal settings
   const defaultConfig: ScriptConfig = {
+    namespace,
     analyticsHost,
     siteId,
     debounceDuration,

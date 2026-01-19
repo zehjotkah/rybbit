@@ -1,4 +1,5 @@
 export interface ScriptConfig {
+  namespace: string;
   analyticsHost: string;
   siteId: string;
   debounceDuration: number;

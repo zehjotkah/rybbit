@@ -153,38 +153,53 @@ export async function getGoals(
         if (!pathPattern) continue;
 
         const regex = patternToRegex(pathPattern);
+        let pathClause = `type = 'pageview' AND match(pathname, ${SqlString.escape(regex)})`;
+
+        // Support both new propertyFilters array and legacy single property
+        const filters = goal.config.propertyFilters || (
+          goal.config.eventPropertyKey && goal.config.eventPropertyValue !== undefined
+            ? [{ key: goal.config.eventPropertyKey, value: goal.config.eventPropertyValue }]
+            : []
+        );
+
+        // Add property matching for page goals (URL parameters)
+        for (const filter of filters) {
+          // Access URL parameters from the url_parameters map
+          const propValueAccessor = `url_parameters[${SqlString.escape(filter.key)}]`;
+
+          // URL parameters are stored as strings in the Map
+          pathClause += ` AND ${propValueAccessor} = ${SqlString.escape(String(filter.value))}`;
+        }
+
         conditionalClauses.push(`
           COUNT(DISTINCT IF(
-            type = 'pageview' AND match(pathname, ${SqlString.escape(regex)}),
+            ${pathClause},
             session_id,
             NULL
           )) AS goal_${goal.goalId}_conversions
         `);
       } else if (goal.goalType === "event") {
         const eventName = goal.config.eventName;
-        const eventPropertyKey = goal.config.eventPropertyKey;
-        const eventPropertyValue = goal.config.eventPropertyValue;
 
         if (!eventName) continue;
 
         let eventClause = `type = 'custom_event' AND event_name = ${SqlString.escape(eventName)}`;
 
-        // Add property matching if needed
-        if (eventPropertyKey && eventPropertyValue !== undefined) {
-          // Access the sub-column directly for native JSON type
-          const propValueAccessor = `props.${SqlString.escapeId(eventPropertyKey)}`;
+        // Support both new propertyFilters array and legacy single property
+        const filters = goal.config.propertyFilters || (
+          goal.config.eventPropertyKey && goal.config.eventPropertyValue !== undefined
+            ? [{ key: goal.config.eventPropertyKey, value: goal.config.eventPropertyValue }]
+            : []
+        );
 
-          // Comparison needs to handle the Dynamic type returned
-          // Let ClickHouse handle the comparison based on the provided value type
-          if (typeof eventPropertyValue === "string") {
-            eventClause += ` AND toString(${propValueAccessor}) = ${SqlString.escape(eventPropertyValue)}`;
-          } else if (typeof eventPropertyValue === "number") {
-            // Use toFloat64 or toInt* depending on expected number type
-            eventClause += ` AND toFloat64OrNull(${propValueAccessor}) = ${SqlString.escape(eventPropertyValue)}`;
-          } else if (typeof eventPropertyValue === "boolean") {
-            // Booleans might be stored as 0/1 or true/false in JSON
-            // Comparing toUInt8 seems robust
-            eventClause += ` AND toUInt8OrNull(${propValueAccessor}) = ${eventPropertyValue ? 1 : 0}`;
+        // Add property matching if needed
+        for (const filter of filters) {
+          if (typeof filter.value === "string") {
+            eventClause += ` AND JSONExtractString(toString(props), ${SqlString.escape(filter.key)}) = ${SqlString.escape(filter.value)}`;
+          } else if (typeof filter.value === "number") {
+            eventClause += ` AND toFloat64(JSONExtractString(toString(props), ${SqlString.escape(filter.key)})) = ${SqlString.escape(filter.value)}`;
+          } else if (typeof filter.value === "boolean") {
+            eventClause += ` AND JSONExtractString(toString(props), ${SqlString.escape(filter.key)}) = ${SqlString.escape(filter.value ? 'true' : 'false')}`;
           }
         }
 

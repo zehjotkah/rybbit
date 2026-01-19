@@ -141,8 +141,10 @@ function SignupPageContent() {
       setOrganizationId(data.id);
 
       // Track how user found Rybbit
-      if (IS_CLOUD && referralSource) {
-        window.rybbit?.event("found", { via: referralSource });
+      if (IS_CLOUD && referralSource && userStore.getState().user?.id) {
+        window.rybbit?.identify(userStore.getState().user?.id || "", {
+          source: referralSource,
+        });
       }
 
       setCurrentStep(3);

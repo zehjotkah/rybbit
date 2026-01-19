@@ -10,8 +10,14 @@ export interface Goal {
   config: {
     pathPattern?: string;
     eventName?: string;
+    // Deprecated fields - kept for backwards compatibility
     eventPropertyKey?: string;
     eventPropertyValue?: string | number | boolean;
+    // New field for multiple property filters
+    propertyFilters?: Array<{
+      key: string;
+      value: string | number | boolean;
+    }>;
   };
   createdAt: string;
   total_conversions: number;
@@ -51,11 +57,16 @@ export interface CreateGoalParams {
     eventName?: string;
     eventPropertyKey?: string;
     eventPropertyValue?: string | number | boolean;
+    propertyFilters?: Array<{
+      key: string;
+      value: string | number | boolean;
+    }>;
   };
 }
 
 export interface UpdateGoalParams extends CreateGoalParams {
   goalId: number;
+  siteId: number;
 }
 
 /**
