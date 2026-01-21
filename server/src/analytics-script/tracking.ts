@@ -47,7 +47,7 @@ export class Tracker {
         },
         body: JSON.stringify(batch),
         mode: "cors",
-        keepalive: true, // Enable keepalive so request completes even during page unload
+        keepalive: false, // Disable keepalive for large session replay requests
       });
     } catch (error) {
       console.error("Failed to send session replay batch:", error);
