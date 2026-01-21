@@ -63,16 +63,17 @@ export async function getFunnelStepSessions(req: FastifyRequest<GetFunnelStepSes
 
   try {
     const timeStatement = getTimeStatement(req.query);
-    let filterStatement = getFilterStatement(req.query.filters, Number(siteId), timeStatement);
 
-    // Transform filter statement to use extracted UTM columns instead of map access
-    // since the CTE already extracts utm_source, utm_medium, etc. as separate columns
-    filterStatement = filterStatement
-      .replace(/url_parameters\['utm_source'\]/g, "utm_source")
-      .replace(/url_parameters\['utm_medium'\]/g, "utm_medium")
-      .replace(/url_parameters\['utm_campaign'\]/g, "utm_campaign")
-      .replace(/url_parameters\['utm_term'\]/g, "utm_term")
-      .replace(/url_parameters\['utm_content'\]/g, "utm_content");
+    // Use fieldMappings since the CTE extracts UTM params as separate columns
+    const filterStatement = getFilterStatement(req.query.filters, Number(siteId), timeStatement, {
+      fieldMappings: {
+        "url_parameters['utm_source']": "utm_source",
+        "url_parameters['utm_medium']": "utm_medium",
+        "url_parameters['utm_campaign']": "utm_campaign",
+        "url_parameters['utm_term']": "utm_term",
+        "url_parameters['utm_content']": "utm_content",
+      },
+    });
 
     // Build conditional statements for each step we need
     const stepsToCheck = mode === "reached" ? stepNumber : stepNumber + 1;

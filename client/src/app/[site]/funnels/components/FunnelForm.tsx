@@ -1,9 +1,8 @@
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { InputWithSuggestions, SuggestionOption } from "@/components/ui/input-with-suggestions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { Reorder } from "framer-motion";
 import { ChevronDown, ChevronUp, GripVertical, Plus, Save, Trash2, X } from "lucide-react";
 import { useState } from "react";
@@ -209,12 +208,10 @@ export function FunnelForm({
 
   if (steps.some(step => !step.value)) {
     funnelArea = (
-      <div className="flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-lg h-full">
+      <div className="flex items-center justify-center rounded-lg h-full">
         <div className="text-center p-6">
           <div className="text-lg font-medium mb-2">Funnel Preview</div>
-          <p className="text-sm text-neutral-500">
-            Configure your funnel steps and click "Query Funnel" to preview results
-          </p>
+          <p className="text-sm text-neutral-500">Configure your funnel steps</p>
         </div>
       </div>
     );
@@ -222,7 +219,7 @@ export function FunnelForm({
 
   if (isPending) {
     funnelArea = (
-      <div className="flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-lg h-full">
+      <div className="flex items-center justify-center rounded-lg h-full">
         <ThreeDotLoader />
       </div>
     );

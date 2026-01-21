@@ -67,6 +67,12 @@ const sponsors: Sponsor[] = [
     url: "https://cosmoflare.com",
     amount: 10,
   },
+  {
+    name: "Fastscribe",
+    logo: "/sponsors/fastscribe.png",
+    url: "https://fastscribe.io",
+    amount: 10,
+  },
 ];
 
 export default function SponsorsPage() {
