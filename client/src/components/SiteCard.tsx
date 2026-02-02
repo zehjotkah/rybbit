@@ -1,3 +1,4 @@
+import { Tag, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import { useGetOverview } from "../api/analytics/hooks/useGetOverview";
@@ -8,14 +9,23 @@ import { useStore } from "../lib/store";
 import { formatter } from "../lib/utils";
 import { Favicon } from "./Favicon";
 import { SiteSessionChart } from "./SiteSessionChart";
+import { SiteSettings } from "./SiteSettings/SiteSettings";
+import { TagEditor } from "./TagEditor";
+import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface SiteCardProps {
   siteId: number;
   domain: string;
+  tags?: string[];
+  allTags?: string[];
+  onTagsUpdated?: () => void;
+  selectedTags?: string[];
+  onTagClick?: (tag: string) => void;
 }
 
-export function SiteCard({ siteId, domain }: SiteCardProps) {
+export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdated, selectedTags = [], onTagClick }: SiteCardProps) {
   const { ref, isInView } = useInView({
     // Start loading slightly before the card comes into view
     rootMargin: "200px",
@@ -45,7 +55,7 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
   });
 
   // Previous period - automatically handles both regular time-based and past-minutes queries
-  const { data: overviewDataPrevious, isLoading: isOverviewLoadingPrevious } = useGetOverview({
+  const { data: overviewDataPrevious } = useGetOverview({
     site: siteId,
     periodTime: "previous",
   });
@@ -64,7 +74,7 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
     <Link href={`/${siteId}`}>
       <div
         ref={ref}
-        className="flex flex-col md:flex-row md:justify-between gap-3 rounded-lg bg-white dark:bg-neutral-900/70 px-4 py-3 border border-neutral-100 dark:border-neutral-850 transition-all duration-300 hover:translate-y-[-2px] w-full"
+        className="flex flex-col md:flex-row md:justify-between gap-3 rounded-lg bg-white dark:bg-neutral-900/70 px-3 py-2 border border-neutral-100 dark:border-neutral-850 transition-all duration-300 hover:translate-y-[-2px] w-full"
       >
         {showSkeleton ? (
           <>
@@ -91,6 +101,59 @@ export function SiteCard({ siteId, domain }: SiteCardProps) {
             <div className="flex gap-2 items-center">
               <Favicon domain={domain} className="w-6 h-6" />
               <span className="text-lg font-medium truncate group-hover:underline transition-all">{domain}</span>
+              <div onClick={(e) => e.preventDefault()}>
+                <Tooltip>
+                  <SiteSettings
+                    siteId={siteId}
+                    trigger={
+                      <TooltipTrigger asChild>
+                        <button className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                          <Settings className="h-4 w-4 text-neutral-400" />
+                        </button>
+                      </TooltipTrigger>
+                    }
+                  />
+                  <TooltipContent>Site Settings</TooltipContent>
+                </Tooltip>
+              </div>
+              {/* Tags display */}
+              <div onClick={(e) => e.preventDefault()} className="flex items-center gap-1">
+                {tags.slice(0, 3).map(tag => {
+                  return (
+                    <Badge
+                      key={tag}
+                      variant={"default"}
+                      className={`text-xs ${onTagClick ? "cursor-pointer" : ""}`}
+                      onClick={onTagClick ? () => onTagClick(tag) : undefined}
+                    >
+                      {tag}
+                    </Badge>
+                  );
+                })}
+                {tags.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{tags.length - 3}
+                  </Badge>
+                )}
+                {onTagsUpdated && (
+                  <Tooltip>
+                    <TagEditor
+                      siteId={siteId}
+                      currentTags={tags}
+                      allTags={allTags}
+                      onTagsUpdated={onTagsUpdated}
+                      trigger={
+                        <TooltipTrigger asChild>
+                          <button className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                            <Tag className="h-4 w-4 text-neutral-400" />
+                          </button>
+                        </TooltipTrigger>
+                      }
+                    />
+                    <TooltipContent>Edit Tags</TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center justify-between">
               <div className="relative rounded-md w-[200px] h-[50px]">

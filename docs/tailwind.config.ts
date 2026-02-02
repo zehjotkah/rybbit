@@ -8,6 +8,7 @@ const config: Config = {
       animation: {
         marquee: "marquee var(--duration) linear infinite",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+        "marquee-vertical-reverse": "marquee-vertical-reverse var(--duration) linear infinite",
       },
       keyframes: {
         marquee: {
@@ -17,6 +18,10 @@ const config: Config = {
         "marquee-vertical": {
           from: { transform: "translateY(0)" },
           to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
+        "marquee-vertical-reverse": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(calc(100% + var(--gap)))" },
         },
       },
     },

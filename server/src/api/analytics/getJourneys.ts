@@ -2,7 +2,7 @@ import { FilterParams } from "@rybbit/shared";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { clickhouse } from "../../db/clickhouse/clickhouse.js";
 import { getFilterStatement } from "./utils/getFilterStatement.js";
-import { getTimeStatement } from "./utils/utils.js";
+import { getTimeStatement, patternToRegex } from "./utils/utils.js";
 
 export const getJourneys = async (
   request: FastifyRequest<{
@@ -51,9 +51,16 @@ export const getJourneys = async (
     }
 
     // Build step filter conditions for the HAVING clause
+    // Supports wildcard patterns: * matches single segment, ** matches multiple segments
     const stepFilterConditions = Object.entries(parsedStepFilters)
       .map(([step, path]) => {
         const stepIndex = parseInt(step, 10) + 1; // ClickHouse arrays are 1-indexed
+        if (path.includes("*")) {
+          // Use regex matching for wildcard patterns
+          const regex = patternToRegex(path);
+          return `match(journey[${stepIndex}], '${regex.replace(/'/g, "\\'")}')`;
+        }
+        // Use exact match for non-wildcard patterns (more efficient)
         return `journey[${stepIndex}] = '${path.replace(/'/g, "''")}'`;
       })
       .join(" AND ");

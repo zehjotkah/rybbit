@@ -7,7 +7,6 @@ import { Suspense } from "react";
 import { StandardPage } from "../../components/StandardPage";
 import { UsageChart } from "../../components/UsageChart";
 import { useStripeSubscription } from "../../lib/subscription/useStripeSubscription";
-import { FAQSection } from "./components/FAQSection";
 import { PricingCard } from "./components/PricingCard";
 import { PricingHeader } from "./components/PricingHeader";
 import { useQueryState } from "nuqs";
@@ -55,15 +54,10 @@ function SubscribeContent() {
 
         {/* Usage Stats and Chart */}
         {organizationId && (
-          <div className="max-w-lg mx-auto mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6">
+          <div className="max-w-4xl mx-auto mt-6 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-100 dark:border-neutral-850 p-6">
             <UsageChart organizationId={organizationId} startDate={startDate} endDate={endDate} />
           </div>
         )}
-
-        {/* FAQ Section */}
-        <div className="max-w-lg mx-auto">
-          <FAQSection />
-        </div>
       </div>
     </StandardPage>
   );

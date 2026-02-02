@@ -112,7 +112,7 @@ export const InputWithSuggestions = React.forwardRef<HTMLInputElement, InputWith
     return (
       <div ref={wrapperRef} className="relative">
         <Input
-          ref={(node) => {
+          ref={node => {
             inputRef.current = node;
             if (typeof ref === "function") {
               ref(node);
@@ -134,18 +134,18 @@ export const InputWithSuggestions = React.forwardRef<HTMLInputElement, InputWith
           createPortal(
             <div
               ref={dropdownRef}
-              className="absolute z-[100] max-h-60 overflow-auto rounded-md border border-neutral-150 bg-white shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+              className="absolute z-[100] max-h-60 overflow-y-auto overflow-x-hidden rounded-lg border border-neutral-150 bg-white shadow-md dark:border-neutral-800 dark:bg-neutral-900"
               style={{
                 top: dropdownStyle.top,
                 left: dropdownStyle.left,
                 width: dropdownStyle.width,
               }}
             >
-              {filteredSuggestions.map((suggestion) => (
+              {filteredSuggestions.map(suggestion => (
                 <div
                   key={suggestion.value}
-                  className="relative cursor-pointer px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  onMouseDown={(e) => e.preventDefault()}
+                  className="relative cursor-pointer mx-1 px-2 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md"
+                  onMouseDown={e => e.preventDefault()}
                   onClick={() => handleSuggestionClick(suggestion.value)}
                 >
                   {suggestion.label || suggestion.value}
