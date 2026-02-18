@@ -41,12 +41,19 @@ import {
   Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
+import { createMetadata, createOGImageUrl } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: "Features - Rybbit Analytics",
   description:
     "Powerful, privacy-friendly analytics features to help you understand your audience and grow your business. Real-time data, session replay, web vitals, and more.",
-};
+  openGraph: {
+    images: [createOGImageUrl("Features - Rybbit Analytics", "Powerful, privacy-friendly analytics features to help you understand your audience and grow your business.")],
+  },
+  twitter: {
+    images: [createOGImageUrl("Features - Rybbit Analytics", "Powerful, privacy-friendly analytics features to help you understand your audience and grow your business.")],
+  },
+});
 
 const coreWebAnalyticsFeatures = [
   {
@@ -347,7 +354,7 @@ export default function FeaturesPage() {
             </div>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm flex items-center justify-center gap-2 mt-6">
               <CheckCircle className="w-4 h-4" />
-              First {DEFAULT_EVENT_LIMIT.toLocaleString()} pageviews/m free • No credit card required
+              30 day money-back guarantee. No credit card required
             </p>
           </div>
         </div>

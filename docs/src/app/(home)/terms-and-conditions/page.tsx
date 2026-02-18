@@ -1,7 +1,15 @@
-export const metadata = {
+import { createMetadata, createOGImageUrl } from "@/lib/metadata";
+
+export const metadata = createMetadata({
   title: "Terms and Conditions",
   description: "Rybbit terms and conditions of service",
-};
+  openGraph: {
+    images: [createOGImageUrl("Terms and Conditions", "Rybbit terms and conditions of service")],
+  },
+  twitter: {
+    images: [createOGImageUrl("Terms and Conditions", "Rybbit terms and conditions of service")],
+  },
+});
 
 export default function TermsAndConditions() {
   return (
@@ -49,7 +57,7 @@ export default function TermsAndConditions() {
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Open Source License</h2>
         <p>
-          Rybbit is open-source software released under the MIT License. The self-hosted version is free to use, modify,
+          Rybbit is open-source software released under the AGPL 3.0 License. The self-hosted version is free to use, modify,
           and distribute according to the terms of that license. These Terms and Conditions apply specifically to the
           use of our cloud-hosted service and website.
         </p>
@@ -146,7 +154,7 @@ export default function TermsAndConditions() {
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Intellectual Property</h2>
         <p>
-          The Rybbit name, logo, and branding are property of Rybbit. The open-source code is available under the MIT
+          The Rybbit name, logo, and branding are property of Rybbit. The open-source code is available under the AGPL 3.0
           License. All other content on this website, including text, graphics, and documentation, is protected by
           copyright and other intellectual property laws.
         </p>

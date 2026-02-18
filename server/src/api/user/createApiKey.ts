@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { auth } from "../../lib/auth.js";
+import { IS_CLOUD } from "../../lib/const.js";
 
 const createApiKeySchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
@@ -31,10 +32,13 @@ export const createApiKey = async (request: FastifyRequest<{ Body: CreateApiKeyB
         name,
         userId,
         expiresIn,
-        rateLimitEnabled: true,
-        rateLimitTimeWindow: 1000 * 60 * 10,
-        rateLimitMax: 500,
         prefix: "rb_",
+        ...(IS_CLOUD && {
+          rateLimitEnabled: true,
+          // 10 minutes
+          rateLimitTimeWindow: 1000 * 60 * 10,
+          rateLimitMax: 500,
+        }),
       },
     });
 

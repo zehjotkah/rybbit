@@ -81,7 +81,7 @@ export async function verifyScript(
         let foundSiteId: string | null = null;
 
         for (const script of scripts) {
-          const src = script.getAttribute("src") || "";
+          const src = script.getAttribute("src") || script.getAttribute("data-src") || "";
           if (src.includes("script.js") || src.includes("rybbit")) {
             found = true;
             foundSiteId = script.getAttribute("data-site-id");

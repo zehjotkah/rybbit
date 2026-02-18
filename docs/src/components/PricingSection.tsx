@@ -12,9 +12,9 @@ const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000,
 
 // Define standard plan features
 const STANDARD_FEATURES = [
-  "Everything in Free",
   `Up to ${STANDARD_SITE_LIMIT} websites`,
   `Up to ${STANDARD_TEAM_LIMIT} team members`,
+  "Custom events",
   "Funnels",
   "Goals",
   "Journeys",
@@ -206,9 +206,9 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
         </div>
 
         {/* Pricing cards layout */}
-        <div className="grid min-[1100px]:grid-cols-4 min-[600px]:grid-cols-2 min-[400px]:grid-cols-1 gap-6 max-w-[1300px] mx-auto justify-center items-stretch">
-          {/* Free Plan Card */}
-          <PricingCard
+        <div className="grid min-[1100px]:grid-cols-3 min-[400px]:grid-cols-1 gap-6 max-w-[1000px] mx-auto justify-center items-stretch">
+          {/* <div className="grid min-[1100px]:grid-cols-3 min-[600px]:grid-cols-2 min-[400px]:grid-cols-1 gap-6 max-w-[1300px] mx-auto justify-center items-stretch"> */}
+          {/* <PricingCard
             title="Free"
             description="Perfect for hobby projects"
             priceDisplay={
@@ -223,7 +223,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
             features={FREE_FEATURES}
             variant="free"
             eventLocation="free"
-          />
+          /> */}
 
           {/* Standard Plan Card */}
           <PricingCard

@@ -382,6 +382,8 @@
   var Tracker = class {
     constructor(config) {
       this.customUserId = null;
+      this.errorDedupeCache = /* @__PURE__ */ new Map();
+      this.errorDedupeLastCleanup = 0;
       this.config = config;
       this.loadUserId();
       if (config.enableSessionReplay) {
@@ -511,6 +513,10 @@
       this.sendTrackingData(payload);
     }
     trackError(error, additionalInfo = {}) {
+      const message = error?.message || "";
+      if (message.includes("ResizeObserver loop completed with undelivered notifications") || message.includes("ResizeObserver loop limit exceeded")) {
+        return;
+      }
       const currentOrigin = window.location.origin;
       const filename = additionalInfo.filename || "";
       const errorStack = error.stack || "";
@@ -526,6 +532,30 @@
         if (!errorStack.includes(currentOrigin)) {
           return;
         }
+      }
+      const dedupeKeyParts = [
+        error.name || "Error",
+        message,
+        additionalInfo.filename || "",
+        additionalInfo.lineno ?? "",
+        additionalInfo.colno ?? ""
+      ];
+      const dedupeKey = dedupeKeyParts.join("|");
+      const now = Date.now();
+      const dedupeWindowMs = 6e4;
+      const lastSeen = this.errorDedupeCache.get(dedupeKey);
+      if (lastSeen && now - lastSeen < dedupeWindowMs) {
+        return;
+      }
+      this.errorDedupeCache.set(dedupeKey, now);
+      const pruneAfterMs = 10 * 6e4;
+      if (now - this.errorDedupeLastCleanup > dedupeWindowMs) {
+        for (const [key, ts] of this.errorDedupeCache.entries()) {
+          if (now - ts > pruneAfterMs) {
+            this.errorDedupeCache.delete(key);
+          }
+        }
+        this.errorDedupeLastCleanup = now;
       }
       const errorProperties = {
         message: error.message?.substring(0, 500) || "Unknown error",
@@ -1018,7 +1048,16 @@
     }
     getElementText(element) {
       const text = element.textContent?.trim().substring(0, 100);
-      return text || void 0;
+      if (text) return text;
+      const ariaLabel = element.getAttribute("aria-label")?.trim().substring(0, 100);
+      if (ariaLabel) return ariaLabel;
+      if (element.tagName === "INPUT") {
+        const value = element.value?.trim().substring(0, 100);
+        if (value) return value;
+      }
+      const title = element.getAttribute("title")?.trim().substring(0, 100);
+      if (title) return title;
+      return void 0;
     }
     cleanup() {
       document.removeEventListener("click", this.handleClick.bind(this), true);
@@ -1079,6 +1118,7 @@
         formAction: form.action || "",
         method: (form.method || "get").toUpperCase(),
         fieldCount: form.elements.length,
+        ariaLabel: form.getAttribute("aria-label") || void 0,
         ...this.extractDataAttributes(form)
       };
       this.tracker.trackFormSubmit(properties);
@@ -1087,15 +1127,18 @@
       const target = event.target;
       const tagName = target.tagName.toUpperCase();
       if (!["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) return;
+      if (target.disabled) return;
       if (tagName === "INPUT") {
         const inputType = target.type?.toLowerCase();
         if (inputType === "hidden" || inputType === "password") return;
       }
+      const inputName = target.name || target.id || target.getAttribute("aria-label") || target.placeholder || "";
       const properties = {
         element: tagName.toLowerCase(),
         inputType: tagName === "INPUT" ? target.type?.toLowerCase() : void 0,
-        inputName: target.name || target.id || "",
+        inputName,
         formId: target.form?.id || void 0,
+        formName: target.form?.name || void 0,
         ...this.extractDataAttributes(target)
       };
       this.tracker.trackInputChange(properties);

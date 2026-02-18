@@ -7,7 +7,6 @@ export type FeatureItem = { feature: string; included?: boolean } | string;
 export interface PricingCardProps {
   title: string;
   description: string;
-  priceDisplay: React.ReactNode;
   buttonText?: string;
   buttonVariant?: "default" | "primary";
   features: FeatureItem[];
@@ -17,12 +16,15 @@ export interface PricingCardProps {
   customButton?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
+  isCustomTier?: boolean;
+  monthlyPrice?: number;
+  annualPrice?: number;
+  isAnnual?: boolean;
 }
 
 export function PricingCard({
   title,
   description,
-  priceDisplay,
   buttonText,
   buttonVariant = "primary",
   features,
@@ -32,6 +34,10 @@ export function PricingCard({
   customButton,
   onClick,
   disabled,
+  isCustomTier = false,
+  monthlyPrice,
+  annualPrice,
+  isAnnual = false,
 }: PricingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isFree = variant === "free";
@@ -59,7 +65,7 @@ export function PricingCard({
                 <h3 className="text-xl font-bold">{title}</h3>
                 {recommended && (
                   <span className="px-2 py-0.5 text-xs font-semibold bg-emerald-500/30 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-500/40 dark:border-emerald-500/30">
-                    Recommended
+                    Most Popular
                   </span>
                 )}
               </div>
@@ -67,7 +73,18 @@ export function PricingCard({
             </div>
 
             {/* Price display */}
-            <div className="mb-6">{priceDisplay}</div>
+            <div className="mb-6 space-y-1">
+              <div>{isCustomTier ? <div className="text-3xl font-bold">Custom
+              </div> : <div>
+                <span className="text-3xl font-bold">
+                  ${isAnnual ? Math.round(annualPrice! / 12) : monthlyPrice}
+                </span>
+                <span className="ml-1 pb-1 text-neutral-600 dark:text-neutral-400">/month</span>
+              </div>}</div>
+              <div className="text-xs">
+                <span className="text-xs text-neutral-600 dark:text-neutral-400">billed {isAnnual ? `annually at $${annualPrice}` : "monthly"}</span>
+              </div>
+            </div>
 
             {customButton ? (
               customButton

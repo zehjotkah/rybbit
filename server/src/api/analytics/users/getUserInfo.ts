@@ -54,7 +54,6 @@ export async function getUserInfo(
   const numericSiteId = Number(siteId);
 
   try {
-    // Run ClickHouse query and Postgres queries in parallel
     const [queryResult, profileResult, aliasesResult] = await Promise.all([
       clickhouse.query({
         query: `

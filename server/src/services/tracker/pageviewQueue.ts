@@ -66,7 +66,6 @@ class PageviewQueue {
         timestamp: DateTime.fromISO(pv.timestamp).toFormat("yyyy-MM-dd HH:mm:ss"),
         session_id: pv.sessionId,
         user_id: pv.userId, // Always the device fingerprint
-        anonymous_id: pv.anonymousId,
         identified_user_id: pv.identifiedUserId || "", // Custom user ID when identified
         hostname: pv.hostname || "",
         pathname: pv.pathname || "",

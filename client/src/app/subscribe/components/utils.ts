@@ -8,9 +8,9 @@ import { FeatureItem } from "@/components/pricing/PricingCard";
 export const EVENT_TIERS = [...STRIPE_TIERS.map(tier => tier.events), "Custom"];
 
 export const STANDARD_FEATURES = [
-  "Everything in Free",
   `Up to ${STANDARD_SITE_LIMIT} websites`,
   `Up to ${STANDARD_TEAM_LIMIT} team members`,
+  "Custom events",
   "Funnels",
   "Goals",
   "Journeys",

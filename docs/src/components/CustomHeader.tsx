@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { AppLink } from "./AppLink";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { BlackFridayBanner } from "./BlackFridayBanner";
 import { WelcomeBanner } from "./WelcomeBanner";
@@ -21,9 +22,9 @@ export function CustomHeader() {
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <Image
-              src="/rybbit-text.svg"
+              src="/rybbit/horizontal_white.svg"
               alt="Rybbit"
-              width={80}
+              width={120}
               height={0}
               style={{ height: "auto" }}
               className="dark:invert-0 invert"
@@ -100,14 +101,14 @@ export function CustomHeader() {
           <ThemeSwitcher />
 
           {/* Login Button */}
-          <a href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer">
+          <AppLink href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer">
             <button
               onClick={() => trackAdEvent("login", { location: "header" })}
               className="bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white text-sm font-medium px-3 py-1.5 rounded-md transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50"
             >
               Login
             </button>
-          </a>
+          </AppLink>
         </div>
 
         {/* Mobile menu button */}
@@ -166,7 +167,7 @@ export function CustomHeader() {
             </div>
 
             <div className="border-t border-neutral-300 dark:border-neutral-800">
-              <a href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer" className="block w-full">
+              <AppLink href="https://app.rybbit.io" target="_blank" rel="noopener noreferrer" className="block w-full">
                 <button
                   onClick={() => trackAdEvent("login", { location: "header" })}
                   data-rybbit-event="login"
@@ -174,7 +175,7 @@ export function CustomHeader() {
                 >
                   Login
                 </button>
-              </a>
+              </AppLink>
             </div>
           </div>
         </div>

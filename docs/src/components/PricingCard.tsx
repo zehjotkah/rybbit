@@ -1,7 +1,7 @@
 import { Check, X, ArrowDown, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { trackAdEvent } from "@/lib/trackAdEvent";
-import Link from "next/link";
+import { AppLink } from "./AppLink";
 import { useState } from "react";
 
 export type FeatureItem = { feature: string; included?: boolean } | string;
@@ -78,7 +78,7 @@ export function PricingCard({
             {customButton ? (
               customButton
             ) : buttonHref ? (
-              <Link href={buttonHref} className="w-full block">
+              <AppLink href={buttonHref} className="w-full block">
                 <button
                   onClick={() => {
                     if (eventLocation) {
@@ -98,7 +98,7 @@ export function PricingCard({
                 >
                   {buttonText}
                 </button>
-              </Link>
+              </AppLink>
             ) : (
               <button
                 onClick={onClick}

@@ -1,22 +1,20 @@
 "use client";
 
+import { PricingCard } from "@/components/pricing/PricingCard";
 import { Slider } from "@/components/ui/slider";
+import { toast } from "@/components/ui/sonner";
 import { authClient } from "@/lib/auth";
 import { BACKEND_URL } from "@/lib/const";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { toast } from "@/components/ui/sonner";
-import { DEFAULT_EVENT_LIMIT } from "../../../lib/subscription/constants";
+import { useEffect, useState } from "react";
 import { trackAdEvent } from "../../../lib/trackAdEvent";
-import { PricingCard } from "@/components/pricing/PricingCard";
 import {
   ENTERPRISE_FEATURES,
   EVENT_TIERS,
-  FREE_FEATURES,
   PRO_FEATURES,
   STANDARD_FEATURES,
   findPriceForTier,
-  formatEventTier,
+  formatEventTier
 } from "./utils";
 
 import { useRouter } from "next/navigation";
@@ -29,7 +27,18 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [eventLimitIndex, setEventLimitIndex] = useState<number>(0);
   const [isAnnual, setIsAnnual] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showTestPlan, setShowTestPlan] = useState(false);
   const { data: activeOrg } = authClient.useActiveOrganization();
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "D" && e.shiftKey) {
+        setShowTestPlan((prev) => !prev);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const eventLimit = EVENT_TIERS[eventLimitIndex];
 
@@ -64,7 +73,9 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
     try {
       // Use NEXT_PUBLIC_BACKEND_URL if available, otherwise use relative path for same-origin requests
       const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/settings/organization/subscription?session_id={CHECKOUT_SESSION_ID}`;
+      const successUrl = siteId
+        ? `${baseUrl}/${siteId}?session_id={CHECKOUT_SESSION_ID}`
+        : `${baseUrl}/settings/organization/subscription?session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${baseUrl}/subscribe${siteId ? `?siteId=${siteId}` : ""}`;
 
       const response = await fetch(`${BACKEND_URL}/stripe/create-checkout-session`, {
@@ -78,6 +89,7 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
           successUrl: successUrl,
           cancelUrl: cancelUrl,
           organizationId: activeOrg.id,
+          referral: window.Rewardful?.referral || undefined,
         }),
       });
 
@@ -96,6 +108,54 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
     } catch (error: any) {
       toast.error(`Subscription failed: ${error.message}`);
       setIsLoading(false); // Stop loading on error
+    }
+  }
+
+  async function handleTestSubscribe(): Promise<void> {
+    if (!isLoggedIn) {
+      toast.error("Please log in to subscribe.");
+      return;
+    }
+    if (!activeOrg) {
+      toast.error("Please select an organization to subscribe.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const baseUrl = window.location.origin;
+      const successUrl = siteId
+        ? `${baseUrl}/${siteId}?session_id={CHECKOUT_SESSION_ID}`
+        : `${baseUrl}/settings/organization/subscription?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${baseUrl}/subscribe${siteId ? `?siteId=${siteId}` : ""}`;
+
+      const response = await fetch(`${BACKEND_URL}/stripe/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          priceId: "price_1SzT8pDFVprnAny2EdkqxRAZ",
+          successUrl,
+          cancelUrl,
+          organizationId: activeOrg.id,
+          referral: window.Rewardful?.referral || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create checkout session.");
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error("Checkout URL not received.");
+      }
+    } catch (error: any) {
+      toast.error(`Subscription failed: ${error.message}`);
+      setIsLoading(false);
     }
   }
 
@@ -181,8 +241,8 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {/* Cards section */}
-      <div className="grid min-[1100px]:grid-cols-4 min-[600px]:grid-cols-2 min-[400px]:grid-cols-1 gap-6 max-w-[1300px] mx-auto mb-16">
-        <PricingCard
+      <div className="grid min-[1100px]:grid-cols-3 min-[400px]:grid-cols-1 gap-6 max-w-[1000px] mx-auto mb-16">
+        {/* <PricingCard
           title="Free"
           description="Perfect for hobby projects"
           priceDisplay={
@@ -197,44 +257,26 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
           variant="free"
           onClick={() => (siteId ? router.push(`/${siteId}`) : undefined)}
           disabled={!siteId}
-        />
-
+        /> */}
         <PricingCard
           title="Standard"
           description="Everything you need to get started as a small business"
-          priceDisplay={
-            isCustomTier ? (
-              <div className="text-3xl font-bold">Custom</div>
-            ) : (
-              <div>
-                <span className="text-3xl font-bold">
-                  ${isAnnual ? Math.round(standardAnnualPrice / 12) : standardMonthlyPrice}
-                </span>
-                <span className="ml-1 text-neutral-600 dark:text-neutral-400">/month</span>
-              </div>
-            )
-          }
+          monthlyPrice={standardMonthlyPrice}
+          annualPrice={standardAnnualPrice}
+          isAnnual={isAnnual}
+          isCustomTier={isCustomTier}
           buttonText={isLoading ? "Processing..." : isCustomTier ? "Contact us" : "Get started"}
           features={STANDARD_FEATURES}
           onClick={() => handleSubscribe("standard")}
           disabled={isLoading}
         />
-
         <PricingCard
           title="Pro"
           description="Advanced features for professional teams"
-          priceDisplay={
-            isCustomTier ? (
-              <div className="text-3xl font-bold">Custom</div>
-            ) : (
-              <div>
-                <span className="text-3xl font-bold">
-                  ${isAnnual ? Math.round(proAnnualPrice / 12) : proMonthlyPrice}
-                </span>
-                <span className="ml-1 text-neutral-600 dark:text-neutral-400">/month</span>
-              </div>
-            )
-          }
+          isCustomTier={isCustomTier}
+          monthlyPrice={proMonthlyPrice}
+          annualPrice={proAnnualPrice}
+          isAnnual={isAnnual}
           buttonText={isLoading ? "Processing..." : isCustomTier ? "Contact us" : "Get started"}
           features={PRO_FEATURES}
           recommended={true}
@@ -242,11 +284,23 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
           disabled={isLoading}
         />
 
+        {showTestPlan && (
+          <PricingCard
+            title="Test"
+            description="$1 test subscription for development"
+            isCustomTier={isCustomTier}
+            buttonText={isLoading ? "Processing..." : "Subscribe ($1)"}
+            features={["Test plan"]}
+            onClick={() => handleTestSubscribe()}
+            disabled={isLoading}
+          />
+        )}
+
         <PricingCard
           title="Enterprise"
           description="Advanced features for enterprise teams"
-          priceDisplay={<div className="text-3xl font-bold">Custom</div>}
           features={ENTERPRISE_FEATURES}
+          isCustomTier={true}
           customButton={
             <a href="https://www.rybbit.com/contact" className="w-full block">
               <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
