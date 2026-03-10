@@ -1189,6 +1189,23 @@
       };
       return;
     }
+    const earlyQueue = [];
+    const queueMethod = (method) => (...args) => {
+      earlyQueue.push([method, args]);
+    };
+    window[namespace] = {
+      pageview: queueMethod("pageview"),
+      event: queueMethod("event"),
+      error: queueMethod("error"),
+      trackOutbound: queueMethod("trackOutbound"),
+      identify: queueMethod("identify"),
+      setTraits: queueMethod("setTraits"),
+      clearUserId: queueMethod("clearUserId"),
+      getUserId: () => null,
+      startSessionReplay: queueMethod("startSessionReplay"),
+      stopSessionReplay: queueMethod("stopSessionReplay"),
+      isSessionReplayActive: () => false
+    };
     const config = await parseScriptConfig(scriptTag);
     if (!config) {
       return;
@@ -1295,6 +1312,10 @@
       stopSessionReplay: () => tracker.stopSessionReplay(),
       isSessionReplayActive: () => tracker.isSessionReplayActive()
     };
+    const api = window[config.namespace];
+    for (const [method, args] of earlyQueue) {
+      api[method](...args);
+    }
     setupEventListeners();
     window.addEventListener("beforeunload", () => {
       clickManager?.cleanup();

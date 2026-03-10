@@ -1,27 +1,35 @@
 // Common utility functions and constants for subscription components
 
-import { FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../../../lib/const";
+import { BASIC_SITE_LIMIT, BASIC_TEAM_LIMIT, FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../../../lib/const";
 import { getStripePrices, STRIPE_TIERS } from "../../../lib/stripe";
 
 import { FeatureItem } from "@/components/pricing/PricingCard";
 
 export const EVENT_TIERS = [...STRIPE_TIERS.map(tier => tier.events), "Custom"];
 
+export const BASIC_FEATURES = [
+  `${BASIC_SITE_LIMIT} website`,
+  `${BASIC_TEAM_LIMIT} team member`,
+  "Web analytics dashboard",
+  "Goals",
+  "Custom events",
+  "2 year data retention",
+  "Email support",
+];
+
 export const STANDARD_FEATURES = [
+  "Everything in Basic",
   `Up to ${STANDARD_SITE_LIMIT} websites`,
   `Up to ${STANDARD_TEAM_LIMIT} team members`,
   "Custom events",
   "Funnels",
-  "Goals",
   "Journeys",
   "Web vitals",
   "Error tracking",
   "User profiles",
   "Retention",
   "Sessions",
-  "Email reports",
-  "2 year data retention",
-  "Email support",
+  "3D globe view"
 ];
 
 export const PRO_FEATURES = [
@@ -63,7 +71,7 @@ const stripePrices = getStripePrices();
 export function findPriceForTier(
   eventLimit: number | string,
   interval: "month" | "year",
-  planType: "standard" | "pro" = "standard"
+  planType: "basic" | "standard" | "pro" = "standard"
 ) {
   // Check if we have a custom tier
   if (eventLimit === "Custom") {

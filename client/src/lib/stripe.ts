@@ -8,6 +8,38 @@ export interface StripePrice {
 }
 
 const STRIPE_PRICES: StripePrice[] = [
+  {
+    priceId: "price_1T2No5DFVprnAny2ahUc6TEI",
+    name: "basic100k",
+    interval: "month",
+    price: 14,
+    events: 100_000,
+    shortName: "100k",
+  },
+  {
+    priceId: "price_1T2NqJDFVprnAny21UlXbpxY",
+    name: "basic100k-annual",
+    interval: "year",
+    price: 14 * 8,
+    events: 100_000,
+    shortName: "100k",
+  },
+  {
+    priceId: "price_1T2NpzDFVprnAny2EmAIheV8",
+    name: "basic250k",
+    interval: "month",
+    price: 24,
+    events: 250_000,
+    shortName: "250k",
+  },
+  {
+    priceId: "price_1T2NrRDFVprnAny2N4KhTwQn",
+    name: "basic250k-annual",
+    interval: "year",
+    price: 24 * 8,
+    events: 250_000,
+    shortName: "250k",
+  },
   // Standard tiers
   {
     price: 19,
@@ -321,6 +353,9 @@ export const getStripePrices = () => {
 };
 
 export function getPlanType(name: string) {
+  if (name.includes("basic")) {
+    return "Basic";
+  }
   if (name.includes("standard")) {
     return "Standard";
   }

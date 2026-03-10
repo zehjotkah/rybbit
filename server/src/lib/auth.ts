@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { admin, captcha, emailOTP, organization, apiKey } from "better-auth/plugins";
 import dotenv from "dotenv";
 import { and, asc, eq } from "drizzle-orm";
@@ -47,6 +47,10 @@ const pluginList = [
             defaultValue: false,
           },
           planOverride: {
+            type: "string",
+            required: false,
+          },
+          customPlan: {
             type: "string",
             required: false,
           },
@@ -181,6 +185,32 @@ export const auth = betterAuth({
     },
   },
   hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (IS_CLOUD && ctx.path === "/organization/invite-member") {
+        const body = ctx.body as { organizationId?: string } | undefined;
+        const organizationId = body?.organizationId;
+
+        if (organizationId) {
+          // Lazy import to avoid circular dependency
+          const { getSubscriptionInner } = await import("../api/stripe/getSubscription.js");
+          const subscription = await getSubscriptionInner(organizationId);
+          const memberLimit = subscription?.memberLimit ?? null;
+
+          if (memberLimit !== null) {
+            const members = await db
+              .select({ id: member.id })
+              .from(member)
+              .where(eq(member.organizationId, organizationId));
+
+            if (members.length >= memberLimit) {
+              throw new APIError("FORBIDDEN", {
+                message: `You have reached the limit of ${memberLimit} member${memberLimit === 1 ? "" : "s"} for your plan. Please upgrade to add more.`,
+              });
+            }
+          }
+        }
+      }
+    }),
     after: createAuthMiddleware(async ctx => {
       // Handle invitation acceptance - copy site access from invitation to member
       if (ctx.path === "/organization/accept-invitation") {
