@@ -181,32 +181,29 @@ export async function getStripeSubscription(stripeCustomerId: string | null): Pr
   }
 
   try {
-    const subscriptions = await (stripe as Stripe).subscriptions.list({
-      customer: stripeCustomerId,
-      status: "active",
-      limit: 1,
-      expand: ["data.plan.product"],
-    });
-
-    let subscription: Stripe.Subscription;
-    let isTrial = false;
-
-    if (subscriptions.data.length === 0) {
-      // Check for trialing subscriptions
-      const trialSubs = await (stripe as Stripe).subscriptions.list({
+    // Fetch both active and trialing subscriptions in parallel
+    const [activeSubs, trialSubs] = await Promise.all([
+      (stripe as Stripe).subscriptions.list({
+        customer: stripeCustomerId,
+        status: "active",
+        expand: ["data.plan.product"],
+      }),
+      (stripe as Stripe).subscriptions.list({
         customer: stripeCustomerId,
         status: "trialing",
-        limit: 1,
         expand: ["data.plan.product"],
-      });
-      if (trialSubs.data.length === 0) {
-        return null;
-      }
-      subscription = trialSubs.data[0];
-      isTrial = true;
-    } else {
-      subscription = subscriptions.data[0];
+      }),
+    ]);
+
+    const allSubs = [...activeSubs.data, ...trialSubs.data];
+
+    if (allSubs.length === 0) {
+      return null;
     }
+
+    // Pick the most recently created subscription across both active and trialing
+    const subscription = allSubs.sort((a, b) => b.created - a.created)[0];
+    const isTrial = subscription.status === "trialing";
 
     const subscriptionItem = subscription.items.data[0];
     const priceId = subscriptionItem.price.id;

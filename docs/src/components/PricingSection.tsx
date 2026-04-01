@@ -6,27 +6,23 @@ import { cn } from "@/lib/utils";
 import { getCalApi } from "@calcom/embed-react";
 import { useExtracted } from "next-intl";
 import { useEffect, useState, useCallback } from "react";
-import { BASIC_SITE_LIMIT, BASIC_TEAM_LIMIT, FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../lib/const";
+import { STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../lib/const";
 import { PricingCard } from "./PricingCard";
 
 // Available event tiers for the slider
-const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000, "Custom"];
+const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000, 30_000_000, 40_000_000, 50_000_000, "Custom"];
 
 export const formatter = Intl.NumberFormat("en", {
   notation: "compact",
 }).format;
 
 // Format price with dollar sign for Basic, Standard, and Pro
-function getFormattedPrice(eventLimit: number | string, planType: "basic" | "standard" | "pro") {
+function getFormattedPrice(eventLimit: number | string, planType: "standard" | "pro") {
   // Monthly prices
   let monthlyPrice;
   if (typeof eventLimit === "string") return { custom: true }; // Custom pricing
 
-  if (planType === "basic") {
-    if (eventLimit <= 100_000) monthlyPrice = 14;
-    else if (eventLimit <= 250_000) monthlyPrice = 24;
-    else return { custom: true };
-  } else if (planType === "standard") {
+  if (planType === "standard") {
     // Standard tier prices
     if (eventLimit <= 100_000) monthlyPrice = 19;
     else if (eventLimit <= 250_000) monthlyPrice = 29;
@@ -36,6 +32,9 @@ function getFormattedPrice(eventLimit: number | string, planType: "basic" | "sta
     else if (eventLimit <= 5_000_000) monthlyPrice = 149;
     else if (eventLimit <= 10_000_000) monthlyPrice = 249;
     else if (eventLimit <= 20_000_000) monthlyPrice = 399;
+    else if (eventLimit <= 30_000_000) monthlyPrice = 549;
+    else if (eventLimit <= 40_000_000) monthlyPrice = 699;
+    else if (eventLimit <= 50_000_000) monthlyPrice = 849;
     else return { custom: true };
   } else {
     // Pro tier prices (roughly double)
@@ -47,6 +46,9 @@ function getFormattedPrice(eventLimit: number | string, planType: "basic" | "sta
     else if (eventLimit <= 5_000_000) monthlyPrice = 299;
     else if (eventLimit <= 10_000_000) monthlyPrice = 499;
     else if (eventLimit <= 20_000_000) monthlyPrice = 799;
+    else if (eventLimit <= 30_000_000) monthlyPrice = 1099;
+    else if (eventLimit <= 40_000_000) monthlyPrice = 1399;
+    else if (eventLimit <= 50_000_000) monthlyPrice = 1699;
     else return { custom: true };
   }
 
@@ -74,16 +76,6 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
       setCurrentSlide(carouselApi.selectedScrollSnap());
     });
   }, [carouselApi]);
-
-  const BASIC_FEATURES = [
-    t("{count} website", { count: String(BASIC_SITE_LIMIT) }),
-    t("{count} team member", { count: String(BASIC_TEAM_LIMIT) }),
-    t("Web analytics dashboard"),
-    t("Goals"),
-    t("Custom events"),
-    t("2 year data retention"),
-    t("Email support"),
-  ];
 
   const STANDARD_FEATURES = [
     t("Up to {count} websites", { count: String(STANDARD_SITE_LIMIT) }),
@@ -125,19 +117,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
     t("Slack/live chat support"),
   ];
 
-  const FREE_FEATURES = [
-    { feature: t("1 user"), included: true },
-    { feature: t("{count} website", { count: String(FREE_SITE_LIMIT) }), included: true },
-    { feature: t("Web analytics dashboard"), included: true },
-    { feature: t("Custom events"), included: true },
-    { feature: t("6 month data retention"), included: true },
-    { feature: t("Advanced features"), included: false },
-    { feature: t("Email support"), included: false },
-  ];
-
   const eventLimit = EVENT_TIERS[eventLimitIndex];
-  const basicPrices = getFormattedPrice(eventLimit, "basic");
-  const isBasicAvailable = typeof eventLimit === "number" && eventLimit <= 250_000;
   const standardPrices = getFormattedPrice(eventLimit, "standard");
   const proPrices = getFormattedPrice(eventLimit, "pro");
 
@@ -221,7 +201,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
             {EVENT_TIERS.map((tier, index) => (
               <span key={index} className={cn(eventLimitIndex === index && "font-bold text-emerald-400")}>
                 {index === EVENT_TIERS.length - 1
-                  ? "20M+"
+                  ? "50M+"
                   : typeof tier === "number" && tier >= 1_000_000
                     ? `${tier / 1_000_000}M`
                     : typeof tier === "number"
@@ -234,34 +214,6 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
 
         {/* Pricing cards - carousel on mobile, grid on desktop */}
         {(() => {
-          const basicCard = (
-            <div className={cn("h-full", !isBasicAvailable && "opacity-60")}>
-              <PricingCard
-                title={t("Basic")}
-                description={t("For personal projects and small sites")}
-                priceDisplay={
-                  !isBasicAvailable ? (
-                    <div className="text-3xl font-bold">-</div>
-                  ) : basicPrices.custom ? (
-                    <div className="text-3xl font-bold">{t("Custom")}</div>
-                  ) : (
-                    <div>
-                      <span className="text-3xl font-bold">
-                        ${isAnnual ? Math.round(basicPrices.annual! / 12) : basicPrices.monthly}
-                      </span>
-                      <span className="ml-1 text-neutral-400">{t("/month")}</span>
-                    </div>
-                  )
-                }
-                buttonText={!isBasicAvailable ? t("Up to 250k only") : t("Start for $0")}
-                buttonHref={!isBasicAvailable ? undefined : "https://app.rybbit.io/signup"}
-                features={BASIC_FEATURES}
-                disabled={!isBasicAvailable}
-                eventLocation={isBasicAvailable ? "basic" : undefined}
-              />
-            </div>
-          );
-
           const standardCard = (
             <PricingCard
               title={t("Standard")}
@@ -324,9 +276,8 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
             <>
               {/* Mobile carousel */}
               <div className="min-[700px]:hidden">
-                <Carousel setApi={setCarouselApi} opts={{ startIndex: 2 }}>
+                <Carousel setApi={setCarouselApi} opts={{ startIndex: 1 }}>
                   <CarouselContent>
-                    <CarouselItem>{basicCard}</CarouselItem>
                     <CarouselItem>{standardCard}</CarouselItem>
                     <CarouselItem>{proCard}</CarouselItem>
                     <CarouselItem>{enterpriseCard}</CarouselItem>
@@ -350,8 +301,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
               </div>
 
               {/* Desktop grid */}
-              <div className="hidden min-[700px]:grid min-[1100px]:grid-cols-4 min-[700px]:grid-cols-2 gap-4 mx-auto justify-center items-stretch">
-                {basicCard}
+              <div className="hidden min-[700px]:grid min-[1100px]:grid-cols-3 min-[700px]:grid-cols-2 gap-4 mx-auto justify-center items-stretch">
                 {standardCard}
                 {proCard}
                 {enterpriseCard}

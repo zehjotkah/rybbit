@@ -79,7 +79,7 @@ export async function updateSubscription(
     }
 
     // 5. Update the subscription with the new price
-    // Using always_invoice to charge immediately for the proration
+    const isTrialing = subscription.status === "trialing";
     const updatedSubscription = await (stripe as Stripe).subscriptions.update(subscription.id, {
       items: [
         {
@@ -87,7 +87,9 @@ export async function updateSubscription(
           price: newPriceId,
         },
       ],
-      proration_behavior: "always_invoice", // Immediately invoice the proration amount
+      // For trialing subscriptions, swap the plan without charging — preserve the trial
+      proration_behavior: isTrialing ? "none" : "always_invoice",
+      ...(isTrialing && subscription.trial_end && { trial_end: subscription.trial_end }),
     });
 
     // Get the updated subscription details
