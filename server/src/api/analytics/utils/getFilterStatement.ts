@@ -14,7 +14,7 @@ export interface FilterStatementOptions {
 
 }
 
-const DEFAULT_SESSION_LEVEL_PARAMS: FilterParameter[] = ["event_name"];
+const DEFAULT_SESSION_LEVEL_PARAMS: FilterParameter[] = ["event_name", "channel"];
 
 const filterTypeToOperator = (type: FilterType) => {
   switch (type) {
