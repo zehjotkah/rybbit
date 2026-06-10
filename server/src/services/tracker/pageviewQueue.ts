@@ -10,6 +10,9 @@ type TotalPayload = TotalTrackingPayload & {
   sessionId: string;
 };
 
+const PAGEVIEW_BATCH_SIZE = 5000;
+const PAGEVIEW_FLUSH_INTERVAL_MS = 1000;
+
 const getParsedProperties = (properties: string | undefined) => {
   try {
     return properties ? JSON.parse(properties) : undefined;
@@ -20,8 +23,8 @@ const getParsedProperties = (properties: string | undefined) => {
 
 class PageviewQueue {
   private queue: TotalPayload[] = [];
-  private batchSize = 5000;
-  private interval = 1000;
+  private batchSize = PAGEVIEW_BATCH_SIZE;
+  private interval = PAGEVIEW_FLUSH_INTERVAL_MS;
   private processing = false;
   private logger = createServiceLogger("pageview-queue");
 
@@ -105,22 +108,8 @@ class PageviewQueue {
         ip: pv.storeIp ? pv.ipAddress : null,
         timezone: timezone,
         tag: pv.tag || "",
+        feature_flags: pv.feature_flags || {},
         import_id: null,
-        company: dataForIp?.company?.name || "",
-        company_domain: dataForIp?.company?.domain || "",
-        company_type: dataForIp?.company?.type || "",
-        company_abuse_score: dataForIp?.company?.abuseScore ?? null,
-        asn: dataForIp?.asn?.asn || null,
-        asn_org: dataForIp?.asn?.org || "",
-        asn_domain: dataForIp?.asn?.domain || "",
-        asn_type: dataForIp?.asn?.type || "",
-        asn_abuse_score: dataForIp?.asn?.abuseScore ?? null,
-        vpn: dataForIp?.vpn || "",
-        crawler: dataForIp?.crawler || "",
-        datacenter: dataForIp?.datacenter || "",
-        is_proxy: dataForIp?.isProxy ?? null,
-        is_tor: dataForIp?.isTor ?? null,
-        is_satellite: dataForIp?.isSatellite ?? null,
       };
     });
 

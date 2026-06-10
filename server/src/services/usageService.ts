@@ -1,14 +1,19 @@
 import { and, eq } from "drizzle-orm";
 import { DateTime } from "luxon";
 import * as cron from "node-cron";
+import Stripe from "stripe";
 import { processResults } from "../api/analytics/utils/utils.js";
 import { clickhouse } from "../db/clickhouse/clickhouse.js";
 import { db } from "../db/postgres/postgres.js";
 import { member, organization, sites, user } from "../db/postgres/schema.js";
-import { DEFAULT_EVENT_LIMIT, IS_CLOUD } from "../lib/const.js";
-import { sendLimitExceededEmail } from "../lib/email/email.js";
+import { IS_CLOUD } from "../lib/const.js";
+import { sendApproachingLimitEmail, sendLimitExceededEmail } from "../lib/email/email.js";
 import { createServiceLogger } from "../lib/logger/logger.js";
-import { getBestSubscription } from "../lib/subscriptionUtils.js";
+import {
+  getAllStripeSubscriptionsByCustomer,
+  getBestSubscriptionFromStripeSub,
+  stripeSubscriptionInfoFromSnapshot,
+} from "../lib/subscriptionUtils.js";
 
 type UsageUpdateCallback = () => void;
 
@@ -123,19 +128,24 @@ class UsageService {
    * Checks both AppSumo and Stripe subscriptions and uses the one with the higher event limit.
    * @returns [eventLimit, periodStartDate]
    */
-  private async getOrganizationSubscriptionInfo(orgData: {
-    id: string;
-    stripeCustomerId: string | null;
-    createdAt: string;
-    name: string;
-  }): Promise<[number, string | null]> {
+  private async getOrganizationSubscriptionInfo(
+    orgData: {
+      id: string;
+      stripeCustomerId: string | null;
+      createdAt: string;
+      name: string;
+    },
+    stripeSubscriptions: Map<string, Stripe.Subscription>
+  ): Promise<[number, string | null]> {
     // Special case for specific organizations
     if (orgData.name === "rybbit" || orgData.name === "Zam") {
       return [Infinity, this.getStartOfMonth()];
     }
 
-    // Get the best subscription (highest event limit from AppSumo or Stripe)
-    const subscription = await getBestSubscription(orgData.id, orgData.stripeCustomerId);
+    // Resolve this org's Stripe subscription from the bulk snapshot (no per-org Stripe call),
+    // then layer in custom plan / override / AppSumo via the same priority rules as elsewhere.
+    const stripeSub = stripeSubscriptionInfoFromSnapshot(stripeSubscriptions, orgData.stripeCustomerId);
+    const subscription = await getBestSubscriptionFromStripeSub(orgData.id, stripeSub);
 
     // Log subscription details
     if (subscription.source === "appsumo") {
@@ -198,6 +208,18 @@ class UsageService {
     this.logger.info("Starting check of monthly event usage for organizations...");
 
     try {
+      // Step 0: Pull every customer's subscription from Stripe in one bulk pass (a handful of
+      // paginated calls) instead of one call per org. If this fails (e.g. rate limit/outage),
+      // skip the whole run rather than treating every paying org as free — which would wrongly
+      // flag them over-limit, block ingestion, and email their owners.
+      let stripeSubscriptions: Map<string, Stripe.Subscription>;
+      try {
+        stripeSubscriptions = await getAllStripeSubscriptionsByCustomer();
+      } catch (error) {
+        this.logger.error(error as Error, "Skipping usage check: failed to fetch Stripe subscriptions in bulk");
+        return;
+      }
+
       // Step 1: Get all sites with their organization IDs
       const allSites = await this.getAllSites();
 
@@ -221,8 +243,15 @@ class UsageService {
           stripeCustomerId: organization.stripeCustomerId,
           createdAt: organization.createdAt,
           overMonthlyLimit: organization.overMonthlyLimit,
+          approachingLimitNotifiedPeriodStart: organization.approachingLimitNotifiedPeriodStart,
         })
         .from(organization);
+
+      const monthStart = this.getStartOfMonth();
+      const now = DateTime.now();
+      const totalDaysInMonth = now.daysInMonth ?? 30;
+      const daysElapsed = now.diff(now.startOf("month"), "days").days;
+      const daysRemaining = totalDaysInMonth - daysElapsed;
 
       // Step 5: Process each organization
       for (const orgData of organizations) {
@@ -231,24 +260,24 @@ class UsageService {
           const eventCount = orgStats?.eventCount || 0;
           const siteIds = orgStats?.siteIds || [];
 
-          // Only fetch subscription info for organizations with > 3000 events
-          // This avoids slow Stripe API calls for low-usage orgs
-          let eventLimit: number;
-          let isOverLimit: boolean;
-
-          if (eventCount <= DEFAULT_EVENT_LIMIT) {
-            // Free tier limit is 3000, so they're definitely not over limit
-            eventLimit = DEFAULT_EVENT_LIMIT;
-            isOverLimit = false;
-            this.logger.debug(`Organization ${orgData.name} has ${eventCount} events, skipping subscription check`);
-          } else {
-            // High usage - need to check their actual subscription
-            const [fetchedLimit, periodStart] = await this.getOrganizationSubscriptionInfo(orgData);
-            eventLimit = fetchedLimit;
-            isOverLimit = eventCount > eventLimit;
-          }
-
           const wasOverLimit = orgData.overMonthlyLimit ?? false;
+          const alreadyNotifiedApproaching = orgData.approachingLimitNotifiedPeriodStart === monthStart;
+
+          const [eventLimit] = await this.getOrganizationSubscriptionInfo(orgData, stripeSubscriptions);
+          const isOverLimit = eventCount > eventLimit;
+
+          let sendApproaching = false;
+          if (
+            !alreadyNotifiedApproaching &&
+            !isOverLimit &&
+            Number.isFinite(eventLimit) &&
+            daysRemaining >= 2
+          ) {
+            const projected = daysElapsed >= 1 ? eventCount * (totalDaysInMonth / daysElapsed) : 0;
+            const trigger90 = eventCount >= eventLimit * 0.9;
+            const triggerProjection = daysElapsed >= 7 && projected >= eventLimit;
+            sendApproaching = trigger90 || triggerProjection;
+          }
 
           // Update organization's monthlyEventCount and overMonthlyLimit fields
           await db
@@ -256,6 +285,7 @@ class UsageService {
             .set({
               monthlyEventCount: eventCount,
               overMonthlyLimit: isOverLimit,
+              ...(sendApproaching ? { approachingLimitNotifiedPeriodStart: monthStart } : {}),
             })
             .where(eq(organization.id, orgData.id));
 
@@ -278,6 +308,29 @@ class UsageService {
               }
             } else {
               this.logger.warn(`No owners found for organization ${orgData.name}, skipping limit exceeded email`);
+            }
+          }
+
+          if (sendApproaching) {
+            const ownerEmails = await this.getOrganizationOwnerEmails(orgData.id);
+            if (ownerEmails.length > 0) {
+              for (const ownerEmail of ownerEmails) {
+                try {
+                  await sendApproachingLimitEmail(ownerEmail, orgData.name, eventCount, eventLimit);
+                  this.logger.info(
+                    `Sent approaching-limit email to owner ${ownerEmail} for organization ${orgData.name}`
+                  );
+                } catch (error) {
+                  this.logger.error(
+                    error as Error,
+                    `Failed to send approaching-limit email to owner ${ownerEmail} for organization ${orgData.name}`
+                  );
+                }
+              }
+            } else {
+              this.logger.warn(
+                `No owners found for organization ${orgData.name}, skipping approaching-limit email`
+              );
             }
           }
 

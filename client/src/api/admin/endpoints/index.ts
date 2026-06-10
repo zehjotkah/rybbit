@@ -2,6 +2,7 @@
 export {
   addSite,
   deleteSite,
+  moveSite,
   updateSiteConfig,
   fetchSite,
   fetchSitesFromOrg,
@@ -15,11 +16,13 @@ export type { SiteResponse, GetSitesFromOrgResponse, VerifyScriptResponse } from
 export {
   getUserOrganizations,
   addUserToOrganization,
+  createUserInOrganization,
   USER_ORGANIZATIONS_QUERY_KEY,
 } from "./organizations";
 export type {
   UserOrganization,
   AddUserToOrganizationInput,
+  CreateUserInOrganizationInput,
   RemoveUserFromOrganizationInput,
 } from "./organizations";
 
@@ -28,7 +31,7 @@ export { getAdminOrganizations } from "./adminOrganizations";
 export type { AdminOrganizationData } from "./adminOrganizations";
 
 // Admin Sites endpoints
-export { getAdminSites } from "./adminSites";
+export { getAdminSites, adminMoveSite } from "./adminSites";
 export type { AdminSiteData } from "./adminSites";
 
 // Admin Service Event Count endpoints

@@ -6,6 +6,7 @@ import { useGetOverview } from "../api/analytics/hooks/useGetOverview";
 import { useGetOverviewBucketed } from "../api/analytics/hooks/useGetOverviewBucketed";
 import { ChangePercentage } from "../app/[site]/main/components/MainSection/Overview";
 import { useInView } from "../hooks/useInView";
+import { LITE_DASHBOARD } from "../lib/const";
 import { useStore } from "../lib/store";
 import { formatter } from "../lib/utils";
 import { Favicon } from "./Favicon";
@@ -18,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface SiteCardProps {
   siteId: number;
+  name: string;
   domain: string;
   tags?: string[];
   allTags?: string[];
@@ -26,7 +28,7 @@ interface SiteCardProps {
   onTagClick?: (tag: string) => void;
 }
 
-export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdated, selectedTags = [], onTagClick }: SiteCardProps) {
+export function SiteCard({ siteId, name, domain, tags = [], allTags = [], onTagsUpdated, selectedTags = [], onTagClick }: SiteCardProps) {
   const t = useExtracted();
   const { ref, isInView } = useInView({
     // Start loading slightly before the card comes into view
@@ -44,6 +46,7 @@ export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdate
     site: siteId,
     bucket,
     useFilters: false,
+    lite: LITE_DASHBOARD,
     props: {
       enabled: isInView,
     },
@@ -56,6 +59,7 @@ export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdate
   } = useGetOverview({
     site: siteId,
     useFilters: false,
+    lite: LITE_DASHBOARD,
   });
 
   // Previous period - automatically handles both regular time-based and past-minutes queries
@@ -63,6 +67,7 @@ export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdate
     site: siteId,
     periodTime: "previous",
     useFilters: false,
+    lite: LITE_DASHBOARD,
   });
 
   // Update the hasLoadedData ref when data loads successfully
@@ -105,7 +110,7 @@ export function SiteCard({ siteId, domain, tags = [], allTags = [], onTagsUpdate
           <>
             <div className="flex gap-2 items-center">
               <Favicon domain={domain} className="w-6 h-6" />
-              <span className="text-lg font-medium truncate group-hover:underline transition-all">{domain}</span>
+              <span className="text-lg font-medium truncate group-hover:underline transition-all">{name}</span>
               <div onClick={(e) => e.preventDefault()}>
                 <Tooltip>
                   <SiteSettings

@@ -1,19 +1,16 @@
 import { useExtracted } from "next-intl";
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/basic-tabs";
-import { Card, CardContent, CardLoader } from "../../../../../components/ui/card";
-import { Button } from "../../../../../components/ui/button";
 import { useGetEventNames } from "../../../../../api/analytics/hooks/events/useGetEventNames";
+import { useGetOutboundLinks } from "../../../../../api/analytics/hooks/events/useGetOutboundLinks";
+import { CardLoader } from "../../../../../components/ui/card";
+import { ScrollArea } from "../../../../../components/ui/scroll-area";
 import { EventList } from "../../../events/components/EventList";
 import { OutboundLinksList } from "../../../events/components/OutboundLinksList";
-import { OutboundLinksDialog } from "./OutboundLinksDialog";
-import { useGetOutboundLinks } from "../../../../../api/analytics/hooks/events/useGetOutboundLinks";
-import { Expand } from "lucide-react";
-import { ScrollArea } from "../../../../../components/ui/scroll-area";
+import { TabbedSectionCard, type TabbedSectionItem } from "../../../components/shared/TabbedSectionCard";
+import { OutboundLinksDialogBody } from "./OutboundLinksDialog";
 
 type Tab = "events" | "outbound";
 
-function Events_() {
+function EventsContent() {
   const { data: eventNamesData, isLoading: isLoadingEventNames } = useGetEventNames();
   const t = useExtracted();
 
@@ -37,7 +34,7 @@ function Events_() {
   );
 }
 
-function OutboundLinks({ expanded, close }: { expanded: boolean; close: () => void }) {
+function OutboundLinksContent() {
   const { data: outboundLinksData, isLoading: isLoadingOutboundLinks } = useGetOutboundLinks();
   const t = useExtracted();
 
@@ -54,42 +51,33 @@ function OutboundLinks({ expanded, close }: { expanded: boolean; close: () => vo
           <div>{t("Clicks")}</div>
         </div>
         <OutboundLinksList outboundLinks={outboundLinksData || []} isLoading={isLoadingOutboundLinks} />
-        <OutboundLinksDialog outboundLinks={outboundLinksData || []} expanded={expanded} close={close} />
       </div>
     </>
   );
 }
 
+function OutboundLinksDialogContent() {
+  const { data: outboundLinksData } = useGetOutboundLinks();
+  return <OutboundLinksDialogBody outboundLinks={outboundLinksData || []} />;
+}
+
 export function Events() {
-  const [tab, setTab] = useState<Tab>("events");
-  const [expandedOutbound, setExpandedOutbound] = useState(false);
   const t = useExtracted();
 
-  return (
-    <Card className="h-[483px]">
-      <CardContent className="mt-2">
-        <Tabs defaultValue="events" value={tab} onValueChange={value => setTab(value as Tab)}>
-          <div className="flex flex-row gap-2 justify-between items-center">
-            <div className="overflow-x-auto">
-              <TabsList>
-                <TabsTrigger value="events">{t("Custom Events")}</TabsTrigger>
-                <TabsTrigger value="outbound">{t("Outbound Links")}</TabsTrigger>
-              </TabsList>
-            </div>
-            {tab === "outbound" && (
-              <Button size="smIcon" onClick={() => setExpandedOutbound(true)}>
-                <Expand className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-          <TabsContent value="events">
-            <Events_ />
-          </TabsContent>
-          <TabsContent value="outbound">
-            <OutboundLinks expanded={expandedOutbound} close={() => setExpandedOutbound(false)} />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
+  const tabs: TabbedSectionItem<Tab>[] = [
+    {
+      value: "events",
+      label: t("Custom Events"),
+      content: <EventsContent />,
+    },
+    {
+      value: "outbound",
+      label: t("Outbound Links"),
+      content: <OutboundLinksContent />,
+      dialogContent: <OutboundLinksDialogContent />,
+      dialogTitle: t("Outbound Links"),
+    },
+  ];
+
+  return <TabbedSectionCard defaultValue="events" tabs={tabs} className="h-[483px]" />;
 }

@@ -97,10 +97,7 @@ export async function getAdminSites(request: FastifyRequest, reply: FastifyReply
   }
 
   // Get goal and funnel counts per site
-  const goalCounts = await db
-    .select({ siteId: goals.siteId, count: count() })
-    .from(goals)
-    .groupBy(goals.siteId);
+  const goalCounts = await db.select({ siteId: goals.siteId, count: count() }).from(goals).groupBy(goals.siteId);
 
   const funnelCounts = await db
     .select({ siteId: funnels.siteId, count: count() })
@@ -127,7 +124,10 @@ export async function getAdminSites(request: FastifyRequest, reply: FastifyReply
 
     return {
       siteId: site.siteId,
-      domain: site.domain,
+      name: site.name,
+      type: site.type || "web",
+      domain: site.domain || "",
+      organizationId: site.organizationId,
       createdAt: site.createdAt,
       public: site.public,
       eventsLast24Hours: siteEventMap24h.get(site.siteId) || 0,

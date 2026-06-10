@@ -1,10 +1,24 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAdminSites } from "@/api/admin/hooks/useAdminSites";
-import { AdminSiteData } from "@/api/admin/endpoints";
+import { useAdminOrganizations } from "@/api/admin/hooks/useAdminOrganizations";
+import { adminMoveSite, AdminSiteData } from "@/api/admin/endpoints";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -29,6 +43,76 @@ import { parseUtcTimestamp } from "../../../../lib/dateTimeUtils";
 import { formatter } from "../../../../lib/utils";
 import { useExtracted } from "next-intl";
 
+function MoveSiteCell({ site }: { site: AdminSiteData }) {
+  const t = useExtracted();
+  const queryClient = useQueryClient();
+  const { data: organizations } = useAdminOrganizations();
+  const [open, setOpen] = useState(false);
+  const [targetOrgId, setTargetOrgId] = useState("");
+  const [isMoving, setIsMoving] = useState(false);
+
+  const targets = (organizations ?? []).filter(org => org.id !== site.organizationId);
+
+  const handleMove = async () => {
+    if (!targetOrgId) return;
+    try {
+      setIsMoving(true);
+      await adminMoveSite(site.siteId, targetOrgId);
+      toast.success(t("Site moved successfully"));
+      queryClient.invalidateQueries({ queryKey: ["admin-sites"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-organizations"] });
+      setTargetOrgId("");
+      setOpen(false);
+    } catch (error) {
+      console.error("Error moving site:", error);
+      toast.error(error instanceof Error ? error.message : t("Failed to move site"));
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          {t("Move")}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("Move Site")}</DialogTitle>
+          <DialogDescription>
+            {t(
+              'Move "{siteName}" to another organization. Team and restricted member access for this site will be reset.',
+              { siteName: site.name }
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        <Select value={targetOrgId} onValueChange={setTargetOrgId}>
+          <SelectTrigger>
+            <SelectValue placeholder={t("Select an organization")} />
+          </SelectTrigger>
+          <SelectContent>
+            {targets.map(org => (
+              <SelectItem key={org.id} value={org.id}>
+                {org.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={isMoving}>
+            {t("Cancel")}
+          </Button>
+          <Button onClick={handleMove} disabled={!targetOrgId || isMoving}>
+            {isMoving ? t("Moving...") : t("Move site")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function Sites() {
   const { data: sites, isLoading, isError } = useAdminSites();
   const t = useExtracted();
@@ -47,6 +131,7 @@ export function Sites() {
     return sites.filter(site => {
       const lowerSearchQuery = searchQuery.toLowerCase();
       return (
+        site.name.toLowerCase().includes(lowerSearchQuery) ||
         site.domain.toLowerCase().includes(lowerSearchQuery) ||
         site.organizationOwnerEmail?.toLowerCase().includes(lowerSearchQuery)
       );
@@ -68,13 +153,14 @@ export function Sites() {
         ),
       },
       {
-        accessorKey: "domain",
-        header: ({ column }) => <SortableHeader column={column}>{t("Domain")}</SortableHeader>,
+        accessorKey: "name",
+        header: ({ column }) => <SortableHeader column={column}>{t("Name")}</SortableHeader>,
         cell: ({ row }) => (
           <div className="font-medium flex items-center gap-2">
             <Favicon domain={row.original.domain} className="w-5 h-5 shrink-0" />
-            <Link href={`https://${row.original.domain}`} target="_blank" className="hover:underline">
-              {row.getValue("domain")}
+            <span>{row.getValue("name")}</span>
+            <Link href={`https://${row.original.domain}`} target="_blank" className="hover:underline text-xs text-muted-foreground">
+              {row.original.domain}
             </Link>
           </div>
         ),
@@ -137,6 +223,11 @@ export function Sites() {
         accessorKey: "organizationOwnerEmail",
         header: ({ column }) => <SortableHeader column={column}>{t("Owner Email")}</SortableHeader>,
         cell: ({ row }) => <div>{row.getValue("organizationOwnerEmail") || "-"}</div>,
+      },
+      {
+        id: "actions",
+        header: () => <span>{t("Actions")}</span>,
+        cell: ({ row }) => <MoveSiteCell site={row.original} />,
       },
     ],
     []
@@ -225,6 +316,9 @@ export function Sites() {
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-5 w-40" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-16" />
                     </TableCell>
                   </TableRow>
                 ))

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, type SQL } from "drizzle-orm";
 import { db } from "../db/postgres/postgres.js";
 import { sites } from "../db/postgres/schema.js";
 import { matchesCIDR, matchesRange } from "./ipUtils.js";
@@ -8,7 +8,9 @@ import { logger } from "./logger/logger.js";
 export interface SiteConfigData {
   id: string | null;
   siteId: number;
+  type: "web" | "mobile";
   public: boolean;
+  embedEnabled: boolean;
   saltUserIds: boolean;
   domain: string;
   blockBots: boolean;
@@ -29,25 +31,51 @@ export interface SiteConfigData {
   tags: string[];
 }
 
+type SiteConfigRow = typeof sites.$inferSelect;
+
 class SiteConfig {
   private cache = new Map<string, { data: SiteConfigData; expires: number }>();
   private cacheTTL = 60 * 1000; // 1 minute TTL
 
   /**
-   * Helper to determine if the input is a numeric siteId or string id
+   * Helper to determine if the input can be interpreted as a legacy numeric siteId
    */
   private isNumericId(id: string | number): boolean {
-    if (String(id).length > 4) {
-      return false;
+    if (typeof id === "number") {
+      return Number.isInteger(id);
     }
-    return true;
+
+    return /^\d+$/.test(id);
+  }
+
+  private getCacheKey(siteIdOrId: string | number): string {
+    return `${typeof siteIdOrId}:${siteIdOrId}`;
+  }
+
+  private async querySiteConfig(where: SQL): Promise<SiteConfigRow | undefined> {
+    const [site] = await db.select().from(sites).where(where).limit(1);
+
+    return site;
+  }
+
+  private async findSiteByIdentifier(siteIdOrId: string | number): Promise<SiteConfigRow | undefined> {
+    if (typeof siteIdOrId === "number") {
+      return Number.isInteger(siteIdOrId) ? this.querySiteConfig(eq(sites.siteId, siteIdOrId)) : undefined;
+    }
+
+    const siteByExactId = await this.querySiteConfig(eq(sites.id, siteIdOrId));
+    if (siteByExactId || !this.isNumericId(siteIdOrId)) {
+      return siteByExactId;
+    }
+
+    return this.querySiteConfig(eq(sites.siteId, Number(siteIdOrId)));
   }
 
   /**
    * Get site by either siteId or id
    */
   private async getSiteByAnyId(siteIdOrId: string | number): Promise<SiteConfigData | undefined> {
-    const cacheKey = String(siteIdOrId);
+    const cacheKey = this.getCacheKey(siteIdOrId);
     const cached = this.cache.get(cacheKey);
 
     if (cached && cached.expires > Date.now()) {
@@ -55,35 +83,7 @@ class SiteConfig {
     }
 
     try {
-      const isNumeric = this.isNumericId(siteIdOrId);
-
-      const [site] = await db
-        .select({
-          id: sites.id,
-          siteId: sites.siteId,
-          public: sites.public,
-          saltUserIds: sites.saltUserIds,
-          domain: sites.domain,
-          blockBots: sites.blockBots,
-          excludedIPs: sites.excludedIPs,
-          excludedCountries: sites.excludedCountries,
-          privateLinkKey: sites.privateLinkKey,
-          sessionReplay: sites.sessionReplay,
-          webVitals: sites.webVitals,
-          trackErrors: sites.trackErrors,
-          trackOutbound: sites.trackOutbound,
-          trackUrlParams: sites.trackUrlParams,
-          trackInitialPageView: sites.trackInitialPageView,
-          trackSpaNavigation: sites.trackSpaNavigation,
-          trackIp: sites.trackIp,
-          trackButtonClicks: sites.trackButtonClicks,
-          trackCopy: sites.trackCopy,
-          trackFormInteractions: sites.trackFormInteractions,
-          tags: sites.tags,
-        })
-        .from(sites)
-        .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)))
-        .limit(1);
+      const site = await this.findSiteByIdentifier(siteIdOrId);
 
       if (!site) {
         return undefined;
@@ -92,7 +92,9 @@ class SiteConfig {
       const configData: SiteConfigData = {
         id: site.id,
         siteId: site.siteId,
+        type: site.type || "web",
         public: site.public || false,
+        embedEnabled: site.embedEnabled || false,
         saltUserIds: site.saltUserIds || false,
         domain: site.domain || "",
         blockBots: site.blockBots === undefined ? true : site.blockBots,
@@ -142,7 +144,7 @@ class SiteConfig {
         .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
 
       // Invalidate cache after update
-      this.cache.delete(String(siteIdOrId));
+      this.cache.clear();
     } catch (error) {
       logger.error(error as Error, `Error updating site configuration for ${siteIdOrId}`);
     }
@@ -178,7 +180,7 @@ class SiteConfig {
       await db.delete(sites).where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
 
       // Invalidate cache after deletion
-      this.cache.delete(String(siteIdOrId));
+      this.cache.clear();
     } catch (error) {
       logger.error(error as Error, `Error removing site ${siteIdOrId}`);
     }

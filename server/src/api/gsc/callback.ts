@@ -2,8 +2,8 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { GSCCallbackRequest } from "./types.js";
 import { gscConnections } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
-import { getGSCProperties } from "./utils.js";
-import { getSessionFromReq } from "../../lib/auth-utils.js";
+import { getGSCProperties, verifyGSCState } from "./utils.js";
+import { getSessionFromReq, getUserHasAdminAccessToSite } from "../../lib/auth-utils.js";
 import { db } from "../../db/postgres/postgres.js";
 import { logger } from "../../lib/logger/logger.js";
 import { getOriginFromRequest } from "../../lib/request-utils.js";
@@ -24,39 +24,47 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
   try {
     const { code, state, error } = req.query;
     
-    // Parse state parameter (format: siteId|origin)
-    let siteId: number;
-    let origin: string;
-    
-    if (state && state.includes("|")) {
-      const [siteIdStr, encodedOrigin] = state.split("|");
-      siteId = Number(siteIdStr);
-      origin = encodedOrigin;
-    } else {
-      // Fallback for old format (just siteId) or missing state
-      siteId = Number(state);
-      origin = getOriginFromRequest(req);
-    }
-    
-    logger.info(`GSC callback received - origin: ${origin}, siteId: ${siteId}, hasCode: ${!!code}, error: ${error}`);
+    // Verify the signed state up front: it is the only trustworthy source of the
+    // target siteId and the initiating frontend origin (the OAuth callback arrives
+    // via Google's redirect, so request headers can't reveal the original domain).
+    // A tampered/forged/expired state yields null. Origin falls back to the request
+    // (then BASE_URL) so error redirects still work when state is missing/invalid.
+    const statePayload = state ? verifyGSCState(state) : null;
+    const origin = statePayload?.origin || getOriginFromRequest(req);
+
+    logger.info(`GSC callback received - origin: ${origin}, hasCode: ${!!code}, error: ${error}`);
 
     if (error) {
       logger.info(`OAuth cancelled or failed: ${error}`);
-      return res.redirect(`${origin}/${siteId}/main`);
+      return res.redirect(`${origin}/`);
     }
 
     if (!code || !state) {
       return res.status(400).send({ error: "Missing code or state parameter" });
     }
 
-    if (isNaN(siteId)) {
-      return res.status(400).send({ error: "Invalid site ID in state" });
+    if (!statePayload) {
+      return res.status(400).send({ error: "Invalid or expired state parameter" });
     }
+    const { siteId } = statePayload;
 
     // Get session to retrieve userId
     const session = await getSessionFromReq(req);
     if (!session) {
       return res.status(401).send({ error: "Unauthorized" });
+    }
+
+    // The session completing the callback must be the same user that initiated
+    // the flow (defends against connection fixation / cross-user state reuse).
+    if (session.user.id !== statePayload.userId) {
+      return res.status(403).send({ error: "State does not match session" });
+    }
+
+    // Verify the caller actually has admin access to the target site before
+    // writing OAuth tokens against it (prevents IDOR / connection hijack).
+    const hasAccess = await getUserHasAdminAccessToSite(req, siteId);
+    if (!hasAccess) {
+      return res.status(403).send({ error: "Access denied" });
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;

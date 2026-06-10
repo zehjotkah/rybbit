@@ -25,8 +25,8 @@ Before setting up the proxy, ensure you have:
 
 Rybbit uses several endpoints for tracking. You can choose between a minimal setup or full proxy:
 
-<Tabs>
-<Tab value="minimal" title="Minimal Setup">
+<Tabs items={['Minimal Setup', 'Full Setup (Recommended)']}>
+<Tab>
 
 **Required endpoints for basic tracking:**
 
@@ -38,7 +38,7 @@ Rybbit uses several endpoints for tracking. You can choose between a minimal set
 This minimal setup enables basic pageview and event tracking, but won't support session replay or some advanced features.
 
 </Tab>
-<Tab value="full-setup-recommended" title="Full Setup (Recommended)">
+<Tab>
 
 **All endpoints for complete functionality:**
 
@@ -85,6 +85,7 @@ Your domain path          →  Rybbit backend
 - Forward necessary headers (User-Agent, X-Forwarded-For, Referer)
 - Maintain request/response body for POST requests
 - Set appropriate Content-Type headers
+- For CDN or edge proxies, forward the visitor IP in `X-Forwarded-For` or `X-Real-IP`
 
 ### Configure Caching (Optional but Recommended)
 
@@ -168,13 +169,32 @@ For accurate tracking, ensure these headers are forwarded to the Rybbit backend:
 | Header | Purpose | Required |
 |--------|---------|----------|
 | `User-Agent` | Device and browser detection | Yes |
-| `X-Forwarded-For` or `X-Real-IP` | IP address for geolocation | Yes |
+| `X-Real-IP` or `X-Forwarded-For` | IP address for geolocation | Yes |
 | `Referer` | Referrer tracking | Recommended |
 | `Accept-Language` | Language detection | Optional |
 
 <Callout type="warn">
-**IP Forwarding**: Rybbit uses IP addresses for geolocation (country/city) and creating anonymous user identifiers (hashed IP + User Agent). If you don't forward the `X-Forwarded-For` or `X-Real-IP` header, all traffic will appear to come from your proxy server's IP.
+**IP Forwarding**: Rybbit uses IP addresses for geolocation (country/city) and creating anonymous user identifiers (hashed IP + User Agent). If you don't forward the `X-Real-IP` or `X-Forwarded-For` header, all traffic will appear to come from your proxy server's IP.
 </Callout>
+
+### Forwarded IP Headers
+
+If your proxy runs on infrastructure such as Cloudflare Workers, AWS CloudFront, Fastly, or another edge/CDN provider, make sure the proxy sets `X-Real-IP` to the original visitor IP. Rybbit also falls back to `X-Forwarded-For`, but `X-Real-IP` is preferred because Cloudflare-fronted requests may include intermediary IPs in `X-Forwarded-For`.
+
+**Cloudflare Worker example:**
+
+```javascript
+const clientIp = request.headers.get('CF-Connecting-IP') || '0.0.0.0';
+
+const proxyHeaders = new Headers(request.headers);
+proxyHeaders.set('X-Real-IP', clientIp);
+proxyHeaders.set('X-Forwarded-For', clientIp);
+```
+
+**CloudFront example:**
+
+- Forward `X-Forwarded-For`, or set `X-Real-IP` to the viewer IP from a CloudFront Function/Lambda@Edge
+- Forward `User-Agent`, `Referer`, and `Accept-Language`
 
 ## Bandwidth Considerations
 
@@ -219,8 +239,8 @@ Configure your proxy to maintain persistent connections to Rybbit's backend to r
 
 ## Common Proxy Patterns
 
-<Tabs>
-<Tab value="subdomain-proxy" title="Subdomain Proxy">
+<Tabs items={['Subdomain Proxy', 'Path-Based Proxy']}>
+<Tab>
 
 Use a dedicated subdomain for analytics:
 
@@ -239,7 +259,7 @@ https://analytics.yourdomain.com/track      →  https://app.rybbit.io/api/track
 - Need to manage subdomain DNS
 
 </Tab>
-<Tab value="path-based-proxy" title="Path-Based Proxy">
+<Tab>
 
 Use a path on your main domain:
 
@@ -291,7 +311,7 @@ If something isn't working, check:
 1. **Script loads but no events tracked**: Verify all tracking endpoints (`/api/track`, etc.) are proxied
 2. **CORS errors**: Ensure CORS headers are preserved from Rybbit backend
 3. **404 errors**: Check that URL paths exactly match expected format
-4. **Incorrect geolocation**: Verify `X-Forwarded-For` header is forwarded
+4. **Incorrect geolocation**: Verify `X-Forwarded-For` or `X-Real-IP` is set to the visitor IP
 5. **Session replay not working**: Add `/api/replay.js` and `/api/session-replay/record/:siteId` endpoints
 
 For more detailed troubleshooting, see our [troubleshooting guide](/docs/proxy-guide/troubleshooting).

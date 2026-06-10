@@ -3,8 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const IS_CLOUD = process.env.CLOUD === "true";
+export const DEPLOYMENT = process.env.DEPLOYMENT;
 export const DISABLE_SIGNUP = process.env.DISABLE_SIGNUP === "true";
 export const DISABLE_TELEMETRY = process.env.DISABLE_TELEMETRY === "true";
+export const LITE_DASHBOARD = process.env.LITE_DASHBOARD === "true";
 export const SECRET = process.env.BETTER_AUTH_SECRET;
 export const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 
