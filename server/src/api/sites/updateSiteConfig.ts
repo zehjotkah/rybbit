@@ -1,10 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { db } from "../../db/postgres/postgres.js";
-import { sites } from "../../db/postgres/schema.js";
+import { organization, sites } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
+import { IS_CLOUD } from "../../lib/const.js";
 import { siteConfig } from "../../lib/siteConfig.js";
 import { validateIPPattern } from "../../lib/ipUtils.js";
+import { getBestSubscription, subscriptionIncludesReplay } from "../../lib/subscriptionUtils.js";
 
 // Schema for the update request - all fields are optional but validated when present
 const updateSiteConfigSchema = z.object({
@@ -27,6 +29,9 @@ const updateSiteConfigSchema = z.object({
     )
     .max(250)
     .optional(),
+  excludedPaths: z.array(z.string().trim().min(1).max(2048)).max(100).optional(),
+  excludedHostnames: z.array(z.string().trim().min(1).max(253)).max(100).optional(),
+  excludedUserAgents: z.array(z.string().trim().min(1).max(512)).max(100).optional(),
 
   // Tags
   tags: z.array(z.string().trim().min(1).max(50)).max(20).optional(),
@@ -111,6 +116,27 @@ export async function updateSiteConfig(
       });
     }
 
+    // Session replay is a Pro feature — block enabling it (turning it off is always allowed)
+    if (IS_CLOUD && updateData.sessionReplay === true) {
+      let includesReplay = false;
+      if (site.organizationId) {
+        const orgResult = await db
+          .select({ stripeCustomerId: organization.stripeCustomerId })
+          .from(organization)
+          .where(eq(organization.id, site.organizationId))
+          .limit(1);
+        const subscription = await getBestSubscription(site.organizationId, orgResult[0]?.stripeCustomerId ?? null);
+        includesReplay = subscriptionIncludesReplay(subscription);
+      }
+
+      if (!includesReplay) {
+        return reply.status(403).send({
+          success: false,
+          error: "Session replay requires a Pro plan",
+        });
+      }
+    }
+
     // Additional validation for excluded IPs if provided
     if (updateData.excludedIPs) {
       const validationErrors: string[] = [];
@@ -142,6 +168,9 @@ export async function updateSiteConfig(
       "blockBots",
       "excludedIPs",
       "excludedCountries",
+      "excludedPaths",
+      "excludedHostnames",
+      "excludedUserAgents",
       "tags",
       "sessionReplay",
       "webVitals",
