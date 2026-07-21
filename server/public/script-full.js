@@ -67,6 +67,7 @@
   }
 
   // config.ts
+  var FEATURE_FLAG_REQUEST_TIMEOUT_MS = 2e3;
   function createVisitorId() {
     try {
       if (crypto?.randomUUID) {
@@ -102,6 +103,8 @@
     return url.pathname;
   }
   async function fetchFeatureFlags(analyticsHost, siteId, namespace, visitorId) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), FEATURE_FLAG_REQUEST_TIMEOUT_MS);
     try {
       const url = new URL(window.location.href);
       const response = await fetch(`${analyticsHost}/site/${siteId}/feature-flags/evaluate`, {
@@ -110,6 +113,7 @@
           "Content-Type": "application/json"
         },
         credentials: "omit",
+        signal: controller.signal,
         body: JSON.stringify({
           anonymousId: visitorId,
           identifiedUserId: getIdentifiedUserId(namespace),
@@ -124,12 +128,17 @@
         })
       });
       if (!response.ok) {
-        return {};
+        return { enabled: true, flags: {} };
       }
       const data = await response.json();
-      return data?.flags && typeof data.flags === "object" ? data.flags : {};
+      return {
+        enabled: data?.featureFlagsEnabled !== false,
+        flags: data?.flags && typeof data.flags === "object" ? data.flags : {}
+      };
     } catch (e2) {
-      return {};
+      return { enabled: true, flags: {} };
+    } finally {
+      window.clearTimeout(timeout);
     }
   }
   async function parseScriptConfig(scriptTag) {
@@ -200,6 +209,7 @@
       trackCopy: false,
       trackFormInteractions: false,
       tag,
+      featureFlagsEnabled: false,
       featureFlags: {},
       // rrweb session replay options (undefined means use rrweb defaults)
       sessionReplayBlockClass,
@@ -236,7 +246,8 @@
           enableSessionReplay: apiConfig.sessionReplay ?? defaultConfig.enableSessionReplay,
           trackButtonClicks: apiConfig.trackButtonClicks ?? defaultConfig.trackButtonClicks,
           trackCopy: apiConfig.trackCopy ?? defaultConfig.trackCopy,
-          trackFormInteractions: apiConfig.trackFormInteractions ?? defaultConfig.trackFormInteractions
+          trackFormInteractions: apiConfig.trackFormInteractions ?? defaultConfig.trackFormInteractions,
+          featureFlagsEnabled: apiConfig.featureFlagsEnabled === true
         };
       } else {
         console.warn("Failed to fetch tracking config from API, using defaults");
@@ -244,7 +255,11 @@
     } catch (error) {
       console.warn("Error fetching tracking config:", error);
     }
-    resolvedConfig.featureFlags = await fetchFeatureFlags(analyticsHost, siteId, namespace, visitorId);
+    if (resolvedConfig.featureFlagsEnabled) {
+      const result = await fetchFeatureFlags(analyticsHost, siteId, namespace, visitorId);
+      resolvedConfig.featureFlagsEnabled = result.enabled;
+      resolvedConfig.featureFlags = result.flags;
+    }
     return resolvedConfig;
   }
 
@@ -597,6 +612,7 @@
   }
 
   // tracking.ts
+  var FEATURE_FLAG_REQUEST_TIMEOUT_MS2 = 2e3;
   var Tracker = class {
     constructor(config) {
       this.customUserId = null;
@@ -641,6 +657,9 @@
       };
     }
     async refreshFeatureFlags() {
+      if (!this.config.featureFlagsEnabled) return;
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), FEATURE_FLAG_REQUEST_TIMEOUT_MS2);
       try {
         const response = await fetch(`${this.config.analyticsHost}/site/${this.config.siteId}/feature-flags/evaluate`, {
           method: "POST",
@@ -654,12 +673,18 @@
           }),
           mode: "cors",
           credentials: "omit",
-          keepalive: true
+          keepalive: true,
+          signal: controller.signal
         });
         if (!response.ok) return;
         const data = await response.json();
         this.config.featureFlags = data?.flags && typeof data.flags === "object" ? data.flags : {};
+        if (data?.featureFlagsEnabled === false) {
+          this.config.featureFlagsEnabled = false;
+        }
       } catch (e2) {
+      } finally {
+        window.clearTimeout(timeout);
       }
     }
     loadUserId() {
