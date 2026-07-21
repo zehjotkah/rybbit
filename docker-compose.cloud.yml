@@ -26,6 +26,7 @@ services:
     image: clickhouse/clickhouse-server:26.3.17.4
     volumes:
       - clickhouse-data:/var/lib/clickhouse
+      - /etc/rybbit-backup/clickhouse-s3.xml:/etc/clickhouse-server/config.d/backup-s3.xml:ro
     configs:
       - source: clickhouse_network
         target: /etc/clickhouse-server/config.d/network.xml
