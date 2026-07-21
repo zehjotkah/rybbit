@@ -107,13 +107,15 @@ ${dataAttributes.map(attr => `    ${formatAttr(attr)}`).join("\n")}
     defer
 ></script>`;
 
-  const jsSnippet = `(function () {
+  const jsSnippet = `<script>
+(function () {
   var el = document.createElement("script");
   el.src = "${scriptUrl}";
 ${dataAttributes.map(([key, value]) => `  el.setAttribute("${key}", ${JSON.stringify(value)});`).join("\n")}
   el.defer = true;
   document.head.appendChild(el);
-})();`;
+})();
+</script>`;
 
   const inlineScript = `<script src="${scriptUrl}" ${dataAttributes.map(formatAttr).join(" ")} defer></script>`;
 
