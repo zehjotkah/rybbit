@@ -33,11 +33,10 @@ sudo rclone config
 sudo chmod 600 /root/.config/rclone/rclone.conf
 ```
 
-The examples use an rclone `crypt` remote named `b2crypt` over a B2 remote.
-This provides client-side encryption in addition to B2 server-side encryption.
-The direct FrogStats ClickHouse backup uses B2 server-side encryption because
-it is written directly through ClickHouse's S3-compatible client. Its B2
-credentials live in a ClickHouse named collection rather than the backup SQL.
+The examples use a Backblaze remote named `b2`. Data is protected in transit by
+TLS and at rest by B2 server-side encryption. The direct FrogStats ClickHouse
+backup is written through ClickHouse's S3-compatible client. Its B2 credentials
+live in a ClickHouse named collection rather than the backup SQL.
 
 ## Install on each host
 
@@ -172,8 +171,8 @@ Object Lock is enabled. Never add an Object-Locked B2 remote to
 Always restore into a disposable container or a differently named database
 first. Never test a restore against production.
 
-For PostgreSQL, download one backup directory through the crypt remote, verify
-it, restore globals, and then restore the custom archive:
+For PostgreSQL, download one backup directory through the B2 remote, verify it,
+restore globals, and then restore the custom archive:
 
 ```bash
 cd /var/tmp/postgres-restore
