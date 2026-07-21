@@ -326,6 +326,7 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
       ipAddress: requestIP,
       candidateIps: trackingIdentity.candidateIps,
       pathname: validatedPayload.pathname,
+      querystring: validatedPayload.querystring,
       hostname: validatedPayload.hostname,
       userAgent: trackingIdentity.userAgent,
     });
