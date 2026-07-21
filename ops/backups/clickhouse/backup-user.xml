@@ -1,0 +1,20 @@
+<clickhouse>
+    <!-- This user can connect only from inside the ClickHouse container. -->
+    <users>
+        <backup>
+            <password></password>
+            <networks>
+                <ip>127.0.0.1</ip>
+                <ip>::1</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+            <grants>
+                <query>GRANT BACKUP ON analytics.*</query>
+                <query>GRANT NAMED COLLECTION ON b2_backups</query>
+                <query>GRANT S3 ON *.*</query>
+            </grants>
+        </backup>
+    </users>
+</clickhouse>
+

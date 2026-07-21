@@ -2,7 +2,6 @@
     <!-- Install this file outside the repository, replace all placeholders,
          make it readable only by root and the ClickHouse group, and mount it
          read-only into /etc/clickhouse-server/config.d/. -->
-    <allow_named_collection_override_by_default>false</allow_named_collection_override_by_default>
     <named_collections>
         <b2_backups>
             <url overridable="false">https://s3.YOUR-B2-REGION.backblazeb2.com/YOUR-BUCKET/frogstats/clickhouse/</url>
@@ -11,4 +10,3 @@
         </b2_backups>
     </named_collections>
 </clickhouse>
-

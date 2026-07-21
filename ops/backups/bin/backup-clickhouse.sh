@@ -25,10 +25,18 @@ trap finish EXIT
 run_clickhouse_query() {
   local query="$1"
 
-  # Feed SQL over stdin so S3 credentials do not appear in the host process
-  # list. Query logging is disabled for this client session by the query.
-  printf '%s\n' "$query" | docker exec -i "$CLICKHOUSE_CONTAINER" sh -ec \
-    'exec clickhouse-client --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --multiquery'
+  # Feed SQL over stdin so it does not appear in the host process list. When a
+  # dedicated backup user is configured, pass its credentials only to this
+  # short-lived exec process. Otherwise use the container's application user.
+  printf '%s\n' "$query" | docker exec -i \
+    -e RYBBIT_BACKUP_USER="${CLICKHOUSE_BACKUP_USER:-}" \
+    -e RYBBIT_BACKUP_PASSWORD="${CLICKHOUSE_BACKUP_PASSWORD:-}" \
+    "$CLICKHOUSE_CONTAINER" sh -ec '
+      if [ -n "$RYBBIT_BACKUP_USER" ]; then
+        exec clickhouse-client --user "$RYBBIT_BACKUP_USER" --password "$RYBBIT_BACKUP_PASSWORD" --multiquery
+      fi
+      exec clickhouse-client --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --multiquery
+    '
 }
 
 load_backup_config

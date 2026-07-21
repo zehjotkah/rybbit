@@ -92,16 +92,22 @@ services:
   clickhouse:
     volumes:
       - /etc/rybbit-backup/clickhouse-s3.xml:/etc/clickhouse-server/config.d/backup-s3.xml:ro
+      - ./ops/backups/clickhouse/backup-user.xml:/etc/clickhouse-server/users.d/backup-user.xml:ro
 ```
 
 UID/GID 101 is the default ClickHouse user in the official image; confirm it
 before installation if the image changes. Recreate ClickHouse and verify the
-collection without printing its contents:
+dedicated user's grants without printing the named collection contents:
 
 ```bash
 docker exec clickhouse clickhouse-client \
-  --query "SELECT name FROM system.named_collections WHERE name = 'b2_backups'"
+  --user backup --query "SHOW GRANTS FOR backup"
 ```
+
+The `backup` user is passwordless but restricted to connections originating
+inside the ClickHouse container. It can back up `analytics`, use the B2 named
+collection, and access S3; it cannot read or mutate application data through
+ordinary SQL. The FrogStats environment example selects this user for backups.
 
 ## Standalone ClickHouse staging disk
 
