@@ -2,7 +2,9 @@
     <!-- This user can connect only from inside the ClickHouse container. -->
     <users>
         <backup>
-            <password></password>
+            <!-- Replace with SHA-256(password), generated for example with:
+                 printf '%s' "$PASSWORD" | sha256sum -->
+            <password_sha256_hex>REPLACE_WITH_SHA256_PASSWORD</password_sha256_hex>
             <networks>
                 <ip>127.0.0.1</ip>
                 <ip>::1</ip>
@@ -17,4 +19,3 @@
         </backup>
     </users>
 </clickhouse>
-
