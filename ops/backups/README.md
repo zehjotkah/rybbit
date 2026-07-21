@@ -37,10 +37,10 @@ sudo rclone config
 sudo chmod 600 /root/.config/rclone/rclone.conf
 ```
 
-The examples use a Backblaze remote named `b2`. Data is protected in transit by
-TLS and at rest by B2 server-side encryption. The direct FrogStats ClickHouse
-backup is written through ClickHouse's S3-compatible client. Its B2 credentials
-live in a ClickHouse named collection rather than the backup SQL.
+The examples use a Backblaze remote named `backblaze`. Data is protected in
+transit by TLS and at rest by B2 server-side encryption. The direct FrogStats
+ClickHouse backup is written through ClickHouse's S3-compatible client. Its B2
+credentials live in a ClickHouse named collection rather than the backup SQL.
 
 ## Install on each host
 
@@ -135,25 +135,30 @@ The FrogStats environment example selects this user for backups.
 ## Standalone ClickHouse staging disk
 
 The standalone host creates one native backup and uploads the same completed
-snapshot to both Hetzner and B2. Add these mounts to its ClickHouse service:
+snapshot to both Hetzner and B2. Install the disk configuration outside the
+repository and prepare the host staging directory:
+
+```bash
+sudo install -d -m 0750 /etc/rybbit-backup
+sudo install -m 0640 -o root -g 101 \
+  ops/backups/clickhouse/backup-disk.xml \
+  /etc/rybbit-backup/clickhouse-backup-disk.xml
+sudo install -d -m 0750 -o 101 -g 101 /var/backups/rybbit/clickhouse
+```
+
+Then add these mounts to its ClickHouse service:
 
 ```yaml
 services:
   clickhouse:
     volumes:
       - /var/backups/rybbit/clickhouse:/var/lib/clickhouse/backups
-      - ./ops/backups/clickhouse/backup-disk.xml:/etc/clickhouse-server/config.d/backup-disk.xml:ro
+      - /etc/rybbit-backup/clickhouse-backup-disk.xml:/etc/clickhouse-server/config.d/backup-disk.xml:ro
 ```
 
-Prepare the host directory before recreating the container. UID/GID 101 is the
-default ClickHouse user in the official image; confirm it with `docker exec`
-if the image changes:
-
-```bash
-sudo install -d -m 0750 -o 101 -g 101 /var/backups/rybbit/clickhouse
-```
-
-Restart ClickHouse after adding the disk configuration, then confirm it exists:
+UID/GID 101 is the default ClickHouse user in the official image; confirm it if
+the image changes. Restart ClickHouse after adding the disk configuration, then
+confirm it exists:
 
 ```bash
 docker exec clickhouse clickhouse-client \
