@@ -6,10 +6,16 @@ import { isDatacenterAsn } from "../tracker/botBlocking/datacenterAsns.js";
 
 const logger = createServiceLogger("sticky-identity");
 
-// How far back a previous identity counts as a re-attachment candidate. Kept
-// well under the 30-minute seen TTL: observed egress rotations happen
-// mid-navigation (seconds apart), and a wide window only adds merge risk.
-const CANDIDATE_WINDOW_MS = 5 * 60 * 1000;
+// How far back a previous identity counts as a re-attachment candidate.
+// Production gap analysis (2026-07-21, ground-truthed against identified_user_id
+// switches) showed a same-person, repeated-rotation pattern extending well past
+// 5 minutes: the 5-30min bucket has ~5 switches/person, same concentration as
+// 0-5min, and 44% of people rotating within 5min also rotate in 5-30min — the
+// same phenomenon, not distinct visits. Past 30min the ratio drops to ~1.8
+// switches/person (ordinary return-visit churn), matching the 30-minute seen
+// TTL below, so 15 minutes captures most of the real recovery without reaching
+// into "different visit" territory.
+const CANDIDATE_WINDOW_MS = 15 * 60 * 1000;
 // How long a fingerprint stays "known" without activity. Matches the session
 // TTL so an identity outlives its session by exactly nothing.
 const SEEN_TTL_MS = 30 * 60 * 1000;
