@@ -9,7 +9,7 @@ hosts. They intentionally do not archive live Docker volumes.
 | --- | --- | --- |
 | FrogStats | Native `pg_dump` to B2 | Native `BACKUP` directly to B2 |
 | Rybbit | Native `pg_dump` to B2 | Not backed up here; production uses the standalone host |
-| ClickHouse | None | One native local backup copied to Hetzner and B2 |
+| ClickHouse | None | Native `BACKUP` staged locally and copied to B2 |
 
 PostgreSQL dumps include a custom-format database archive, cluster globals,
 and SHA-256 checksums. ClickHouse backs up only the `analytics` database, not
@@ -134,9 +134,9 @@ The FrogStats environment example selects this user for backups.
 
 ## Standalone ClickHouse staging disk
 
-The standalone host creates one native backup and uploads the same completed
-snapshot to both Hetzner and B2. Install the disk configuration outside the
-repository and prepare the host staging directory:
+The standalone host creates one native backup and uploads the completed
+snapshot to B2. Install the disk configuration outside the repository and
+prepare the host staging directory:
 
 ```bash
 sudo install -d -m 0750 /etc/rybbit-backup
@@ -195,9 +195,8 @@ The PostgreSQL timer runs every six hours. The ClickHouse timer runs daily with
 a randomized delay. Use systemd timer overrides if the two ClickHouse hosts
 should run in different windows.
 
-The standalone example prunes only the Hetzner destination after 14 days. B2
-retention should be implemented with bucket lifecycle rules, especially when
-Object Lock is enabled. Never add an Object-Locked B2 remote to
+B2 retention should be implemented with bucket lifecycle rules, especially
+when Object Lock is enabled. Never add an Object-Locked B2 remote to
 `CLICKHOUSE_PRUNE_REMOTES`.
 
 ## Restore drills
