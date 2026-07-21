@@ -15,6 +15,10 @@ PostgreSQL dumps include a custom-format database archive, cluster globals,
 and SHA-256 checksums. ClickHouse backs up only the `analytics` database, not
 the large and regenerable `system` log tables.
 
+The ClickHouse client receive timeout is raised to six hours because native
+backups can produce no client-visible data for longer than the client's
+five-minute default while the server is still making progress.
+
 ## Prerequisites
 
 All hosts need Bash, Docker, `flock`, `curl`, and `rclone`. The `clickhouse`

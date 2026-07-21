@@ -31,11 +31,12 @@ run_clickhouse_query() {
   printf '%s\n' "$query" | docker exec -i \
     -e RYBBIT_BACKUP_USER="${CLICKHOUSE_BACKUP_USER:-}" \
     -e RYBBIT_BACKUP_PASSWORD="${CLICKHOUSE_BACKUP_PASSWORD:-}" \
+    -e RYBBIT_BACKUP_RECEIVE_TIMEOUT="$CLICKHOUSE_BACKUP_RECEIVE_TIMEOUT" \
     "$CLICKHOUSE_CONTAINER" sh -ec '
       if [ -n "$RYBBIT_BACKUP_USER" ]; then
-        exec clickhouse-client --user "$RYBBIT_BACKUP_USER" --password "$RYBBIT_BACKUP_PASSWORD" --multiquery
+        exec clickhouse-client --user "$RYBBIT_BACKUP_USER" --password "$RYBBIT_BACKUP_PASSWORD" --receive_timeout "$RYBBIT_BACKUP_RECEIVE_TIMEOUT" --multiquery
       fi
-      exec clickhouse-client --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --multiquery
+      exec clickhouse-client --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --receive_timeout "$RYBBIT_BACKUP_RECEIVE_TIMEOUT" --multiquery
     '
 }
 
@@ -44,6 +45,7 @@ load_backup_config
 CLICKHOUSE_CONTAINER="${CLICKHOUSE_CONTAINER:-clickhouse}"
 CLICKHOUSE_DATABASE="${CLICKHOUSE_DATABASE:-analytics}"
 CLICKHOUSE_BACKUP_MODE="${CLICKHOUSE_BACKUP_MODE:-s3}"
+CLICKHOUSE_BACKUP_RECEIVE_TIMEOUT="${CLICKHOUSE_BACKUP_RECEIVE_TIMEOUT:-21600}"
 CLICKHOUSE_LOCK_FILE="${CLICKHOUSE_LOCK_FILE:-/run/lock/rybbit-clickhouse-backup.lock}"
 BACKUP_HOST="${BACKUP_HOST:-$(hostname -s)}"
 DRY_RUN="${DRY_RUN:-false}"
@@ -53,6 +55,8 @@ validate_simple_name CLICKHOUSE_CONTAINER "$CLICKHOUSE_CONTAINER"
 validate_identifier CLICKHOUSE_DATABASE "$CLICKHOUSE_DATABASE"
 [[ "$CLICKHOUSE_BACKUP_MODE" == "s3" || "$CLICKHOUSE_BACKUP_MODE" == "local" ]] || \
   fatal "CLICKHOUSE_BACKUP_MODE must be 's3' or 'local'"
+[[ "$CLICKHOUSE_BACKUP_RECEIVE_TIMEOUT" =~ ^[1-9][0-9]*$ ]] || \
+  fatal "CLICKHOUSE_BACKUP_RECEIVE_TIMEOUT must be a positive integer"
 
 BACKUP_NAME="${BACKUP_HOST}-clickhouse-${CLICKHOUSE_DATABASE}-$(date -u '+%Y%m%dT%H%M%SZ')"
 
