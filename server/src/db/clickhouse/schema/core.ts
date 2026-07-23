@@ -22,6 +22,39 @@ const EVENTS_COLUMNS_TO_ENSURE: ColumnDefinition[] = [
   { name: "is_datacenter_asn", definition: "is_datacenter_asn UInt8 DEFAULT 0" },
 ];
 
+const BOT_EVENTS_COLUMNS_TO_ENSURE: ColumnDefinition[] = [
+  // Prod tables created before session_id landed in the CREATE statement lack
+  // it; the insert already sends it, so healing the column starts populating it.
+  { name: "session_id", definition: "session_id String DEFAULT ''" },
+  // Null = the client sent no score and the server inferred nothing.
+  { name: "client_bot_score", definition: "client_bot_score Nullable(UInt8)" },
+  { name: "client_signal_mask", definition: "client_signal_mask UInt16 DEFAULT 0" },
+];
+
+async function ensureBotEventsColumns() {
+  const existingColumns = await getTableColumns("bot_events");
+  const missingColumns = BOT_EVENTS_COLUMNS_TO_ENSURE.filter(column => !existingColumns.has(column.name));
+
+  if (missingColumns.length === 0) {
+    logger.debug("Bot events table columns are up to date");
+    return;
+  }
+
+  logger.info(
+    { missingColumns: missingColumns.map(column => column.name) },
+    "Adding missing bot events table columns"
+  );
+
+  await execClickhouseInitStep(
+    "add missing bot events columns",
+    `
+      ALTER TABLE bot_events
+        ${missingColumns.map(column => `ADD COLUMN IF NOT EXISTS ${column.definition}`).join(",\n        ")}
+      `,
+    { lockAcquireTimeoutSeconds: 15 }
+  );
+}
+
 async function ensureEventsColumns() {
   const existingColumns = await getTableColumns("events");
   const missingColumns = EVENTS_COLUMNS_TO_ENSURE.filter(column => !existingColumns.has(column.name));
@@ -134,7 +167,9 @@ export async function initializeCoreTables() {
         detected_bot_asn Bool DEFAULT false,
         detected_rate_anomaly Bool DEFAULT false,
         matched_ua_pattern String DEFAULT '',
-        bot_category LowCardinality(String) DEFAULT ''
+        bot_category LowCardinality(String) DEFAULT '',
+        client_bot_score Nullable(UInt8),
+        client_signal_mask UInt16 DEFAULT 0
       )
       ENGINE = MergeTree()
       PARTITION BY toYYYYMM(timestamp)
@@ -142,6 +177,8 @@ export async function initializeCoreTables() {
       TTL timestamp + INTERVAL 3 MONTH
       `
   );
+
+  await ensureBotEventsColumns();
 
   await execClickhouseInitStep(
     "create session replay events table",
