@@ -98,7 +98,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
     const tokens: TokenResponse = await tokenResponse.json();
 
     // Get available GSC properties
-    const properties = await getGSCProperties(tokens.access_token);
+    const properties = await getGSCProperties(tokens.access_token, req.log);
 
     if (properties.length === 0) {
       return res.redirect(`${origin}/error?message=No GSC properties found`);

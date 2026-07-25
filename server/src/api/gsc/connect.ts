@@ -63,7 +63,7 @@ export async function connectGSC(req: FastifyRequest<ConnectGSCRequest>, res: Fa
 
     return res.send({ authUrl: authUrl.toString() });
   } catch (error) {
-    logger.error(error, "Error initiating GSC OAuth");
+    req.log.error(error, "Error initiating GSC OAuth");
     return res.status(500).send({ error: "Failed to initiate OAuth" });
   }
 }
