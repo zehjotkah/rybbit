@@ -12,8 +12,10 @@ interface GSCStatePayload {
   siteId: number;
   userId: string;
   // Frontend origin that initiated the flow, so the callback can redirect back
-  // to the correct domain in multi-domain self-hosted deployments.
-  origin: string;
+  // to the correct domain in multi-domain self-hosted deployments. Optional so
+  // the upstream two-argument call shape keeps working; the callback falls back
+  // to the request origin when it is absent.
+  origin?: string;
   ts: number;
 }
 
@@ -29,7 +31,7 @@ function gscStateSecret(): string {
  * initiating user and the target site. Prevents the callback from trusting an
  * attacker-supplied siteId (IDOR) and mitigates OAuth CSRF / connection fixation.
  */
-export function signGSCState(siteId: number, userId: string, origin: string): string {
+export function signGSCState(siteId: number, userId: string, origin?: string): string {
   const payload: GSCStatePayload = { siteId, userId, origin, ts: Date.now() };
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const signature = crypto.createHmac("sha256", gscStateSecret()).update(body).digest("base64url");
@@ -59,7 +61,7 @@ export function verifyGSCState(state: string): GSCStatePayload | null {
     if (
       typeof payload.siteId !== "number" ||
       typeof payload.userId !== "string" ||
-      typeof payload.origin !== "string" ||
+      (payload.origin !== undefined && typeof payload.origin !== "string") ||
       typeof payload.ts !== "number" ||
       Date.now() - payload.ts > GSC_STATE_TTL_MS
     ) {
