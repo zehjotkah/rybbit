@@ -1,3 +1,4 @@
+vi.mock("../../services/lifecycleEmails/platformDetect.js", () => ({ detectPlatform: vi.fn(async () => null) }));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
@@ -8,10 +9,15 @@ const state = vi.hoisted(() => ({
 
 const mocks = vi.hoisted(() => ({
   getSubscriptionInner: vi.fn(),
+  invalidateSitesAccessCache: vi.fn(),
 }));
 
 vi.mock("../../db/postgres/postgres.js", () => ({
   db: {
+    execute: vi.fn(async () => []),
+    async transaction<T>(operation: (tx: unknown) => Promise<T>): Promise<T> {
+      return operation(this);
+    },
     select: vi.fn(() => ({
       from: () => ({
         where: async () => Array.from({ length: state.existingSiteCount }, (_, i) => ({ siteId: i + 1 })),
@@ -40,6 +46,10 @@ vi.mock("../../lib/const.js", async importOriginal => {
 
 vi.mock("../stripe/getSubscription.js", () => ({
   getSubscriptionInner: mocks.getSubscriptionInner,
+}));
+
+vi.mock("../../lib/auth-utils.js", () => ({
+  invalidateSitesAccessCache: mocks.invalidateSitesAccessCache,
 }));
 
 import { addSite } from "./addSite.js";
@@ -78,6 +88,18 @@ beforeEach(() => {
   state.existingSiteCount = 0;
   state.insertedValues.length = 0;
   mocks.getSubscriptionInner.mockResolvedValue(subscription());
+});
+
+describe("addSite — access cache invalidation", () => {
+  it("invalidates the creator's cached site access after creating a site", async () => {
+    const reply = replyStub();
+
+    await addSite(makeRequest({}), reply);
+
+    expect(reply.statusCode).toBe(201);
+    expect(mocks.invalidateSitesAccessCache).toHaveBeenCalledOnce();
+    expect(mocks.invalidateSitesAccessCache).toHaveBeenCalledWith("u_1");
+  });
 });
 
 describe("addSite — cloud pro-feature gating (session replay)", () => {

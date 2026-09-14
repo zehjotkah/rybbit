@@ -6,8 +6,6 @@ import {
   Code,
   Database,
   File,
-  Flag,
-  FlaskConical,
   Funnel,
   Gauge,
   Globe2,
@@ -27,12 +25,11 @@ import { Suspense } from "react";
 import { useGetSite } from "../../../../api/admin/hooks/useSites";
 import { Sidebar as SidebarComponents } from "../../../../components/sidebar/Sidebar";
 import { SiteSettings } from "../../../../components/SiteSettings/SiteSettings";
-import { DEMO_HOSTNAME, IS_CLOUD } from "../../../../lib/const";
+import { useAppEnv } from "../../../../hooks/useIsProduction";
 import { getSiteRouteContext } from "../../../../lib/siteRoute";
+import { useStripeSubscription } from "../../../../lib/subscription/useStripeSubscription";
 import { useEmbedPageOptions } from "../../utils";
 import { SiteSelector } from "./SiteSelector";
-import { useStripeSubscription } from "../../../../lib/subscription/useStripeSubscription";
-import { useAppEnv } from "../../../../hooks/useIsProduction";
 
 function SidebarContent() {
   const t = useExtracted();
@@ -74,15 +71,21 @@ function SidebarContent() {
       <div className="flex flex-col p-3 border-b border-neutral-200 dark:border-neutral-800">
         <SiteSelector />
       </div>
-      <div className="flex flex-col p-3 pt-1">
-        <SidebarComponents.SectionHeader>
-          {isMobileSite ? t("App Analytics") : t("Web Analytics")}
-        </SidebarComponents.SectionHeader>
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 pt-1">
+        <div className="mt-2">
+          <SidebarComponents.Item
+            label={t("Main")}
+            active={isActiveTab("main")}
+            href={getTabPath("main")}
+            icon={<LayoutDashboard className="w-4 h-4" />}
+          />
+        </div>
+        <SidebarComponents.SectionHeader>{t("Traffic")}</SidebarComponents.SectionHeader>
         <SidebarComponents.Item
-          label={t("Main")}
-          active={isActiveTab("main")}
-          href={getTabPath("main")}
-          icon={<LayoutDashboard className="w-4 h-4" />}
+          label={t("Pages")}
+          active={isActiveTab("pages")}
+          href={getTabPath("pages")}
+          icon={<File className="w-4 h-4" />}
         />
         <SidebarComponents.Item
           label={t("Globe")}
@@ -91,57 +94,18 @@ function SidebarContent() {
           icon={<Globe2 className="w-4 h-4" />}
         />
         <SidebarComponents.Item
-          label={t("Pages")}
-          active={isActiveTab("pages")}
-          href={getTabPath("pages")}
-          icon={<File className="w-4 h-4" />}
-        />
-        {!isMobileSite && (
-          <SidebarComponents.Item
-            label={t("Performance")}
-            active={isActiveTab("performance")}
-            href={getTabPath("performance")}
-            icon={<Gauge className="w-4 h-4" />}
-          />
-        )}
-        <SidebarComponents.Item
           label={t("Bots")}
           active={isActiveTab("bots")}
           href={getTabPath("bots")}
           icon={<Bot className="w-4 h-4" />}
         />
-
+        <SidebarComponents.SectionHeader>{t("Behavior")}</SidebarComponents.SectionHeader>
         <SidebarComponents.Item
-          label={t("Goals")}
-          active={isActiveTab("goals")}
-          href={getTabPath("goals")}
-          icon={<Target className="w-4 h-4" />}
+          label={t("Sessions")}
+          active={isActiveTab("sessions")}
+          href={getTabPath("sessions")}
+          icon={<Rewind className="w-4 h-4" />}
         />
-        <div className="hidden md:block">
-          <SidebarComponents.Item
-            label={t("API Playground")}
-            active={isActiveTab("api-playground")}
-            href={getTabPath("api-playground")}
-            icon={<Code className="w-4 h-4" />}
-          />
-        </div>
-        {!IS_CLOUD && (
-          <>
-            <SidebarComponents.Item
-              label={t("Query")}
-              active={isActiveTab("query")}
-              href={getTabPath("query")}
-              icon={<Database className="w-4 h-4" />}
-            />
-            <SidebarComponents.Item
-              label={t("Dashboards")}
-              active={isActiveTab("dashboards")}
-              href={getTabPath("dashboards")}
-              icon={<LayoutGrid className="w-4 h-4" />}
-            />
-          </>
-        )}
-        <SidebarComponents.SectionHeader>{t("Product Analytics")}</SidebarComponents.SectionHeader>
         <div className="hidden md:block">
           {!isMobileSite &&
             !subscription?.planName?.startsWith("appsumo") &&
@@ -155,22 +119,25 @@ function SidebarContent() {
               />
             )}
         </div>
-        {/* {!privateKey && (
-          <SidebarComponents.Item
-            label={t("Feature Flags")}
-            active={isActiveTab("feature-flags")}
-            href={getTabPath("feature-flags")}
-            icon={<Flag className="w-4 h-4" />}
-          />
-        )}
-        {!privateKey && (
-          <SidebarComponents.Item
-            label={t("Experiments")}
-            active={isActiveTab("experiments")}
-            href={getTabPath("experiments")}
-            icon={<FlaskConical className="w-4 h-4" />}
-          />
-        )} */}
+        <SidebarComponents.Item
+          label={t("Users")}
+          active={isActiveTab("users")}
+          href={getTabPath("users")}
+          icon={<User className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label={t("Events")}
+          active={isActiveTab("events")}
+          href={getTabPath("events")}
+          icon={<MousePointerClick className="w-4 h-4" />}
+        />
+        <SidebarComponents.SectionHeader>{t("Conversion")}</SidebarComponents.SectionHeader>
+        <SidebarComponents.Item
+          label={t("Goals")}
+          active={isActiveTab("goals")}
+          href={getTabPath("goals")}
+          icon={<Target className="w-4 h-4" />}
+        />
         <SidebarComponents.Item
           label={t("Funnels")}
           active={isActiveTab("funnels")}
@@ -189,30 +156,57 @@ function SidebarContent() {
           href={getTabPath("retention")}
           icon={<ChartColumnDecreasing className="w-4 h-4" />}
         />
-        <SidebarComponents.SectionHeader>{t("Behavior")}</SidebarComponents.SectionHeader>
-        <SidebarComponents.Item
-          label={t("Sessions")}
-          active={isActiveTab("sessions")}
-          href={getTabPath("sessions")}
-          icon={<Rewind className="w-4 h-4" />}
-        />
-        <SidebarComponents.Item
-          label={t("Users")}
-          active={isActiveTab("users")}
-          href={getTabPath("users")}
-          icon={<User className="w-4 h-4" />}
-        />
-        <SidebarComponents.Item
-          label={t("Events")}
-          active={isActiveTab("events")}
-          href={getTabPath("events")}
-          icon={<MousePointerClick className="w-4 h-4" />}
-        />
+        {/* {!privateKey && (
+          <SidebarComponents.Item
+            label={t("Feature Flags")}
+            active={isActiveTab("feature-flags")}
+            href={getTabPath("feature-flags")}
+            icon={<Flag className="w-4 h-4" />}
+          />
+        )}
+        {!privateKey && (
+          <SidebarComponents.Item
+            label={t("Experiments")}
+            active={isActiveTab("experiments")}
+            href={getTabPath("experiments")}
+            icon={<FlaskConical className="w-4 h-4" />}
+          />
+        )} */}
+        <SidebarComponents.SectionHeader>{t("Health")}</SidebarComponents.SectionHeader>
         <SidebarComponents.Item
           label={t("Errors")}
           active={isActiveTab("errors")}
           href={getTabPath("errors")}
           icon={<AlertTriangle className="w-4 h-4" />}
+        />
+        {!isMobileSite && (
+          <SidebarComponents.Item
+            label={t("Performance")}
+            active={isActiveTab("performance")}
+            href={getTabPath("performance")}
+            icon={<Gauge className="w-4 h-4" />}
+          />
+        )}
+        <SidebarComponents.SectionHeader>{t("Explore")}</SidebarComponents.SectionHeader>
+        <div className="hidden md:block">
+          <SidebarComponents.Item
+            label={t("API Playground")}
+            active={isActiveTab("api-playground")}
+            href={getTabPath("api-playground")}
+            icon={<Code className="w-4 h-4" />}
+          />
+        </div>
+        <SidebarComponents.Item
+          label={t("Query")}
+          active={isActiveTab("query")}
+          href={getTabPath("query")}
+          icon={<Database className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
+          label={t("Dashboards")}
+          active={isActiveTab("dashboards")}
+          href={getTabPath("dashboards")}
+          icon={<LayoutGrid className="w-4 h-4" />}
         />
         {/* <SidebarComponents.Item
           label="Reports"

@@ -49,13 +49,13 @@ describe("getSqlParam", () => {
 
     it("should handle entry_page", () => {
       expect(getSqlParam("entry_page")).toBe(
-        "(SELECT argMin(pathname, timestamp) FROM events WHERE session_id = events.session_id)"
+        "(SELECT argMinIf(pathname, timestamp_ms, type = 'pageview') FROM events WHERE session_id = events.session_id)"
       );
     });
 
     it("should handle exit_page", () => {
       expect(getSqlParam("exit_page")).toBe(
-        "(SELECT argMax(pathname, timestamp) FROM events WHERE session_id = events.session_id)"
+        "(SELECT argMaxIf(pathname, timestamp_ms, type = 'pageview') FROM events WHERE session_id = events.session_id)"
       );
     });
 
@@ -232,31 +232,46 @@ describe("getFilterStatement", () => {
   });
 
   describe("User ID special handling", () => {
-    it("should check both user_id and identified_user_id for equals", () => {
+    // A filter value can be either a custom user ID or an anonymous fingerprint.
+    // The fingerprint branch is guarded on identified_user_id = '' so that filtering
+    // by a fingerprint shared behind one IP+browser doesn't sweep in every identified
+    // user sitting behind it.
+    it("matches an identified user, or a device only while it is still anonymous", () => {
       const filters = JSON.stringify([{ parameter: "user_id", type: "equals", value: ["user123"] }]);
       const result = getFilterStatement(filters);
-      expect(result).toBe("AND (user_id = 'user123' OR identified_user_id = 'user123')");
+      expect(result).toBe("AND (identified_user_id = 'user123' OR (user_id = 'user123' AND identified_user_id = ''))");
     });
 
-    it("should check both user_id and identified_user_id for not_equals", () => {
+    it("negates exactly the equals predicate for not_equals", () => {
       const filters = JSON.stringify([{ parameter: "user_id", type: "not_equals", value: ["user123"] }]);
       const result = getFilterStatement(filters);
-      expect(result).toBe("AND (user_id != 'user123' AND identified_user_id != 'user123')");
+      expect(result).toBe(
+        "AND NOT (identified_user_id = 'user123' OR (user_id = 'user123' AND identified_user_id = ''))"
+      );
     });
 
     it("should handle multiple user IDs with equals using OR", () => {
       const filters = JSON.stringify([{ parameter: "user_id", type: "equals", value: ["user1", "user2"] }]);
       const result = getFilterStatement(filters);
-      expect(result).toContain("user_id = 'user1' OR identified_user_id = 'user1'");
-      expect(result).toContain("user_id = 'user2' OR identified_user_id = 'user2'");
+      expect(result).toContain("identified_user_id = 'user1' OR (user_id = 'user1' AND identified_user_id = '')");
+      expect(result).toContain("identified_user_id = 'user2' OR (user_id = 'user2' AND identified_user_id = '')");
       expect(result).toContain(" OR ");
     });
 
     it("should handle multiple user IDs with not_equals using AND", () => {
       const filters = JSON.stringify([{ parameter: "user_id", type: "not_equals", value: ["user1", "user2"] }]);
       const result = getFilterStatement(filters);
-      expect(result).toContain("user_id != 'user1' AND identified_user_id != 'user1'");
-      expect(result).toContain("user_id != 'user2' AND identified_user_id != 'user2'");
+      expect(result).toContain("NOT (identified_user_id = 'user1' OR (user_id = 'user1' AND identified_user_id = ''))");
+      expect(result).toContain("NOT (identified_user_id = 'user2' OR (user_id = 'user2' AND identified_user_id = ''))");
+      expect(result).toContain(" AND ");
+    });
+
+    it("does not attribute one person's identified events to a device fingerprint they share", () => {
+      // The regression this guard exists for: alice and bob behind one corporate
+      // proxy share fingerprint 'fp1'. Filtering on 'fp1' must not return alice's rows.
+      const result = getFilterStatement(JSON.stringify([{ parameter: "user_id", type: "equals", value: ["fp1"] }]));
+      expect(result).not.toMatch(/user_id = 'fp1'\s*\)\s*$/);
+      expect(result).toContain("identified_user_id = ''");
     });
   });
 
@@ -311,7 +326,8 @@ describe("getFilterStatement", () => {
       const filters = JSON.stringify([{ parameter: "entry_page", type: "equals", value: ["/home"] }]);
       const result = getFilterStatement(filters);
       expect(result).toContain("session_id IN");
-      expect(result).toContain("argMin(pathname, timestamp) AS entry_pathname");
+      expect(result).toContain("argMin(pathname, timestamp_ms) AS entry_pathname");
+      expect(result).toContain("type = 'pageview'");
       expect(result).toContain("entry_pathname = '/home'");
     });
 
@@ -335,7 +351,8 @@ describe("getFilterStatement", () => {
       const filters = JSON.stringify([{ parameter: "exit_page", type: "equals", value: ["/checkout"] }]);
       const result = getFilterStatement(filters);
       expect(result).toContain("session_id IN");
-      expect(result).toContain("argMax(pathname, timestamp) AS exit_pathname");
+      expect(result).toContain("argMax(pathname, timestamp_ms) AS exit_pathname");
+      expect(result).toContain("type = 'pageview'");
       expect(result).toContain("exit_pathname = '/checkout'");
     });
 
@@ -558,20 +575,26 @@ describe("getFilterStatement", () => {
     });
 
     it("should handle negated filters inside the session subquery", () => {
-      // Note the semantics: this selects sessions containing at least one event
-      // whose hostname differs, not sessions with no matching event.
       const filters = JSON.stringify([{ parameter: "hostname", type: "not_equals", value: ["bad.example.com"] }]);
       const result = getFilterStatement(filters, undefined, undefined, { sessionLevelParams: ["hostname"] });
       expect(normalize(result)).toBe(
-        "AND session_id IN ( SELECT DISTINCT session_id FROM events WHERE hostname != 'bad.example.com' )"
+        "AND session_id NOT IN ( SELECT DISTINCT session_id FROM events WHERE hostname = 'bad.example.com' )"
       );
     });
 
-    it("should AND-join multi-value not_contains inside the session subquery", () => {
+    it("excludes sessions containing any negatively filtered value", () => {
       const filters = JSON.stringify([{ parameter: "pathname", type: "not_contains", value: ["/admin", "/debug"] }]);
       const result = getFilterStatement(filters, undefined, undefined, { sessionLevelParams: ["pathname"] });
       expect(normalize(result)).toBe(
-        "AND session_id IN ( SELECT DISTINCT session_id FROM events WHERE (pathname NOT LIKE '%/admin%' AND pathname NOT LIKE '%/debug%') )"
+        "AND session_id NOT IN ( SELECT DISTINCT session_id FROM events WHERE (pathname LIKE '%/admin%' OR pathname LIKE '%/debug%') )"
+      );
+    });
+
+    it("treats is_null as no non-empty value anywhere in the session", () => {
+      const filters = JSON.stringify([{ parameter: "event_name", type: "is_null", value: [] }]);
+      const result = getFilterStatement(filters, undefined, undefined, { sessionLevelParams: ["event_name"] });
+      expect(normalize(result)).toBe(
+        "AND session_id NOT IN ( SELECT DISTINCT session_id FROM events WHERE (event_name IS NOT NULL AND event_name != '') )"
       );
     });
 

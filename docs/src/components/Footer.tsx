@@ -21,6 +21,11 @@ interface FooterLink {
   external?: boolean;
 }
 
+/**
+ * Site footer. Default register is the marketing pages' instrument sheet
+ * (1200px column with hairline sides, corner crosses and seams between
+ * cells).
+ */
 export function Footer() {
   const t = useExtracted();
 
@@ -71,11 +76,13 @@ export function Footer() {
     {
       title: t("Company"),
       links: [
+        { href: "/company", label: t("Company information") },
         { href: "/contact", label: t("Contact") },
         { href: "/privacy", label: t("Privacy Policy") },
         { href: "/terms-and-conditions", label: t("Terms and Conditions") },
         { href: "/security", label: t("Security") },
         { href: "/dpa", label: t("DPA") },
+        { href: "/subprocessors", label: t("Subprocessors") },
         { href: "/brand", label: t("Brand Kit") },
         { href: "mailto:hello@rybbit.com", label: t("Support"), external: true },
       ],

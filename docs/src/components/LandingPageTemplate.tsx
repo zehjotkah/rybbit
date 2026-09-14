@@ -16,6 +16,7 @@ import { IntegrationsGrid } from "@/components/Integration";
 import { LandingPricing } from "@/components/LandingPricing";
 import { Marquee } from "@/components/magicui/marquee";
 import { TweetCard } from "@/components/Tweet";
+import { customerLogos } from "@/components/customerLogos";
 import { ArrowRight } from "lucide-react";
 import { useExtracted } from "next-intl";
 import Image from "next/image";
@@ -90,35 +91,6 @@ interface LandingPageTemplateProps {
   subtitle: React.ReactNode;
   showEUFlag?: boolean;
 }
-
-// Every SVG in /public/logos is pure white: invert to black in light mode, render as-is in dark.
-const whiteSvgLogo = "opacity-40 hover:opacity-70 invert dark:opacity-60 dark:hover:opacity-100 dark:invert-0";
-
-const customerLogos = [
-  { src: "/logos/bosch.svg", alt: "bosch", width: 120, className: whiteSvgLogo },
-  { src: "/logos/texas-instruments.svg", alt: "Texas Instruments", width: 120, className: whiteSvgLogo },
-  { src: "/logos/govuk-logo.svg", alt: "GOV.UK", width: 120, className: whiteSvgLogo },
-  { src: "/logos/royalcaribbean.svg", alt: "Royal Caribbean", width: 120, className: whiteSvgLogo },
-  { src: "/logos/netapp.svg", alt: "NetApp", width: 120, className: whiteSvgLogo },
-  { src: "/logos/trafigura.svg", alt: "Trafigura", width: 120, className: whiteSvgLogo },
-  { src: "/logos/op.svg", alt: "OP.GG", width: 120, className: whiteSvgLogo },
-  // { src: "/logos/softr.svg", alt: "Softr", width: 100, className: whiteSvgLogo },
-  // {
-  //   src: "/logos/onyx.webp",
-  //   alt: "Onyx",
-  //   width: 100,
-  //   href: "https://onyx.app",
-  //   className: "opacity-40 hover:opacity-70 dark:opacity-60 dark:hover:opacity-100 dark:invert",
-  // },
-  // { src: "/logos/ustwo.svg", alt: "ustwo", width: 100, className: whiteSvgLogo },
-  {
-    src: "/logos/automatio.webp",
-    alt: "Automatio",
-    width: 140,
-    href: "https://automatio.ai",
-    className: "opacity-50 hover:opacity-80 grayscale invert dark:opacity-70 dark:hover:opacity-100 dark:invert-0",
-  },
-];
 
 export function LandingPageTemplate({ title, subtitle, showEUFlag = true }: LandingPageTemplateProps) {
   const t = useExtracted();
@@ -434,10 +406,6 @@ export function LandingPageTemplate({ title, subtitle, showEUFlag = true }: Land
                 <p className="max-w-md text-base leading-7 text-neutral-600 dark:text-neutral-400 text-pretty">
                   {t("What teams say after replacing heavier analytics products with Rybbit.")}
                 </p>
-                <div className="mt-10 flex items-center justify-between border-t border-neutral-200 pt-4 text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400 md:text-xs">
-                  <span>{t("Customer notes")}</span>
-                  <span className="hidden md:inline">{t("Pause on hover")}</span>
-                </div>
               </div>
             </div>
 
@@ -473,7 +441,7 @@ export function LandingPageTemplate({ title, subtitle, showEUFlag = true }: Land
                   id="faq-title"
                   className="max-w-sm text-4xl font-semibold leading-[1.04] tracking-[-0.035em] md:text-5xl"
                 >
-                  {t("Questions, answered plainly.")}
+                  {t("FAQ")}
                 </h2>
                 <p className="mt-6 max-w-sm text-base leading-7 text-neutral-600 dark:text-neutral-400">
                   {t("The questions people ask before adding Rybbit to their site.")}

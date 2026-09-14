@@ -3,9 +3,10 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { eq, and } from "drizzle-orm";
 import { db } from "../../../db/postgres/postgres.js";
 import { userProfiles, userAliases } from "../../../db/postgres/schema.js";
-import { getFilterStatement } from "../utils/getFilterStatement.js";
 import { SESSION_CHANNEL_AGG, SESSION_REFERRER_AGG } from "../utils/sessionAttribution.js";
-import { getTimeStatement } from "../utils/utils.js";
+import { buildFilteredSessionsCTE } from "../utils/sessionFilters.js";
+import { getTimeStatement } from "../utils/timeWindow.js";
+import { matchesUser } from "../utils/effectiveUserId.js";
 import { runAnalyticsQuery } from "../utils/analyticsQuery.js";
 
 interface UserPageviewData {
@@ -88,24 +89,26 @@ export const buildUserInfoQueries = (query: FilterParams, siteId: number) => {
   // Optional time range + dimension filters; both empty when the page is on
   // all-time with no filters, which keeps the original full-history behavior.
   const timeStatement = getTimeStatement(query);
-  const filterStatement = getFilterStatement(query.filters, siteId, timeStatement);
+  const filteredSessionsCTE = buildFilteredSessionsCTE(query.filters, siteId, timeStatement);
+  const filteredSessionsJoin = filteredSessionsCTE ? "INNER JOIN FilteredSessions USING (session_id)" : "";
+  const withFilteredSessions = filteredSessionsCTE ? `WITH ${filteredSessionsCTE}` : "";
 
-  // Filters run in a subquery below each aggregation: the aggregate SELECTs
-  // alias argMax(...) to the same names as raw columns (browser_version, …),
-  // and ClickHouse resolves unqualified WHERE references at that level to the
-  // aliases, throwing ILLEGAL_AGGREGATION.
+  // Filters select sessions first. Every panel then reads all events in those
+  // sessions, keeping the summary, vitals, locations, devices, and session list
+  // on the same session-scoped semantics.
   const scopedEvents = `(
-        SELECT *
-        FROM events
+        SELECT source_events.*
+        FROM events AS source_events
+        ${filteredSessionsJoin}
         WHERE
-            (events.identified_user_id = {userId:String} OR events.user_id = {userId:String})
-            AND site_id = {site:Int32}
+            ${matchesUser("{userId:String}", "source_events")}
+            AND source_events.site_id = {site:Int32}
             ${timeStatement}
-            ${filterStatement}
     ) AS events`;
 
   const sessionsQuery = `
-    WITH sessions AS (
+    WITH ${filteredSessionsCTE ? `${filteredSessionsCTE},` : ""}
+    sessions AS (
         SELECT
             session_id,
             argMax(user_id, timestamp) AS user_id,
@@ -130,8 +133,8 @@ export const buildUserInfoQueries = (query: FilterParams, siteId: number) => {
             MAX(timestamp) AS session_end,
             MIN(timestamp) AS session_start,
             dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration,
-            argMinIf(pathname, timestamp, type = 'pageview') AS entry_page,
-            argMaxIf(pathname, timestamp, type = 'pageview') AS exit_page,
+            argMinIf(pathname, timestamp_ms, type = 'pageview') AS entry_page,
+            argMaxIf(pathname, timestamp_ms, type = 'pageview') AS exit_page,
             countIf(type = 'pageview') AS pageviews,
             countIf(type = 'custom_event') AS events,
             argMax(ip, timestamp) AS ip
@@ -179,6 +182,7 @@ export const buildUserInfoQueries = (query: FilterParams, siteId: number) => {
   // Separate query: the sessions CTE collapses rows per session, which
   // would turn an event-level quantile into a quantile of session picks.
   const vitalsQuery = `
+    ${withFilteredSessions}
     SELECT
         quantile(0.75)(lcp) AS lcp_p75,
         quantile(0.75)(cls) AS cls_p75,
@@ -193,6 +197,7 @@ export const buildUserInfoQueries = (query: FilterParams, siteId: number) => {
   // Every location this user was seen in, by session share. A session that
   // moves between cities counts once per city, so shares are approximate.
   const locationsQuery = `
+    ${withFilteredSessions}
     SELECT
         country,
         region,
@@ -212,6 +217,7 @@ export const buildUserInfoQueries = (query: FilterParams, siteId: number) => {
   // browser update doesn't split one physical device into many rows;
   // versions and screen are argMax'd to the latest sighting instead.
   const devicesQuery = `
+    ${withFilteredSessions}
     SELECT
         device_type,
         browser,
@@ -250,13 +256,9 @@ export async function getUserInfo(
 
   const { sessionsQuery, vitalsQuery, locationsQuery, devicesQuery } = buildUserInfoQueries(req.query, numericSiteId);
 
-  const chParams = {
-    userId,
-    site: siteId,
-  };
-
-  try {
-    const [data, vitalsData, locations, devices, profileResult, aliasesResult] = await Promise.all([
+  const loadUser = (effectiveUserId: string) => {
+    const chParams = { userId: effectiveUserId, site: siteId };
+    return Promise.all([
       runAnalyticsQuery<UserPageviewData>({ query: sessionsQuery, params: chParams }),
       runAnalyticsQuery<UserVitalsData>({ query: vitalsQuery, params: chParams }),
       runAnalyticsQuery<UserLocationBreakdown>({ query: locationsQuery, params: chParams }),
@@ -265,7 +267,7 @@ export async function getUserInfo(
       db
         .select()
         .from(userProfiles)
-        .where(and(eq(userProfiles.siteId, numericSiteId), eq(userProfiles.userId, userId)))
+        .where(and(eq(userProfiles.siteId, numericSiteId), eq(userProfiles.userId, effectiveUserId)))
         .limit(1),
       // Get linked devices (all anonymous IDs for this user) from Postgres
       db
@@ -274,8 +276,30 @@ export async function getUserInfo(
           created_at: userAliases.createdAt,
         })
         .from(userAliases)
-        .where(and(eq(userAliases.siteId, numericSiteId), eq(userAliases.userId, userId))),
+        .where(and(eq(userAliases.siteId, numericSiteId), eq(userAliases.userId, effectiveUserId))),
     ]);
+  };
+
+  try {
+    let [data, vitalsData, locations, devices, profileResult, aliasesResult] = await loadUser(userId);
+
+    // A device whose events have all been claimed by an identity — the dashboard's
+    // "Identify User" action backfills the full history — no longer has anonymous
+    // rows, so the anonymous branch of the query matches nothing. Follow the alias
+    // rather than 404ing a route the operator was just looking at. Only on a miss:
+    // while a shared fingerprint still has anonymous activity of its own, that
+    // activity is what this route is about, and resolving early would put someone
+    // else's identity on it.
+    if (data.length === 0) {
+      const alias = await db
+        .select({ userId: userAliases.userId })
+        .from(userAliases)
+        .where(and(eq(userAliases.siteId, numericSiteId), eq(userAliases.anonymousId, userId)))
+        .limit(1);
+      if (alias.length > 0 && alias[0].userId !== userId) {
+        [data, vitalsData, locations, devices, profileResult, aliasesResult] = await loadUser(alias[0].userId);
+      }
+    }
 
     // If no data found for user
     if (data.length === 0) {
