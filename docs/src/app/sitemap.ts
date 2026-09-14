@@ -144,7 +144,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Legal / company pages
-  const legalSlugs = ["privacy", "terms-and-conditions", "dpa", "security", "contact"];
+  const legalSlugs = ["privacy", "terms-and-conditions", "dpa", "subprocessors", "security", "contact"];
   const legalPages = legalSlugs.map(slug => ({
     url: `${baseUrl}/${slug}`,
     lastModified: new Date(),

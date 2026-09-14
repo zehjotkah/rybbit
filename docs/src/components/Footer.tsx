@@ -82,6 +82,7 @@ export function Footer() {
         { href: "/terms-and-conditions", label: t("Terms and Conditions") },
         { href: "/security", label: t("Security") },
         { href: "/dpa", label: t("DPA") },
+        { href: "/subprocessors", label: t("Subprocessors") },
         { href: "/brand", label: t("Brand Kit") },
         { href: "mailto:hello@rybbit.com", label: t("Support"), external: true },
       ],
