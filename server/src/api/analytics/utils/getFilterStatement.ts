@@ -1,4 +1,5 @@
 import SqlString from "sqlstring";
+import { ZodError } from "zod";
 import { filterParamSchema, validateFilters } from "./query-validation.js";
 import { SESSION_CHANNEL_AGG } from "./sessionAttribution.js";
 import { FilterParameter, FilterType } from "../types.js";
@@ -195,6 +196,105 @@ export const getSqlParam = (parameter: FilterParameter) => {
   return filterParamSchema.parse(parameter);
 };
 
+// Parameters stored as numbers. Only these take numeric comparisons, and they
+// take no string operators: either mismatch renders SQL ClickHouse rejects
+// (`browser > 5`, `lat LIKE '%4%'`).
+const NUMERIC_PARAMS: ReadonlySet<FilterParameter> = new Set<FilterParameter>(["lat", "lon"]);
+const NUMERIC_COMPARISON_TYPES: ReadonlySet<FilterType> = new Set<FilterType>([
+  "greater_than",
+  "less_than",
+  "greater_than_or_equal",
+  "less_than_or_equal",
+]);
+const STRING_ONLY_TYPES: ReadonlySet<FilterType> = new Set<FilterType>([
+  "contains",
+  "not_contains",
+  "starts_with",
+  "ends_with",
+  "regex",
+  "not_regex",
+]);
+
+/** Throws when a filter's operator or values cannot apply to its parameter's type. */
+const assertFilterTypeCompatible = (
+  parameter: FilterParameter,
+  filterType: FilterType,
+  values: (string | number)[]
+) => {
+  const isNumericParam = NUMERIC_PARAMS.has(parameter);
+  if (NUMERIC_COMPARISON_TYPES.has(filterType) && !isNumericParam) {
+    throw new Error(`${filterType} filters only apply to lat and lon, not "${parameter}"`);
+  }
+  if (STRING_ONLY_TYPES.has(filterType) && isNumericParam) {
+    throw new Error(`${filterType} filters do not apply to the numeric parameter "${parameter}"`);
+  }
+  if (isNumericParam && filterType !== "is_null" && filterType !== "is_not_null") {
+    const invalid = values.find(value => !Number.isFinite(Number(value)));
+    if (invalid !== undefined) {
+      throw new Error(`Invalid numeric value for ${filterType} filter: ${invalid}`);
+    }
+  }
+};
+
+// Several filter expressions are built from more than one column — city is
+// `region-city`, browser_version `browser version`, dimensions `WxH` — so they
+// are never empty even when the value is unknown, and lat/lon are numbers that
+// cannot be compared with ''. Null checks test the stored column instead.
+const NULL_CHECK_COLUMNS: Partial<Record<FilterParameter, string>> = {
+  city: "city",
+  browser_version: "browser_version",
+  operating_system_version: "operating_system_version",
+};
+
+const buildNullCheckCondition = (
+  parameter: FilterParameter,
+  filterType: "is_null" | "is_not_null",
+  mapField: (expression: string) => string
+): string => {
+  const isNull = filterType === "is_null";
+  if (NUMERIC_PARAMS.has(parameter)) {
+    // Unknown coordinates are stored as 0.
+    const column = mapField(getSqlParam(parameter));
+    return isNull ? `${column} = 0` : `${column} != 0`;
+  }
+  if (parameter === "dimensions") {
+    return isNull ? "(screen_width = 0 AND screen_height = 0)" : "(screen_width != 0 OR screen_height != 0)";
+  }
+  return buildStringFilterCondition(mapField(NULL_CHECK_COLUMNS[parameter] ?? getSqlParam(parameter)), filterType, []);
+};
+
+/**
+ * Returns why a request's `filters` param can't be used, or null when it is
+ * valid or absent. Builds the statement once so regex and numeric checks run
+ * too: handlers throw on the same input, which surfaced as a 500.
+ */
+export function filterParamError(filters: unknown): string | null {
+  if (filters === undefined || filters === "") {
+    return null;
+  }
+  if (typeof filters !== "string") {
+    return "filters must be a JSON array";
+  }
+  try {
+    // An empty value list builds `AND ()`, which ClickHouse rejects.
+    const empty = validateFilters(filters).find(
+      filter => filter.type !== "is_null" && filter.type !== "is_not_null" && filter.value.length === 0
+    );
+    if (empty) {
+      return `filter on "${empty.parameter}" needs at least one value`;
+    }
+    getFilterStatement(filters);
+    return null;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return error.issues
+        .map(issue => (issue.path.length ? `${issue.path.join(".")}: ` : "") + issue.message)
+        .join("; ");
+    }
+    return error instanceof Error ? error.message : "Invalid filters";
+  }
+}
+
 export function getFilterStatement(
   filters: string,
   siteId?: number,
@@ -242,7 +342,10 @@ export function getFilterStatement(
       is_null: "is_not_null",
     };
     const positiveFilterType = negatedSessionFilterTypes[filterType] ?? filterType;
-    const condition = buildStringFilterCondition(getSqlParam(param), positiveFilterType, values);
+    const condition =
+      positiveFilterType === "is_null" || positiveFilterType === "is_not_null"
+        ? buildNullCheckCondition(param, positiveFilterType, expression => expression)
+        : buildStringFilterCondition(getSqlParam(param), positiveFilterType, values);
     const membershipOperator = negatedSessionFilterTypes[filterType] ? "NOT IN" : "IN";
 
     const finalWhere = whereClause ? `WHERE ${whereClause} AND ${condition}` : `WHERE ${condition}`;
@@ -277,8 +380,9 @@ export function getFilterStatement(
     "AND " +
     filtersArray
       .map(filter => {
-        const isNumericParam = filter.parameter === "lat" || filter.parameter === "lon";
-        const isNullCheck = filter.type === "is_null" || filter.type === "is_not_null";
+        const isNumericParam = NUMERIC_PARAMS.has(filter.parameter);
+
+        assertFilterTypeCompatible(filter.parameter, filter.type, filter.value);
 
         // Handle session-level filters (configurable via options).
         // Most parameters match sessions containing an event; channel uses the session's first attributed value.
@@ -362,8 +466,8 @@ export function getFilterStatement(
           }
         }
 
-        if (isNullCheck) {
-          return buildStringFilterCondition(mapField(getSqlParam(filter.parameter)), filter.type, filter.value);
+        if (filter.type === "is_null" || filter.type === "is_not_null") {
+          return buildNullCheckCondition(filter.parameter, filter.type, mapField);
         }
 
         if (filter.type === "regex" || filter.type === "not_regex") {

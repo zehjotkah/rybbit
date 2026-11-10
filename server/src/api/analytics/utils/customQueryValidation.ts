@@ -1,3 +1,5 @@
+import { QUERY_USER_LIMITS } from "../../../db/clickhouse/queryLimits.js";
+
 export const MAX_CUSTOM_QUERY_LENGTH = 20_000;
 
 const blockedKeywords = [
@@ -132,16 +134,17 @@ const blockedFunctionPrefixes = [
 ] as const;
 
 const unsupportedSyntaxError =
-  "Quoted identifiers, # and // comments, and $$ strings are not allowed in custom analytics queries";
+  "Quoted identifiers, nested /* comments, # and // comments, $$ strings, and non-ASCII characters outside string literals are not allowed in custom analytics queries";
 
 // Rejects syntax the literal stripper below can't model. ClickHouse treats
-// double quotes and backticks as identifier quoting, `#` / `#!` / `//` as line
-// comments, and `$tag$…$tag$` as string literals. If any of these reached the
-// stripper it would disagree with ClickHouse about where a literal starts and
-// ends, and text it classified as "inside a string" would execute as SQL —
-// e.g. `WHERE 1=1 # '\nUNION ALL SELECT * FROM events -- '`. None of them are
-// needed for analytics SQL, so they're rejected outright outside a
-// single-quoted literal.
+// double quotes, backticks and “…” as identifier quoting, `#` / `#!` / `//` as
+// line comments, `$tag$…$tag$` and ‘…’ as string literals, nests `/* */`
+// comments, and skips Unicode whitespace the JS regexes below don't all match.
+// If any of these reached the stripper it would disagree with ClickHouse about
+// where a literal or comment starts and ends, and text it classified as
+// "inside a string" would execute as SQL. None of them are needed for
+// analytics SQL, so they're rejected outright outside a single-quoted literal
+// (non-ASCII text stays allowed inside literals and comments).
 export function hasUnsupportedSyntax(query: string) {
   let index = 0;
   let state: "normal" | "single" | "line-comment" | "block-comment" = "normal";
@@ -151,7 +154,14 @@ export function hasUnsupportedSyntax(query: string) {
     const next = query[index + 1];
 
     if (state === "normal") {
-      if (char === '"' || char === "`" || char === "#" || char === "$" || (char === "/" && next === "/")) {
+      if (
+        char === '"' ||
+        char === "`" ||
+        char === "#" ||
+        char === "$" ||
+        (char === "/" && next === "/") ||
+        char.charCodeAt(0) > 0x7f
+      ) {
         return true;
       }
       if (char === "'") {
@@ -176,6 +186,11 @@ export function hasUnsupportedSyntax(query: string) {
         state = "normal";
       }
     } else if (state === "block-comment") {
+      // ClickHouse nests block comments, so `/* /* */` is still open after the
+      // first `*/`. Mirror its lexer order: an opener is checked before a closer.
+      if (char === "/" && next === "*") {
+        return true;
+      }
       if (char === "*" && next === "/") {
         state = "normal";
         index++;
@@ -192,6 +207,7 @@ export function stripSqlLiteralsAndComments(query: string) {
   let result = "";
   let index = 0;
   let state: "normal" | "single" | "double" | "backtick" | "line-comment" | "block-comment" = "normal";
+  let commentDepth = 0;
 
   while (index < query.length) {
     const char = query[index];
@@ -213,6 +229,7 @@ export function stripSqlLiteralsAndComments(query: string) {
         index++;
       } else if (char === "/" && next === "*") {
         state = "block-comment";
+        commentDepth = 1;
         result += "  ";
         index++;
       } else {
@@ -254,8 +271,16 @@ export function stripSqlLiteralsAndComments(query: string) {
         result += " ";
       }
     } else if (state === "block-comment") {
-      if (char === "*" && next === "/") {
-        state = "normal";
+      // Block comments nest in ClickHouse; the comment ends at the matching */.
+      if (char === "/" && next === "*") {
+        commentDepth++;
+        result += "  ";
+        index++;
+      } else if (char === "*" && next === "/") {
+        commentDepth--;
+        if (commentDepth === 0) {
+          state = "normal";
+        }
         result += "  ";
         index++;
       } else {
@@ -313,12 +338,27 @@ function isIdentifierChar(char: string) {
   return /[A-Za-z0-9_.]/.test(char);
 }
 
+// ClickHouse joins `db . table` (whitespace, or a stripped comment, around the
+// dot) into one compound identifier. Read it the same way so the qualified
+// name is what gets checked, not just its first part — which could otherwise
+// match a declared CTE.
 function readIdentifier(query: string, start: number): [string, number] {
+  let identifier = "";
   let end = start;
-  while (end < query.length && isIdentifierChar(query[end])) {
-    end++;
+  for (;;) {
+    const partStart = end;
+    while (end < query.length && isIdentifierChar(query[end])) {
+      end++;
+    }
+    identifier += query.slice(partStart, end);
+    const dot = skipWhitespace(query, end);
+    const next = skipWhitespace(query, dot + 1);
+    if (query[dot] !== "." || next >= query.length || !isIdentifierStart(query[next])) {
+      return [identifier, end];
+    }
+    identifier += ".";
+    end = next;
   }
-  return [query.slice(start, end), end];
 }
 
 function skipWhitespace(query: string, index: number): number {
@@ -478,6 +518,14 @@ export function validateScopedQuery(query: string): string | null {
     return "scoped_events is reserved and cannot be redefined";
   }
 
+  // getCteNames also matches `, name AS (` outside a WITH clause (e.g. a second
+  // named WINDOW), so a name it reports may not be a CTE ClickHouse knows about.
+  // That's harmless for made-up names, but `events` is the real table: treating
+  // it as a CTE would let `FROM events` through, so it can never be one.
+  if (cteNames.has("events")) {
+    return "events is reserved and cannot be used as a CTE name";
+  }
+
   // Every data-source reference must be scoped_events or a declared CTE. collectTableReferences
   // walks the full FROM list, so comma-separated targets (`FROM scoped_events, other`) are
   // validated too — a FROM/JOIN-keyword-only scan captured only the first table and let the
@@ -519,17 +567,13 @@ const userFacingClickhouseErrorCodes = new Set([
   70, // CANNOT_CONVERT_TYPE
   117, // INCORRECT_DATA
   158, // TOO_MANY_ROWS
-  159, // TIMEOUT_EXCEEDED
-  160, // TOO_SLOW
   164, // READONLY
   179, // MULTIPLE_EXPRESSIONS_FOR_ALIAS
   182, // ILLEGAL_PREWHERE
   184, // ILLEGAL_AGGREGATION
   215, // NOT_AN_AGGREGATE
-  241, // MEMORY_LIMIT_EXCEEDED
   306, // TOO_DEEP_RECURSION
   386, // NO_COMMON_TYPE
-  394, // QUERY_WAS_CANCELLED
   452, // SETTING_CONSTRAINT_VIOLATION
   497, // ACCESS_DENIED (handled separately, listed for clarity)
 ]);
@@ -539,9 +583,37 @@ export function sanitizeClickhouseError(error: unknown): string {
   if (!raw) {
     return "Failed to run query";
   }
-  const code = Number(/^Code: (\d+)\./.exec(raw)?.[1]);
+  // The SDK removes "Code: ..." from message and puts it on error.code.
+  // Also accept unparsed ClickHouse errors returned while reading a response.
+  const errorCode = error instanceof Error && "code" in error ? error.code : undefined;
+  const code = Number(
+    (typeof errorCode === "string" || typeof errorCode === "number") && /^\d+$/.test(String(errorCode))
+      ? errorCode
+      : /^Code: (\d+)\./.exec(raw)?.[1]
+  );
   if (code === 497 || /Not enough privileges/i.test(raw)) {
     return "Query references data outside scoped_events";
+  }
+  if (code === 159 || code === 160) {
+    return `Query exceeded the ${QUERY_USER_LIMITS.maxExecutionTimeSeconds}-second time limit. Try a shorter date range or simplify the query.`;
+  }
+  if (code === 241) {
+    return "Query exceeded the memory limit. Try a shorter date range or simplify the query.";
+  }
+  if (code === 202) {
+    return "Too many queries are running at once. Wait a moment and try again.";
+  }
+  if (code === 394) {
+    return "Query was cancelled. Try running it again.";
+  }
+  if (raw === "Timeout error." || errorCode === "ETIMEDOUT") {
+    return "Timed out waiting for the database. Try again or use a shorter date range.";
+  }
+  if (
+    typeof errorCode === "string" &&
+    ["ECONNREFUSED", "ECONNRESET", "ENOTFOUND", "EAI_AGAIN", "EPIPE"].includes(errorCode)
+  ) {
+    return "Could not connect to the database. Please try again shortly.";
   }
   if (!Number.isFinite(code) || !userFacingClickhouseErrorCodes.has(code)) {
     return Number.isFinite(code) ? `Query failed (ClickHouse error ${code})` : "Failed to run query";

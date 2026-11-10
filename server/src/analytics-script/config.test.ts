@@ -37,6 +37,7 @@ describe("parseScriptConfig", () => {
           trackErrors: false,
           trackOutbound: true,
           trackUrlParams: false,
+          trackUrlFragments: true,
           trackInitialPageView: true,
           trackSpaNavigation: false,
         }),
@@ -69,6 +70,7 @@ describe("parseScriptConfig", () => {
       autoTrackPageview: true, // trackInitialPageView from API
       autoTrackSpa: false, // trackSpaNavigation from API
       trackQuerystring: false, // trackUrlParams from API
+      trackUrlFragments: true,
       trackOutbound: true, // trackOutbound from API
       enableWebVitals: true, // webVitals from API
       trackErrors: false, // trackErrors from API
@@ -130,6 +132,52 @@ describe("parseScriptConfig", () => {
     expect(config?.featureFlags).toEqual({});
   });
 
+  it("evaluates feature flags using opted-in checkout fragments", async () => {
+    const originalLocation = Object.getOwnPropertyDescriptor(window, "location");
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { href: "https://example.com/checkout/#shipping" },
+    });
+    try {
+      mockScriptTag.setAttribute("src", "https://analytics.example.com/script.js");
+      mockScriptTag.setAttribute("data-site-id", "123");
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ featureFlagsEnabled: true, trackUrlFragments: true }),
+        } as Response)
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ flags: {} }) } as Response);
+
+      await parseScriptConfig(mockScriptTag);
+
+      const body = JSON.parse(vi.mocked(fetch).mock.calls[1][1]!.body as string);
+      expect(body.pathname).toBe("/checkout/#shipping");
+    } finally {
+      if (originalLocation) Object.defineProperty(window, "location", originalLocation);
+    }
+  });
+
+  it("reuses a stored visitor id, but replaces one longer than the server accepts", async () => {
+    mockScriptTag.setAttribute("src", "https://analytics.example.com/script.js");
+    mockScriptTag.setAttribute("data-site-id", "123");
+    const mockFlagsEnabled = () =>
+      vi
+        .mocked(fetch)
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ featureFlagsEnabled: true }) } as Response)
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ flags: {} }) } as Response);
+
+    localStorage.setItem("rybbit-visitor-id", "stored-visitor");
+    mockFlagsEnabled();
+    expect((await parseScriptConfig(mockScriptTag))?.visitorId).toBe("stored-visitor");
+
+    localStorage.setItem("rybbit-visitor-id", "x".repeat(65));
+    mockFlagsEnabled();
+    const { visitorId } = (await parseScriptConfig(mockScriptTag))!;
+    expect(visitorId).not.toBe("x".repeat(65));
+    expect(visitorId!.length).toBeLessThanOrEqual(64);
+    expect(localStorage.getItem("rybbit-visitor-id")).toBe(visitorId);
+  });
+
   it("stops future evaluation when flags are deleted between configuration and evaluation", async () => {
     mockScriptTag.setAttribute("src", "https://analytics.example.com/script.js");
     mockScriptTag.setAttribute("data-site-id", "123");
@@ -172,6 +220,7 @@ describe("parseScriptConfig", () => {
       autoTrackPageview: true,
       autoTrackSpa: true,
       trackQuerystring: true,
+      trackUrlFragments: false,
       trackOutbound: true,
       enableWebVitals: false,
       trackErrors: false,
@@ -221,6 +270,7 @@ describe("parseScriptConfig", () => {
       autoTrackPageview: true,
       autoTrackSpa: true,
       trackQuerystring: true,
+      trackUrlFragments: false,
       trackOutbound: true,
       enableWebVitals: false,
       trackErrors: false,

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../../db/postgres/postgres.js";
 import { goals } from "../../../db/postgres/schema.js";
-import { eq, desc, asc, sql } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
 import { getTimeStatement } from "../utils/timeWindow.js";
 import SqlString from "sqlstring";
 import { FilterParams } from "@rybbit/shared";
@@ -125,26 +125,9 @@ export const getGoals = analyticsRoute<GetGoalsRequest>(
       return reply.status(400).send({ error: "Invalid page size, must be between 1 and 100" });
     }
 
-    // Count total goals for pagination metadata
-    const totalGoalsResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(goals)
-      .where(eq(goals.siteId, Number(siteId)));
-
-    const totalGoals = totalGoalsResult[0]?.count || 0;
-    const totalPages = Math.ceil(totalGoals / pageSizeNumber);
-
-    // If no goals exist, return early with empty data
-    if (totalGoals === 0) {
-      return reply.send({
-        data: [],
-        meta: {
-          total: 0,
-          page: pageNumber,
-          pageSize: pageSizeNumber,
-          totalPages: 0,
-        },
-      });
+    // An offset past the safe-integer range would make the page query fail in Postgres.
+    if (!Number.isSafeInteger((pageNumber - 1) * pageSizeNumber)) {
+      return reply.status(400).send({ error: "Invalid page number" });
     }
 
     // Apply sorting
@@ -165,14 +148,38 @@ export const getGoals = analyticsRoute<GetGoalsRequest>(
       else orderBy = desc(goals.createdAt);
     }
 
-    // Fetch paginated goals for this site from PostgreSQL
-    const siteGoals = await db
-      .select()
-      .from(goals)
-      .where(eq(goals.siteId, Number(siteId)))
-      .orderBy(orderBy)
-      .limit(pageSizeNumber)
-      .offset((pageNumber - 1) * pageSizeNumber);
+    // The total (for pagination metadata) and the page are independent reads.
+    // Drizzle's count() maps the Postgres bigint to a number; a raw
+    // sql`count(*)` comes back as a string.
+    const [totalGoalsResult, siteGoals] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(goals)
+        .where(eq(goals.siteId, Number(siteId))),
+      db
+        .select()
+        .from(goals)
+        .where(eq(goals.siteId, Number(siteId)))
+        .orderBy(orderBy)
+        .limit(pageSizeNumber)
+        .offset((pageNumber - 1) * pageSizeNumber),
+    ]);
+
+    const totalGoals = Number(totalGoalsResult[0]?.count ?? 0);
+    const totalPages = Math.ceil(totalGoals / pageSizeNumber);
+
+    // If no goals exist, return early with empty data
+    if (totalGoals === 0) {
+      return reply.send({
+        data: [],
+        meta: {
+          total: 0,
+          page: pageNumber,
+          pageSize: pageSizeNumber,
+          totalPages: 0,
+        },
+      });
+    }
 
     if (siteGoals.length === 0) {
       // If no goals for this page, return empty data
@@ -187,15 +194,18 @@ export const getGoals = analyticsRoute<GetGoalsRequest>(
       });
     }
 
-    // First, get the total number of unique sessions (denominator for conversion rate)
-    const totalSessionsData = await runAnalyticsQuery<{ total_sessions: number }>({
-      query: buildGoalsTotalSessionsQuery(request.query, Number(siteId)),
-    });
+    // The total number of unique sessions (denominator for conversion rate)
+    // doesn't depend on the conversions, so the two queries run together.
+    const conversionQuery = buildGoalsConversionsQuery(request.query, Number(siteId), siteGoals);
+    const [totalSessionsData, conversionData] = await Promise.all([
+      runAnalyticsQuery<{ total_sessions: number }>({
+        query: buildGoalsTotalSessionsQuery(request.query, Number(siteId)),
+      }),
+      conversionQuery === null ? null : runAnalyticsQuery<Record<string, number>>({ query: conversionQuery }),
+    ]);
     const totalSessions = totalSessionsData[0]?.total_sessions || 0;
 
-    const conversionQuery = buildGoalsConversionsQuery(request.query, Number(siteId), siteGoals);
-
-    if (conversionQuery === null) {
+    if (conversionData === null) {
       // If no valid goals to calculate, return the goals without conversion data
       const goalsWithZeroConversions = siteGoals.map(goal => ({
         ...goal,
@@ -214,9 +224,6 @@ export const getGoals = analyticsRoute<GetGoalsRequest>(
         },
       });
     }
-
-    // Execute the comprehensive query
-    const conversionData = await runAnalyticsQuery<Record<string, number>>({ query: conversionQuery });
 
     // If we didn't get any results, use zeros
     const conversions = conversionData[0] || {};
