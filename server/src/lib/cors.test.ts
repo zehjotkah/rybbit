@@ -324,4 +324,20 @@ describe("trusted CORS origins", () => {
       })
     ).toEqual(["https://rybbit.example.com", "http://localhost:3002", "http://127.0.0.1:3002"]);
   });
+
+  it("accepts TRUSTED_ORIGINS as bare hostnames, full URLs, or with trailing slashes", () => {
+    expect(
+      getTrustedCorsOrigins({
+        NODE_ENV: "production",
+        BASE_URL: "https://rybbit.example.com",
+        TRUSTED_ORIGINS: "insight.a.de, insight.b.de/,https://insight.c.de,http://insight.d.de/x,,",
+      })
+    ).toEqual([
+      "https://rybbit.example.com",
+      "https://insight.a.de",
+      "https://insight.b.de",
+      "https://insight.c.de",
+      "http://insight.d.de",
+    ]);
+  });
 });

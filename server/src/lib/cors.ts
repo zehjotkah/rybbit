@@ -80,9 +80,15 @@ export function getTrustedCorsOrigins(env: NodeJS.ProcessEnv = process.env): str
 
   // Self-hosted multi-domain support: allow additional origins via a
   // comma-separated TRUSTED_ORIGINS env var (each normalized to its origin).
+  // Bare hostnames ("insight.example.com") are treated as https origins.
   if (env.TRUSTED_ORIGINS) {
     for (const entry of env.TRUSTED_ORIGINS.split(",")) {
-      const normalized = normalizeCorsOrigin(entry.trim());
+      const trimmed = cleanEnvUrl(entry);
+      if (!trimmed) {
+        continue;
+      }
+      const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      const normalized = normalizeCorsOrigin(withScheme);
       if (normalized) {
         origins.add(normalized);
       }
