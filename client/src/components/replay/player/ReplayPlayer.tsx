@@ -7,7 +7,6 @@ import { ThreeDotLoader } from "@/components/Loaders";
 import { useReplayStore } from "../replayStore";
 import { useActivityPeriods } from "./hooks/useActivityPeriods";
 import { useReplayKeyboardShortcuts } from "./hooks/useReplayKeyboardShortcuts";
-import { useSuppressReferrer } from "./hooks/useSuppressReferrer";
 import { ReplayPlayerControls } from "./ReplayPlayerControls";
 import { ReplayPlayerCore } from "./ReplayPlayerCore";
 import { SKIP_SECONDS } from "./utils/replayUtils";
@@ -37,9 +36,6 @@ export function ReplayPlayer({ width, height, isDrawer }: { width: number; heigh
 
   // Calculate activity periods when player and data are ready
   useActivityPeriods({ data, player });
-
-  // Suppress referrer to bypass hotlink protection for images
-  useSuppressReferrer();
 
   const handlePlayPause = useCallback(() => {
     if (!player) return;
